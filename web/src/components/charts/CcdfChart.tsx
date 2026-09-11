@@ -28,6 +28,10 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
     return { ...s, pts, dropped };
   });
   const total = prepared.reduce((a, s) => a + s.pts.length, 0);
+  const allX = prepared.flatMap((s) => s.pts.map((p) => p.x));
+  const allY = prepared.flatMap((s) => s.pts.map((p) => p.y));
+  const xd = decadeDomain(allX);
+  const yd = decadeDomain(allY);
   const dropped = prepared.reduce((a, s) => a + s.dropped, 0);
   if (total === 0) {
     return <div className="text-sm text-slate-500 py-8 text-center">CCDF arrays are empty for this selection (no avalanches to plot).</div>;
@@ -41,7 +45,8 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             type="number"
             dataKey="x"
             scale="log"
-            domain={['auto', 'auto']}
+            domain={xd.domain}
+            ticks={xd.ticks}
             stroke={SERIES.axis}
             tick={{ fontSize: 11 }}
             tickFormatter={(v) => fmtNum(v, 2)}
@@ -51,7 +56,8 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             type="number"
             dataKey="y"
             scale="log"
-            domain={['auto', 'auto']}
+            domain={yd.domain}
+            ticks={yd.ticks}
             stroke={SERIES.axis}
             tick={{ fontSize: 11 }}
             tickFormatter={(v) => fmtNum(v, 2)}
@@ -70,4 +76,14 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
       {dropped > 0 && <div className="text-xs text-slate-500">{dropped} point(s) with x ≤ 0 or y ≤ 0 not drawable on log axes.</div>}
     </div>
   );
+}
+
+/** Decade (power-of-ten) domain and ticks spanning the positive data. */
+function decadeDomain(vals: number[]): { domain: [number, number]; ticks: number[] } {
+  if (vals.length === 0) return { domain: [1, 10], ticks: [1, 10] };
+  const lo = Math.floor(Math.log10(Math.min(...vals)));
+  const hi = Math.ceil(Math.log10(Math.max(...vals)));
+  const ticks: number[] = [];
+  for (let e = lo; e <= hi; e++) ticks.push(Math.pow(10, e));
+  return { domain: [Math.pow(10, lo), Math.pow(10, hi)], ticks };
 }

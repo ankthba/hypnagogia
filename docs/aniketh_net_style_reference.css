@@ -1,0 +1,764 @@
+/* =========================================================
+   style.css - Portfolio
+   One centered column, serif throughout. Italic serif for
+   names and titles, letterspaced caps for labels and nav,
+   hairline rules for structure.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. Fonts
+   --------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* ---------------------------------------------------------
+   2. CSS Variables & Theme
+   --------------------------------------------------------- */
+
+/* The light palette, and the whole palette as far as a browser without
+   light-dark() is concerned. Those browsers stay on ivory, which is
+   where the site was before dark mode existed. */
+:root {
+  --color-bg: #faf9f5;
+  --color-bg-alt: #f0eee8;
+  --color-fg: #262624;
+  --color-muted: #6f695e;
+  --color-border: rgba(38, 38, 36, 0.14);
+  --color-border-hover: rgba(38, 38, 36, 0.3);
+
+  /* The gallery mat behind a photo. White in both themes: a print is
+     mounted on white board whatever the room's lighting, and on the dark
+     page the mat becomes the thing that reads as paper. */
+  --color-mat: #ffffff;
+  --color-scrim: rgba(250, 249, 245, 0.96);
+
+  /* Muted Prussian blue: cool enough to read as a link on the warm
+     ivory, desaturated enough to sit beside the ink without shouting */
+  --color-link: #2f5575;
+  --color-link-hover: #4a749b;
+  --color-link-underline: rgba(47, 85, 117, 0.35);
+
+  /* A link underline drawn in ink instead of blue, for the colophon
+     controls: they set the page's appearance, they don't go anywhere. */
+  --color-underline-quiet: rgba(38, 38, 36, 0.32);
+
+  --font-serif: "EB Garamond", Garamond, Georgia, serif;
+  --font-display: "EB Garamond", Garamond, Georgia, serif;
+  --font-sans: "EB Garamond", Garamond, Georgia, serif;
+
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2.5rem;
+  --space-lg: 4.5rem;
+  --space-xl: 7rem;
+
+  --measure: 36rem;
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  color-scheme: light;
+}
+
+/* Both palettes, in one place. Each token carries its light and its dark
+   value, and light-dark() reads whichever the used color-scheme calls
+   for, so switching themes means changing one property rather than
+   restating twenty. The dark side is not an inversion: the ivory becomes
+   a warm near-black of the same temperature, the ink a warm off-white
+   rather than #fff, and the Prussian blue rises to a tint that still
+   reads as a link against it.
+
+   Guarded by @supports so that a browser without light-dark() also
+   keeps color-scheme: light above, and doesn't end up with dark
+   scrollbars framing an ivory page. */
+@supports (color: light-dark(#000, #fff)) {
+  :root {
+    --color-bg: light-dark(#faf9f5, #1a1917);
+    --color-bg-alt: light-dark(#f0eee8, #22211e);
+    --color-fg: light-dark(#262624, #e8e6df);
+    --color-muted: light-dark(#6f695e, #a49d90);
+    --color-border: light-dark(rgba(38, 38, 36, 0.14), rgba(232, 230, 223, 0.16));
+    --color-border-hover: light-dark(rgba(38, 38, 36, 0.3), rgba(232, 230, 223, 0.32));
+
+    /* --color-mat is deliberately absent: the gallery mat is white in
+       both themes, so it keeps its single definition above. Only the
+       paper the lightbox lays over the page follows the theme. */
+    --color-scrim: light-dark(rgba(250, 249, 245, 0.96), rgba(26, 25, 23, 0.96));
+
+    --color-link: light-dark(#2f5575, #8fb3d4);
+    --color-link-hover: light-dark(#4a749b, #b3cde5);
+    --color-link-underline: light-dark(rgba(47, 85, 117, 0.35), rgba(143, 179, 212, 0.38));
+
+    --color-underline-quiet: light-dark(rgba(38, 38, 36, 0.32), rgba(232, 230, 223, 0.3));
+
+    /* No data-theme is the default state, and it defers to the system.
+       The colophon toggle writes the attribute to override it, and
+       removes it again for "System". */
+    color-scheme: light dark;
+  }
+
+  :root[data-theme="light"] { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+}
+
+/* ---------------------------------------------------------
+   3. Base
+   --------------------------------------------------------- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+
+body {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--color-fg);
+  background-color: var(--color-bg);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+
+/* ---------------------------------------------------------
+   4. Masthead (every page)
+   --------------------------------------------------------- */
+
+.masthead {
+  width: 100%;
+  /* Was 48rem, which put the masthead in a wider box than the text and
+     gave the page three different column edges. One measure now. */
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md) 0;
+  text-align: center;
+  /* Makes this box the reference the name sizes itself against. */
+  container-type: inline-size;
+}
+
+.masthead__name {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  /* Fallback for browsers without container query units. */
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  /* "Aniketh Bandlamudi" advances 8.068em in EB Garamond, so the column
+     width divided by that sets the name to exactly one measure — the same
+     left and right edge as the nav and the body copy, at every viewport.
+     The constant is tied to this string in this face: change either and
+     re-measure, or the name stops meeting the column. */
+  font-size: calc(100cqi / 8.068);
+  white-space: nowrap;
+  line-height: 1.1;
+  color: var(--color-fg);
+  transition: opacity var(--transition-fast);
+}
+
+a.masthead__name:hover {
+  opacity: 0.6;
+}
+
+/* The masthead's own content box is already exactly one measure, so the
+   nav just fills it — no second copy of the column arithmetic to drift.
+   text-wrap: balance is gone: it evened the rows against each other but
+   pulled them to ~300px inside a 496px column, which read as a third
+   width on the page. Filling the measure matters more than a balanced
+   last line. */
+.masthead__nav {
+  max-width: 100%;
+  margin: 2rem auto 0;
+  /* The body copy on this site is justified, so the nav is too: every row
+     meets both edges of the same measure the name and the text meet.
+     balance still picks the break points, which keeps the rows to an even
+     number of links each — without it the 15th link strands alone on a
+     line, and justifying a lone link would stretch it across the column. */
+  text-wrap: balance;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+/* Keep handles and other unbreakable tokens on one line */
+.nowrap {
+  white-space: nowrap;
+}
+
+.masthead__nav-link {
+  display: inline-block;
+  /* No side margins: justification supplies the horizontal gaps, and
+     margins here would inset the first and last link of every row, leaving
+     the nav a few px narrower than the column it is supposed to match. */
+  margin: 0 0 0.65rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--color-fg);
+  transition: color var(--transition-fast);
+}
+
+/* Invisible ghosts reserve both the upright and italic widths
+   (EB Garamond italic runs narrower) so the italic current-page
+   link sits at the same width as the rest of the row */
+.masthead__nav-link::before,
+.masthead__nav-link::after {
+  content: attr(data-text);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.masthead__nav-link::before {
+  font-style: normal;
+}
+
+.masthead__nav-link::after {
+  font-style: italic;
+}
+
+.masthead__nav-link:hover {
+  color: var(--color-muted);
+}
+
+/* Current page reads quiet, like the reference */
+.masthead__nav-link.active {
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+/* ---------------------------------------------------------
+   5. Page column
+   --------------------------------------------------------- */
+
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md) var(--space-xl);
+}
+
+/* Body text justifies to both column edges, like the nav */
+.page p {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 2.9rem);
+  line-height: 1.15;
+  margin-bottom: var(--space-md);
+  color: var(--color-fg);
+}
+
+/* ---------------------------------------------------------
+   6. Home intro
+   --------------------------------------------------------- */
+
+.about__text p {
+  color: var(--color-fg);
+  margin-bottom: 1.6rem;
+}
+
+.about__text p:last-child {
+  margin-bottom: 0;
+}
+
+.about__text a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-link-underline);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.about__text a:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+/* Latest writing: the nav link treatment, stacked and left-aligned */
+
+.writing {
+  margin-top: var(--space-md);
+}
+
+.writing__heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  margin-bottom: 0.9rem;
+  color: var(--color-fg);
+}
+
+.writing__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.writing__link {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-link-underline);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.writing__link:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+/* ---------------------------------------------------------
+   7. Entry lists (work, projects, education, research)
+   --------------------------------------------------------- */
+
+.projects__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-item {
+  padding: var(--space-md) 0;
+}
+
+.project-item:first-child {
+  padding-top: 0;
+}
+
+.project-item:last-child {
+  padding-bottom: 0;
+}
+
+.project-item__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.project-item__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.project-item__role {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.project-item__description {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-fg);
+  margin: 0 0 0.5rem;
+}
+
+.project-item__description:last-child {
+  margin-bottom: 0;
+}
+
+.project-item__link {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-link-underline);
+  text-underline-offset: 3px;
+  margin-top: 0.35rem;
+  transition: color var(--transition-fast);
+}
+
+.project-item__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+}
+
+.project-item__links .project-item__link {
+  margin-top: 0;
+}
+
+.project-item__link:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+.project-item__link--disabled {
+  cursor: default;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   8. Photos
+   --------------------------------------------------------- */
+
+/* Masonry columns; photos keep their native aspect ratio,
+   each in a white gallery mat */
+.photos__grid {
+  columns: 3;
+  column-gap: 0.9rem;
+}
+
+.photo-item {
+  break-inside: avoid;
+  margin-bottom: 0.9rem;
+  padding: 1.85rem;
+  background: var(--color-mat);
+  cursor: zoom-in;
+}
+
+.photo-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity var(--transition-base);
+}
+
+.photo-item:hover img {
+  opacity: 0.85;
+}
+
+.photos__links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.photos__links a {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-link-underline);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.photos__links a:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+/* Full-screen viewer: same ivory paper, photo centered,
+   a quiet Close in the corner */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: var(--color-scrim);
+  animation: lightbox-fade var(--transition-base);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+@keyframes lightbox-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox__img {
+  display: block;
+  max-width: min(60rem, 100%);
+  max-height: 82vh;
+  padding: 2.5rem;
+  background: var(--color-mat);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.75rem;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--color-fg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.lightbox__close:hover {
+  color: var(--color-muted);
+}
+
+.lightbox__close:focus {
+  outline: none;
+}
+
+.lightbox__close:focus-visible {
+  outline: 1px solid var(--color-border-hover);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .photos__grid {
+    columns: 2;
+    column-gap: 0.6rem;
+  }
+
+  .photo-item {
+    margin-bottom: 0.6rem;
+    padding: 1.2rem;
+  }
+}
+
+/* ---------------------------------------------------------
+   9. Contact & Resume
+   --------------------------------------------------------- */
+
+.contact__text {
+  max-width: 34rem;
+  margin-bottom: var(--space-md);
+}
+
+.resume__frame {
+  width: 100%;
+  border: 1px solid var(--color-border);
+}
+
+.resume__download {
+  margin-top: var(--space-sm);
+}
+
+/* ---------------------------------------------------------
+   10. Colophon (footer, every page)
+   --------------------------------------------------------- */
+
+.colophon {
+  width: 100%;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-md) var(--space-lg);
+}
+
+.colophon__meta {
+  /* The copyright takes the left edge of the measure and the theme
+     control the right, so this row meets the same two edges the name,
+     the nav and the body copy meet. They drop onto two lines rather
+     than crowd on a narrow screen. */
+  display: flex;
+  flex-wrap: wrap;
+  /* Centred, not baseline-aligned: the buttons carry the invisible width
+     ghosts below, and a zero-height block after the text moves a
+     button's baseline down past the copyright's. Both boxes are the same
+     height, so centring lines the two lots of text up exactly. */
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1.5rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+/* Hidden until the inline head script has proved scripting is on:
+   without it these three buttons would sit in the footer doing
+   nothing, and the page would still be following the system anyway. */
+.theme-toggle {
+  display: none;
+}
+
+:root.js .theme-toggle {
+  display: inline-flex;
+  gap: 0.8rem;
+}
+
+.theme-toggle__option {
+  /* Underlined like a link, in ink rather than blue: these change how
+     the page looks, they don't go anywhere. Upright against the italic
+     colophon line, so that italic is left to mean "in force". */
+  font-family: inherit;
+  font-size: inherit;
+  font-style: normal;
+  line-height: inherit;
+  padding: 0;
+  color: var(--color-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-underline-quiet);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+/* The same invisible ghosts the nav uses: each button reserves both its
+   upright and its italic width, so switching the setting doesn't change
+   how wide these three words are and shove the centred row sideways. */
+.theme-toggle__option::before,
+.theme-toggle__option::after {
+  content: attr(data-text);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.theme-toggle__option:last-child {
+  text-align: right;
+}
+
+.theme-toggle__option::before {
+  font-style: normal;
+}
+
+.theme-toggle__option::after {
+  font-style: italic;
+}
+
+.theme-toggle__option:hover {
+  color: var(--color-fg);
+}
+
+/* The setting in force goes italic and full ink, the way the current
+   page reads in the nav. */
+.theme-toggle__option[aria-pressed="true"] {
+  font-style: italic;
+  color: var(--color-fg);
+  text-decoration-color: var(--color-fg);
+}
+
+.theme-toggle__option:focus-visible {
+  outline: 1px solid var(--color-border-hover);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------
+   11. Labels shared by inline page styles
+   --------------------------------------------------------- */
+
+.section-label {
+  display: block;
+  color: var(--color-muted);
+  margin: var(--space-lg) 0 var(--space-md);
+}
+
+.section-label:first-child {
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------
+   12. Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  :root {
+    --space-xl: 4.5rem;
+    --space-lg: 3rem;
+    --space-md: 2rem;
+  }
+
+  .masthead {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+
+  .masthead__nav-link {
+    margin: 0 0 0.45rem;
+  }
+
+  .page {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+
+  /* Matches the masthead and the page column, so the colophon's two
+     edges stay the same two edges at every width. */
+  .colophon {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+
+  /* Center only the page title under the centered masthead;
+     entry titles, roles, and links stay left-aligned */
+  .page-title {
+    text-align: center;
+  }
+
+  .contact__text {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ---------------------------------------------------------
+   13. Reduced Motion & View Transitions
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
+}
