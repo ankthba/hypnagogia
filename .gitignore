@@ -1,0 +1,25 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+# data (fetched by scripts/fetch_data.py; too large / not ours to redistribute)
+data/raw/
+data/cache/
+# simulation outputs (large); curated exports live in web/public/data
+results/**/standalone*/
+results/**/*.npz
+results/**/*.npy
+results/**/spikes*
+results/**/*.parquet
+# brian2 codegen
+*.brian2*
+# web
+web/node_modules/
+web/dist/
+web/.vite/
+# misc
+.DS_Store
+*.log

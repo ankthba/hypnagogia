@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hypnagogia"
+version = "0.1.0"
+description = "Does a whole-brain Drosophila connectome LIF model reactivate a learned memory during simulated sleep?"
+requires-python = ">=3.11"
+dependencies = [
+  "brian2==2.10.1", "numpy>=2.0", "scipy>=1.14", "pandas>=2.2", "pyarrow>=17",
+  "powerlaw>=1.5", "PyYAML>=6.0", "matplotlib>=3.9", "joblib>=1.4", "numba>=0.61",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

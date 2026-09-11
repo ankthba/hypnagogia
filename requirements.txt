@@ -1,0 +1,10 @@
+brian2==2.10.1
+numpy>=2.0
+scipy>=1.14
+pandas>=2.2
+pyarrow>=17
+powerlaw>=1.5
+PyYAML>=6.0
+matplotlib>=3.9
+joblib>=1.4
+numba>=0.61
