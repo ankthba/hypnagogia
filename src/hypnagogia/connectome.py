@@ -320,16 +320,17 @@ def build_cache_flywire(version: str = "783") -> None:
     ann_meta = {"source": None, "n_annotated": 0}
     if version == "783" and (DATA_RAW / FLYWIRE_ANNOTATION_FILE).exists():
         a = pd.read_csv(DATA_RAW / FLYWIRE_ANNOTATION_FILE, sep="\t", low_memory=False, dtype={"root_id": np.int64})
-        a = a.drop_duplicates("root_id").set_index("root_id").reindex(ids)
+        a = a.drop_duplicates("root_id").set_index("root_id").reindex(ids).reset_index(drop=True)
+        def col(c):
+            return a[c].astype("string").reset_index(drop=True)
         ann = pd.DataFrame({
-            "super_class": a["super_class"].astype("string"), "cell_class": a["cell_class"].astype("string"),
-            "cell_sub_class": a["cell_sub_class"].astype("string"), "cell_type": a["cell_type"].astype("string"),
-            "hemibrain_type": a["hemibrain_type"].astype("string"), "flywire_type": a["cell_type"].astype("string"),
-            "side": a["side"].astype("string"), "nt": a["top_nt"].astype("string"),
-            "nt_source": pd.Series(["top_nt"] * len(ids), dtype="string"), "status": a["status"].astype("string"),
+            "super_class": col("super_class"), "cell_class": col("cell_class"), "cell_sub_class": col("cell_sub_class"),
+            "cell_type": col("cell_type"), "hemibrain_type": col("hemibrain_type"), "flywire_type": col("cell_type"),
+            "side": col("side"), "nt": col("top_nt"),
+            "nt_source": pd.Series(["top_nt"] * len(ids), dtype="string"), "status": col("status"),
             "region": pd.Series(["brain"] * len(ids), dtype="string"), "instance": pd.Series([None] * len(ids), dtype="string"),
-            "flow": a["flow"].astype("string")}).reset_index(drop=True)
-        ann_meta = {"source": FLYWIRE_ANNOTATION_FILE, "n_annotated": int(a.index.notna().sum())}
+            "flow": col("flow")})
+        ann_meta = {"source": FLYWIRE_ANNOTATION_FILE, "n_annotated": int(a["super_class"].notna().sum())}
     npz, annp, meta = _cache_paths("flywire", version)
     np.savez(npz, ids=ids, pre=pre.astype(np.int32), post=post.astype(np.int32), count=cnt.astype(np.int32), sign=sign.astype(np.int8))
     ann.to_parquet(annp)

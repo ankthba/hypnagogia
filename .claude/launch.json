@@ -1,6 +1,0 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "qa-preview", "runtimeExecutable": "/Users/ankthba/Developer/fly/web/node_modules/.bin/vite", "runtimeArgs": ["preview", "--config", "/Users/ankthba/Developer/fly/web/vite.config.ts", "--outDir", "/private/tmp/claude-501/-Users-ankthba-Developer-fly/7e6576e9-242d-401d-b195-48c23468abaa/scratchpad/dist", "--base", "/hypnagogia/", "--port", "4173", "--strictPort"], "port": 4173 }
-  ]
-}

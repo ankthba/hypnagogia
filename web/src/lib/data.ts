@@ -47,14 +47,22 @@ class NotFound extends Error {
   }
 }
 
+/** Fetch a raw binary under public/data. Returns null when absent or unreachable (never throws). */
 export async function fetchBinary(relPath: string): Promise<ArrayBuffer | null> {
   const url = dataUrl(relPath);
-  const r = await fetch(url, { cache: 'no-cache' });
-  if (!r.ok) return null;
-  const ct = r.headers.get('content-type') ?? '';
-  if (ct.includes('text/html')) return null;
-  return r.arrayBuffer();
+  try {
+    const r = await fetch(url, { cache: 'no-cache' });
+    if (!r.ok) return null;
+    const ct = r.headers.get('content-type') ?? '';
+    if (ct.includes('text/html')) return null;
+    return await r.arrayBuffer();
+  } catch {
+    return null;
+  }
 }
+
+/** Repository URL used by provenance footers to link config/data paths at a commit. */
+export const REPO_URL = 'https://github.com/ankthba/hypnagogia';
 
 /** Load a JSON file under public/data. Never substitutes any default data. */
 export function useDataFile<T>(relPath: string | null): Loaded<T> {
@@ -79,15 +87,19 @@ export function useDataFile<T>(relPath: string | null): Loaded<T> {
   return state;
 }
 
-/** Canonical stage list (order, default filenames, producing scripts). Metadata only; no results. */
+/**
+ * Canonical stage list (order, default filenames, producing scripts). Metadata only; no results.
+ * Script names follow the stage table in the repository README.md; they are the documented
+ * (planned) pipeline entry points and must be kept in sync as the scripts land.
+ */
 export const STAGES: { key: StageKey; file: string; script: string; route: string; label: string }[] = [
-  { key: 'stage0_reproduction', file: 'stage0_reproduction.json', script: 'scripts/stage0_reproduction.py', route: '/', label: 'Stage 0 - Reproduction' },
-  { key: 'stage1_noise', file: 'stage1_noise.json', script: 'scripts/stage1_noise.py', route: '/criticality', label: 'Stage 1 - Noise' },
-  { key: 'stage2_criticality', file: 'stage2_criticality.json', script: 'scripts/stage2_criticality.py', route: '/criticality', label: 'Stage 2 - Criticality' },
-  { key: 'stage3_plasticity', file: 'stage3_plasticity.json', script: 'scripts/stage3_plasticity.py', route: '/learning', label: 'Stage 3 - Plasticity' },
-  { key: 'stage4_learning', file: 'stage4_learning.json', script: 'scripts/stage4_learning.py', route: '/learning', label: 'Stage 4 - Learning' },
-  { key: 'stage5_sleep', file: 'stage5_sleep.json', script: 'scripts/stage5_sleep.py', route: '/replay', label: 'Stage 5 - Sleep' },
-  { key: 'stage6_replay', file: 'stage6_replay.json', script: 'scripts/stage6_replay.py', route: '/replay', label: 'Stage 6 - Replay' },
+  { key: 'stage0_reproduction', file: 'stage0_reproduction.json', script: 'scripts/00_reproduce_shiu.py', route: '/', label: 'Stage 0 - Reproduction' },
+  { key: 'stage1_noise', file: 'stage1_noise.json', script: 'scripts/01_noise.py', route: '/criticality', label: 'Stage 1 - Noise' },
+  { key: 'stage2_criticality', file: 'stage2_criticality.json', script: 'scripts/02_criticality.py', route: '/criticality', label: 'Stage 2 - Criticality' },
+  { key: 'stage3_plasticity', file: 'stage3_plasticity.json', script: 'scripts/03_plasticity.py', route: '/learning', label: 'Stage 3 - Plasticity' },
+  { key: 'stage4_learning', file: 'stage4_learning.json', script: 'scripts/04_encode.py', route: '/learning', label: 'Stage 4 - Learning' },
+  { key: 'stage5_sleep', file: 'stage5_sleep.json', script: 'scripts/05_sleep.py', route: '/replay', label: 'Stage 5 - Sleep' },
+  { key: 'stage6_replay', file: 'stage6_replay.json', script: 'scripts/06_replay.py', route: '/replay', label: 'Stage 6 - Replay' },
 ];
 
 export function stageMeta(key: StageKey) {

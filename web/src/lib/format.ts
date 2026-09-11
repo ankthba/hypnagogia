@@ -7,7 +7,8 @@ export function fmtNum(n: number | null | undefined, digits = 3): string {
   if (n === null || n === undefined || Number.isNaN(n)) return 'null';
   if (n === 0) return '0';
   const a = Math.abs(n);
-  if (a >= 1e5 || a < 1e-3) return n.toExponential(Math.max(1, digits - 1));
+  // Only tiny values use exponential notation; large (count-like) values keep thousands separators.
+  if (a < 1e-3) return n.toExponential(Math.max(1, digits - 1));
   return n.toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: 0 });
 }
 

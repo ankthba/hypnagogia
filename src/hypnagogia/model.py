@@ -75,8 +75,7 @@ class Simulation:
             set_device("cpp_standalone", directory=str(sa_dir), build_on_run=False)
         b2.prefs.devices.cpp_standalone.openmp_threads = int(run_cfg.get("openmp_threads", 0))
         b2.prefs.codegen.cpp.extra_compile_args_gcc = list(run_cfg.get("extra_compile_args", ["-O3", "-ffast-math", "-march=native"]))
-        dt = float(m["dt_ms"]) * ms
-        defaultclock.dt = dt
+        defaultclock.dt = float(m["dt_ms"]) * ms
         b2.seed(self.seed)
         np.random.seed(self.seed)
 
@@ -164,9 +163,9 @@ class Simulation:
             dsy = Synapses(drv, neu, on_pre="v_post += w_drive", namespace={"w_drive": w_syn * float(drive["f_poi"]) * mV}, name="drvsyn")
             dsy.connect(i=np.arange(len(all_driven)), j=all_driven)
             if drive.get("no_refractory_when_driven", True):
-                rfc = np.full(N, float(m["t_refr_ms"]))
-                rfc[all_driven] = 0.0
-                neu.rfc = rfc * ms
+                refr_arr = np.full(N, float(m["t_refr_ms"]))
+                refr_arr[all_driven] = 0.0
+                neu.rfc = refr_arr * ms
             objs += [drv, dsy]
         pos_in_driven = {k: np.searchsorted(all_driven, v) for k, v in self.drive_groups.items()}
         if noise["mode"] == "poisson":
@@ -187,10 +186,10 @@ class Simulation:
         epoch_table = []
         for ep in self.epochs:
             if drv is not None:
-                rates = np.zeros(len(all_driven))
+                rate_arr = np.zeros(len(all_driven))
                 for k, r in ep["drives"].items():
-                    rates[pos_in_driven[k]] = r
-                drv.rates = rates * Hz
+                    rate_arr[pos_in_driven[k]] = r
+                drv.rates = rate_arr * Hz
             if psyn is not None:
                 psyn.plastic = 1.0 if ep["plastic"] else 0.0
             if gauss and ep.get("sigma_mV") is not None:

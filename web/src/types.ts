@@ -299,6 +299,8 @@ export interface TraceSidecar {
   bin: string;
   dtype: 'float32';
   shape: [number, number];
+  /** byte offset of the first element in `bin` (contract: little-endian raw array) */
+  byte_offset: number;
   columns: string[];
   dt_s: number;
   threshold_corr: number;
@@ -309,6 +311,8 @@ export interface RasterSidecar {
   bin: string;
   dtype: 'uint32';
   shape: [number, number];
+  /** byte offset of the first element in `bin` (contract: little-endian raw array) */
+  byte_offset: number;
   columns: string[];
   neuron_rows: { row: number; root_id: string; group: 'ensemble_A' | 'ensemble_B' | 'other_kc' }[];
   duration_s: number;

@@ -1,0 +1,129 @@
+{
+ "name": "v630_sugar100_t17",
+ "seed": 1017,
+ "dataset": "flywire",
+ "version": "630",
+ "network": "full",
+ "n_neurons": 127400,
+ "n_connections": 14687178,
+ "n_synapses_raw": 52793639,
+ "weight_scale": 1.0,
+ "dt_ms": 0.1,
+ "duration_s": 1.0,
+ "epochs": [
+  {
+   "name": "stim",
+   "duration_s": 1.0,
+   "drives": {
+    "sugar": 100.0
+   },
+   "plastic": false,
+   "sigma_mV": null,
+   "note": "",
+   "t_start_s": 0.0,
+   "t_end_s": 1.0
+  }
+ ],
+ "noise": {
+  "mode": "none",
+  "sigma_mV": 0.0,
+  "poisson": {
+   "rate_hz": 0.0,
+   "n_inputs": 1,
+   "weight_mV": 0.275
+  }
+ },
+ "model": {
+  "v_rest_mV": -52.0,
+  "v_reset_mV": -52.0,
+  "v_th_mV": -45.0,
+  "tau_m_ms": 20.0,
+  "tau_syn_ms": 5.0,
+  "t_refr_ms": 2.2,
+  "delay_ms": 1.8,
+  "w_syn_mV": 0.275,
+  "dt_ms": 0.1,
+  "sign_rule": "GABA & glutamate -1 (Liu & Wilson 2013), ACh/DA/OA/5-HT +1 (Shiu et al. 2024); histamine -1 (HisCl, Hardie 1989 - pipeline decision)"
+ },
+ "drive": {
+  "f_poi": 250,
+  "no_refractory_when_driven": true
+ },
+ "drive_groups": {
+  "sugar": [
+   11916,
+   14231,
+   27293,
+   27680,
+   31392,
+   44337,
+   47685,
+   48902,
+   65153,
+   84634,
+   86214,
+   90982,
+   93880,
+   100853,
+   102632,
+   103321,
+   113421,
+   114820,
+   116889,
+   117163,
+   119716
+  ]
+ },
+ "drive_group_ids": {
+  "sugar": [
+   720575940611875570,
+   720575940612670570,
+   720575940616885538,
+   720575940617000768,
+   720575940617937543,
+   720575940620900446,
+   720575940621502051,
+   720575940621754367,
+   720575940624963786,
+   720575940628853239,
+   720575940629176663,
+   720575940630233916,
+   720575940630797113,
+   720575940632425919,
+   720575940632889389,
+   720575940633143833,
+   720575940637568838,
+   720575940638202345,
+   720575940639198653,
+   720575940639332736,
+   720575940640649691
+  ]
+ },
+ "record": "all",
+ "n_spikes": 9469,
+ "n_active": 365,
+ "walltime_build_run_s": 6.8,
+ "walltime_total_s": 7.1,
+ "brian2": "2.10.1",
+ "filtering_steps": [
+  {
+   "step": "neurons listed in 2023_03_23_completeness_630_final.csv (Completed == True)",
+   "n_neurons_before": 127400,
+   "n_neurons_after": 127400,
+   "n_connections_before": 14687178,
+   "n_connections_after": 14687178,
+   "n_synapses_before": 52793639,
+   "n_synapses_after": 52793639
+  }
+ ],
+ "connectome_provenance": {
+  "source_files": [
+   "2023_03_23_completeness_630_final.csv",
+   "2023_03_23_connectivity_630_final.parquet"
+  ],
+  "annotations": {
+   "source": null,
+   "n_annotated": 0
+  }
+ }
+}
