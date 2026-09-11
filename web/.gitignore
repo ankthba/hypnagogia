@@ -1,6 +1,4 @@
 node_modules/
 dist/
 .vite/
-# pipeline-written exports (see DATA_CONTRACT.md); only .gitkeep is tracked
-public/data/*
-!public/data/.gitkeep
+# GitHub Pages build ships real results; see README.md "Data on the deployed site".

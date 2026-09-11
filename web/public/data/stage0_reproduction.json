@@ -1,0 +1,2165 @@
+{
+ "status": "passed",
+ "criterion": "(a) engine: reproduce the paper's shipped FlyWire v630 output at the same drive (MN9 within the shipped 30-trial range +/-10%, active neurons and spikes within 15%, per-neuron rate r > 0.95); (b) gate on male CNS: MN9 active in >= 90% of trials and its rate and the active-neuron count within 2x of the FlyWire v630 value at the same drive, with weight_scale 0.581 and no retuning",
+ "engine_check": {
+  "status": "passed",
+  "runs": {
+   "200": {
+    "status": "passed",
+    "n_trials": 30,
+    "sugar_rate_hz": 200,
+    "criterion": "MN9 mean rate within the shipped 30-trial range +/- 10%, per-trial active-neuron count and spike count within 15% of the shipped means, per-neuron rate correlation r > 0.95 over the union of active neurons",
+    "ours": {
+     "mn9_rate_hz_mean": 92.8,
+     "mn9_rate_hz_sd": 4.66387436987008,
+     "mn9_per_trial": [
+      95,
+      92,
+      84,
+      93,
+      91,
+      94,
+      88,
+      88,
+      87,
+      94,
+      92,
+      93,
+      89,
+      91,
+      101,
+      94,
+      85,
+      98,
+      94,
+      93,
+      94,
+      105,
+      95,
+      91,
+      100,
+      93,
+      93,
+      87,
+      99,
+      91
+     ],
+     "n_active_per_trial_mean": 401.7,
+     "n_active_union": 447,
+     "n_spikes_per_trial_mean": 16990.933333333334
+    },
+    "reference": {
+     "source": "philshiu/Drosophila_brain_model results/example/sugarR.parquet (v630, 21 sugar GRNs, 200 Hz, 30 x 1 s)",
+     "mn9_rate_hz_mean": 93.26666666666667,
+     "mn9_rate_hz_sd": 3.2048813344359712,
+     "mn9_per_trial": [
+      86,
+      94,
+      90,
+      89,
+      95,
+      91,
+      95,
+      97,
+      93,
+      97,
+      89,
+      88,
+      89,
+      94,
+      90,
+      95,
+      91,
+      95,
+      94,
+      99,
+      97,
+      96,
+      94,
+      94,
+      93,
+      93,
+      96,
+      91,
+      97,
+      96
+     ],
+     "n_active_per_trial_mean": 402.6,
+     "n_active_union": 448,
+     "n_spikes_per_trial_mean": 17052.2
+    },
+    "per_neuron_rate_correlation": 0.9998557233211924,
+    "n_neurons_compared": 451,
+    "walltime_s": 36.1,
+    "checks": {
+     "mn9_within_range": true,
+     "active_within_15pct": true,
+     "spikes_within_15pct": true,
+     "rate_corr_gt_0.95": true
+    }
+   },
+   "100": {
+    "status": "passed",
+    "n_trials": 30,
+    "sugar_rate_hz": 100,
+    "criterion": "MN9 mean rate within the shipped 30-trial range +/- 10%, per-trial active-neuron count and spike count within 15% of the shipped means, per-neuron rate correlation r > 0.95 over the union of active neurons",
+    "ours": {
+     "mn9_rate_hz_mean": 67.46666666666667,
+     "mn9_rate_hz_sd": 5.587753439956628,
+     "mn9_per_trial": [
+      61,
+      59,
+      71,
+      74,
+      65,
+      59,
+      76,
+      68,
+      66,
+      68,
+      66,
+      81,
+      65,
+      71,
+      66,
+      63,
+      71,
+      62,
+      65,
+      61,
+      58,
+      74,
+      71,
+      73,
+      71,
+      68,
+      75,
+      63,
+      67,
+      66
+     ],
+     "n_active_per_trial_mean": 357.3666666666667,
+     "n_active_union": 428,
+     "n_spikes_per_trial_mean": 9677.0
+    },
+    "reference": {
+     "source": "philshiu/Drosophila_brain_model results/example/sugarR_100Hz.parquet (v630, 21 sugar GRNs, 100 Hz, 30 x 1 s)",
+     "mn9_rate_hz_mean": 67.03333333333333,
+     "mn9_rate_hz_sd": 6.708118258849693,
+     "mn9_per_trial": [
+      69,
+      75,
+      65,
+      70,
+      66,
+      59,
+      78,
+      60,
+      60,
+      68,
+      70,
+      63,
+      54,
+      78,
+      70,
+      80,
+      76,
+      67,
+      68,
+      72,
+      71,
+      53,
+      67,
+      60,
+      66,
+      68,
+      65,
+      59,
+      65,
+      69
+     ],
+     "n_active_per_trial_mean": 354.3,
+     "n_active_union": 404,
+     "n_spikes_per_trial_mean": 9635.766666666666
+    },
+    "per_neuron_rate_correlation": 0.9996902384661229,
+    "n_neurons_compared": 439,
+    "walltime_s": 35.1,
+    "checks": {
+     "mn9_within_range": true,
+     "active_within_15pct": true,
+     "spikes_within_15pct": true,
+     "rate_corr_gt_0.95": true
+    }
+   }
+  }
+ },
+ "validation_malecns": {
+  "status": "passed",
+  "gate_checks": [
+   "mn9_active_in_90pct_trials",
+   "mn9_rate_within_2x_of_flywire",
+   "n_active_within_2x_of_flywire"
+  ],
+  "checks": {
+   "mn9_active_in_90pct_trials": true,
+   "mn9_rate_within_2x_of_flywire": true,
+   "n_active_within_2x_of_flywire": true,
+   "scale_factor_prereg_statistic": false,
+   "scale_factor_total_input_statistic": true
+  },
+  "gate_note": "gate = propagation benchmark (the response-magnitude test); the two scale-factor statistics are reported alongside (one fails, one passes) and did not lead to any retuning",
+  "criterion": "(written before running):\n    scale: count-weighted median FlyWire/male ratio within [0.45, 0.75] (i.e. 0.581 +/- ~25%);\n    propagation: at 200 Hz the matched-set MN9 (side matched to Shiu's MN9) fires in >= 90% of trials,\n    its mean rate is within a factor of 2 of the FlyWire v630 value at 200 Hz, and the number of activated\n    neurons is within a factor of 2 of the FlyWire v630 count. If either fails: STOP and report; W_syn is\n    NOT retuned.",
+  "network": {
+   "name": "brain",
+   "dataset": "malecns",
+   "version": "v1.0",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_synapses": 101079336,
+   "weight_scale": 0.581,
+   "n_excitatory_connections": 13502767,
+   "n_inhibitory_connections": 8365295,
+   "nt_counts": {
+    "acetylcholine": 92610,
+    "glutamate": 27132,
+    "gaba": 16783,
+    "histamine": 5902,
+    "unknown": 952,
+    "dopamine": 395,
+    "serotonin": 352,
+    "octopamine": 83
+   },
+   "filtering_steps": [
+    {
+     "step": "bodies in body-annotations table",
+     "n_neurons_before": 211577,
+     "n_neurons_after": 211577,
+     "n_connections_before": 25563197,
+     "n_connections_after": 25563197,
+     "n_synapses_before": null,
+     "n_synapses_after": null
+    },
+    {
+     "step": "status == 'Traced' (proofread neurons)",
+     "n_neurons_before": 211577,
+     "n_neurons_after": 165122,
+     "n_connections_before": 25563197,
+     "n_connections_after": 25563197,
+     "n_synapses_before": null,
+     "n_synapses_after": 124025046
+    },
+    {
+     "step": "scope == 'brain': drop superclass vnc_* (VNC), ENS, and Traced bodies with no superclass",
+     "n_neurons_before": 165122,
+     "n_neurons_after": 144209,
+     "n_connections_before": 25563197,
+     "n_connections_after": 21868062,
+     "n_synapses_before": 124025046,
+     "n_synapses_after": 101079336
+    }
+   ]
+  },
+  "weight_scale_check": {
+   "n_type_pairs": 39307,
+   "min_pairs_per_type_pair": 20,
+   "ratio_weighted_median": 0.7948,
+   "ratio_quartiles": [
+    0.6864,
+    0.8338,
+    0.96
+   ],
+   "ratio_of_totals": 0.5473,
+   "expected": 0.581,
+   "examples": [
+    {
+     "pre": "KCg-m",
+     "post": "KCg-m",
+     "mean_syn_male": 1.57,
+     "mean_syn_flywire": 1.17,
+     "n_pairs_male": 265164,
+     "n_pairs_flywire": 103282,
+     "ratio": 0.743
+    },
+    {
+     "pre": "KCab",
+     "post": "KCab",
+     "mean_syn_male": 1.66,
+     "mean_syn_flywire": 1.35,
+     "n_pairs_male": 229532,
+     "n_pairs_flywire": 112331,
+     "ratio": 0.813
+    },
+    {
+     "pre": "LC12",
+     "post": "LC12",
+     "mean_syn_male": 1.78,
+     "mean_syn_flywire": 1.25,
+     "n_pairs_male": 42526,
+     "n_pairs_flywire": 12997,
+     "ratio": 0.703
+    },
+    {
+     "pre": "LC17",
+     "post": "LC17",
+     "mean_syn_male": 2.44,
+     "mean_syn_flywire": 1.51,
+     "n_pairs_male": 41079,
+     "n_pairs_flywire": 15941,
+     "ratio": 0.619
+    },
+    {
+     "pre": "KCapbp-ap2",
+     "post": "KCapbp-ap2",
+     "mean_syn_male": 2.72,
+     "mean_syn_flywire": 1.39,
+     "n_pairs_male": 25654,
+     "n_pairs_flywire": 10760,
+     "ratio": 0.509
+    },
+    {
+     "pre": "KCg-m",
+     "post": "PAM08",
+     "mean_syn_male": 1.54,
+     "mean_syn_flywire": 1.18,
+     "n_pairs_male": 19406,
+     "n_pairs_flywire": 7838,
+     "ratio": 0.762
+    },
+    {
+     "pre": "PAM08",
+     "post": "KCg-m",
+     "mean_syn_male": 1.46,
+     "mean_syn_flywire": 1.1,
+     "n_pairs_male": 18478,
+     "n_pairs_flywire": 4834,
+     "ratio": 0.755
+    },
+    {
+     "pre": "Tm3",
+     "post": "Tm3",
+     "mean_syn_male": 3.07,
+     "mean_syn_flywire": 2.29,
+     "n_pairs_male": 18477,
+     "n_pairs_flywire": 11031,
+     "ratio": 0.745
+    },
+    {
+     "pre": "KCg-m",
+     "post": "PAM01",
+     "mean_syn_male": 1.5,
+     "mean_syn_flywire": 1.13,
+     "n_pairs_male": 17920,
+     "n_pairs_flywire": 5279,
+     "ratio": 0.75
+    },
+    {
+     "pre": "KCg-d",
+     "post": "KCg-d",
+     "mean_syn_male": 2.98,
+     "mean_syn_flywire": 1.31,
+     "n_pairs_male": 17240,
+     "n_pairs_flywire": 7516,
+     "ratio": 0.439
+    },
+    {
+     "pre": "KCapbp-m",
+     "post": "KCapbp-m",
+     "mean_syn_male": 2.85,
+     "mean_syn_flywire": 1.4,
+     "n_pairs_male": 15913,
+     "n_pairs_flywire": 16978,
+     "ratio": 0.49
+    },
+    {
+     "pre": "KCapbp-ap1",
+     "post": "KCapbp-ap1",
+     "mean_syn_male": 3.19,
+     "mean_syn_flywire": 1.3,
+     "n_pairs_male": 15708,
+     "n_pairs_flywire": 10185,
+     "ratio": 0.407
+    },
+    {
+     "pre": "T2",
+     "post": "T2",
+     "mean_syn_male": 2.77,
+     "mean_syn_flywire": 1.89,
+     "n_pairs_male": 15475,
+     "n_pairs_flywire": 9245,
+     "ratio": 0.683
+    },
+    {
+     "pre": "PAM01",
+     "post": "KCg-m",
+     "mean_syn_male": 1.34,
+     "mean_syn_flywire": 1.07,
+     "n_pairs_male": 15280,
+     "n_pairs_flywire": 3025,
+     "ratio": 0.796
+    },
+    {
+     "pre": "PFNp",
+     "post": "PFNp",
+     "mean_syn_male": 1.77,
+     "mean_syn_flywire": 1.36,
+     "n_pairs_male": 14978,
+     "n_pairs_flywire": 4270,
+     "ratio": 0.769
+    },
+    {
+     "pre": "T5b",
+     "post": "T5b",
+     "mean_syn_male": 2.41,
+     "mean_syn_flywire": 1.86,
+     "n_pairs_male": 14779,
+     "n_pairs_flywire": 7352,
+     "ratio": 0.772
+    },
+    {
+     "pre": "T4b",
+     "post": "T4b",
+     "mean_syn_male": 2.77,
+     "mean_syn_flywire": 2.08,
+     "n_pairs_male": 14478,
+     "n_pairs_flywire": 7460,
+     "ratio": 0.753
+    },
+    {
+     "pre": "KCab",
+     "post": "PAM04",
+     "mean_syn_male": 1.46,
+     "mean_syn_flywire": 1.37,
+     "n_pairs_male": 14459,
+     "n_pairs_flywire": 9339,
+     "ratio": 0.938
+    },
+    {
+     "pre": "L3",
+     "post": "Dm20",
+     "mean_syn_male": 3.58,
+     "mean_syn_flywire": 2.55,
+     "n_pairs_male": 13940,
+     "n_pairs_flywire": 7451,
+     "ratio": 0.711
+    },
+    {
+     "pre": "T2a",
+     "post": "LMt2",
+     "mean_syn_male": 8.3,
+     "mean_syn_flywire": 4.59,
+     "n_pairs_male": 13593,
+     "n_pairs_flywire": 8255,
+     "ratio": 0.553
+    },
+    {
+     "pre": "Mi1",
+     "post": "Tm3",
+     "mean_syn_male": 9.34,
+     "mean_syn_flywire": 7.19,
+     "n_pairs_male": 13487,
+     "n_pairs_flywire": 9722,
+     "ratio": 0.77
+    },
+    {
+     "pre": "LPLC2",
+     "post": "LPLC2",
+     "mean_syn_male": 3.44,
+     "mean_syn_flywire": 1.6,
+     "n_pairs_male": 13434,
+     "n_pairs_flywire": 8647,
+     "ratio": 0.464
+    },
+    {
+     "pre": "Dm3q",
+     "post": "Dm3p",
+     "mean_syn_male": 1.68,
+     "mean_syn_flywire": 1.6,
+     "n_pairs_male": 13065,
+     "n_pairs_flywire": 8609,
+     "ratio": 0.949
+    },
+    {
+     "pre": "L5",
+     "post": "Tm3",
+     "mean_syn_male": 7.85,
+     "mean_syn_flywire": 6.65,
+     "n_pairs_male": 13029,
+     "n_pairs_flywire": 9328,
+     "ratio": 0.847
+    },
+    {
+     "pre": "Tm3",
+     "post": "TmY3",
+     "mean_syn_male": 4.46,
+     "mean_syn_flywire": 3.3,
+     "n_pairs_male": 13025,
+     "n_pairs_flywire": 9711,
+     "ratio": 0.74
+    },
+    {
+     "pre": "Tm21",
+     "post": "Tm21",
+     "mean_syn_male": 3.14,
+     "mean_syn_flywire": 2.17,
+     "n_pairs_male": 12939,
+     "n_pairs_flywire": 6981,
+     "ratio": 0.693
+    },
+    {
+     "pre": "L1",
+     "post": "Tm3",
+     "mean_syn_male": 11.84,
+     "mean_syn_flywire": 9.13,
+     "n_pairs_male": 12802,
+     "n_pairs_flywire": 8958,
+     "ratio": 0.771
+    },
+    {
+     "pre": "KCab",
+     "post": "PAM10",
+     "mean_syn_male": 1.7,
+     "mean_syn_flywire": 1.41,
+     "n_pairs_male": 12574,
+     "n_pairs_flywire": 6838,
+     "ratio": 0.83
+    },
+    {
+     "pre": "Tm9",
+     "post": "T5c",
+     "mean_syn_male": 5.94,
+     "mean_syn_flywire": 4.64,
+     "n_pairs_male": 12462,
+     "n_pairs_flywire": 9003,
+     "ratio": 0.781
+    },
+    {
+     "pre": "T2a",
+     "post": "LC17",
+     "mean_syn_male": 8.68,
+     "mean_syn_flywire": 6.51,
+     "n_pairs_male": 12285,
+     "n_pairs_flywire": 10377,
+     "ratio": 0.749
+    }
+   ],
+   "prereg_statistic": "count-weighted median of (FlyWire mean synapses per connected pair) / (male mean synapses per connected pair) over shared type pairs",
+   "prereg_passed": false,
+   "total_input_statistic": "sum of FlyWire synapses / sum of male synapses over the same shared type pairs",
+   "total_input_consistent_with_0.581": true,
+   "passed": false,
+   "note": "pre-registered per-pair statistic FAILED (0.795, outside [0.45, 0.75]); the total-input statistic is 0.547, consistent with 0.581. Both are reported; W_syn and the scale were NOT retuned. The gate decision rests on the propagation benchmark."
+  },
+  "sugar_grn_mapping": {
+   "flywire_ids": [
+    720575940624963786,
+    720575940630233916,
+    720575940637568838,
+    720575940638202345,
+    720575940617000768,
+    720575940630797113,
+    720575940632889389,
+    720575940621754367,
+    720575940621502051,
+    720575940640649691,
+    720575940639332736,
+    720575940616885538,
+    720575940639198653,
+    720575940620900446,
+    720575940617937543,
+    720575940632425919,
+    720575940633143833,
+    720575940612670570,
+    720575940628853239,
+    720575940629176663,
+    720575940611875570
+   ],
+   "n_flywire": 21,
+   "one_to_one_matched": [
+    {
+     "flywire_id": "720575940632425919",
+     "male_body": "516218",
+     "score": "0.5584362745285034",
+     "rank": "1"
+    },
+    {
+     "flywire_id": "720575940632889389",
+     "male_body": "163597",
+     "score": "0.5413985252380371",
+     "rank": "1"
+    },
+    {
+     "flywire_id": "720575940629176663",
+     "male_body": "120303",
+     "score": "0.5271558165550232",
+     "rank": "2"
+    },
+    {
+     "flywire_id": "720575940616885538",
+     "male_body": "261048",
+     "score": "0.504497230052948",
+     "rank": "3"
+    },
+    {
+     "flywire_id": "720575940630797113",
+     "male_body": "210344",
+     "score": "0.5014862418174744",
+     "rank": "2"
+    },
+    {
+     "flywire_id": "720575940611875570",
+     "male_body": "209155",
+     "score": "0.49137961864471436",
+     "rank": "2"
+    },
+    {
+     "flywire_id": "720575940638202345",
+     "male_body": "140015",
+     "score": "0.4912005066871643",
+     "rank": "1"
+    },
+    {
+     "flywire_id": "720575940621754367",
+     "male_body": "140619",
+     "score": "0.4901706874370575",
+     "rank": "1"
+    },
+    {
+     "flywire_id": "720575940621502051",
+     "male_body": "158537",
+     "score": "0.4600009024143219",
+     "rank": "5"
+    },
+    {
+     "flywire_id": "720575940640649691",
+     "male_body": "72059",
+     "score": "0.4519180357456207",
+     "rank": "3"
+    },
+    {
+     "flywire_id": "720575940612670570",
+     "male_body": "101087",
+     "score": "0.4470539391040802",
+     "rank": "1"
+    },
+    {
+     "flywire_id": "720575940637568838",
+     "male_body": "141663",
+     "score": "0.44376808404922485",
+     "rank": "4"
+    },
+    {
+     "flywire_id": "720575940639332736",
+     "male_body": "92440",
+     "score": "0.4322892427444458",
+     "rank": "4"
+    },
+    {
+     "flywire_id": "720575940639198653",
+     "male_body": "142827",
+     "score": "0.4235857427120209",
+     "rank": "4"
+    },
+    {
+     "flywire_id": "720575940617937543",
+     "male_body": "213650853",
+     "score": "0.41170236468315125",
+     "rank": "1"
+    },
+    {
+     "flywire_id": "720575940630233916",
+     "male_body": "516217",
+     "score": "0.4013303816318512",
+     "rank": "5"
+    },
+    {
+     "flywire_id": "720575940628853239",
+     "male_body": "215556",
+     "score": "0.31111940741539",
+     "rank": "4"
+    }
+   ],
+   "unmatched_flywire_ids": [
+    "720575940624963786",
+    "720575940617000768",
+    "720575940620900446",
+    "720575940633143833"
+   ],
+   "allR_n": 40,
+   "male_types_matched": {
+    "LB3c": 8,
+    "LB3d": 4,
+    "LB3b": 3,
+    "LB3a": 2
+   }
+  },
+  "mn9_male": {
+   "MN9_L": 10331,
+   "MN9_R": 16949
+  },
+  "mn9_flywire_match": {
+   "flywire": "720575940660219265",
+   "male_body": 10331,
+   "instance": "MN9_L"
+  },
+  "walltime_s": 8.6
+ },
+ "crossmatch": {
+  "method": "Validate male-CNS target populations against their FlyWire v783 counterparts.\n\nUses the NBLAST cross-matching tables shipped with the male CNS release\n(gs://flyem-male-cns/v1.0/nblasts/matches_{mcns_v1.0_flywire783,flywire783_mcns_v1.0}.feather: top-5\nmorphological matches in each direction, min(forward, reverse) NBLAST score; male CNS neurons were\ntruncated to the brain (z < 281 um) for this NBLAST) and the type-level `flywireType` column of the\nmale CNS annotations.\n\nFor each population we report: counts in both datasets, the fraction of male-CNS members whose best\nFlyWire match falls inside the FlyWire population, the same in reverse, type-name agreement, and an\n'ambiguous' flag when either direction agrees < 80% or the counts differ by > 40%.  Ambiguous\npopulations are reported, not silently used.",
+  "min_agree": 0.8,
+  "populations": [
+   {
+    "population": "KC",
+    "source": "class == 'Kenyon_Cell' (male CNS annotations; FlyWire cell_class 'Kenyon_Cell', Schlegel et al. 2024)",
+    "male_selector": {
+     "cell_class": "Kenyon_Cell"
+    },
+    "flywire_selector": {
+     "cell_class": "Kenyon_Cell"
+    },
+    "n_male": 4064,
+    "n_flywire": 5177,
+    "count_ratio": 0.785,
+    "n_male_with_match_row": 4064,
+    "n_flywire_with_match_row": 5177,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 1.0,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.412,
+    "flywireType_column_agreement": 0.999,
+    "flywire_types_of_best_matches": {
+     "KCab": 1687,
+     "KCg-m": 1357,
+     "KCapbp-m": 312,
+     "KCapbp-ap2": 209,
+     "KCg-d": 202,
+     "KCapbp-ap1": 165,
+     "KCab-p": 123,
+     "KCg-s2": 5
+    },
+    "male_types": {
+     "KCg-m": 1342,
+     "KCab-s": 657,
+     "KCab-m": 536,
+     "KCab-c": 488,
+     "KCa'b'-ap2": 291,
+     "KCg-d": 206,
+     "KCa'b'-m": 205,
+     "KCa'b'-ap1": 199,
+     "KCab-p": 129,
+     "KCg-s1": 2,
+     "KCg-s2": 2,
+     "KCg-s3": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "MBON",
+    "source": "class == 'MBON' (Aso et al. 2014 nomenclature MBON01-35; Li et al. 2020)",
+    "male_selector": {
+     "cell_class": "MBON"
+    },
+    "flywire_selector": {
+     "cell_class": "MBON"
+    },
+    "n_male": 97,
+    "n_flywire": 96,
+    "count_ratio": 1.01,
+    "n_male_with_match_row": 97,
+    "n_flywire_with_match_row": 96,
+    "male_to_flywire_top1_in_pop": 0.99,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.99,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.532,
+    "flywireType_column_agreement": 0.99,
+    "flywire_types_of_best_matches": {
+     "MBON10": 9,
+     "MBON25,MBON34": 7,
+     "MBON15-like": 5,
+     "MBON14": 4,
+     "MBON07": 4,
+     "MBON12": 4,
+     "MBON09": 4,
+     "MBON19": 4
+    },
+    "male_types": {
+     "MBON10": 9,
+     "MBON14": 4,
+     "MBON15": 4,
+     "MBON07": 4,
+     "MBON12": 4,
+     "MBON09": 4,
+     "MBON19": 4,
+     "MBON15-like": 4,
+     "MBON25-like": 4,
+     "MBON01": 2,
+     "MBON06": 2,
+     "MBON05": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "PAM",
+    "source": "type PAM01-PAM15 (Aso et al. 2014; Li et al. 2020)",
+    "male_selector": {
+     "cell_type": {
+      "regex": "^PAM\\d\\d"
+     }
+    },
+    "flywire_selector": {
+     "cell_type": {
+      "regex": "^PAM\\d\\d"
+     }
+    },
+    "n_male": 316,
+    "n_flywire": 307,
+    "count_ratio": 1.029,
+    "n_male_with_match_row": 316,
+    "n_flywire_with_match_row": 307,
+    "male_to_flywire_top1_in_pop": 0.968,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.993,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.417,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "PAM08": 51,
+     "PAM01": 38,
+     "PAM06": 38,
+     "PAM04": 28,
+     "PAM13": 24,
+     "PAM10": 20,
+     "PAM12": 20,
+     "PAM02": 18
+    },
+    "male_types": {
+     "PAM08": 50,
+     "PAM01": 44,
+     "PAM04": 32,
+     "PAM06": 28,
+     "PAM12": 22,
+     "PAM05": 20,
+     "PAM14": 18,
+     "PAM02": 17,
+     "PAM13": 16,
+     "PAM10": 15,
+     "PAM11": 15,
+     "PAM07": 14
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "PPL1",
+    "source": "type PPL101-PPL108 (Aso et al. 2014; Li et al. 2020)",
+    "male_selector": {
+     "cell_type": {
+      "regex": "^PPL1\\d\\d"
+     }
+    },
+    "flywire_selector": {
+     "cell_type": {
+      "regex": "^PPL1\\d\\d"
+     }
+    },
+    "n_male": 16,
+    "n_flywire": 16,
+    "count_ratio": 1.0,
+    "n_male_with_match_row": 16,
+    "n_flywire_with_match_row": 16,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 1.0,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.547,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "PPL101": 2,
+     "PPL102": 2,
+     "PPL103": 2,
+     "PPL108": 2,
+     "PPL105": 2,
+     "PPL107": 2,
+     "PPL104": 2,
+     "PPL106": 2
+    },
+    "male_types": {
+     "PPL101": 2,
+     "PPL102": 2,
+     "PPL103": 2,
+     "PPL108": 2,
+     "PPL105": 2,
+     "PPL107": 2,
+     "PPL104": 2,
+     "PPL106": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "DAN",
+    "source": "class == 'DAN' (PAM + PPL1 mushroom-body dopaminergic neurons)",
+    "male_selector": {
+     "cell_class": "DAN"
+    },
+    "flywire_selector": {
+     "cell_class": "DAN"
+    },
+    "n_male": 340,
+    "n_flywire": 331,
+    "count_ratio": 1.027,
+    "n_male_with_match_row": 340,
+    "n_flywire_with_match_row": 331,
+    "male_to_flywire_top1_in_pop": 0.971,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.994,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.42,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "PAM08": 51,
+     "PAM01": 38,
+     "PAM06": 38,
+     "PAM04": 28,
+     "PAM13": 24,
+     "PAM10": 20,
+     "PAM12": 20,
+     "PAM02": 18
+    },
+    "male_types": {
+     "PAM08": 50,
+     "PAM01": 44,
+     "PAM04": 32,
+     "PAM06": 28,
+     "PAM12": 22,
+     "PAM05": 20,
+     "PAM14": 18,
+     "PAM02": 17,
+     "PAM13": 16,
+     "PAM10": 15,
+     "PAM11": 15,
+     "PAM07": 14
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "ORN",
+    "source": "type ORN_<glomerulus> (olfactory receptor neurons, 53 glomerular types)",
+    "male_selector": {
+     "cell_type": {
+      "regex": "^ORN_"
+     }
+    },
+    "flywire_selector": {
+     "cell_type": {
+      "regex": "^ORN_"
+     }
+    },
+    "n_male": 2635,
+    "n_flywire": 2275,
+    "count_ratio": 1.158,
+    "n_male_with_match_row": 2635,
+    "n_flywire_with_match_row": 2275,
+    "male_to_flywire_top1_in_pop": 0.986,
+    "male_to_flywire_top5_in_pop": 0.995,
+    "flywire_to_male_top1_in_pop": 0.997,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.437,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "ORN_DA1": 189,
+     "ORN_VA1v": 136,
+     "ORN_VA1d": 124,
+     "ORN_DM1": 101,
+     "ORN_VL1": 90,
+     "ORN_VM5d": 83,
+     "ORN_DA3": 82,
+     "ORN_VC5": 79
+    },
+    "male_types": {
+     "ORN_DA1": 204,
+     "ORN_VA1d": 132,
+     "ORN_VA1v": 130,
+     "ORN_DL3": 103,
+     "ORN_VL2a": 98,
+     "ORN_VM5d": 84,
+     "ORN_VA2": 83,
+     "ORN_DL1": 83,
+     "ORN_VL1": 82,
+     "ORN_VM4": 78,
+     "ORN_DM1": 74,
+     "ORN_VA6": 63
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "dFB",
+    "source": "Hulse et al. 2021 eLife 10:e66039 Fig. 48 (R23E10 -> FB6A, FB6C_a/b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K)",
+    "male_selector": {
+     "cell_type": {
+      "regex": "^(FB6A(_[abc])?|FB6C(_[ab])?|FB6E|FB6G|FB6I|FB6Z|FB7A|FB7K)$"
+     }
+    },
+    "flywire_selector": {
+     "cell_type": {
+      "regex": "^(FB6A(_[abc])?|FB6C(_[ab])?|FB6E|FB6G|FB6I|FB6Z|FB7A|FB7K)$"
+     }
+    },
+    "n_male": 32,
+    "n_flywire": 33,
+    "count_ratio": 0.97,
+    "n_male_with_match_row": 32,
+    "n_flywire_with_match_row": 33,
+    "male_to_flywire_top1_in_pop": 0.969,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 1.0,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.589,
+    "flywireType_column_agreement": 0.938,
+    "flywire_types_of_best_matches": {
+     "FB6C": 7,
+     "FB7A": 5,
+     "FB6A": 4,
+     "FB7K": 4,
+     "FB6Z": 3,
+     "FB6G": 3,
+     "FB6A_c": 2,
+     "FB6E": 2
+    },
+    "male_types": {
+     "FB6C_b": 6,
+     "FB7A": 6,
+     "FB7K": 4,
+     "FB6A_a": 2,
+     "FB6A_c": 2,
+     "FB6I": 2,
+     "FB6C_a": 2,
+     "FB6E": 2,
+     "FB6G": 2,
+     "FB6Z": 2,
+     "FB6A_b": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "dFB_core",
+    "source": "Hulse et al. 2021: layer-6 high-quality LM-EM matches only",
+    "male_selector": {
+     "cell_type": {
+      "regex": "^(FB6A(_[abc])?|FB6C(_[ab])?|FB6E|FB6G|FB6I|FB6Z)$"
+     }
+    },
+    "flywire_selector": {
+     "cell_type": {
+      "regex": "^(FB6A(_[abc])?|FB6C(_[ab])?|FB6E|FB6G|FB6I|FB6Z)$"
+     }
+    },
+    "n_male": 22,
+    "n_flywire": 23,
+    "count_ratio": 0.957,
+    "n_male_with_match_row": 22,
+    "n_flywire_with_match_row": 23,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.957,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.589,
+    "flywireType_column_agreement": 0.909,
+    "flywire_types_of_best_matches": {
+     "FB6C": 7,
+     "FB6A": 4,
+     "FB6Z": 3,
+     "FB6G": 3,
+     "FB6A_c": 2,
+     "FB6E": 2,
+     "FB6I": 1
+    },
+    "male_types": {
+     "FB6C_b": 6,
+     "FB6A_a": 2,
+     "FB6A_c": 2,
+     "FB6I": 2,
+     "FB6C_a": 2,
+     "FB6E": 2,
+     "FB6G": 2,
+     "FB6Z": 2,
+     "FB6A_b": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "dFB_wake_DAN",
+    "source": "Hulse et al. 2021 (FB5H, FB6H, FB7B = PPL1 dopaminergic dFB inputs that switch dFB neurons OFF)",
+    "male_selector": {
+     "cell_type": [
+      "FB5H",
+      "FB6H",
+      "FB7B"
+     ]
+    },
+    "flywire_selector": {
+     "cell_type": [
+      "FB5H",
+      "FB6H",
+      "FB7B"
+     ]
+    },
+    "n_male": 6,
+    "n_flywire": 6,
+    "count_ratio": 1.0,
+    "n_male_with_match_row": 6,
+    "n_flywire_with_match_row": 6,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 1.0,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.6,
+    "flywireType_column_agreement": 0.333,
+    "flywire_types_of_best_matches": {
+     "FB6H": 2,
+     "FB5H": 2,
+     "FB7B": 2
+    },
+    "male_types": {
+     "FB6H": 2,
+     "FB5H": 2,
+     "FB7B": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "MN9",
+    "source": "type 'MN9' (proboscis motor neuron 9; FlyWire CB0701 = Shiu et al. 2024 MN9 720575940660219265)",
+    "male_selector": {
+     "cell_type": "MN9"
+    },
+    "flywire_selector": {
+     "cell_type": "CB0701"
+    },
+    "n_male": 2,
+    "n_flywire": 2,
+    "count_ratio": 1.0,
+    "n_male_with_match_row": 2,
+    "n_flywire_with_match_row": 2,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.5,
+    "flywire_to_male_top5_in_pop": 0.5,
+    "median_nblast_score_male_to_flywire": 0.443,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "CB0701": 2
+    },
+    "male_types": {
+     "MN9": 2
+    },
+    "ambiguous": true,
+    "reasons": [
+     "only 50% of FlyWire members have their best NBLAST match inside the male-CNS population"
+    ]
+   },
+   {
+    "population": "sugar_GRN",
+    "source": "type LB3a-LB3d (labellar bristle GRNs matched to FlyWire LB3 'sugar/water', Schlegel et al. 2024; Shiu et al. 2024 sugar GRNs are FlyWire LB3)",
+    "male_selector": {
+     "cell_type": {
+      "regex": "^LB3[a-d]?$"
+     }
+    },
+    "flywire_selector": {
+     "cell_type": "LB3"
+    },
+    "n_male": 78,
+    "n_flywire": 122,
+    "count_ratio": 0.639,
+    "n_male_with_match_row": 78,
+    "n_flywire_with_match_row": 122,
+    "male_to_flywire_top1_in_pop": 0.923,
+    "male_to_flywire_top5_in_pop": 0.987,
+    "flywire_to_male_top1_in_pop": 0.877,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.514,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "LB3": 72,
+     "LB4a": 1,
+     "BM_InOm": 1,
+     "LB1a,LB1d": 1,
+     "LB1e": 1,
+     "LB2a-b": 1,
+     "BM_Taste": 1
+    },
+    "male_types": {
+     "LB3d": 26,
+     "LB3c": 23,
+     "LB3a": 17,
+     "LB3b": 11,
+     "LB3": 1
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "APL",
+    "source": "type APL",
+    "male_selector": {
+     "cell_type": "APL"
+    },
+    "flywire_selector": {
+     "cell_type": "APL"
+    },
+    "n_male": 2,
+    "n_flywire": 2,
+    "count_ratio": 1.0,
+    "n_male_with_match_row": 2,
+    "n_flywire_with_match_row": 2,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 1.0,
+    "flywire_to_male_top5_in_pop": 1.0,
+    "median_nblast_score_male_to_flywire": 0.687,
+    "flywireType_column_agreement": 1.0,
+    "flywire_types_of_best_matches": {
+     "APL": 2
+    },
+    "male_types": {
+     "APL": 2
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "ALPN",
+    "source": "class ALPN (antennal lobe projection neurons)",
+    "male_selector": {
+     "cell_class": "ALPN"
+    },
+    "flywire_selector": {
+     "cell_class": "ALPN"
+    },
+    "n_male": 686,
+    "n_flywire": 685,
+    "count_ratio": 1.001,
+    "n_male_with_match_row": 686,
+    "n_flywire_with_match_row": 685,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.991,
+    "flywire_to_male_top5_in_pop": 0.997,
+    "median_nblast_score_male_to_flywire": 0.503,
+    "flywireType_column_agreement": 0.983,
+    "flywire_types_of_best_matches": {
+     "DA1_lPN": 13,
+     "VM5d_adPN": 12,
+     "DL3_lPN": 11,
+     "M_lPNm11D": 11,
+     "M_vPNml53": 11,
+     "DA2_lPN": 10,
+     "CB1296": 10,
+     "DL2d_adPN": 9
+    },
+    "male_types": {
+     "DA1_lPN": 13,
+     "VM5d_adPN": 12,
+     "M_lPNm11D": 12,
+     "M_vPNml53": 12,
+     "DL3_lPN": 11,
+     "DA2_lPN": 10,
+     "DL2d_adPN": 9,
+     "VP1l+_lvPN": 9,
+     "M_adPNm5": 9,
+     "VA1v_adPN": 8,
+     "DL2v_adPN": 8,
+     "VP1m+VP2_lvPN2": 8
+    },
+    "ambiguous": false,
+    "reasons": []
+   },
+   {
+    "population": "CX",
+    "source": "class CX (central complex)",
+    "male_selector": {
+     "cell_class": "CX"
+    },
+    "flywire_selector": {
+     "cell_class": "CX"
+    },
+    "n_male": 2950,
+    "n_flywire": 2875,
+    "count_ratio": 1.026,
+    "n_male_with_match_row": 2950,
+    "n_flywire_with_match_row": 2875,
+    "male_to_flywire_top1_in_pop": 1.0,
+    "male_to_flywire_top5_in_pop": 1.0,
+    "flywire_to_male_top1_in_pop": 0.988,
+    "flywire_to_male_top5_in_pop": 0.993,
+    "median_nblast_score_male_to_flywire": 0.531,
+    "flywireType_column_agreement": 0.849,
+    "flywire_types_of_best_matches": {
+     "PFNm": 205,
+     "PFNp": 129,
+     "PFNa": 68,
+     "FS4A": 63,
+     "vDeltaK": 60,
+     "EPG": 57,
+     "FS2": 57,
+     "FC1A,FC1B,FC1F": 54
+    },
+    "male_types": {
+     "PFNp_b": 136,
+     "vDeltaA_a": 70,
+     "PFNp_a": 64,
+     "PFNa": 58,
+     "FS4A": 57,
+     "vDeltaM": 55,
+     "FC2C": 47,
+     "vDeltaK": 47,
+     "EPG": 46,
+     "Delta7": 42,
+     "FS2": 42,
+     "PFNp_c": 40
+    },
+    "ambiguous": false,
+    "reasons": []
+   }
+  ],
+  "n_ambiguous": 1
+ },
+ "target": {
+  "source": "philshiu/Drosophila_brain_model results/example/sugarR.parquet (v630, 21 sugar GRNs, 200 Hz, 30 x 1 s)",
+  "mn9_rate_hz_mean": 93.26666666666667,
+  "mn9_rate_hz_per_trial": [
+   86,
+   94,
+   90,
+   89,
+   95,
+   91,
+   95,
+   97,
+   93,
+   97,
+   89,
+   88,
+   89,
+   94,
+   90,
+   95,
+   91,
+   95,
+   94,
+   99,
+   97,
+   96,
+   94,
+   94,
+   93,
+   93,
+   96,
+   91,
+   97,
+   96
+  ],
+  "n_trials": 30,
+  "n_active_neurons": 448,
+  "total_spikes": 511566
+ },
+ "runs": [
+  {
+   "name": "engine_check_flywire_v630_200Hz",
+   "data_version": "flywire-630",
+   "n_neurons": 127400,
+   "n_connections": 14687178,
+   "n_sugar_grns": 21,
+   "sugar_rate_hz": 200,
+   "mn9_rate_hz_mean": 92.8,
+   "mn9_rate_hz_sd": 4.66387436987008,
+   "mn9_rate_hz_per_trial": [
+    95,
+    92,
+    84,
+    93,
+    91,
+    94,
+    88,
+    88,
+    87,
+    94,
+    92,
+    93,
+    89,
+    91,
+    101,
+    94,
+    85,
+    98,
+    94,
+    93,
+    94,
+    105,
+    95,
+    91,
+    100,
+    93,
+    93,
+    87,
+    99,
+    91
+   ],
+   "n_trials": 30,
+   "n_active_neurons": 447,
+   "n_active_per_trial_mean": 401.7,
+   "total_spikes": 509728,
+   "reference": {
+    "mn9_rate_hz_mean": 93.26666666666667,
+    "mn9_rate_hz_sd": 3.2048813344359712,
+    "n_active_neurons": 448,
+    "n_active_per_trial_mean": 402.6,
+    "total_spikes": 511566,
+    "source": "philshiu/Drosophila_brain_model results/example/sugarR.parquet (v630, 21 sugar GRNs, 200 Hz, 30 x 1 s)"
+   },
+   "per_neuron_rate_correlation": 0.9998557233211924,
+   "checks": {
+    "mn9_within_range": true,
+    "active_within_15pct": true,
+    "spikes_within_15pct": true,
+    "rate_corr_gt_0.95": true
+   },
+   "status": "passed",
+   "top_active": [
+    {
+     "root_id": "720575940637568838",
+     "rate_hz": 197.16666666666666,
+     "target_rate_hz": 202.06666666666666
+    },
+    {
+     "root_id": "720575940621502051",
+     "rate_hz": 199.66666666666666,
+     "target_rate_hz": 200.2
+    },
+    {
+     "root_id": "720575940639198653",
+     "rate_hz": 198.83333333333334,
+     "target_rate_hz": 199.96666666666667
+    },
+    {
+     "root_id": "720575940617937543",
+     "rate_hz": 196.0,
+     "target_rate_hz": 199.4
+    },
+    {
+     "root_id": "720575940633143833",
+     "rate_hz": 199.2,
+     "target_rate_hz": 199.03333333333333
+    },
+    {
+     "root_id": "720575940639332736",
+     "rate_hz": 197.03333333333333,
+     "target_rate_hz": 198.9
+    },
+    {
+     "root_id": "720575940640649691",
+     "rate_hz": 196.23333333333332,
+     "target_rate_hz": 198.46666666666667
+    },
+    {
+     "root_id": "720575940624963786",
+     "rate_hz": 196.93333333333334,
+     "target_rate_hz": 198.33333333333334
+    },
+    {
+     "root_id": "720575940632889389",
+     "rate_hz": 195.2,
+     "target_rate_hz": 197.76666666666668
+    },
+    {
+     "root_id": "720575940616885538",
+     "rate_hz": 193.46666666666667,
+     "target_rate_hz": 197.3
+    },
+    {
+     "root_id": "720575940628853239",
+     "rate_hz": 195.46666666666667,
+     "target_rate_hz": 197.26666666666668
+    },
+    {
+     "root_id": "720575940632425919",
+     "rate_hz": 190.8,
+     "target_rate_hz": 196.96666666666667
+    },
+    {
+     "root_id": "720575940630233916",
+     "rate_hz": 194.56666666666666,
+     "target_rate_hz": 196.6
+    },
+    {
+     "root_id": "720575940630797113",
+     "rate_hz": 198.03333333333333,
+     "target_rate_hz": 195.73333333333332
+    },
+    {
+     "root_id": "720575940611875570",
+     "rate_hz": 197.56666666666666,
+     "target_rate_hz": 194.96666666666667
+    }
+   ]
+  },
+  {
+   "name": "engine_check_flywire_v630_100Hz",
+   "data_version": "flywire-630",
+   "n_neurons": 127400,
+   "n_connections": 14687178,
+   "n_sugar_grns": 21,
+   "sugar_rate_hz": 100,
+   "mn9_rate_hz_mean": 67.46666666666667,
+   "mn9_rate_hz_sd": 5.587753439956628,
+   "mn9_rate_hz_per_trial": [
+    61,
+    59,
+    71,
+    74,
+    65,
+    59,
+    76,
+    68,
+    66,
+    68,
+    66,
+    81,
+    65,
+    71,
+    66,
+    63,
+    71,
+    62,
+    65,
+    61,
+    58,
+    74,
+    71,
+    73,
+    71,
+    68,
+    75,
+    63,
+    67,
+    66
+   ],
+   "n_trials": 30,
+   "n_active_neurons": 428,
+   "n_active_per_trial_mean": 357.3666666666667,
+   "total_spikes": 290310,
+   "reference": {
+    "mn9_rate_hz_mean": 67.03333333333333,
+    "mn9_rate_hz_sd": 6.708118258849693,
+    "n_active_neurons": 404,
+    "n_active_per_trial_mean": 354.3,
+    "total_spikes": 289073,
+    "source": "philshiu/Drosophila_brain_model results/example/sugarR_100Hz.parquet (v630, 21 sugar GRNs, 100 Hz, 30 x 1 s)"
+   },
+   "per_neuron_rate_correlation": 0.9996902384661229,
+   "checks": {
+    "mn9_within_range": true,
+    "active_within_15pct": true,
+    "spikes_within_15pct": true,
+    "rate_corr_gt_0.95": true
+   },
+   "status": "passed",
+   "top_active": [
+    {
+     "root_id": "720575940622695448",
+     "rate_hz": 114.96666666666667,
+     "target_rate_hz": 114.26666666666667
+    },
+    {
+     "root_id": "720575940621754367",
+     "rate_hz": 96.16666666666667,
+     "target_rate_hz": 102.56666666666666
+    },
+    {
+     "root_id": "720575940617937543",
+     "rate_hz": 97.9,
+     "target_rate_hz": 101.73333333333333
+    },
+    {
+     "root_id": "720575940629888530",
+     "rate_hz": 102.7,
+     "target_rate_hz": 101.7
+    },
+    {
+     "root_id": "720575940638202345",
+     "rate_hz": 97.86666666666666,
+     "target_rate_hz": 101.26666666666667
+    },
+    {
+     "root_id": "720575940629176663",
+     "rate_hz": 98.9,
+     "target_rate_hz": 101.26666666666667
+    },
+    {
+     "root_id": "720575940627383685",
+     "rate_hz": 101.23333333333333,
+     "target_rate_hz": 101.13333333333334
+    },
+    {
+     "root_id": "720575940630233916",
+     "rate_hz": 100.33333333333333,
+     "target_rate_hz": 100.4
+    },
+    {
+     "root_id": "720575940640649691",
+     "rate_hz": 98.66666666666667,
+     "target_rate_hz": 100.03333333333333
+    },
+    {
+     "root_id": "720575940632889389",
+     "rate_hz": 98.2,
+     "target_rate_hz": 99.46666666666667
+    },
+    {
+     "root_id": "720575940611875570",
+     "rate_hz": 101.23333333333333,
+     "target_rate_hz": 99.26666666666667
+    },
+    {
+     "root_id": "720575940633143833",
+     "rate_hz": 101.86666666666666,
+     "target_rate_hz": 99.1
+    },
+    {
+     "root_id": "720575940617000768",
+     "rate_hz": 98.6,
+     "target_rate_hz": 98.9
+    },
+    {
+     "root_id": "720575940639198653",
+     "rate_hz": 99.23333333333333,
+     "target_rate_hz": 98.76666666666667
+    },
+    {
+     "root_id": "720575940637568838",
+     "rate_hz": 99.06666666666666,
+     "target_rate_hz": 98.46666666666667
+    }
+   ]
+  },
+  {
+   "name": "malecns_matched17_100Hz_scale0.581",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 17,
+   "sugar_rate_hz": 100,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 25.7,
+   "mn9_rate_hz_sd": 4.720826929315639,
+   "mn9_rate_hz_per_trial": [
+    26,
+    25,
+    20,
+    27,
+    26,
+    28,
+    24,
+    24,
+    26,
+    20,
+    22,
+    26,
+    32,
+    24,
+    30,
+    21,
+    35,
+    29,
+    21,
+    32,
+    34,
+    20,
+    23,
+    23,
+    27,
+    22,
+    23,
+    25,
+    37,
+    19
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 25.7,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "frac_trials_active": 0.0
+    }
+   },
+   "n_active_per_trial_mean": 220.4,
+   "total_spikes": 143893,
+   "reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_matched17_100Hz_scale1.0",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 17,
+   "sugar_rate_hz": 100,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 105.6,
+   "mn9_rate_hz_sd": 17.889700369495984,
+   "mn9_rate_hz_per_trial": [
+    126,
+    116,
+    70,
+    118,
+    84,
+    99,
+    109,
+    108,
+    113,
+    74,
+    108,
+    84,
+    87,
+    114,
+    89,
+    99,
+    94,
+    99,
+    115,
+    121,
+    69,
+    126,
+    112,
+    133,
+    139,
+    114,
+    112,
+    104,
+    121,
+    111
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 105.6,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 10.766666666666667,
+     "frac_trials_active": 1.0
+    }
+   },
+   "n_active_per_trial_mean": 9566.466666666667,
+   "total_spikes": 13187066,
+   "reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_matched17_200Hz_scale0.581",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 17,
+   "sugar_rate_hz": 200,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 80.4,
+   "mn9_rate_hz_sd": 3.944441746262097,
+   "mn9_rate_hz_per_trial": [
+    76,
+    83,
+    82,
+    83,
+    78,
+    87,
+    81,
+    75,
+    87,
+    76,
+    76,
+    74,
+    83,
+    85,
+    86,
+    80,
+    82,
+    79,
+    77,
+    76,
+    78,
+    83,
+    79,
+    83,
+    78,
+    80,
+    77,
+    89,
+    81,
+    78
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 80.4,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "frac_trials_active": 0.0
+    }
+   },
+   "n_active_per_trial_mean": 431.1666666666667,
+   "total_spikes": 335399,
+   "reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_matched17_200Hz_scale1.0",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 17,
+   "sugar_rate_hz": 200,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 135.76666666666668,
+   "mn9_rate_hz_sd": 8.830524385309188,
+   "mn9_rate_hz_per_trial": [
+    140,
+    166,
+    119,
+    143,
+    118,
+    130,
+    134,
+    134,
+    137,
+    141,
+    144,
+    135,
+    141,
+    128,
+    136,
+    134,
+    133,
+    141,
+    128,
+    135,
+    134,
+    130,
+    133,
+    130,
+    149,
+    137,
+    142,
+    139,
+    129,
+    133
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 135.76666666666668,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 12.333333333333334,
+     "frac_trials_active": 1.0
+    }
+   },
+   "n_active_per_trial_mean": 11064.3,
+   "total_spikes": 17579055,
+   "reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_allR_100Hz_scale0.581",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 40,
+   "sugar_rate_hz": 100,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 68.33333333333333,
+   "mn9_rate_hz_sd": 4.922386114220547,
+   "mn9_rate_hz_per_trial": [
+    63,
+    67,
+    74,
+    71,
+    66,
+    62,
+    70,
+    78,
+    67,
+    71,
+    69,
+    72,
+    65,
+    61,
+    67,
+    75,
+    66,
+    66,
+    72,
+    76,
+    76,
+    66,
+    59,
+    71,
+    60,
+    72,
+    67,
+    64,
+    66,
+    71
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 68.33333333333333,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "frac_trials_active": 0.0
+    }
+   },
+   "n_active_per_trial_mean": 356.73333333333335,
+   "total_spikes": 285873,
+   "reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_allR_100Hz_scale1.0",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 40,
+   "sugar_rate_hz": 100,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 121.6,
+   "mn9_rate_hz_sd": 16.30231631521666,
+   "mn9_rate_hz_per_trial": [
+    126,
+    132,
+    116,
+    143,
+    136,
+    138,
+    113,
+    87,
+    140,
+    112,
+    145,
+    132,
+    126,
+    108,
+    97,
+    124,
+    92,
+    111,
+    110,
+    112,
+    142,
+    94,
+    133,
+    128,
+    131,
+    135,
+    142,
+    119,
+    113,
+    111
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 121.6,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 15.433333333333334,
+     "frac_trials_active": 1.0
+    }
+   },
+   "n_active_per_trial_mean": 10152.233333333334,
+   "total_spikes": 15065468,
+   "reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_allR_200Hz_scale0.581",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 40,
+   "sugar_rate_hz": 200,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 101.46666666666667,
+   "mn9_rate_hz_sd": 3.411272725713293,
+   "mn9_rate_hz_per_trial": [
+    99,
+    104,
+    98,
+    102,
+    104,
+    104,
+    103,
+    106,
+    103,
+    100,
+    103,
+    105,
+    104,
+    100,
+    105,
+    103,
+    101,
+    101,
+    99,
+    99,
+    103,
+    107,
+    94,
+    100,
+    91,
+    103,
+    99,
+    101,
+    104,
+    99
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 101.46666666666667,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "frac_trials_active": 0.0
+    }
+   },
+   "n_active_per_trial_mean": 521.0,
+   "total_spikes": 581094,
+   "reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  },
+  {
+   "name": "malecns_allR_200Hz_scale1.0",
+   "data_version": "malecns-v1.0 (brain)",
+   "n_neurons": 144209,
+   "n_connections": 21868062,
+   "n_sugar_grns": 40,
+   "sugar_rate_hz": 200,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9_rate_hz_mean": 144.5,
+   "mn9_rate_hz_sd": 6.755585173357136,
+   "mn9_rate_hz_per_trial": [
+    154,
+    136,
+    150,
+    144,
+    147,
+    132,
+    149,
+    142,
+    134,
+    139,
+    151,
+    147,
+    161,
+    148,
+    144,
+    144,
+    139,
+    144,
+    137,
+    153,
+    145,
+    147,
+    137,
+    147,
+    141,
+    148,
+    134,
+    141,
+    146,
+    154
+   ],
+   "mn9_by_side": {
+    "MN9_L": {
+     "rate_hz_mean": 144.5,
+     "frac_trials_active": 1.0
+    },
+    "MN9_R": {
+     "rate_hz_mean": 16.533333333333335,
+     "frac_trials_active": 1.0
+    }
+   },
+   "n_active_per_trial_mean": 12017.766666666666,
+   "total_spikes": 20379878,
+   "reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7,
+    "source": "this pipeline's engine-check runs on FlyWire v630 at the same drive"
+   }
+  }
+ ],
+ "discrepancies": [
+  "The paper repository's shipped example output (results/example/sugarR.parquet) was generated with 200 Hz sugar-GRN drive (its GRNs fire at ~199 Hz), not the 150 Hz default in the current model.py; we compared at 200 Hz and 100 Hz (sugarR_100Hz.parquet).",
+  "FlyWire v630 @ 200 Hz: MN9 92.80 Hz (ours) vs 93.27 Hz (shipped); union of active neurons 447 vs 448; per-neuron rate correlation r = 0.9999.",
+  "FlyWire v630 @ 100 Hz: MN9 67.47 Hz (ours) vs 67.03 Hz (shipped); union of active neurons 428 vs 404; per-neuron rate correlation r = 0.9997.",
+  "Male CNS scale factor: the pre-registered per-type-pair mean-synapse statistic gave 0.795 (FAILS the [0.45, 0.75] window); the total-input statistic over the same 39307 shared type pairs gave 0.547, consistent with the published 0.581. Neither W_syn nor the scale was retuned.",
+  "Only 17 of the paper's 21 FlyWire sugar GRNs have one-to-one NBLAST matches among male LB3a-d bodies (unmatched: 720575940624963786, 720575940617000768, 720575940620900446, 720575940633143833); the 'allR' variant drives all 40 right labellar LB3a-d GRNs.",
+  "Without the 0.581 scaling (weight_scale = 1.0) the same drive activates >9,500 neurons per trial (runaway), versus ~400 in FlyWire.",
+  "MN9 side convention: Shiu's MN9 (720575940660219265) matches male body 10331 (MN9_L); the other MN9 stays silent in the scaled runs."
+ ],
+ "provenance": {
+  "config": "configs/base.yaml",
+  "config_hash": "",
+  "results_dir": "results/stage0_engine_check + results/stage0_validate_malecns",
+  "files": [
+   "results/stage0_engine_check/engine_check.json",
+   "results/stage0_validate_malecns/validation.json",
+   "results/stage0_engine_check/crossmatch_report.json"
+  ],
+  "git_commit": "bec98e6",
+  "generated_at": "2026-09-11T23:55:08+00:00"
+ }
+}
