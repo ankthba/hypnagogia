@@ -1,0 +1,9 @@
+extends: base.yaml
+noise: {mode: gaussian, sigma_mV: 2.0}
+stage1:
+  gaussian_sigmas_mV: [1.0, 2.0, 3.0, 4.0]
+  poisson_rates_hz: [50, 100, 200]       # background rate per input stream (weight = W_syn, one stream per neuron)
+  duration_s: 3.0
+  n_record_v: 50                          # neurons whose membrane potential is recorded (1 ms) to verify the noise s.d.
+  isolated: true                          # synapses off (weight_scale 0): tests the noise term itself
+  criterion: "isolated Gaussian model: sample s.d. of v within 5% of sigma for sigma <= 2 mV (threshold 7 mV above rest -> spikes negligible); Poisson mode runs with finite rates"

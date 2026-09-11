@@ -1,0 +1,12 @@
+extends: base.yaml
+noise: {mode: gaussian, sigma_mV: 2.0}
+stage2:
+  sigma_values_mV: [0.5, 0.71, 1.0, 1.41, 2.0, 2.83, 4.0, 5.66, 8.0]   # log-spaced (factor sqrt(2))
+  seeds: [0, 1, 2]
+  warmup_s: 1.0
+  duration_s: 4.0
+  mr_bin_ms: 2.0            # ~ synaptic delay (1.8 ms); Wilting & Priesemann 2018 used 4 ms for cortex
+  mr_kmax_ms: 500.0
+  avalanche_bin_mult: 1.0   # avalanche bin = <IEI> x this (Priesemann 2014); 0.5 and 2.0 run as robustness checks
+  max_avalanches_for_fit: 200000
+  operating_rule: "if any sigma is 'critical': the critical sigma with mean m closest to 1; else the non-saturated sigma with mean m closest to 1 from below, and 'no critical regime' is reported as the finding"

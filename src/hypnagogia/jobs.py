@@ -64,8 +64,9 @@ def run_job(spec: dict) -> dict:
     init_w = None
     if spec.get("init_plastic_w"):
         init_w = np.load(spec["init_plastic_w"])["w_final_mV"].astype(np.float64)
+    rv = resolve_group(conn, spec["record_v"]) if spec.get("record_v") else None
     sim = Simulation(conn, spec["config"], spec["out_dir"], spec["seed"], groups, record=record, plasticity=pl,
-                     init_plastic_w=init_w, name=spec.get("name", "sim"))
+                     init_plastic_w=init_w, name=spec.get("name", "sim"), record_v=rv, record_v_dt_s=spec.get("record_v_dt_s", 0.001))
     for ep in spec["epochs"]:
         sim.add_epoch(ep["name"], ep["duration_s"], ep.get("drives"), ep.get("plastic", False), ep.get("sigma_mV"), ep.get("note", ""))
     out = sim.run(clean=True)

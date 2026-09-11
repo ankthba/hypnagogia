@@ -35,7 +35,7 @@ class Simulation:
     def __init__(self, conn: Connectome, cfg: dict, run_dir: str | Path, seed: int,
                  drive_groups: dict[str, np.ndarray], record: str | np.ndarray = "all",
                  plasticity: dict | None = None, init_plastic_w: np.ndarray | None = None,
-                 name: str = "sim"):
+                 name: str = "sim", record_v: np.ndarray | None = None, record_v_dt_s: float = 0.001):
         self.conn, self.cfg, self.name = conn, cfg, name
         self.run_dir = Path(run_dir)
         self.seed = int(seed)
@@ -43,6 +43,8 @@ class Simulation:
         self.record = record
         self.plasticity = plasticity
         self.init_plastic_w = init_plastic_w
+        self.record_v = None if record_v is None else np.unique(np.asarray(record_v, dtype=np.int64))
+        self.record_v_dt_s = float(record_v_dt_s)
         self.epochs: list[dict] = []
 
     def add_epoch(self, name: str, duration_s: float, drives: dict[str, float] | None = None,
@@ -179,6 +181,10 @@ class Simulation:
             rec_idx = np.unique(np.asarray(self.record, dtype=np.int64))
             spk = SpikeMonitor(neu, record=rec_idx, name="spk")
         objs.append(spk)
+        vmon = None
+        if self.record_v is not None and len(self.record_v):
+            vmon = StateMonitor(neu, "v", record=self.record_v, dt=self.record_v_dt_s * second, name="vmon")
+            objs.append(vmon)
 
         net = Network(neu, *objs)
         # ---- epochs ---------------------------------------------------------------------
@@ -219,6 +225,10 @@ class Simulation:
                 "n_spikes": int(len(si)), "n_active": int(len(np.unique(si))), "walltime_build_run_s": round(t_run, 1),
                 "walltime_total_s": round(time.time() - t_wall0, 1), "brian2": b2.__version__,
                 "filtering_steps": conn.filtering_steps, "connectome_provenance": {k: v for k, v in conn.provenance.items() if k != "cache"}}
+        if vmon is not None:
+            np.savez_compressed(self.run_dir / "voltage.npz", idx=self.record_v.astype(np.int32),
+                                t_s=np.asarray(vmon.t[:] / second, dtype=np.float32), v_mV=np.asarray(vmon.v[:] / mV, dtype=np.float32))
+            out["voltage"] = str(self.run_dir / "voltage.npz")
         if psyn is not None:
             info = self._plastic_info
             wz = {"pre": info["pre"].astype(np.int32), "post": info["post"].astype(np.int32),
