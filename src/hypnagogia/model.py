@@ -90,15 +90,29 @@ class Simulation:
                       eta_ltd=float(pl["eta_ltd"]), eta_ltp=float(pl.get("eta_ltp", 0.0)),
                       w_min_frac=float(pl.get("w_min_frac", 0.0)), w_max_frac=float(pl.get("w_max_frac", 1.0)))
         gauss = noise["mode"] == "gaussian"
-        eqs = ["dv/dt = (v_rest - v + g)/tau_m" + (" + sigma*sqrt(2/tau_m)*xi" if gauss else "") + " : volt (unless refractory)",
+        graded_idx = np.unique(np.asarray(cfg.get("graded", {}).get("index", []), dtype=np.int64))
+        use_graded = len(graded_idx) > 0
+        eqs = ["dv/dt = (v_rest - v + g" + (" + g_graded" if use_graded else "") + ")/tau_m"
+               + (" + sigma*sqrt(2/tau_m)*xi" if gauss else "") + " : volt (unless refractory)",
                "dg/dt = -g/tau_syn : volt (unless refractory)",
-               "rfc : second", "sigma : volt"]
+               "rfc : second", "sigma : volt", "v_th_i : volt"]
+        if use_graded:
+            # Graded (non-spiking) release. APL, the mushroom body's feedback inhibitory neuron, does not fire
+            # action potentials; it releases transmitter continuously in proportion to its membrane potential
+            # (Amin, Aso et al. 2020 eLife 9:e56954). Modelling it as a spiking neuron replaces a continuously
+            # graded gain control with a saturated binary relay, because one Kenyon-cell spike already exceeds
+            # its threshold and its output is then capped by the refractory period.
+            eqs.append("g_graded : volt")
         if pl:
             eqs.append("dda/dt = -da/tau_da : 1")                 # dopamine trace, driven on MBONs by DAN->MBON synapses
         N = conn.N
         neu = NeuronGroup(N, "\n".join(eqs), method="euler" if gauss else "linear",
-                          threshold="v > v_th", reset="v = v_reset; g = 0*mV", refractory="rfc", namespace=ns, name="neu")
+                          threshold="v > v_th_i", reset="v = v_reset; g = 0*mV", refractory="rfc", namespace=ns, name="neu")
         neu.v = ns["v_rest"]; neu.g = 0 * mV; neu.rfc = m["t_refr_ms"] * ms
+        th = np.full(N, float(m["v_th_mV"]))
+        if use_graded:
+            th[graded_idx] = 1e6          # never spikes: release is graded, handled by the graded synapses below
+        neu.v_th_i = th * mV
         sigma0 = float(noise.get("sigma_mV", 0.0)) if gauss else 0.0
         neu.sigma = sigma0 * mV
         if pl:
@@ -113,10 +127,26 @@ class Simulation:
             kc = np.zeros(N, bool); kc[np.asarray(pl["pre_idx"], dtype=np.int64)] = True
             mbon = np.zeros(N, bool); mbon[np.asarray(pl["post_idx"], dtype=np.int64)] = True
             plastic_mask = kc[conn.pre] & mbon[conn.post]
+        graded_mask = np.isin(conn.pre, graded_idx) if use_graded else np.zeros(conn.E, dtype=bool)
+        spiking_mask = (~plastic_mask) & (~graded_mask)
         syn = Synapses(neu, neu, "w : volt", on_pre="g += w", delay=m["delay_ms"] * ms, name="syn")
-        syn.connect(i=conn.pre[~plastic_mask], j=conn.post[~plastic_mask])
-        syn.w = w_all_mV[~plastic_mask] * mV
+        syn.connect(i=conn.pre[spiking_mask], j=conn.post[spiking_mask])
+        syn.w = w_all_mV[spiking_mask] * mV
         objs.append(syn)
+        gsyn = None
+        if use_graded and graded_mask.any():
+            # The conversion introduces NO new free parameter. A spiking synapse of weight w driven at the
+            # maximum rate the refractory period allows, 1/t_refr, settles at a conductance of w/t_refr*tau_syn.
+            # The graded synapse is scaled so that a presynaptic neuron depolarised to threshold delivers exactly
+            # that, and proportionally less below it. Release is rectified at rest: no depolarisation, no release.
+            k_graded = float(m["tau_syn_ms"] / m["t_refr_ms"])
+            gns = dict(ns, v_span=(m["v_th_mV"] - m["v_rest_mV"]) * mV, k_graded=k_graded)
+            gsyn = Synapses(neu, neu, model="""w_g : volt
+                                               g_graded_post = k_graded * w_g * clip((v_pre - v_rest) / v_span, 0, 1) : volt (summed)""",
+                            namespace=gns, name="gsyn")
+            gsyn.connect(i=conn.pre[graded_mask], j=conn.post[graded_mask])
+            gsyn.w_g = w_all_mV[graded_mask] * mV
+            objs.append(gsyn)
 
         psyn = dsyn = ltd = wmon = None
         n_plastic = int(plastic_mask.sum())
@@ -239,6 +269,13 @@ class Simulation:
                 "dt_ms": m["dt_ms"], "duration_s": t, "epochs": epoch_table, "noise": noise, "model": m, "drive": drive,
                 "drive_groups": {k: [int(x) for x in v] for k, v in self.drive_groups.items()},
                 "drive_group_ids": {k: [int(conn.ids[x]) for x in v] for k, v in self.drive_groups.items()},
+                "graded_release": {"n_neurons": int(len(graded_idx)), "n_connections": int(graded_mask.sum()),
+                                   "ids": [int(conn.ids[x]) for x in graded_idx],
+                                   "note": ("These neurons do not fire action potentials; they release transmitter in "
+                                            "proportion to membrane depolarisation, rectified at rest and saturating at "
+                                            "the spike threshold. Scaling is fixed by matching a spiking synapse driven "
+                                            "at its maximum refractory-limited rate, so no free parameter is introduced.")}
+                if use_graded else None,
                 "record": "all" if rec_idx is None else [int(x) for x in rec_idx],
                 "record_all_spikes": bool(rec_idx is None), "n_spikes_whole_network": n_spikes_all,
                 "n_spikes": int(len(si)), "n_active": int(len(np.unique(si))), "walltime_build_run_s": round(t_run, 1),

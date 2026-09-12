@@ -99,6 +99,8 @@ def run_job(spec: dict) -> dict:
     init_w = None
     if spec.get("init_plastic_w"):   # None means start from the connectome weights, i.e. an unlearned network
         init_w = np.load(spec["init_plastic_w"])["w_final_mV"].astype(np.float64)
+    if spec.get("graded"):
+        spec["config"] = dict(spec["config"], graded={"index": [int(x) for x in resolve_group(conn, spec["graded"])]})
     rv = resolve_group(conn, spec["record_v"]) if spec.get("record_v") else None
     sim = Simulation(conn, spec["config"], spec["out_dir"], spec["seed"], groups, record=record, plasticity=pl,
                      init_plastic_w=init_w, name=spec.get("name", "sim"), record_v=rv, record_v_dt_s=spec.get("record_v_dt_s", 0.001))
