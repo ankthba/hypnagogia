@@ -76,6 +76,8 @@ def main():
     # Stage 11, the injected positive control. Read here rather than through the web exporter so the document
     # stands on the result files alone.
     s11 = [c for c in (load(f) for f in sorted(RESULTS.glob("stage11_injected/injected_*.json"))) if c]
+    s12 = load(RESULTS / "stage12_adaptation/adaptation_grid.json")
+    s13 = load(RESULTS / "stage13_depression/depression_grid.json")
     # the labelled reduced-gain variant, if it has been run
     variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
     s6v = load(variant_dirs[-1] / "stage6.json") if variant_dirs else None
@@ -137,6 +139,43 @@ def main():
               f"slower than the 5 ms synaptic time constant, so nothing can terminate an up state. Every failure "
               f"below is therefore a property of this model class, which cannot represent an episode even when the "
               f"mechanism for one is supplied directly, and is not evidence that the fly does not replay.")
+        # What was done about it. Both are labelled deviations and both sentences say so, because a reader
+        # who stops after the headline must not leave thinking the published model did any of this.
+        if s12 and s12.get("per_run"):
+            n_ok = len([r for r in s12["per_run"] if "error" not in r])
+            w()
+            w(f"**Stage 12 (labelled deviation, both constants unsourced).** Adding one hyperpolarising term "
+              f"per neuron, stepping up by b on each of that cell's spikes and decaying with tau, produces "
+              f"episodes: {s12.get('n_settings_with_brain_episodes', 0)} of {n_ok} scanned settings give the "
+              f"brain repeated up and down states and {s12.get('n_settings_with_ensemble_episodes', 0)} give "
+              f"them to the trained Kenyon-cell ensemble. That is the first repeated episode anywhere in this "
+              f"project, and it confirms Stage 11's diagnosis from the other side: the missing ingredient was "
+              f"a slow variable. Neither constant has a measurement behind it, so both are scanned over "
+              f"tau {s12.get('tau_ms_scanned')} ms and b {s12.get('b_mV_scanned')} mV and the range is "
+              f"reported instead of a value.")
+        if s13 and s13.get("per_run"):
+            rows13 = [r for r in s13["per_run"] if "error" not in r]
+            byscope = {}
+            for r in rows13:
+                byscope.setdefault(r["scope"], []).append(r)
+            def rate(rs, pop):
+                v = [r["pop"][pop]["rate_hz"] for r in rs if pop in r["pop"]]
+                return sum(v) / len(v) if v else float("nan")
+            w()
+            w("**Stage 13 (labelled deviation, both constants measured).** The one mechanism whose magnitude "
+              "is measured is short-term synaptic depression at antennal-lobe synapses, fit three times in two "
+              "laboratories: f = 0.78, tau = 893 ms (Nagel, Hong & Wilson 2015), f = 0.75, tau = 1566 ms "
+              "(Nagel & Wilson 2016), f = 0.72, tau = 2.4 s (Kazama & Wilson 2009). What is not measured is "
+              "which synapses to apply it to, so scope is an arm and every arm is reported. Applied exactly "
+              "where the constants were measured, at ORN synapses, it does nothing: the antennal lobe still "
+              f"runs at {rate(byscope.get('orn_only', []), 'ALLN'):.1f} Hz, because offline there is no odour "
+              "and those synapses carry almost no traffic. Extrapolated to the antennal-lobe loop it works as "
+              f"predicted and takes the mushroom body with it: the runaway falls to "
+              f"{rate(byscope.get('al_local', []), 'ALLN'):.1f} Hz and Kenyon-cell activity falls with it, from "
+              f"0.42 Hz to {rate(byscope.get('al_local', []), 'KC'):.3f} Hz. That is a finding about the model "
+              "rather than a failed manipulation: the offline Kenyon-cell activity this project has measured "
+              "for ten stages was the antennal-lobe runaway driving it, and with the runaway gone there is "
+              "nothing left in the mushroom body to reactivate. No arm of Stage 13 produced an episode.")
     elif s6v:
         w("**Two answers, and the difference between them is the result.**")
         w()
