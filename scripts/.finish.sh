@@ -12,6 +12,9 @@ python -u scripts/03a_apl_correction.py 2>&1 | tail -14
 log "stage 3f: the DPM transmitter correction"
 python -u scripts/03f_dpm_correction.py --gain 1.0 2>&1 | tail -6
 
+log "stage 6b: is reactivation explained by wiring rather than by memory?"
+python -u scripts/06b_structure.py --gain 1.0 2>&1 | tail -8
+
 log "export + contract check + results.md"
 python -u scripts/export_web.py 2>&1 | tail -12
 python -u scripts/validate_export.py 2>&1 | tail -16

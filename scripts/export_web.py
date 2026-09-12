@@ -124,9 +124,13 @@ def main():
     s3c = load_json(RESULTS / "stage3c_control" / "stage3c.json")
     s3d = load_json(RESULTS / "stage3d_gain" / "stage3d.json")
     s3e = load_json(RESULTS / "stage3e_discrim" / "stage3e.json")
-    s6b = None
-    for cand in sorted(RESULTS.glob("stage6_structure/structure*.json")):
-        s6b = load_json(cand) or s6b
+    # The structural confound, written by scripts/06b_structure.py, is gain-tagged: structure.json is the
+    # published-parameter run and structure_gain<g>.json a labelled deviation. Prefer the published one, and
+    # never attach a deviation's structure result to a published-parameter stage 6 just because it sorts later.
+    s6b = load_json(RESULTS / "stage6_structure" / "structure.json")
+    if s6b is None:
+        for cand in sorted(RESULTS.glob("stage6_structure/structure*.json")):
+            s6b = load_json(cand) or s6b
     s3dg = load_json(RESULTS / "stage3d_gain" / "gustatory_cost.json")
     s3f = load_json(RESULTS / "stage3f_dpm" / "stage3f.json")
     if s3a or s3b or s3c or s3d or s3e or s3f:
