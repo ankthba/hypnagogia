@@ -12,9 +12,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {
+        // React is in the shell and is always needed. Recharts is NOT listed here on purpose: the
+        // routes are lazy, so leaving it to the chunker keeps it out of the entry graph and it is
+        // fetched with the first page that actually charts something.
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
-          recharts: ['recharts'],
         },
       },
     },

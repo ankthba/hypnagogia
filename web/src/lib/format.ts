@@ -32,6 +32,9 @@ export function fmtNum(n: number | null | undefined, digits = 3): string {
 
 export function fmtP(p: number | null | undefined): string {
   if (!isNum(p)) return NOT_MEASURED;
+  // An exact 0 is what a permutation test writes when no permutation reached the observed value.
+  // "0.0e+0" is that same number dressed up as a measurement; the plain 0 is the honest rendering.
+  if (p === 0) return '0';
   if (p < 1e-4) return p.toExponential(1);
   return p.toFixed(4);
 }
@@ -54,6 +57,34 @@ export function fmtAny(v: unknown): string {
   const s = String(v);
   // A file that literally holds the text "null" / "NaN" is still not a measurement.
   return s === '' || s === 'null' || s === 'undefined' || s === 'NaN' ? NOT_MEASURED : s;
+}
+
+/**
+ * A number with its unit, or the marker on its own.
+ *
+ * Never "not measured mV": the unit belongs to a measurement, and there is not one.
+ */
+export function fmtUnit(v: number | null | undefined, unit: string, digits = 3): string {
+  return isNum(v) ? `${fmtNum(v, digits)} ${unit}` : NOT_MEASURED;
+}
+
+/**
+ * "mean ± s.d.", collapsing to one marker when the file carries no mean.
+ *
+ * A cell reading "not measured ± 0" is worse than either half of it: it looks like a measurement
+ * of zero spread around something. When the mean is absent the whole cell is the marker, and when
+ * only the spread is absent the cell says which part is missing.
+ */
+export function fmtMeanSd(mean: number | null | undefined, sd: number | null | undefined, digits = 3): string {
+  if (!isNum(mean)) return NOT_MEASURED;
+  return isNum(sd) ? `${fmtNum(mean, digits)} ± ${fmtNum(sd, digits)}` : `${fmtNum(mean, digits)} (no s.d. in the file)`;
+}
+
+/** "value [lo, hi]", collapsing to one marker when the file carries no value. */
+export function fmtValueCI(v: number | null | undefined, ci: [number | null, number | null] | null | undefined, digits = 3): string {
+  if (!isNum(v)) return NOT_MEASURED;
+  const c = fmtCI(ci, digits);
+  return c === NOT_MEASURED ? `${fmtNum(v, digits)} (no interval in the file)` : `${fmtNum(v, digits)} ${c}`;
 }
 
 /**

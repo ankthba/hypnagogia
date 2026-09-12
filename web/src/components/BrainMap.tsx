@@ -872,14 +872,29 @@ function BrainMapInner({
       }
     };
 
+    /**
+     * The wheel zooms, but it must never trap the page.
+     *
+     * This map sits in a sticky rail that a reader's pointer passes over constantly, so a wheel
+     * that always zoomed would stop the page dead every time the cursor crossed it. The rule:
+     *  - a pinch on a trackpad arrives as ctrl+wheel, and always zooms;
+     *  - a wheel that arrives while the page is already scrolling passes straight through, so a
+     *    scroll that happens to sweep over the map keeps scrolling the page;
+     *  - a wheel that starts with the pointer resting on the map zooms;
+     *  - at either end of the zoom range the wheel is not swallowed at all.
+     */
+    let lastPageScroll = 0;
+    const onPageScroll = () => {
+      lastPageScroll = performance.now();
+    };
     const onWheel = (e: WheelEvent) => {
+      const pinch = e.ctrlKey || e.metaKey;
+      if (!pinch && performance.now() - lastPageScroll < 260) return; // the page is mid-scroll
       const before = c.zoomTarget;
-      const factor = Math.exp(-(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) * 0.0016);
+      const factor = Math.exp(-(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) * (pinch ? 0.01 : 0.0016));
       const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, before * factor));
       c.zoomTarget = next;
       mark();
-      // Only swallow the wheel when it actually zoomed. At either end of the range the page keeps
-      // scrolling, so a reader can never be trapped inside the map.
       if (Math.abs(next - before) > 1e-6) e.preventDefault();
     };
 
@@ -888,12 +903,14 @@ function BrainMapInner({
     cv.addEventListener('pointerup', onUp);
     cv.addEventListener('pointercancel', onUp);
     cv.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('scroll', onPageScroll, { passive: true });
     return () => {
       cv.removeEventListener('pointerdown', onDown);
       cv.removeEventListener('pointermove', onMove);
       cv.removeEventListener('pointerup', onUp);
       cv.removeEventListener('pointercancel', onUp);
       cv.removeEventListener('wheel', onWheel);
+      window.removeEventListener('scroll', onPageScroll);
     };
   }, []);
 

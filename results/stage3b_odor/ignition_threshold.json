@@ -6,254 +6,254 @@
    "n_driven": 1,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.5270498605033898,
-   "pop_rate_post_mean": 2.8808072542860246
+   "pop_rate_odor_mean": 1.4310225667838576,
+   "pop_rate_post_mean": 1.6770096796239409
   },
   {
    "n_driven": 2,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.5591768428692614,
-   "pop_rate_post_mean": 2.87932714940738
+   "pop_rate_odor_mean": 1.4708443994480236,
+   "pop_rate_post_mean": 1.692619739406001
   },
   {
    "n_driven": 3,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.711497433123684,
-   "pop_rate_post_mean": 2.8851466351691726
+   "pop_rate_odor_mean": 1.5477975253509373,
+   "pop_rate_post_mean": 1.6925272810065024
   },
   {
    "n_driven": 5,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.674867726702217,
-   "pop_rate_post_mean": 2.8824753579103173
+   "pop_rate_odor_mean": 1.5236520143218062,
+   "pop_rate_post_mean": 1.6954089011242173
   },
   {
    "n_driven": 8,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.7233390426395023,
-   "pop_rate_post_mean": 2.880877368572311
+   "pop_rate_odor_mean": 1.4513148740138735,
+   "pop_rate_post_mean": 1.6035329895421846
   },
   {
    "n_driven": 12,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.742108097737774,
-   "pop_rate_post_mean": 2.8788201691834616
+   "pop_rate_odor_mean": 1.5660950426117648,
+   "pop_rate_post_mean": 1.6287941652586022
   },
   {
    "n_driven": 20,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.7730100063102854,
-   "pop_rate_post_mean": 2.880668566686776
+   "pop_rate_odor_mean": 1.5207603778774788,
+   "pop_rate_post_mean": 1.6858363748294336
   },
   {
    "n_driven": 35,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.795641511047623,
-   "pop_rate_post_mean": 2.8816586420480768
+   "pop_rate_odor_mean": 1.5829039796406603,
+   "pop_rate_post_mean": 1.6925989362661138
   },
   {
    "n_driven": 74,
    "n_seeds": 3,
    "fraction_ignited": 1.0,
-   "pop_rate_odor_mean": 2.8526860320784415,
-   "pop_rate_post_mean": 2.8803056674687433
+   "pop_rate_odor_mean": 1.663137067265797,
+   "pop_rate_post_mean": 1.6908245054823976
   }
  ],
  "per_run": [
   {
    "n": 1,
    "seed": 0,
-   "pop_rate_odor": 2.466718443370386,
-   "pop_rate_post": 2.8759416310123966,
+   "pop_rate_odor": 1.3220603429744329,
+   "pop_rate_post": 1.6527794150619355,
    "ignited": true
   },
   {
    "n": 1,
    "seed": 1,
-   "pop_rate_odor": 2.51303316713936,
-   "pop_rate_post": 2.888062927186699,
+   "pop_rate_odor": 1.4801503373575853,
+   "pop_rate_post": 1.6893559579036908,
    "ignited": true
   },
   {
    "n": 1,
    "seed": 2,
-   "pop_rate_odor": 2.601397971000423,
-   "pop_rate_post": 2.878417204658979,
+   "pop_rate_odor": 1.490857020019555,
+   "pop_rate_post": 1.6888936659061962,
    "ignited": true
   },
   {
    "n": 2,
    "seed": 0,
-   "pop_rate_odor": 2.4625439466330117,
-   "pop_rate_post": 2.879600672172564,
+   "pop_rate_odor": 1.40679153173519,
+   "pop_rate_post": 1.689043910805382,
    "ignited": true
   },
   {
    "n": 2,
    "seed": 1,
-   "pop_rate_odor": 2.623983246538011,
-   "pop_rate_post": 2.881533052722091,
+   "pop_rate_odor": 1.5492028930233204,
+   "pop_rate_post": 1.6929803271640467,
    "ignited": true
   },
   {
    "n": 2,
    "seed": 2,
-   "pop_rate_odor": 2.591003335436762,
-   "pop_rate_post": 2.876847723327485,
+   "pop_rate_odor": 1.45653877358556,
+   "pop_rate_post": 1.6958349802485744,
    "ignited": true
   },
   {
    "n": 3,
    "seed": 0,
-   "pop_rate_odor": 2.7174517540514116,
-   "pop_rate_post": 2.877633619723226,
+   "pop_rate_odor": 1.5479061639703486,
+   "pop_rate_post": 1.6927977218250363,
    "ignited": true
   },
   {
    "n": 3,
    "seed": 1,
-   "pop_rate_odor": 2.7244554778134513,
-   "pop_rate_post": 2.895066650948739,
+   "pop_rate_odor": 1.5564978607437816,
+   "pop_rate_post": 1.6947601513544,
    "ignited": true
   },
   {
    "n": 3,
    "seed": 2,
-   "pop_rate_odor": 2.692585067506189,
-   "pop_rate_post": 2.882739634835551,
+   "pop_rate_odor": 1.538988551338682,
+   "pop_rate_post": 1.69002396984007,
    "ignited": true
   },
   {
    "n": 5,
    "seed": 0,
-   "pop_rate_odor": 2.6676004965016054,
-   "pop_rate_post": 2.877247605905318,
+   "pop_rate_odor": 1.5013209993828402,
+   "pop_rate_post": 1.6970161363021725,
    "ignited": true
   },
   {
    "n": 5,
    "seed": 1,
-   "pop_rate_odor": 2.638483035039422,
-   "pop_rate_post": 2.8830979111336092,
+   "pop_rate_odor": 1.4622527026745904,
+   "pop_rate_post": 1.6942354499372438,
    "ignited": true
   },
   {
    "n": 5,
    "seed": 2,
-   "pop_rate_odor": 2.7185196485656236,
-   "pop_rate_post": 2.8870805566920232,
+   "pop_rate_odor": 1.6073823409079877,
+   "pop_rate_post": 1.6949751171332348,
    "ignited": true
   },
   {
    "n": 8,
    "seed": 0,
-   "pop_rate_odor": 2.6993807598693564,
-   "pop_rate_post": 2.8795775575726896,
+   "pop_rate_odor": 1.4581059434570658,
+   "pop_rate_post": 1.6237220515594266,
    "ignited": true
   },
   {
    "n": 8,
    "seed": 1,
-   "pop_rate_odor": 2.704477529141732,
-   "pop_rate_post": 2.8787038256974253,
+   "pop_rate_odor": 1.4348133611633116,
+   "pop_rate_post": 1.5887542848689518,
    "ignited": true
   },
   {
    "n": 8,
    "seed": 2,
-   "pop_rate_odor": 2.766158838907419,
-   "pop_rate_post": 2.884350722446819,
+   "pop_rate_odor": 1.4610253174212429,
+   "pop_rate_post": 1.5981226321981752,
    "ignited": true
   },
   {
    "n": 12,
    "seed": 0,
-   "pop_rate_odor": 2.7398220638101645,
-   "pop_rate_post": 2.882057754139247,
+   "pop_rate_odor": 1.6244686531353798,
+   "pop_rate_post": 1.690978602814896,
    "ignited": true
   },
   {
    "n": 12,
    "seed": 1,
-   "pop_rate_odor": 2.7660132169282083,
-   "pop_rate_post": 2.8755949120142756,
+   "pop_rate_odor": 1.6227627956646256,
+   "pop_rate_post": 1.6949612483733099,
    "ignited": true
   },
   {
    "n": 12,
    "seed": 2,
-   "pop_rate_odor": 2.7204890124749497,
-   "pop_rate_post": 2.8788078413968616,
+   "pop_rate_odor": 1.451053679035289,
+   "pop_rate_post": 1.500442644587601,
    "ignited": true
   },
   {
    "n": 20,
    "seed": 0,
-   "pop_rate_odor": 2.775665873835891,
-   "pop_rate_post": 2.881325021323218,
+   "pop_rate_odor": 1.497181174545278,
+   "pop_rate_post": 1.6911427164740065,
    "ignited": true
   },
   {
    "n": 20,
    "seed": 1,
-   "pop_rate_odor": 2.775769889535327,
-   "pop_rate_post": 2.8799427682507104,
+   "pop_rate_odor": 1.5943942472383832,
+   "pop_rate_post": 1.6950976245125708,
    "ignited": true
   },
   {
    "n": 20,
    "seed": 2,
-   "pop_rate_odor": 2.767594255559639,
-   "pop_rate_post": 2.8807379104864004,
+   "pop_rate_odor": 1.470705711848775,
+   "pop_rate_post": 1.6712687835017233,
    "ignited": true
   },
   {
    "n": 35,
    "seed": 0,
-   "pop_rate_odor": 2.7924054670651626,
-   "pop_rate_post": 2.8851805365823213,
+   "pop_rate_odor": 1.5820510509052832,
+   "pop_rate_post": 1.6905047535174642,
    "ignited": true
   },
   {
    "n": 35,
    "seed": 1,
-   "pop_rate_odor": 2.803292443606155,
-   "pop_rate_post": 2.8792285271145817,
+   "pop_rate_odor": 1.594123806419849,
+   "pop_rate_post": 1.6978575077376123,
    "ignited": true
   },
   {
    "n": 35,
    "seed": 2,
-   "pop_rate_odor": 2.7912266224715516,
-   "pop_rate_post": 2.8805668624473277,
+   "pop_rate_odor": 1.572537081596849,
+   "pop_rate_post": 1.6894345475432646,
    "ignited": true
   },
   {
    "n": 74,
    "seed": 0,
-   "pop_rate_odor": 2.858885367764841,
-   "pop_rate_post": 2.8806986156666134,
+   "pop_rate_odor": 1.6425257785575103,
+   "pop_rate_post": 1.690151100139381,
    "ignited": true
   },
   {
    "n": 74,
    "seed": 1,
-   "pop_rate_odor": 2.8555846029027316,
-   "pop_rate_post": 2.8789696435959846,
+   "pop_rate_odor": 1.6790214202997038,
+   "pop_rate_post": 1.69126753531333,
    "ignited": true
   },
   {
    "n": 74,
    "seed": 2,
-   "pop_rate_odor": 2.843588125567752,
-   "pop_rate_post": 2.8812487431436318,
+   "pop_rate_odor": 1.667864002940177,
+   "pop_rate_post": 1.6910548809944825,
    "ignited": true
   }
  ],

@@ -12,7 +12,7 @@ import ProvenanceFooter from '../components/ProvenanceFooter';
 import SigmaChart, { type SigmaPoint } from '../components/charts/SigmaChart';
 import CcdfChart, { seedColor } from '../components/charts/CcdfChart';
 import { classColor, CLASS_LABELS } from '../lib/colors';
-import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
+import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct, fmtMeanSd, fmtValueCI } from '../lib/format';
 
 export default function Criticality() {
   const s1 = useDataFile<Stage1>('stage1_noise.json');
@@ -153,7 +153,9 @@ function Stage2View({ d }: { d: Stage2 }) {
             <>
               Whiskers: 95% CI of the multistep-regression estimator; dashed line m = 1. Background band colour is the
               per-sigma classification from <span className="mono">summary_by_sigma</span>.
-              {nMissingM > 0 && <span className="tone-failed"> {nMissingM} run(s) have m = null and are not plotted.</span>}
+              {nMissingM > 0 && (
+                <span className="tone-failed"> {nMissingM} run(s) state no branching ratio in the file and are not plotted.</span>
+              )}
             </>
           }
         >
@@ -175,8 +177,8 @@ function Stage2View({ d }: { d: Stage2 }) {
                 header: 'class',
                 render: (r) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span>,
               },
-              { key: 'm', header: 'm mean ± sd', render: (r) => `${fmtNum(r.m_mean)} ± ${fmtNum(r.m_sd)}` },
-              { key: 'r', header: 'rate mean ± sd (Hz)', render: (r) => `${fmtNum(r.pop_rate_hz_mean, 4)} ± ${fmtNum(r.pop_rate_hz_sd, 4)}` },
+              { key: 'm', header: 'm mean ± sd', render: (r) => fmtMeanSd(r.m_mean, r.m_sd) },
+              { key: 'r', header: 'rate mean ± sd (Hz)', render: (r) => fmtMeanSd(r.pop_rate_hz_mean, r.pop_rate_hz_sd, 4) },
               { key: 'f', header: 'frac active', render: (r) => fmtPct(r.frac_active_mean) },
             ]}
             rows={d.summary_by_sigma}
@@ -316,7 +318,7 @@ function FitTable({ rows }: { rows: PerSigma[] }) {
         { key: 'sigma', header: 'sigma (mV)', render: (r) => fmtNum(r.sigma_mV) },
         { key: 'seed', header: 'seed', render: (r) => r.seed },
         { key: 'cls', header: 'class', render: (r) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span> },
-        { key: 'm', header: 'm [CI95]', render: (r) => `${fmtNum(r.branching_ratio_mr?.m)} ${fmtCI(r.branching_ratio_mr?.ci95)}` },
+        { key: 'm', header: 'm [CI95]', render: (r) => fmtValueCI(r.branching_ratio_mr?.m, r.branching_ratio_mr?.ci95) },
         { key: 'kmax', header: 'k_max', render: (r) => fmtInt(r.branching_ratio_mr?.k_max) },
         { key: 'mrbin', header: 'MR bin (ms)', render: (r) => fmtNum(r.branching_ratio_mr?.bin_ms) },
         { key: 'mn', header: 'm naive', render: (r) => fmtNum(r.branching_ratio_naive) },

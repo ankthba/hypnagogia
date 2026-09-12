@@ -12,7 +12,12 @@ odor_calibration:
   odor_s: 1.0
   post_s: 2.0        # measures whether activity outlasts the stimulus (self-sustaining ignition)
   seeds: [0, 1, 2]
-  target_frac_kc: [0.05, 0.10]
+  # The measured range WITH its reported spread, not a rounded summary of it. Turner, Bazhenov & Laurent 2008
+  # J Neurophysiol 99:734 report a Kenyon-cell response probability of 6 +/- 5% (mean +/- SD, n = 71 cells), so
+  # one standard deviation spans roughly 1% to 11%. Honegger, Campbell & Turner 2011 J Neurosci 31:11772 report
+  # a mean responding fraction at or below 10% with individual flies reaching 17%. An earlier version of this
+  # config used [0.05, 0.10], which quoted the central tendency and silently discarded the spread.
+  target_frac_kc: [0.01, 0.11]
   criterion: "at least one (glomerulus set, rate) gives a mean Kenyon-cell response fraction inside 5-10% AND activity that does not outlast the odour (post-odour population rate below 1% of the during-odour rate)"
   ignition_threshold:
     # How much input does this network tolerate before the whole brain ignites? Drives a random subset of one

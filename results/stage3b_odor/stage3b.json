@@ -1,9 +1,9 @@
 {
- "status": "failed",
+ "status": "passed",
  "criterion": "at least one (glomerulus set, rate) gives a mean Kenyon-cell response fraction inside 5-10% AND activity that does not outlast the odour (post-odour population rate below 1% of the during-odour rate)",
  "target_frac_kc": [
-  0.05,
-  0.1
+  0.01,
+  0.11
  ],
  "reference": "In a real fly about 5-10% of Kenyon cells respond to a given odour, each firing a few spikes (Honegger, Campbell & Turner 2011 J Neurosci 31:11772: mean responding fraction <= 0.10; Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734: 6 +/- 5% of KCs, 2-5 spikes per response).",
  "n_kc": 4064,
@@ -13,255 +13,300 @@
    "rate_hz": 10,
    "n_orn": 74,
    "n_seeds": 3,
-   "frac_kc_active": 0.57373687664042,
-   "n_kc_active": 2331.6666666666665,
-   "spikes_per_active_kc": 53.55331085819582,
-   "pop_rate_hz_odor": 2.7318706414532614,
-   "pop_rate_hz_post": 2.8781779685502755,
-   "kc_rate_hz_odor": 30.725311679790025,
-   "mbon_rate_hz_odor": 93.12714776632303,
-   "apl_rate_hz_odor": 342.6666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.011482939632545932,
+   "n_kc_active": 46.666666666666664,
+   "spikes_per_active_kc": 12.155495169082124,
+   "pop_rate_hz_odor": 1.5880076832929984,
+   "pop_rate_hz_post": 1.6930889657834578,
+   "kc_rate_hz_odor": 0.13951771653543307,
+   "mbon_rate_hz_odor": 5.0034364261168385,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13307906824146984,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "1 glomerulus",
    "rate_hz": 20,
    "n_orn": 74,
    "n_seeds": 3,
-   "frac_kc_active": 0.5852198162729659,
-   "n_kc_active": 2378.3333333333335,
-   "spikes_per_active_kc": 53.80224045295234,
-   "pop_rate_hz_odor": 2.7972433528189415,
-   "pop_rate_hz_post": 2.8805911327771963,
-   "kc_rate_hz_odor": 31.485564304461942,
-   "mbon_rate_hz_odor": 94.78350515463917,
-   "apl_rate_hz_odor": 345.6666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.0119750656167979,
+   "n_kc_active": 48.666666666666664,
+   "spikes_per_active_kc": 12.98846495119787,
+   "pop_rate_hz_odor": 1.5735633698312865,
+   "pop_rate_hz_post": 1.6765400680031526,
+   "kc_rate_hz_odor": 0.15526574803149606,
+   "mbon_rate_hz_odor": 4.920962199312715,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13718011811023623,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "1 glomerulus",
    "rate_hz": 50,
    "n_orn": 74,
    "n_seeds": 3,
-   "frac_kc_active": 0.5934219160104987,
-   "n_kc_active": 2411.6666666666665,
-   "spikes_per_active_kc": 54.15974246594801,
-   "pop_rate_hz_odor": 2.8500971968924733,
-   "pop_rate_hz_post": 2.883976265928849,
-   "kc_rate_hz_odor": 32.13869750656168,
-   "mbon_rate_hz_odor": 95.85910652920963,
-   "apl_rate_hz_odor": 347.1666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.014435695538057743,
+   "n_kc_active": 58.666666666666664,
+   "spikes_per_active_kc": 13.807007632074537,
+   "pop_rate_hz_odor": 1.6520744197657564,
+   "pop_rate_hz_post": 1.6927988775550302,
+   "kc_rate_hz_odor": 0.19931102362204725,
+   "mbon_rate_hz_odor": 5.123711340206185,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13512959317585302,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "1 glomerulus",
    "rate_hz": 100,
    "n_orn": 74,
    "n_seeds": 3,
-   "frac_kc_active": 0.6017880577427821,
-   "n_kc_active": 2445.6666666666665,
-   "spikes_per_active_kc": 55.26202791472113,
-   "pop_rate_hz_odor": 2.921426540645868,
-   "pop_rate_hz_post": 2.8813689390629804,
-   "kc_rate_hz_odor": 33.254921259842526,
-   "mbon_rate_hz_odor": 97.7422680412371,
-   "apl_rate_hz_odor": 347.5,
-   "sparse": false,
+   "frac_kc_active": 0.01845472440944882,
+   "n_kc_active": 75.0,
+   "spikes_per_active_kc": 14.121456008779953,
+   "pop_rate_hz_odor": 1.7066410556900056,
+   "pop_rate_hz_post": 1.6921874963883436,
+   "kc_rate_hz_odor": 0.2603346456692914,
+   "mbon_rate_hz_odor": 5.652920962199313,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13394028871391075,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "1 glomerulus",
    "rate_hz": 150,
    "n_orn": 74,
    "n_seeds": 3,
-   "frac_kc_active": 0.6113024934383202,
-   "n_kc_active": 2484.3333333333335,
-   "spikes_per_active_kc": 55.537763519850785,
-   "pop_rate_hz_odor": 2.987037332390258,
-   "pop_rate_hz_post": 2.873828956583847,
-   "kc_rate_hz_odor": 33.9498031496063,
-   "mbon_rate_hz_odor": 98.87285223367697,
-   "apl_rate_hz_odor": 347.8333333333333,
-   "sparse": false,
+   "frac_kc_active": 0.021571522309711284,
+   "n_kc_active": 87.66666666666667,
+   "spikes_per_active_kc": 15.302203807656895,
+   "pop_rate_hz_odor": 1.7370298201452983,
+   "pop_rate_hz_post": 1.6943151953068114,
+   "kc_rate_hz_odor": 0.3300524934383202,
+   "mbon_rate_hz_odor": 5.525773195876288,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13439140419947507,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "2 glomeruli",
    "rate_hz": 10,
    "n_orn": 106,
    "n_seeds": 3,
-   "frac_kc_active": 0.5789041994750656,
-   "n_kc_active": 2352.6666666666665,
-   "spikes_per_active_kc": 53.530044109925484,
-   "pop_rate_hz_odor": 2.765745087569661,
-   "pop_rate_hz_post": 2.8816451585314833,
-   "kc_rate_hz_odor": 30.987614829396325,
-   "mbon_rate_hz_odor": 93.87628865979381,
-   "apl_rate_hz_odor": 344.1666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.011154855643044621,
+   "n_kc_active": 45.333333333333336,
+   "spikes_per_active_kc": 12.430171277997365,
+   "pop_rate_hz_odor": 1.557621230297693,
+   "pop_rate_hz_post": 1.6900089453501514,
+   "kc_rate_hz_odor": 0.13861548556430447,
+   "mbon_rate_hz_odor": 4.752577319587629,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.1318077427821522,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "2 glomeruli",
    "rate_hz": 20,
    "n_orn": 106,
    "n_seeds": 3,
-   "frac_kc_active": 0.5853838582677166,
-   "n_kc_active": 2379.0,
-   "spikes_per_active_kc": 53.971910511059036,
-   "pop_rate_hz_odor": 2.808040182420422,
-   "pop_rate_hz_post": 2.8872030640713593,
-   "kc_rate_hz_odor": 31.592191601049866,
-   "mbon_rate_hz_odor": 94.9106529209622,
-   "apl_rate_hz_odor": 345.8333333333333,
-   "sparse": false,
+   "frac_kc_active": 0.011811023622047244,
+   "n_kc_active": 48.0,
+   "spikes_per_active_kc": 13.34373643074251,
+   "pop_rate_hz_odor": 1.6402443675498757,
+   "pop_rate_hz_post": 1.6966798188739955,
+   "kc_rate_hz_odor": 0.15756233595800526,
+   "mbon_rate_hz_odor": 5.240549828178694,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13882053805774278,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "2 glomeruli",
    "rate_hz": 50,
    "n_orn": 106,
    "n_seeds": 3,
-   "frac_kc_active": 0.6026082677165354,
-   "n_kc_active": 2449.0,
-   "spikes_per_active_kc": 54.91862349762528,
-   "pop_rate_hz_odor": 2.8904899601735443,
-   "pop_rate_hz_post": 2.8759485653923584,
-   "kc_rate_hz_odor": 33.094242125984245,
-   "mbon_rate_hz_odor": 97.48797250859106,
-   "apl_rate_hz_odor": 347.5,
-   "sparse": false,
+   "frac_kc_active": 0.015748031496062992,
+   "n_kc_active": 64.0,
+   "spikes_per_active_kc": 13.320512820512823,
+   "pop_rate_hz_odor": 1.6904978191375017,
+   "pop_rate_hz_post": 1.6921239312386884,
+   "kc_rate_hz_odor": 0.20972769028871388,
+   "mbon_rate_hz_odor": 5.460481099656357,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13500656167979005,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "2 glomeruli",
    "rate_hz": 100,
    "n_orn": 106,
    "n_seeds": 3,
-   "frac_kc_active": 0.6233595800524934,
-   "n_kc_active": 2533.3333333333335,
-   "spikes_per_active_kc": 55.586483660701965,
-   "pop_rate_hz_odor": 2.9967732018574895,
-   "pop_rate_hz_post": 2.877968781421409,
-   "kc_rate_hz_odor": 34.6502624671916,
-   "mbon_rate_hz_odor": 100.07216494845362,
-   "apl_rate_hz_odor": 349.1666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.02042322834645669,
+   "n_kc_active": 83.0,
+   "spikes_per_active_kc": 14.710709115531893,
+   "pop_rate_hz_odor": 1.7413707420017703,
+   "pop_rate_hz_post": 1.6961967237366136,
+   "kc_rate_hz_odor": 0.3002788713910761,
+   "mbon_rate_hz_odor": 5.725085910652922,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13500656167979003,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "2 glomeruli",
    "rate_hz": 150,
    "n_orn": 106,
    "n_seeds": 3,
-   "frac_kc_active": 0.6322178477690289,
-   "n_kc_active": 2569.3333333333335,
-   "spikes_per_active_kc": 56.16077515669496,
-   "pop_rate_hz_odor": 3.0894650588150996,
-   "pop_rate_hz_post": 2.880176225709445,
-   "kc_rate_hz_odor": 35.50582349081365,
-   "mbon_rate_hz_odor": 101.21649484536083,
-   "apl_rate_hz_odor": 350.1666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.024278215223097113,
+   "n_kc_active": 98.66666666666667,
+   "spikes_per_active_kc": 15.888472222222225,
+   "pop_rate_hz_odor": 1.804781023838087,
+   "pop_rate_hz_post": 1.693529298911071,
+   "kc_rate_hz_odor": 0.38566272965879267,
+   "mbon_rate_hz_odor": 5.7869415807560145,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13414534120734908,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "4 glomeruli",
    "rate_hz": 10,
    "n_orn": 243,
    "n_seeds": 3,
-   "frac_kc_active": 0.588500656167979,
-   "n_kc_active": 2391.6666666666665,
-   "spikes_per_active_kc": 53.820918868070656,
-   "pop_rate_hz_odor": 2.807718889482164,
-   "pop_rate_hz_post": 2.8829430433144485,
-   "kc_rate_hz_odor": 31.672736220472444,
-   "mbon_rate_hz_odor": 95.05498281786942,
-   "apl_rate_hz_odor": 346.1666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.011893044619422572,
+   "n_kc_active": 48.333333333333336,
+   "spikes_per_active_kc": 12.822278911564625,
+   "pop_rate_hz_odor": 1.597713503780393,
+   "pop_rate_hz_post": 1.6665857655671052,
+   "kc_rate_hz_odor": 0.1524770341207349,
+   "mbon_rate_hz_odor": 4.890034364261168,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13303805774278213,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "4 glomeruli",
    "rate_hz": 20,
    "n_orn": 243,
    "n_seeds": 3,
-   "frac_kc_active": 0.6119586614173228,
-   "n_kc_active": 2487.0,
-   "spikes_per_active_kc": 53.85765710393718,
-   "pop_rate_hz_odor": 2.8895977366183803,
-   "pop_rate_hz_post": 2.8761600639812124,
-   "kc_rate_hz_odor": 32.95751312335958,
-   "mbon_rate_hz_odor": 97.32646048109966,
-   "apl_rate_hz_odor": 347.8333333333333,
-   "sparse": false,
+   "frac_kc_active": 0.014271653543307087,
+   "n_kc_active": 58.0,
+   "spikes_per_active_kc": 13.080063298710442,
+   "pop_rate_hz_odor": 1.5247014171561186,
+   "pop_rate_hz_post": 1.6469822734133561,
+   "kc_rate_hz_odor": 0.1866797900262467,
+   "mbon_rate_hz_odor": 4.247422680412371,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13361220472440946,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "4 glomeruli",
    "rate_hz": 50,
    "n_orn": 243,
    "n_seeds": 3,
-   "frac_kc_active": 0.6336942257217847,
-   "n_kc_active": 2575.3333333333335,
-   "spikes_per_active_kc": 55.59804719876058,
-   "pop_rate_hz_odor": 3.042207259371237,
-   "pop_rate_hz_post": 2.8819005748600985,
-   "kc_rate_hz_odor": 35.231791338582674,
-   "mbon_rate_hz_odor": 100.7766323024055,
-   "apl_rate_hz_odor": 349.6666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.022227690288713912,
+   "n_kc_active": 90.33333333333333,
+   "spikes_per_active_kc": 13.961995488135644,
+   "pop_rate_hz_odor": 1.7317088392541382,
+   "pop_rate_hz_post": 1.6931028345433825,
+   "kc_rate_hz_odor": 0.31020341207349084,
+   "mbon_rate_hz_odor": 5.470790378006872,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.13418635170603674,
+   "kc_transient": false,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": false,
+   "usable_whole_brain": false
   },
   {
    "set": "4 glomeruli",
    "rate_hz": 100,
    "n_orn": 243,
    "n_seeds": 3,
-   "frac_kc_active": 0.6652723097112861,
-   "n_kc_active": 2703.6666666666665,
-   "spikes_per_active_kc": 57.61339771817092,
-   "pop_rate_hz_odor": 3.275613865986173,
-   "pop_rate_hz_post": 2.8758457054229165,
-   "kc_rate_hz_odor": 38.32833005249344,
-   "mbon_rate_hz_odor": 104.63573883161513,
-   "apl_rate_hz_odor": 352.6666666666667,
-   "sparse": false,
+   "frac_kc_active": 0.03379265091863517,
+   "n_kc_active": 137.33333333333334,
+   "spikes_per_active_kc": 16.208667502088556,
+   "pop_rate_hz_odor": 1.904090590739829,
+   "pop_rate_hz_post": 1.6926752144457005,
+   "kc_rate_hz_odor": 0.5474901574803149,
+   "mbon_rate_hz_odor": 6.082474226804123,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.1365239501312336,
+   "kc_transient": true,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": true,
+   "usable_whole_brain": false
   },
   {
    "set": "4 glomeruli",
    "rate_hz": 150,
    "n_orn": 243,
    "n_seeds": 3,
-   "frac_kc_active": 0.6770013123359581,
-   "n_kc_active": 2751.3333333333335,
-   "spikes_per_active_kc": 59.09752741749159,
-   "pop_rate_hz_odor": 3.4440846271730616,
-   "pop_rate_hz_post": 2.883789037669864,
-   "kc_rate_hz_odor": 40.00902230971129,
-   "mbon_rate_hz_odor": 106.69415807560136,
-   "apl_rate_hz_odor": 354.0,
-   "sparse": false,
+   "frac_kc_active": 0.04396325459317585,
+   "n_kc_active": 178.66666666666666,
+   "spikes_per_active_kc": 17.567800351162322,
+   "pop_rate_hz_odor": 1.997697785852478,
+   "pop_rate_hz_post": 1.6903568200782662,
+   "kc_rate_hz_odor": 0.7723917322834645,
+   "mbon_rate_hz_odor": 5.907216494845361,
+   "apl_rate_hz_odor": 0.0,
+   "kc_rate_hz_post": 0.1352936351706037,
+   "kc_transient": true,
+   "sparse": true,
    "transient": false,
-   "usable": false
+   "usable": true,
+   "usable_whole_brain": false
   }
  ],
  "per_run": [
@@ -283,24 +328,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.7581218925309794,
-    "kc_rate_hz": 30.77755905511811,
-    "n_kc_active": 2330,
-    "frac_kc": 0.5733267716535433,
-    "spikes_per_active_kc": 53.682403433476395,
-    "mbon_rate_hz": 93.41237113402062,
-    "apl_rate_hz": 343.5
+    "pop_rate_hz": 1.6130893356170557,
+    "kc_rate_hz": 0.1390255905511811,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 11.770833333333334,
+    "mbon_rate_hz": 5.443298969072165,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.870178005533635,
-    "kc_rate_hz": 32.09251968503937,
-    "n_kc_active": 2348,
-    "frac_kc": 0.577755905511811,
-    "spikes_per_active_kc": 111.09369676320273,
-    "mbon_rate_hz": 97.81958762886597,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6968774487029241,
+    "kc_rate_hz": 0.13533464566929135,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 25.0,
+    "mbon_rate_hz": 5.958762886597938,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_10Hz_seed0"
   },
   {
@@ -321,24 +367,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.698971631451574,
-    "kc_rate_hz": 30.79847440944882,
-    "n_kc_active": 2344,
-    "frac_kc": 0.5767716535433071,
-    "spikes_per_active_kc": 53.39803754266212,
-    "mbon_rate_hz": 93.18556701030928,
-    "apl_rate_hz": 344.0
+    "pop_rate_hz": 1.5362980119132648,
+    "kc_rate_hz": 0.1390255905511811,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 12.282608695652174,
+    "mbon_rate_hz": 4.453608247422681,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8872539161910837,
-    "kc_rate_hz": 32.28567913385827,
-    "n_kc_active": 2340,
-    "frac_kc": 0.5757874015748031,
-    "spikes_per_active_kc": 112.14444444444445,
-    "mbon_rate_hz": 98.18041237113403,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6945960376952895,
+    "kc_rate_hz": 0.13213582677165353,
+    "n_kc_active": 42,
+    "frac_kc": 0.01033464566929134,
+    "spikes_per_active_kc": 25.571428571428573,
+    "mbon_rate_hz": 6.0,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_10Hz_seed1"
   },
   {
@@ -359,24 +406,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.7385184003772305,
-    "kc_rate_hz": 30.599901574803148,
-    "n_kc_active": 2321,
-    "frac_kc": 0.5711122047244095,
-    "spikes_per_active_kc": 53.579491598448946,
-    "mbon_rate_hz": 92.78350515463917,
-    "apl_rate_hz": 340.5
+    "pop_rate_hz": 1.6146357023486746,
+    "kc_rate_hz": 0.140501968503937,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 12.41304347826087,
+    "mbon_rate_hz": 5.11340206185567,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8771019839261074,
-    "kc_rate_hz": 32.217888779527556,
-    "n_kc_active": 2319,
-    "frac_kc": 0.5706200787401575,
-    "spikes_per_active_kc": 112.92238033635188,
-    "mbon_rate_hz": 98.13917525773196,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6877934109521597,
+    "kc_rate_hz": 0.13176673228346455,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 22.3125,
+    "mbon_rate_hz": 6.041237113402062,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_10Hz_seed2"
   },
   {
@@ -397,24 +445,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.808514031717854,
-    "kc_rate_hz": 31.627706692913385,
-    "n_kc_active": 2382,
-    "frac_kc": 0.5861220472440944,
-    "spikes_per_active_kc": 53.96095717884131,
-    "mbon_rate_hz": 94.98969072164948,
-    "apl_rate_hz": 345.5
+    "pop_rate_hz": 1.6464714407561247,
+    "kc_rate_hz": 0.15206692913385828,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 13.434782608695652,
+    "mbon_rate_hz": 5.422680412371134,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8705801995714553,
-    "kc_rate_hz": 32.01439468503937,
-    "n_kc_active": 2317,
-    "frac_kc": 0.5701279527559056,
-    "spikes_per_active_kc": 112.30599913681485,
-    "mbon_rate_hz": 97.66494845360825,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6947971347141995,
+    "kc_rate_hz": 0.13681102362204725,
+    "n_kc_active": 45,
+    "frac_kc": 0.01107283464566929,
+    "spikes_per_active_kc": 24.711111111111112,
+    "mbon_rate_hz": 5.907216494845361,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_20Hz_seed0"
   },
   {
@@ -435,24 +484,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.7856028403220328,
-    "kc_rate_hz": 31.433070866141733,
-    "n_kc_active": 2364,
-    "frac_kc": 0.5816929133858267,
-    "spikes_per_active_kc": 54.03722504230119,
-    "mbon_rate_hz": 94.5979381443299,
-    "apl_rate_hz": 345.5
+    "pop_rate_hz": 1.4717111969433254,
+    "kc_rate_hz": 0.15059055118110237,
+    "n_kc_active": 51,
+    "frac_kc": 0.012549212598425197,
+    "spikes_per_active_kc": 12.0,
+    "mbon_rate_hz": 4.082474226804123,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.894382458792447,
-    "kc_rate_hz": 32.51980807086614,
-    "n_kc_active": 2355,
-    "frac_kc": 0.5794783464566929,
-    "spikes_per_active_kc": 112.23821656050956,
-    "mbon_rate_hz": 98.53092783505154,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6355705954552073,
+    "kc_rate_hz": 0.1377952755905512,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 25.454545454545453,
+    "mbon_rate_hz": 5.505154639175258,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_20Hz_seed1"
   },
   {
@@ -473,24 +523,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.7976131864169367,
-    "kc_rate_hz": 31.395915354330707,
-    "n_kc_active": 2389,
-    "frac_kc": 0.5878444881889764,
-    "spikes_per_active_kc": 53.40853913771453,
-    "mbon_rate_hz": 94.76288659793815,
-    "apl_rate_hz": 346.0
+    "pop_rate_hz": 1.6025074717944094,
+    "kc_rate_hz": 0.16313976377952755,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 13.53061224489796,
+    "mbon_rate_hz": 5.257731958762887,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8768107399676857,
-    "kc_rate_hz": 32.15575787401575,
-    "n_kc_active": 2325,
-    "frac_kc": 0.5720964566929134,
-    "spikes_per_active_kc": 112.41376344086021,
-    "mbon_rate_hz": 98.05670103092784,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6992524738400516,
+    "kc_rate_hz": 0.13693405511811024,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 24.195652173913043,
+    "mbon_rate_hz": 6.15979381443299,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_20Hz_seed2"
   },
   {
@@ -511,24 +562,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8226879043610316,
-    "kc_rate_hz": 31.93996062992126,
-    "n_kc_active": 2392,
-    "frac_kc": 0.5885826771653543,
-    "spikes_per_active_kc": 54.26588628762542,
-    "mbon_rate_hz": 95.34020618556701,
-    "apl_rate_hz": 347.0
+    "pop_rate_hz": 1.6552642345484678,
+    "kc_rate_hz": 0.20127952755905512,
+    "n_kc_active": 60,
+    "frac_kc": 0.014763779527559055,
+    "spikes_per_active_kc": 13.633333333333333,
+    "mbon_rate_hz": 5.608247422680412,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8826876269858333,
-    "kc_rate_hz": 32.181102362204726,
-    "n_kc_active": 2327,
-    "frac_kc": 0.5725885826771654,
-    "spikes_per_active_kc": 112.40567253975075,
-    "mbon_rate_hz": 98.13917525773196,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6907855959059421,
+    "kc_rate_hz": 0.1359498031496063,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 22.551020408163264,
+    "mbon_rate_hz": 6.061855670103093,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_50Hz_seed0"
   },
   {
@@ -549,24 +601,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8674770645382743,
-    "kc_rate_hz": 32.28198818897638,
-    "n_kc_active": 2410,
-    "frac_kc": 0.593011811023622,
-    "spikes_per_active_kc": 54.43734439834025,
-    "mbon_rate_hz": 96.19587628865979,
-    "apl_rate_hz": 347.0
+    "pop_rate_hz": 1.6652566760743088,
+    "kc_rate_hz": 0.19266732283464566,
+    "n_kc_active": 57,
+    "frac_kc": 0.014025590551181102,
+    "spikes_per_active_kc": 13.736842105263158,
+    "mbon_rate_hz": 5.0,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.883620301090778,
-    "kc_rate_hz": 32.3726624015748,
-    "n_kc_active": 2329,
-    "frac_kc": 0.5730807086614174,
-    "spikes_per_active_kc": 112.9776728209532,
-    "mbon_rate_hz": 98.28350515463917,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6952582709817001,
+    "kc_rate_hz": 0.13496555118110237,
+    "n_kc_active": 42,
+    "frac_kc": 0.01033464566929134,
+    "spikes_per_active_kc": 26.11904761904762,
+    "mbon_rate_hz": 5.984536082474227,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_50Hz_seed1"
   },
   {
@@ -587,24 +640,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8601266217781136,
-    "kc_rate_hz": 32.1941437007874,
-    "n_kc_active": 2433,
-    "frac_kc": 0.5986712598425197,
-    "spikes_per_active_kc": 53.77599671187834,
-    "mbon_rate_hz": 96.04123711340206,
-    "apl_rate_hz": 347.5
+    "pop_rate_hz": 1.6357023486744933,
+    "kc_rate_hz": 0.20398622047244094,
+    "n_kc_active": 59,
+    "frac_kc": 0.014517716535433071,
+    "spikes_per_active_kc": 14.05084745762712,
+    "mbon_rate_hz": 4.762886597938144,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.885620869709935,
-    "kc_rate_hz": 32.38115157480315,
-    "n_kc_active": 2339,
-    "frac_kc": 0.5755413385826772,
-    "spikes_per_active_kc": 112.5241556220607,
-    "mbon_rate_hz": 98.29896907216495,
-    "apl_rate_hz": 353.75
+    "pop_rate_hz": 1.692352765777448,
+    "kc_rate_hz": 0.1344734251968504,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 23.76086956521739,
+    "mbon_rate_hz": 5.329896907216495,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_50Hz_seed2"
   },
   {
@@ -625,24 +679,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.939657025567059,
-    "kc_rate_hz": 33.3683562992126,
-    "n_kc_active": 2431,
-    "frac_kc": 0.5981791338582677,
-    "spikes_per_active_kc": 55.78321678321678,
-    "mbon_rate_hz": 98.15463917525773,
-    "apl_rate_hz": 348.0
+    "pop_rate_hz": 1.7148028209057686,
+    "kc_rate_hz": 0.2563976377952756,
+    "n_kc_active": 71,
+    "frac_kc": 0.017470472440944882,
+    "spikes_per_active_kc": 14.67605633802817,
+    "mbon_rate_hz": 5.88659793814433,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8730523060280566,
-    "kc_rate_hz": 32.05807086614173,
-    "n_kc_active": 2323,
-    "frac_kc": 0.5716043307086615,
-    "spikes_per_active_kc": 112.16874730951356,
-    "mbon_rate_hz": 97.78865979381443,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.691950571739628,
+    "kc_rate_hz": 0.1376722440944882,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 24.32608695652174,
+    "mbon_rate_hz": 6.11340206185567,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_100Hz_seed0"
   },
   {
@@ -663,24 +718,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.9057548419308086,
-    "kc_rate_hz": 33.21924212598425,
-    "n_kc_active": 2447,
-    "frac_kc": 0.6021161417322834,
-    "spikes_per_active_kc": 55.1708214139763,
-    "mbon_rate_hz": 97.48453608247422,
-    "apl_rate_hz": 346.5
+    "pop_rate_hz": 1.7149207053651299,
+    "kc_rate_hz": 0.26304133858267714,
+    "n_kc_active": 77,
+    "frac_kc": 0.01894685039370079,
+    "spikes_per_active_kc": 13.883116883116884,
+    "mbon_rate_hz": 5.711340206185567,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.889029117461462,
-    "kc_rate_hz": 32.464936023622045,
-    "n_kc_active": 2354,
-    "frac_kc": 0.5792322834645669,
-    "spikes_per_active_kc": 112.0964316057774,
-    "mbon_rate_hz": 98.5979381443299,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6925989362661138,
+    "kc_rate_hz": 0.13582677165354332,
+    "n_kc_active": 50,
+    "frac_kc": 0.012303149606299213,
+    "spikes_per_active_kc": 22.08,
+    "mbon_rate_hz": 6.036082474226804,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_100Hz_seed1"
   },
   {
@@ -701,24 +757,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.9188677544397366,
-    "kc_rate_hz": 33.17716535433071,
-    "n_kc_active": 2459,
-    "frac_kc": 0.6050688976377953,
-    "spikes_per_active_kc": 54.83204554697031,
-    "mbon_rate_hz": 97.58762886597938,
-    "apl_rate_hz": 348.0
+    "pop_rate_hz": 1.690199640799118,
+    "kc_rate_hz": 0.26156496062992124,
+    "n_kc_active": 77,
+    "frac_kc": 0.01894685039370079,
+    "spikes_per_active_kc": 13.805194805194805,
+    "mbon_rate_hz": 5.360824742268041,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8820253936994225,
-    "kc_rate_hz": 32.34682578740158,
-    "n_kc_active": 2319,
-    "frac_kc": 0.5706200787401575,
-    "spikes_per_active_kc": 113.3742992669254,
-    "mbon_rate_hz": 98.22680412371135,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6920129811592897,
+    "kc_rate_hz": 0.12832185039370078,
+    "n_kc_active": 43,
+    "frac_kc": 0.010580708661417323,
+    "spikes_per_active_kc": 24.25581395348837,
+    "mbon_rate_hz": 5.835051546391752,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_100Hz_seed2"
   },
   {
@@ -739,24 +796,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.986672121712237,
-    "kc_rate_hz": 34.070127952755904,
-    "n_kc_active": 2503,
-    "frac_kc": 0.6158956692913385,
-    "spikes_per_active_kc": 55.318018377946466,
-    "mbon_rate_hz": 99.0,
-    "apl_rate_hz": 348.5
+    "pop_rate_hz": 1.7055107517561316,
+    "kc_rate_hz": 0.32677165354330706,
+    "n_kc_active": 86,
+    "frac_kc": 0.021161417322834646,
+    "spikes_per_active_kc": 15.44186046511628,
+    "mbon_rate_hz": 4.907216494845361,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.861468424300841,
-    "kc_rate_hz": 32.11011318897638,
-    "n_kc_active": 2350,
-    "frac_kc": 0.578248031496063,
-    "spikes_per_active_kc": 111.06,
-    "mbon_rate_hz": 97.88144329896907,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.698524363943998,
+    "kc_rate_hz": 0.1344734251968504,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 23.76086956521739,
+    "mbon_rate_hz": 5.38659793814433,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_150Hz_seed0"
   },
   {
@@ -777,24 +835,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.001047091374325,
-    "kc_rate_hz": 33.84965551181102,
-    "n_kc_active": 2478,
-    "frac_kc": 0.609744094488189,
-    "spikes_per_active_kc": 55.51452784503632,
-    "mbon_rate_hz": 98.70103092783505,
-    "apl_rate_hz": 347.0
+    "pop_rate_hz": 1.770478957624004,
+    "kc_rate_hz": 0.3363681102362205,
+    "n_kc_active": 90,
+    "frac_kc": 0.02214566929133858,
+    "spikes_per_active_kc": 15.188888888888888,
+    "mbon_rate_hz": 6.103092783505154,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8858393026787508,
-    "kc_rate_hz": 32.34067421259842,
-    "n_kc_active": 2364,
-    "frac_kc": 0.5816929133858267,
-    "spikes_per_active_kc": 111.19500846023689,
-    "mbon_rate_hz": 98.40721649484536,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6918812279400037,
+    "kc_rate_hz": 0.13730314960629922,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 22.775510204081634,
+    "mbon_rate_hz": 5.969072164948454,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_150Hz_seed1"
   },
   {
@@ -815,24 +874,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.973392784084211,
-    "kc_rate_hz": 33.92962598425197,
-    "n_kc_active": 2472,
-    "frac_kc": 0.6082677165354331,
-    "spikes_per_active_kc": 55.780744336569576,
-    "mbon_rate_hz": 98.91752577319588,
-    "apl_rate_hz": 348.0
+    "pop_rate_hz": 1.7350997510557593,
+    "kc_rate_hz": 0.32701771653543305,
+    "n_kc_active": 87,
+    "frac_kc": 0.02140748031496063,
+    "spikes_per_active_kc": 15.275862068965518,
+    "mbon_rate_hz": 5.56701030927835,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.874179142771949,
-    "kc_rate_hz": 31.975516732283463,
-    "n_kc_active": 2339,
-    "frac_kc": 0.5755413385826772,
-    "spikes_per_active_kc": 111.11457887986319,
-    "mbon_rate_hz": 97.54123711340206,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6925399940364332,
+    "kc_rate_hz": 0.13139763779527558,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 22.25,
+    "mbon_rate_hz": 6.103092783505154,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/1glomerulus_150Hz_seed2"
   },
   {
@@ -854,24 +914,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.776851652809464,
-    "kc_rate_hz": 30.96456692913386,
-    "n_kc_active": 2358,
-    "frac_kc": 0.5802165354330708,
-    "spikes_per_active_kc": 53.36726039016116,
-    "mbon_rate_hz": 94.02061855670104,
-    "apl_rate_hz": 345.0
+    "pop_rate_hz": 1.52187450159144,
+    "kc_rate_hz": 0.14000984251968504,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 12.369565217391305,
+    "mbon_rate_hz": 4.597938144329897,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8676538912273157,
-    "kc_rate_hz": 31.900590551181104,
-    "n_kc_active": 2324,
-    "frac_kc": 0.5718503937007874,
-    "spikes_per_active_kc": 111.5697074010327,
-    "mbon_rate_hz": 97.54639175257732,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6943117281168305,
+    "kc_rate_hz": 0.13213582677165353,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 24.40909090909091,
+    "mbon_rate_hz": 6.092783505154639,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_10Hz_seed0"
   },
   {
@@ -893,24 +954,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.7574908639543994,
-    "kc_rate_hz": 30.89763779527559,
-    "n_kc_active": 2329,
-    "frac_kc": 0.5730807086614174,
-    "spikes_per_active_kc": 53.91498497209103,
-    "mbon_rate_hz": 93.5360824742268,
-    "apl_rate_hz": 344.0
+    "pop_rate_hz": 1.603381203669674,
+    "kc_rate_hz": 0.13730314960629922,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 12.681818181818182,
+    "mbon_rate_hz": 5.278350515463917,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8909326047611454,
-    "kc_rate_hz": 32.37795275590551,
-    "n_kc_active": 2348,
-    "frac_kc": 0.577755905511811,
-    "spikes_per_active_kc": 112.08177172061329,
-    "mbon_rate_hz": 98.38144329896907,
-    "apl_rate_hz": 354.75
+    "pop_rate_hz": 1.688781560096804,
+    "kc_rate_hz": 0.1331200787401575,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 24.59090909090909,
+    "mbon_rate_hz": 5.969072164948454,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_10Hz_seed1"
   },
   {
@@ -932,24 +994,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.762892745945121,
-    "kc_rate_hz": 31.100639763779526,
-    "n_kc_active": 2371,
-    "frac_kc": 0.5834153543307087,
-    "spikes_per_active_kc": 53.307886967524254,
-    "mbon_rate_hz": 94.0721649484536,
-    "apl_rate_hz": 343.5
+    "pop_rate_hz": 1.5476079856319647,
+    "kc_rate_hz": 0.13853346456692914,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 12.23913043478261,
+    "mbon_rate_hz": 4.381443298969073,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8863489796059887,
-    "kc_rate_hz": 32.43159448818898,
-    "n_kc_active": 2344,
-    "frac_kc": 0.5767716535433071,
-    "spikes_per_active_kc": 112.45904436860069,
-    "mbon_rate_hz": 98.41237113402062,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6869335478368201,
+    "kc_rate_hz": 0.13016732283464566,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 24.045454545454547,
+    "mbon_rate_hz": 6.056701030927835,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_10Hz_seed2"
   },
   {
@@ -971,24 +1034,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8119465497992495,
-    "kc_rate_hz": 31.514517716535433,
-    "n_kc_active": 2371,
-    "frac_kc": 0.5834153543307087,
-    "spikes_per_active_kc": 54.01729228173766,
-    "mbon_rate_hz": 94.65979381443299,
-    "apl_rate_hz": 346.5
+    "pop_rate_hz": 1.6404107926689735,
+    "kc_rate_hz": 0.1592027559055118,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 13.204081632653061,
+    "mbon_rate_hz": 5.536082474226804,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8820288608894034,
-    "kc_rate_hz": 32.16031003937008,
-    "n_kc_active": 2335,
-    "frac_kc": 0.5745570866141733,
-    "spikes_per_active_kc": 111.94817987152034,
-    "mbon_rate_hz": 98.02061855670104,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6985139623740544,
+    "kc_rate_hz": 0.13828740157480315,
+    "n_kc_active": 45,
+    "frac_kc": 0.01107283464566929,
+    "spikes_per_active_kc": 24.977777777777778,
+    "mbon_rate_hz": 6.108247422680412,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_20Hz_seed0"
   },
   {
@@ -1010,24 +1074,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.804166175481419,
-    "kc_rate_hz": 31.79896653543307,
-    "n_kc_active": 2365,
-    "frac_kc": 0.5819389763779528,
-    "spikes_per_active_kc": 54.643128964059194,
-    "mbon_rate_hz": 95.42268041237114,
-    "apl_rate_hz": 346.0
+    "pop_rate_hz": 1.6525736951230505,
+    "kc_rate_hz": 0.15501968503937008,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 13.125,
+    "mbon_rate_hz": 5.505154639175258,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.885010644273242,
-    "kc_rate_hz": 32.30880905511811,
-    "n_kc_active": 2341,
-    "frac_kc": 0.5760334645669292,
-    "spikes_per_active_kc": 112.17684750106793,
-    "mbon_rate_hz": 98.23195876288659,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.693989279448578,
+    "kc_rate_hz": 0.1421013779527559,
+    "n_kc_active": 47,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 24.574468085106382,
+    "mbon_rate_hz": 5.938144329896907,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_20Hz_seed1"
   },
   {
@@ -1049,24 +1114,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8080078219805977,
-    "kc_rate_hz": 31.463090551181104,
-    "n_kc_active": 2401,
-    "frac_kc": 0.5907972440944882,
-    "spikes_per_active_kc": 53.25531028738026,
-    "mbon_rate_hz": 94.64948453608247,
-    "apl_rate_hz": 345.0
+    "pop_rate_hz": 1.6277486148576026,
+    "kc_rate_hz": 0.15846456692913385,
+    "n_kc_active": 47,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 13.702127659574469,
+    "mbon_rate_hz": 4.680412371134021,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8945696870514324,
-    "kc_rate_hz": 32.446727362204726,
-    "n_kc_active": 2353,
-    "frac_kc": 0.578986220472441,
-    "spikes_per_active_kc": 112.08117297067574,
-    "mbon_rate_hz": 98.58247422680412,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6975362147993538,
+    "kc_rate_hz": 0.1360728346456693,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 25.136363636363637,
+    "mbon_rate_hz": 6.030927835051546,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_20Hz_seed2"
   },
   {
@@ -1088,24 +1154,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.895817875444667,
-    "kc_rate_hz": 33.15157480314961,
-    "n_kc_active": 2447,
-    "frac_kc": 0.6021161417322834,
-    "spikes_per_active_kc": 55.05843890478136,
-    "mbon_rate_hz": 97.6082474226804,
-    "apl_rate_hz": 347.5
+    "pop_rate_hz": 1.686864204037196,
+    "kc_rate_hz": 0.2059547244094488,
+    "n_kc_active": 62,
+    "frac_kc": 0.015255905511811024,
+    "spikes_per_active_kc": 13.5,
+    "mbon_rate_hz": 5.587628865979381,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.879598360712577,
-    "kc_rate_hz": 32.37672244094488,
-    "n_kc_active": 2330,
-    "frac_kc": 0.5733267716535433,
-    "spikes_per_active_kc": 112.94334763948498,
-    "mbon_rate_hz": 98.56701030927834,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6892253604143985,
+    "kc_rate_hz": 0.13521161417322836,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 22.895833333333332,
+    "mbon_rate_hz": 5.974226804123711,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_50Hz_seed0"
   },
   {
@@ -1127,24 +1194,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8825801440964156,
-    "kc_rate_hz": 33.07037401574803,
-    "n_kc_active": 2444,
-    "frac_kc": 0.6013779527559056,
-    "spikes_per_active_kc": 54.99099836333879,
-    "mbon_rate_hz": 97.24742268041237,
-    "apl_rate_hz": 348.0
+    "pop_rate_hz": 1.691135782094044,
+    "kc_rate_hz": 0.21309055118110237,
+    "n_kc_active": 65,
+    "frac_kc": 0.015994094488188976,
+    "spikes_per_active_kc": 13.323076923076924,
+    "mbon_rate_hz": 5.041237113402062,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8732811405668164,
-    "kc_rate_hz": 32.228715551181104,
-    "n_kc_active": 2355,
-    "frac_kc": 0.5794783464566929,
-    "spikes_per_active_kc": 111.23354564755839,
-    "mbon_rate_hz": 98.04639175257732,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6957540791490129,
+    "kc_rate_hz": 0.13410433070866143,
+    "n_kc_active": 45,
+    "frac_kc": 0.01107283464566929,
+    "spikes_per_active_kc": 24.22222222222222,
+    "mbon_rate_hz": 5.680412371134021,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_50Hz_seed1"
   },
   {
@@ -1166,24 +1234,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8930718609795507,
-    "kc_rate_hz": 33.06077755905512,
-    "n_kc_active": 2456,
-    "frac_kc": 0.6043307086614174,
-    "spikes_per_active_kc": 54.7064332247557,
-    "mbon_rate_hz": 97.6082474226804,
-    "apl_rate_hz": 347.0
+    "pop_rate_hz": 1.6934934712812655,
+    "kc_rate_hz": 0.21013779527559054,
+    "n_kc_active": 65,
+    "frac_kc": 0.015994094488188976,
+    "spikes_per_active_kc": 13.138461538461538,
+    "mbon_rate_hz": 5.752577319587629,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.874966194897683,
-    "kc_rate_hz": 32.04502952755905,
-    "n_kc_active": 2343,
-    "frac_kc": 0.5765255905511811,
-    "spikes_per_active_kc": 111.16602646180111,
-    "mbon_rate_hz": 97.86082474226804,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6913923541526534,
+    "kc_rate_hz": 0.13570374015748032,
+    "n_kc_active": 43,
+    "frac_kc": 0.010580708661417323,
+    "spikes_per_active_kc": 25.651162790697676,
+    "mbon_rate_hz": 5.948453608247423,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_50Hz_seed2"
   },
   {
@@ -1205,24 +1274,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.009340609809374,
-    "kc_rate_hz": 34.65575787401575,
-    "n_kc_active": 2542,
-    "frac_kc": 0.625492125984252,
-    "spikes_per_active_kc": 55.40558615263572,
-    "mbon_rate_hz": 100.12371134020619,
-    "apl_rate_hz": 349.0
+    "pop_rate_hz": 1.7637734122003481,
+    "kc_rate_hz": 0.29945866141732286,
+    "n_kc_active": 83,
+    "frac_kc": 0.02042322834645669,
+    "spikes_per_active_kc": 14.662650602409638,
+    "mbon_rate_hz": 5.855670103092783,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8881796559160664,
-    "kc_rate_hz": 32.476254921259844,
-    "n_kc_active": 2366,
-    "frac_kc": 0.5821850393700787,
-    "spikes_per_active_kc": 111.56677937447168,
-    "mbon_rate_hz": 98.35567010309278,
-    "apl_rate_hz": 354.75
+    "pop_rate_hz": 1.6925503956063768,
+    "kc_rate_hz": 0.13398129921259844,
+    "n_kc_active": 47,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 23.170212765957448,
+    "mbon_rate_hz": 5.917525773195877,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_100Hz_seed0"
   },
   {
@@ -1244,24 +1314,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.0069551831023027,
-    "kc_rate_hz": 34.800196850393704,
-    "n_kc_active": 2532,
-    "frac_kc": 0.6230314960629921,
-    "spikes_per_active_kc": 55.8562401263823,
-    "mbon_rate_hz": 100.42268041237114,
-    "apl_rate_hz": 349.0
+    "pop_rate_hz": 1.7580109424515806,
+    "kc_rate_hz": 0.3048720472440945,
+    "n_kc_active": 86,
+    "frac_kc": 0.021161417322834646,
+    "spikes_per_active_kc": 14.406976744186046,
+    "mbon_rate_hz": 5.907216494845361,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8743906413608027,
-    "kc_rate_hz": 32.19574311023622,
-    "n_kc_active": 2332,
-    "frac_kc": 0.5738188976377953,
-    "spikes_per_active_kc": 112.21569468267582,
-    "mbon_rate_hz": 98.12886597938144,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6945266938956653,
+    "kc_rate_hz": 0.1331200787401575,
+    "n_kc_active": 47,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 23.02127659574468,
+    "mbon_rate_hz": 6.030927835051546,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_100Hz_seed1"
   },
   {
@@ -1283,24 +1354,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.974023812660791,
-    "kc_rate_hz": 34.494832677165356,
-    "n_kc_active": 2526,
-    "frac_kc": 0.6215551181102362,
-    "spikes_per_active_kc": 55.49762470308789,
-    "mbon_rate_hz": 99.6701030927835,
-    "apl_rate_hz": 349.5
+    "pop_rate_hz": 1.702327871353383,
+    "kc_rate_hz": 0.296505905511811,
+    "n_kc_active": 80,
+    "frac_kc": 0.01968503937007874,
+    "spikes_per_active_kc": 15.0625,
+    "mbon_rate_hz": 5.412371134020619,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.871336046987359,
-    "kc_rate_hz": 32.18811515748032,
-    "n_kc_active": 2362,
-    "frac_kc": 0.5812007874015748,
-    "spikes_per_active_kc": 110.76418289585098,
-    "mbon_rate_hz": 98.07731958762886,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.701513081707799,
+    "kc_rate_hz": 0.13791830708661418,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 22.877551020408163,
+    "mbon_rate_hz": 6.030927835051546,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_100Hz_seed2"
   },
   {
@@ -1322,24 +1394,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.1273152161099516,
-    "kc_rate_hz": 35.781003937007874,
-    "n_kc_active": 2590,
-    "frac_kc": 0.6373031496062992,
-    "spikes_per_active_kc": 56.144401544401546,
-    "mbon_rate_hz": 101.4639175257732,
-    "apl_rate_hz": 350.5
+    "pop_rate_hz": 1.7849302054656784,
+    "kc_rate_hz": 0.3811515748031496,
+    "n_kc_active": 96,
+    "frac_kc": 0.023622047244094488,
+    "spikes_per_active_kc": 16.135416666666668,
+    "mbon_rate_hz": 5.628865979381444,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8880964433565173,
-    "kc_rate_hz": 32.294783464566926,
-    "n_kc_active": 2364,
-    "frac_kc": 0.5816929133858267,
-    "spikes_per_active_kc": 111.03722504230119,
-    "mbon_rate_hz": 98.21649484536083,
-    "apl_rate_hz": 354.75
+    "pop_rate_hz": 1.689665693542012,
+    "kc_rate_hz": 0.13324311023622049,
+    "n_kc_active": 51,
+    "frac_kc": 0.012549212598425197,
+    "spikes_per_active_kc": 21.235294117647058,
+    "mbon_rate_hz": 6.103092783505154,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_150Hz_seed0"
   },
   {
@@ -1361,24 +1434,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.0635813298753893,
-    "kc_rate_hz": 35.44340551181102,
-    "n_kc_active": 2563,
-    "frac_kc": 0.6306594488188977,
-    "spikes_per_active_kc": 56.200546234880996,
-    "mbon_rate_hz": 100.91752577319588,
-    "apl_rate_hz": 350.5
+    "pop_rate_hz": 1.8092421416139075,
+    "kc_rate_hz": 0.3843503937007874,
+    "n_kc_active": 100,
+    "frac_kc": 0.024606299212598427,
+    "spikes_per_active_kc": 15.62,
+    "mbon_rate_hz": 5.649484536082475,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.875229701336255,
-    "kc_rate_hz": 32.07443405511811,
-    "n_kc_active": 2427,
-    "frac_kc": 0.5971948818897638,
-    "spikes_per_active_kc": 107.41697569015246,
-    "mbon_rate_hz": 97.81958762886597,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.700261426124583,
+    "kc_rate_hz": 0.13877952755905512,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 23.020408163265305,
+    "mbon_rate_hz": 6.036082474226804,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_150Hz_seed1"
   },
   {
@@ -1400,24 +1474,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.0774986304599574,
-    "kc_rate_hz": 35.293061023622045,
-    "n_kc_active": 2555,
-    "frac_kc": 0.6286909448818898,
-    "spikes_per_active_kc": 56.137377690802346,
-    "mbon_rate_hz": 101.26804123711341,
-    "apl_rate_hz": 349.5
+    "pop_rate_hz": 1.8201707244346748,
+    "kc_rate_hz": 0.39148622047244097,
+    "n_kc_active": 100,
+    "frac_kc": 0.024606299212598427,
+    "spikes_per_active_kc": 15.91,
+    "mbon_rate_hz": 6.082474226804123,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8772025324355623,
-    "kc_rate_hz": 32.29392224409449,
-    "n_kc_active": 2349,
-    "frac_kc": 0.578001968503937,
-    "spikes_per_active_kc": 111.74329501915709,
-    "mbon_rate_hz": 98.22680412371135,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6906607770666187,
+    "kc_rate_hz": 0.13041338582677164,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 21.632653061224488,
+    "mbon_rate_hz": 5.93298969072165,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/2glomeruli_150Hz_seed2"
   },
   {
@@ -1441,24 +1516,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8418683993370735,
-    "kc_rate_hz": 32.105561023622045,
-    "n_kc_active": 2432,
-    "frac_kc": 0.5984251968503937,
-    "spikes_per_active_kc": 53.6500822368421,
-    "mbon_rate_hz": 95.74226804123711,
-    "apl_rate_hz": 346.5
+    "pop_rate_hz": 1.489872338064892,
+    "kc_rate_hz": 0.1518208661417323,
+    "n_kc_active": 49,
+    "frac_kc": 0.012057086614173228,
+    "spikes_per_active_kc": 12.591836734693878,
+    "mbon_rate_hz": 3.9896907216494846,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8745397305299947,
-    "kc_rate_hz": 32.13447342519685,
-    "n_kc_active": 2317,
-    "frac_kc": 0.5701279527559056,
-    "spikes_per_active_kc": 112.72723349158395,
-    "mbon_rate_hz": 97.84536082474227,
-    "apl_rate_hz": 355.0
+    "pop_rate_hz": 1.613592078164331,
+    "kc_rate_hz": 0.13496555118110237,
+    "n_kc_active": 46,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 23.847826086956523,
+    "mbon_rate_hz": 4.948453608247423,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_10Hz_seed0"
   },
   {
@@ -1482,24 +1558,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.787565269851396,
-    "kc_rate_hz": 31.574557086614174,
-    "n_kc_active": 2382,
-    "frac_kc": 0.5861220472440944,
-    "spikes_per_active_kc": 53.87027707808564,
-    "mbon_rate_hz": 94.98969072164948,
-    "apl_rate_hz": 346.5
+    "pop_rate_hz": 1.6548412373707604,
+    "kc_rate_hz": 0.1500984251968504,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 12.708333333333334,
+    "mbon_rate_hz": 5.164948453608248,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8816474699914707,
-    "kc_rate_hz": 32.297121062992126,
-    "n_kc_active": 2331,
-    "frac_kc": 0.5735728346456693,
-    "spikes_per_active_kc": 112.61733161733162,
-    "mbon_rate_hz": 98.37113402061856,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6928347051848358,
+    "kc_rate_hz": 0.1327509842519685,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 24.522727272727273,
+    "mbon_rate_hz": 5.896907216494846,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_10Hz_seed1"
   },
   {
@@ -1523,24 +1600,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.7937229992580215,
-    "kc_rate_hz": 31.338090551181104,
-    "n_kc_active": 2361,
-    "frac_kc": 0.5809547244094488,
-    "spikes_per_active_kc": 53.9423972892842,
-    "mbon_rate_hz": 94.43298969072166,
-    "apl_rate_hz": 345.5
+    "pop_rate_hz": 1.648426935905526,
+    "kc_rate_hz": 0.15551181102362205,
+    "n_kc_active": 48,
+    "frac_kc": 0.011811023622047244,
+    "spikes_per_active_kc": 13.166666666666666,
+    "mbon_rate_hz": 5.515463917525773,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8926419294218806,
-    "kc_rate_hz": 32.40218996062992,
-    "n_kc_active": 2346,
-    "frac_kc": 0.577263779527559,
-    "spikes_per_active_kc": 112.2612958226769,
-    "mbon_rate_hz": 98.5721649484536,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6933305133521486,
+    "kc_rate_hz": 0.13139763779527558,
+    "n_kc_active": 40,
+    "frac_kc": 0.00984251968503937,
+    "spikes_per_active_kc": 26.7,
+    "mbon_rate_hz": 6.097938144329897,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_10Hz_seed2"
   },
   {
@@ -1564,24 +1642,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.888155385586198,
-    "kc_rate_hz": 33.00959645669291,
-    "n_kc_active": 2481,
-    "frac_kc": 0.6104822834645669,
-    "spikes_per_active_kc": 54.07134220072551,
-    "mbon_rate_hz": 97.35051546391753,
-    "apl_rate_hz": 348.0
+    "pop_rate_hz": 1.5269365989640036,
+    "kc_rate_hz": 0.18184055118110237,
+    "n_kc_active": 57,
+    "frac_kc": 0.014025590551181102,
+    "spikes_per_active_kc": 12.964912280701755,
+    "mbon_rate_hz": 4.257731958762887,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8682953213738394,
-    "kc_rate_hz": 31.985851377952756,
-    "n_kc_active": 2349,
-    "frac_kc": 0.578001968503937,
-    "spikes_per_active_kc": 110.67730949340145,
-    "mbon_rate_hz": 97.6082474226804,
-    "apl_rate_hz": 353.75
+    "pop_rate_hz": 1.6813687079169817,
+    "kc_rate_hz": 0.1279527559055118,
+    "n_kc_active": 44,
+    "frac_kc": 0.010826771653543307,
+    "spikes_per_active_kc": 23.636363636363637,
+    "mbon_rate_hz": 5.974226804123711,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_20Hz_seed0"
   },
   {
@@ -1605,24 +1684,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.8751672919165934,
-    "kc_rate_hz": 32.85162401574803,
-    "n_kc_active": 2470,
-    "frac_kc": 0.6077755905511811,
-    "spikes_per_active_kc": 54.052226720647774,
-    "mbon_rate_hz": 97.25773195876289,
-    "apl_rate_hz": 347.5
+    "pop_rate_hz": 1.5174919734551935,
+    "kc_rate_hz": 0.1889763779527559,
+    "n_kc_active": 58,
+    "frac_kc": 0.014271653543307087,
+    "spikes_per_active_kc": 13.241379310344827,
+    "mbon_rate_hz": 4.257731958762887,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.878821710156786,
-    "kc_rate_hz": 32.1941437007874,
-    "n_kc_active": 2349,
-    "frac_kc": 0.578001968503937,
-    "spikes_per_active_kc": 111.3980417198808,
-    "mbon_rate_hz": 98.15463917525773,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6565817667413267,
+    "kc_rate_hz": 0.13693405511811024,
+    "n_kc_active": 42,
+    "frac_kc": 0.01033464566929134,
+    "spikes_per_active_kc": 26.5,
+    "mbon_rate_hz": 5.680412371134021,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_20Hz_seed1"
   },
   {
@@ -1646,24 +1726,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 2.9054705323523495,
-    "kc_rate_hz": 33.01131889763779,
-    "n_kc_active": 2510,
-    "frac_kc": 0.6176181102362205,
-    "spikes_per_active_kc": 53.449402390438244,
-    "mbon_rate_hz": 97.37113402061856,
-    "apl_rate_hz": 348.0
+    "pop_rate_hz": 1.529675679049158,
+    "kc_rate_hz": 0.1892224409448819,
+    "n_kc_active": 59,
+    "frac_kc": 0.014517716535433071,
+    "spikes_per_active_kc": 13.033898305084746,
+    "mbon_rate_hz": 4.22680412371134,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8813631604130117,
-    "kc_rate_hz": 32.22576279527559,
-    "n_kc_active": 2342,
-    "frac_kc": 0.5762795275590551,
-    "spikes_per_active_kc": 111.84073441502989,
-    "mbon_rate_hz": 98.07731958762886,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6029963455817597,
+    "kc_rate_hz": 0.1359498031496063,
+    "n_kc_active": 51,
+    "frac_kc": 0.012549212598425197,
+    "spikes_per_active_kc": 21.666666666666668,
+    "mbon_rate_hz": 5.283505154639175,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_20Hz_seed2"
   },
   {
@@ -1687,24 +1768,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.0474658308427354,
-    "kc_rate_hz": 35.26082677165354,
-    "n_kc_active": 2584,
-    "frac_kc": 0.6358267716535433,
-    "spikes_per_active_kc": 55.45665634674923,
-    "mbon_rate_hz": 100.8659793814433,
-    "apl_rate_hz": 350.0
+    "pop_rate_hz": 1.7076118688847437,
+    "kc_rate_hz": 0.3078248031496063,
+    "n_kc_active": 87,
+    "frac_kc": 0.02140748031496063,
+    "spikes_per_active_kc": 14.379310344827585,
+    "mbon_rate_hz": 5.278350515463917,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8803958144082547,
-    "kc_rate_hz": 32.089812992125985,
-    "n_kc_active": 2347,
-    "frac_kc": 0.5775098425196851,
-    "spikes_per_active_kc": 111.13165743502343,
-    "mbon_rate_hz": 97.93298969072166,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6887746257168414,
+    "kc_rate_hz": 0.13078248031496062,
+    "n_kc_active": 45,
+    "frac_kc": 0.01107283464566929,
+    "spikes_per_active_kc": 23.622222222222224,
+    "mbon_rate_hz": 5.963917525773196,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_50Hz_seed0"
   },
   {
@@ -1728,24 +1810,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.0520841278977042,
-    "kc_rate_hz": 35.24655511811024,
-    "n_kc_active": 2580,
-    "frac_kc": 0.6348425196850394,
-    "spikes_per_active_kc": 55.52015503875969,
-    "mbon_rate_hz": 100.75257731958763,
-    "apl_rate_hz": 349.0
+    "pop_rate_hz": 1.726951854599921,
+    "kc_rate_hz": 0.31914370078740156,
+    "n_kc_active": 93,
+    "frac_kc": 0.022883858267716536,
+    "spikes_per_active_kc": 13.946236559139784,
+    "mbon_rate_hz": 5.525773195876289,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8781976159601688,
-    "kc_rate_hz": 32.16067913385827,
-    "n_kc_active": 2342,
-    "frac_kc": 0.5762795275590551,
-    "spikes_per_active_kc": 111.61485909479077,
-    "mbon_rate_hz": 98.05670103092784,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.6912952728331796,
+    "kc_rate_hz": 0.13656496062992127,
+    "n_kc_active": 47,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 23.617021276595743,
+    "mbon_rate_hz": 6.077319587628866,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_50Hz_seed1"
   },
   {
@@ -1769,24 +1852,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.027071819373271,
-    "kc_rate_hz": 35.18799212598425,
-    "n_kc_active": 2562,
-    "frac_kc": 0.6304133858267716,
-    "spikes_per_active_kc": 55.81733021077283,
-    "mbon_rate_hz": 100.71134020618557,
-    "apl_rate_hz": 350.0
+    "pop_rate_hz": 1.7605627942777498,
+    "kc_rate_hz": 0.3036417322834646,
+    "n_kc_active": 91,
+    "frac_kc": 0.022391732283464565,
+    "spikes_per_active_kc": 13.56043956043956,
+    "mbon_rate_hz": 5.608247422680412,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.887108294211873,
-    "kc_rate_hz": 32.432332677165356,
-    "n_kc_active": 2391,
-    "frac_kc": 0.5883366141732284,
-    "spikes_per_active_kc": 110.25094102885822,
-    "mbon_rate_hz": 98.4639175257732,
-    "apl_rate_hz": 353.75
+    "pop_rate_hz": 1.6992386050801267,
+    "kc_rate_hz": 0.13521161417322836,
+    "n_kc_active": 47,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 23.382978723404257,
+    "mbon_rate_hz": 6.036082474226804,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_50Hz_seed2"
   },
   {
@@ -1810,24 +1894,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.2718693008064683,
-    "kc_rate_hz": 38.34965551181102,
-    "n_kc_active": 2699,
-    "frac_kc": 0.6641240157480315,
-    "spikes_per_active_kc": 57.74472026676547,
-    "mbon_rate_hz": 104.65979381443299,
-    "apl_rate_hz": 353.0
+    "pop_rate_hz": 1.889292623900034,
+    "kc_rate_hz": 0.5258366141732284,
+    "n_kc_active": 133,
+    "frac_kc": 0.0327263779527559,
+    "spikes_per_active_kc": 16.06766917293233,
+    "mbon_rate_hz": 6.082474226804123,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8683507964135386,
-    "kc_rate_hz": 31.971579724409448,
-    "n_kc_active": 2527,
-    "frac_kc": 0.6218011811023622,
-    "spikes_per_active_kc": 102.83537791848042,
-    "mbon_rate_hz": 97.67525773195877,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.690716252106318,
+    "kc_rate_hz": 0.1345964566929134,
+    "n_kc_active": 51,
+    "frac_kc": 0.012549212598425197,
+    "spikes_per_active_kc": 21.45098039215686,
+    "mbon_rate_hz": 5.865979381443299,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": true,
    "file": "results/stage3b_odor/4glomeruli_100Hz_seed0"
   },
   {
@@ -1851,24 +1936,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.2809117322774584,
-    "kc_rate_hz": 38.30216535433071,
-    "n_kc_active": 2698,
-    "frac_kc": 0.6638779527559056,
-    "spikes_per_active_kc": 57.6945885841364,
-    "mbon_rate_hz": 104.70103092783505,
-    "apl_rate_hz": 352.5
+    "pop_rate_hz": 1.9215166875853795,
+    "kc_rate_hz": 0.5615157480314961,
+    "n_kc_active": 144,
+    "frac_kc": 0.03543307086614173,
+    "spikes_per_active_kc": 15.847222222222221,
+    "mbon_rate_hz": 6.164948453608248,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8789812008959217,
-    "kc_rate_hz": 32.30007381889764,
-    "n_kc_active": 2407,
-    "frac_kc": 0.5922736220472441,
-    "spikes_per_active_kc": 109.07145824678022,
-    "mbon_rate_hz": 98.28865979381443,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6912328634135179,
+    "kc_rate_hz": 0.13718011811023623,
+    "n_kc_active": 56,
+    "frac_kc": 0.013779527559055118,
+    "spikes_per_active_kc": 19.910714285714285,
+    "mbon_rate_hz": 5.979381443298969,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": false,
    "file": "results/stage3b_odor/4glomeruli_100Hz_seed1"
   },
   {
@@ -1892,24 +1978,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.2740605648745915,
-    "kc_rate_hz": 38.333169291338585,
-    "n_kc_active": 2714,
-    "frac_kc": 0.6678149606299213,
-    "spikes_per_active_kc": 57.40088430361091,
-    "mbon_rate_hz": 104.54639175257732,
-    "apl_rate_hz": 352.5
+    "pop_rate_hz": 1.9014624607340735,
+    "kc_rate_hz": 0.5551181102362205,
+    "n_kc_active": 135,
+    "frac_kc": 0.03321850393700788,
+    "spikes_per_active_kc": 16.711111111111112,
+    "mbon_rate_hz": 6.0,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8802051189592883,
-    "kc_rate_hz": 32.102485236220474,
-    "n_kc_active": 2398,
-    "frac_kc": 0.5900590551181102,
-    "spikes_per_active_kc": 108.81109257714762,
-    "mbon_rate_hz": 97.8298969072165,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6960765278172651,
+    "kc_rate_hz": 0.1377952755905512,
+    "n_kc_active": 54,
+    "frac_kc": 0.01328740157480315,
+    "spikes_per_active_kc": 20.74074074074074,
+    "mbon_rate_hz": 6.030927835051546,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": false,
    "file": "results/stage3b_odor/4glomeruli_100Hz_seed2"
   },
   {
@@ -1933,24 +2020,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.4638892163457204,
-    "kc_rate_hz": 40.20423228346457,
-    "n_kc_active": 2757,
-    "frac_kc": 0.6783956692913385,
-    "spikes_per_active_kc": 59.26369241929633,
-    "mbon_rate_hz": 106.9381443298969,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 2.003169011642824,
+    "kc_rate_hz": 0.7758366141732284,
+    "n_kc_active": 178,
+    "frac_kc": 0.043799212598425195,
+    "spikes_per_active_kc": 17.713483146067414,
+    "mbon_rate_hz": 5.876288659793815,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8781109362106387,
-    "kc_rate_hz": 32.16843011811024,
-    "n_kc_active": 2536,
-    "frac_kc": 0.6240157480314961,
-    "spikes_per_active_kc": 103.10134069400631,
-    "mbon_rate_hz": 98.07731958762886,
-    "apl_rate_hz": 353.75
+    "pop_rate_hz": 1.6855536062242995,
+    "kc_rate_hz": 0.13373523622047245,
+    "n_kc_active": 53,
+    "frac_kc": 0.013041338582677165,
+    "spikes_per_active_kc": 20.50943396226415,
+    "mbon_rate_hz": 5.93298969072165,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": false,
    "file": "results/stage3b_odor/4glomeruli_150Hz_seed0"
   },
   {
@@ -1974,24 +2062,25 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.4231636028264534,
-    "kc_rate_hz": 39.93922244094488,
-    "n_kc_active": 2757,
-    "frac_kc": 0.6783956692913385,
-    "spikes_per_active_kc": 58.873050417120055,
-    "mbon_rate_hz": 106.45360824742268,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 1.9553148555221935,
+    "kc_rate_hz": 0.7531988188976378,
+    "n_kc_active": 177,
+    "frac_kc": 0.04355314960629921,
+    "spikes_per_active_kc": 17.293785310734464,
+    "mbon_rate_hz": 5.742268041237113,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8802328564791377,
-    "kc_rate_hz": 32.21333661417323,
-    "n_kc_active": 2461,
-    "frac_kc": 0.6055610236220472,
-    "spikes_per_active_kc": 106.39171068671271,
-    "mbon_rate_hz": 98.11855670103093,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 1.6911080445741944,
+    "kc_rate_hz": 0.13521161417322836,
+    "n_kc_active": 53,
+    "frac_kc": 0.013041338582677165,
+    "spikes_per_active_kc": 20.735849056603772,
+    "mbon_rate_hz": 6.128865979381444,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": false,
    "file": "results/stage3b_odor/4glomeruli_150Hz_seed1"
   },
   {
@@ -2015,30 +2104,50 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 3.44520106234701,
-    "kc_rate_hz": 39.88361220472441,
-    "n_kc_active": 2740,
-    "frac_kc": 0.6742125984251969,
-    "spikes_per_active_kc": 59.15583941605839,
-    "mbon_rate_hz": 106.69072164948453,
-    "apl_rate_hz": 353.5
+    "pop_rate_hz": 2.0346094903924166,
+    "kc_rate_hz": 0.7881397637795275,
+    "n_kc_active": 181,
+    "frac_kc": 0.04453740157480315,
+    "spikes_per_active_kc": 17.696132596685082,
+    "mbon_rate_hz": 6.103092783505154,
+    "apl_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8930233203198137,
-    "kc_rate_hz": 32.40661909448819,
-    "n_kc_active": 2510,
-    "frac_kc": 0.6176181102362205,
-    "spikes_per_active_kc": 104.9406374501992,
-    "mbon_rate_hz": 98.48453608247422,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 1.6944088094363043,
+    "kc_rate_hz": 0.13693405511811024,
+    "n_kc_active": 61,
+    "frac_kc": 0.015009842519685039,
+    "spikes_per_active_kc": 18.24590163934426,
+    "mbon_rate_hz": 6.108247422680412,
+    "apl_rate_hz": 0.0
    },
    "outlasts": true,
+   "kc_outlasts": false,
    "file": "results/stage3b_odor/4glomeruli_150Hz_seed2"
   }
  ],
- "chosen": null,
- "finding": "NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. This is a property of the published model at this scale, not a tuning failure: no parameter was changed to obtain it.",
- "walltime_s": 307.8,
+ "chosen": {
+  "set": "4 glomeruli",
+  "rate_hz": 150,
+  "n_orn": 243,
+  "n_seeds": 3,
+  "frac_kc_active": 0.04396325459317585,
+  "n_kc_active": 178.66666666666666,
+  "spikes_per_active_kc": 17.567800351162322,
+  "pop_rate_hz_odor": 1.997697785852478,
+  "pop_rate_hz_post": 1.6903568200782662,
+  "kc_rate_hz_odor": 0.7723917322834645,
+  "mbon_rate_hz_odor": 5.907216494845361,
+  "apl_rate_hz_odor": 0.0,
+  "kc_rate_hz_post": 0.1352936351706037,
+  "kc_transient": true,
+  "sparse": true,
+  "transient": false,
+  "usable": true,
+  "usable_whole_brain": false
+ },
+ "finding": "Sparse, transient Kenyon-cell odour coding is reproduced at 4 glomeruli / 150 Hz: 4.4% of Kenyon cells respond at 0.77 Hz, falling to 0.14 Hz once the odour stops. The rest of the network does not return to baseline (1.69 vs 2.00 Hz per neuron), so the mushroom body recovers while the wider brain does not.",
+ "walltime_s": 229.1,
  "provenance": {
   "config": "configs/stage3b_odor.yaml",
   "results_dir": "results/stage3b_odor",

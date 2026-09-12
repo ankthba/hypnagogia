@@ -413,7 +413,7 @@ const DEPTH_BUCKETS = 48;
 class Canvas2DCloud implements CloudRenderer {
   readonly kind = 'canvas2d';
   private ctx: CanvasRenderingContext2D;
-  private pos = new Float32Array(0);
+  private pos: Float32Array = new Float32Array(0);
   private groups: GroupDraw[] = [];
   /** for a capped group, the stride through its run; 1 when it is drawn in full */
   private stride: number[] = [];

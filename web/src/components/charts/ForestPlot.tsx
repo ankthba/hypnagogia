@@ -68,6 +68,40 @@ function symlogTicks(logMax: number): number[] {
 }
 
 /**
+ * Greedy word wrap for SVG text, which has no wrapping of its own.
+ *
+ * `maxPx` is the width of the column the text must stay inside, and the character width is the
+ * measured average for EB Garamond at the given size. It matters that this errs narrow: a label
+ * that overflowed its column landed on top of the whiskers, which is exactly the defect this plot
+ * is being rebuilt to remove. Anything past `maxLines` is cut with an ellipsis, and the caller puts
+ * the full string in a <title> so nothing is actually lost.
+ */
+function wrapText(text: string, maxPx: number, fontPx: number, maxLines: number): string[] {
+  const perChar = fontPx * 0.435;
+  const maxChars = Math.max(8, Math.floor(maxPx / perChar));
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    const next = cur ? `${cur} ${w}` : w;
+    if (next.length <= maxChars) {
+      cur = next;
+      continue;
+    }
+    if (cur) lines.push(cur);
+    cur = w;
+    if (lines.length === maxLines) break;
+  }
+  if (cur && lines.length < maxLines) lines.push(cur);
+  if (lines.length === maxLines) {
+    // did everything fit?
+    const used = lines.join(' ');
+    if (used.length < text.length) lines[maxLines - 1] = `${lines[maxLines - 1].slice(0, Math.max(4, maxChars - 1))}…`;
+  }
+  return lines.length > 0 ? lines : [text];
+}
+
+/**
  * Effect sizes (Hedges g) with 95% CI whiskers and a zero line, one row per comparison.
  *
  * Three things the earlier version got wrong are fixed here and must stay fixed:
@@ -106,19 +140,21 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
   // Three fixed columns on the right of the plot, so nothing can ever land on top of anything else:
   // the whiskers, then the value and its CI, then the verdict badge.
   const badgeW = 86;
-  const valueW = narrow ? 0 : 132;
+  const valueW = narrow ? 0 : 128;
   const gutter = 10;
-  const labelW = narrow ? 8 : 236;
-  const plotW = narrow ? W - 24 : W - labelW - valueW - badgeW - 2 * gutter - 6;
-  const rowH = narrow ? 96 : 50;
+  const labelW = narrow ? W - 16 : 244;
+  const plotW = narrow ? W - 24 : W - labelW - valueW - badgeW - 2 * gutter - 8;
+  const rowH = narrow ? 116 : 66;
   const top = narrow ? 24 : 28;
   const H = top + rows.length * rowH + 34;
   const plotX = narrow ? 12 : labelW;
   const scale = makeScale(lo, hi, plotW, plotX);
   const valueX = plotX + plotW + gutter;
   const badgeX = narrow ? W - badgeW - 6 : valueX + valueW + gutter;
-  /** vertical offset of the whisker line inside a row: centred when wide, fourth line when stacked */
-  const barDy = narrow ? 60 : rowH / 2;
+  /** vertical offset of the whisker line inside a row: centred when wide, below the text when stacked */
+  const barDy = narrow ? 98 : rowH / 2;
+  /** the width the label column has for text; the wrap keeps every string inside it */
+  const textW = narrow ? W - 20 : labelW - 14;
   const ticks = symlogTicks(scale.logMax);
 
   /** an endpoint outside the drawn range is clipped and gets an arrow at the edge */
@@ -150,7 +186,7 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
         {rows.map((r, i) => {
           const y0 = top + i * rowH;
           const cy = y0 + barDy;
-          const badgeY = narrow ? y0 + rowH - 26 : y0 + rowH / 2 - 9;
+          const badgeY = narrow ? y0 + 62 : y0 + rowH / 2 - 9;
           if (r.kind === 'missing') {
             return (
               <g key={`missing-${r.name}`}>
@@ -158,9 +194,11 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
                 <text x={8} y={y0 + 17} fontSize={narrow ? 12 : 13} fill={BAD} fontWeight={500}>
                   {r.name}
                 </text>
-                <text x={8} y={y0 + 33} fontSize={12} fill={BAD}>
-                  pre-registered comparison missing from stage6_replay.json
-                </text>
+                {wrapText('pre-registered comparison missing from stage6_replay.json', textW, 11.5, 2).map((ln, k) => (
+                  <text key={k} x={8} y={y0 + 33 + k * 14} fontSize={11.5} fill={BAD}>
+                    {ln}
+                  </text>
+                ))}
                 <rect x={badgeX} y={badgeY} width={badgeW} height={18} rx={2} fill="none" stroke={BAD} />
                 <text x={badgeX + badgeW / 2} y={badgeY + 13} fontSize={11.5} letterSpacing="0.08em" textAnchor="middle" fill={BAD}>
                   MISSING
@@ -176,23 +214,28 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
           const p = isNum(c.p) ? c.p : isNum(c.p_permutation) ? c.p_permutation : isNum(c.p_wilcoxon) ? c.p_wilcoxon : null;
           const loOut = isNum(cl) && scale.x(cl) < plotX + 1;
           const hiOut = isNum(ch) && scale.x(ch) > plotX + plotW - 1;
+          const labelLines = wrapText(c.label, textW, narrow ? 12.5 : 13, 2);
+          const meta = `${c.metric} · n = ${fmtInt(c.n)}${p !== null ? ` · p = ${fmtP(p)}` : ''}${
+            r.prereg ? '' : ' · additional comparison, outside the pre-registered set'
+          }`;
+          const metaLines = wrapText(meta, textW, 11.5, r.prereg ? 1 : 2);
           return (
             <g key={c.name}>
               {i % 2 === 1 && <rect x={0} y={y0} width={W} height={rowH} fill={STRIPE} />}
-              <text x={8} y={y0 + 17} fontSize={narrow ? 12.5 : 13} fill={INK}>
-                {c.label}
-              </text>
-              <text x={8} y={y0 + 33} fontSize={11.5} fill={MUTED}>
-                {c.metric} · n = {fmtInt(c.n)}
-                {/* a p value the file does not carry is not printed at all */}
-                {p !== null && <> · p = {fmtP(p)}</>}
-                {!r.prereg && (
-                  <tspan fill={INK}>
-                    {' '}
-                    · additional comparison, outside the pre-registered set
-                  </tspan>
-                )}
-              </text>
+              {/* The label and the metadata are wrapped inside the label column's own width. They
+                  used to be single lines drawn across the whole row, which put them straight over
+                  the whiskers on any row whose label was long. */}
+              {labelLines.map((ln, k) => (
+                <text key={`l${k}`} x={8} y={y0 + 16 + k * 14} fontSize={narrow ? 12.5 : 13} fill={INK}>
+                  {ln}
+                  {k === 0 && <title>{c.label}</title>}
+                </text>
+              ))}
+              {metaLines.map((ln, k) => (
+                <text key={`m${k}`} x={8} y={y0 + 16 + (labelLines.length + k) * 14} fontSize={11.5} fill={r.prereg ? MUTED : INK}>
+                  {ln}
+                </text>
+              ))}
               {finite && isNum(cl) && isNum(ch) && (
                 <>
                   <line x1={clampX(cl)} x2={clampX(ch)} y1={cy} y2={cy} stroke={color} strokeWidth={2} />
@@ -216,7 +259,7 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
                 </text>
               )}
               {narrow ? (
-                <text x={8} y={y0 + rowH - 32} fontSize={12} fill={INK}>
+                <text x={8} y={y0 + 76} fontSize={12} fill={INK}>
                   g = {fmtNum(g, 3)} <tspan fill={MUTED}>{fmtCI(c.g_ci95, 2)}</tspan>
                 </text>
               ) : (
