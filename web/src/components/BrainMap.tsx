@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import { checkAtlasIdentity, loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad, type Loadable } from '../lib/binary';
 import { resolveColors, useThemeVersion } from '../lib/colors';
 import { useCanvasPixelRatio, usePrefersReducedMotion } from '../lib/media';
-import { createRenderer, FOV_Y, type Camera, type CloudRenderer, type GroupDraw, type LitPoints } from '../lib/pointcloud';
+import { basisOf, createRenderer, FOV_Y, type Camera, type CloudRenderer, type GroupDraw, type LitPoints } from '../lib/pointcloud';
 import { fmtInt, fmtNum, fmtPct } from '../lib/format';
 import type { AtlasViewBox, Manifest, Provenance } from '../types';
 
@@ -36,8 +36,8 @@ interface GroupSpec {
   order: number;
 }
 const GROUP_SPEC: Record<string, GroupSpec> = {
-  optic: { dark: '#38342e', light: '#d6d2c8', r: 0.32, alpha: 0.55, order: 1 },
-  other: { dark: '#413e38', light: '#cdc9bf', r: 0.4, alpha: 0.55, order: 2 },
+  optic: { dark: '#3d3931', light: '#c6c0b2', r: 0.32, alpha: 0.5, order: 1 },
+  other: { dark: '#4a463e', light: '#b5afa1', r: 0.4, alpha: 0.55, order: 2 },
   ALPN: { dark: '#a49d90', light: '#6f695e', r: 0.8, alpha: 0.95, order: 3 },
   CX: { dark: '#8fb3d4', light: '#2f5575', r: 0.8, alpha: 0.95, order: 4 },
   ORN: { dark: '#a49d90', light: '#6f695e', r: 0.8, alpha: 0.95, order: 5 },
@@ -47,7 +47,7 @@ const GROUP_SPEC: Record<string, GroupSpec> = {
   dFB: { dark: '#e0b96a', light: '#b07d15', r: 3.3, alpha: 1.0, order: 9 },
 };
 /** A group code the sidecar lists with a label the spec does not cover, and unlisted codes. */
-const GROUP_FALLBACK: GroupSpec = { dark: '#413e38', light: '#cdc9bf', r: 0.4, alpha: 0.55, order: 2.5 };
+const GROUP_FALLBACK: GroupSpec = { dark: '#4a463e', light: '#b5afa1', r: 0.4, alpha: 0.55, order: 2.5 };
 const specFor = (label: string): GroupSpec => GROUP_SPEC[label] ?? GROUP_FALLBACK;
 const specColor = (s: GroupSpec, dark: boolean) => (dark ? s.dark : s.light);
 const specRadius = (s: GroupSpec, dark: boolean) => (dark ? s.r : s.rLight ?? s.r);
@@ -634,7 +634,14 @@ function BrainMapInner({
   const [rendererKind, setRendererKind] = useState<'webgl' | 'canvas2d' | 'none' | null>(null);
   const [drawnPoints, setDrawnPoints] = useState<number | null>(null);
   /** yaw / pitch / zoom, plus the inertia and the idle clock: mutated by the loop, never state */
-  const cam = useRef({ yaw: 0, pitch: 0, zoom: 1, zoomTarget: 1, velYaw: 0, velPitch: 0, dragging: false, lastInteract: -1e9, auto: 0 });
+  const cam = useRef({
+    yaw: 0, pitch: 0, zoom: 1, zoomTarget: 1, velYaw: 0, velPitch: 0,
+    // What the camera looks at. Zooming used to magnify the centre of the box and nothing else, so
+    // there was no way to get a close look at anything off-centre; now the wheel anchors on the
+    // cursor and a two-finger or shift drag pans, both of which move this.
+    tx: 0, ty: 0, tz: 0,
+    dragging: false, panning: false, lastInteract: -1e9, auto: 0,
+  });
 
   /** Everything the loop reads that React owns; rewritten on every commit, read on every frame. */
   const live = useRef({
@@ -690,6 +697,9 @@ function BrainMapInner({
   const oobRef = useRef<HTMLSpanElement>(null);
   const scaleBarRef = useRef<HTMLDivElement>(null);
   const orientRef = useRef<HTMLElement>(null);
+  /** the "pinch to zoom" note, shown for a moment when a plain wheel crosses the canvas */
+  const hintRef = useRef<HTMLDivElement>(null);
+  const hintTimer = useRef(0);
 
   const resetView = useCallback(() => {
     const c = cam.current;
@@ -697,6 +707,9 @@ function BrainMapInner({
     c.pitch = 0;
     c.zoom = 1;
     c.zoomTarget = 1;
+    c.tx = 0;
+    c.ty = 0;
+    c.tz = 0;
     c.velYaw = 0;
     c.velPitch = 0;
     c.lastInteract = performance.now();
@@ -794,7 +807,7 @@ function BrainMapInner({
       const timeMs = L.time.get();
       const lit = buildLit(L, timeMs, litBuf, stampRef);
 
-      const camera: Camera = { yaw: c.yaw, pitch: c.pitch, dist: L.view.fitDist / c.zoom };
+      const camera: Camera = { yaw: c.yaw, pitch: c.pitch, dist: L.view.fitDist / c.zoom, target: [c.tx, c.ty, c.tz] };
       r.draw(camera, lit && lit.n > 0 ? litBuf.current : null, {
         sceneRadius: L.geometry.radius,
         bg: L.C.bg,
@@ -807,7 +820,7 @@ function BrainMapInner({
       // the readouts, written only when the text they would carry has actually changed
       const key = `${lit ? lit.n : -1}|${lit ? lit.spikes : -1}|${timeMs === null ? '' : Math.round(timeMs / 10)}|${Math.round(c.yaw * 30)}|${Math.round(
         c.pitch * 30,
-      )}|${Math.round(c.zoom * 100)}`;
+      )}|${Math.round(c.zoom * 100)}|${Math.round(c.tx)},${Math.round(c.ty)},${Math.round(c.tz)}`;
       if (key !== prevKey) {
         prevKey = key;
         if (nLitRef.current) nLitRef.current.textContent = lit ? fmtInt(lit.n) : '0';
@@ -851,6 +864,9 @@ function BrainMapInner({
     if (!cv) return;
     const active = new Map<number, { x: number; y: number }>();
     let pinchDist = 0;
+    let pinchX = 0;
+    let pinchY = 0;
+    let lastMoveAt = 0;
     const c = cam.current;
 
     const mark = () => {
@@ -858,16 +874,88 @@ function BrainMapInner({
       c.auto = 0;
     };
 
+    /** Keep the look-at point inside the brain, so a pan can never lose the cloud off-frame. */
+    const clampTarget = () => {
+      const lim = live.current.geometry ? live.current.geometry.radius * 0.85 : 0;
+      if (!(lim > 0)) return;
+      const d = Math.hypot(c.tx, c.ty, c.tz);
+      if (d > lim) {
+        const k = lim / d;
+        c.tx *= k;
+        c.ty *= k;
+        c.tz *= k;
+      }
+    };
+
+    /**
+     * Zoom, optionally anchored so the world point under the cursor stays under the cursor.
+     *
+     * The anchor is exact on the plane through the look-at point, which is where the reader is
+     * looking; points nearer and further than that plane drift slightly, which is true of every
+     * perspective zoom-to-cursor and is not noticeable at this field of view.
+     */
+    const zoomAt = (factor: number, clientX?: number, clientY?: number) => {
+      const before = c.zoomTarget;
+      const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, before * factor));
+      if (Math.abs(next - before) < 1e-9) return false;
+      const L = live.current;
+      if (L.view && clientX !== undefined && clientY !== undefined) {
+        const r = cv.getBoundingClientRect();
+        if (r.width > 1 && r.height > 1) {
+          const distBefore = L.view.fitDist / before;
+          const halfH = distBefore * Math.tan(FOV_Y / 2);
+          const halfW = halfH * (r.width / r.height);
+          const ndcX = ((clientX - r.left) / r.width) * 2 - 1;
+          const ndcY = 1 - ((clientY - r.top) / r.height) * 2;
+          const k = 1 - L.view.fitDist / next / distBefore;
+          const { right, up } = basisOf({ yaw: c.yaw, pitch: c.pitch, dist: distBefore });
+          const u = ndcX * halfW * k;
+          const v = ndcY * halfH * k;
+          c.tx += right[0] * u + up[0] * v;
+          c.ty += right[1] * u + up[1] * v;
+          c.tz += right[2] * u + up[2] * v;
+          clampTarget();
+        }
+      }
+      c.zoomTarget = next;
+      return true;
+    };
+
+    /** Move the look-at point so the cloud follows the pointer one for one. */
+    const panBy = (dxPx: number, dyPx: number) => {
+      const L = live.current;
+      if (!L.view) return;
+      const r = cv.getBoundingClientRect();
+      if (r.height < 1) return;
+      const dist = L.view.fitDist / c.zoomTarget;
+      const perPx = (2 * dist * Math.tan(FOV_Y / 2)) / r.height;
+      const { right, up } = basisOf({ yaw: c.yaw, pitch: c.pitch, dist });
+      const u = -dxPx * perPx;
+      const v = dyPx * perPx;
+      c.tx += right[0] * u + up[0] * v;
+      c.ty += right[1] * u + up[1] * v;
+      c.tz += right[2] * u + up[2] * v;
+      clampTarget();
+    };
+
+    /** A drag pans rather than orbits when it is a secondary button, or shift is held. */
+    const wantsPan = (e: PointerEvent) => e.button === 1 || e.button === 2 || e.shiftKey;
+
     const onDown = (e: PointerEvent) => {
       active.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (active.size === 1) {
         c.dragging = true;
+        c.panning = wantsPan(e);
         c.velYaw = 0;
         c.velPitch = 0;
+        lastMoveAt = performance.now();
+        cv.classList.add('is-grabbing');
       }
       if (active.size === 2) {
         const [a, b] = [...active.values()];
         pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
+        pinchX = (a.x + b.x) / 2;
+        pinchY = (a.y + b.y) / 2;
       }
       mark();
       try {
@@ -884,32 +972,60 @@ function BrainMapInner({
       const dy = e.clientY - prev.y;
       active.set(e.pointerId, { x: e.clientX, y: e.clientY });
       mark();
+
       if (active.size >= 2) {
+        // Two fingers do what two fingers do everywhere else: the gap between them zooms, and the
+        // point between them drags the picture along with it.
         const [a, b] = [...active.values()];
         const d = Math.hypot(a.x - b.x, a.y - b.y);
+        const mx = (a.x + b.x) / 2;
+        const my = (a.y + b.y) / 2;
         if (pinchDist > 0 && d > 0) {
-          const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, c.zoomTarget * (d / pinchDist)));
-          c.zoomTarget = next;
-          c.zoom = next; // a pinch is direct, not eased: it has to track the fingers
+          const before = c.zoomTarget;
+          zoomAt(d / pinchDist, mx, my);
+          if (c.zoomTarget !== before) c.zoom = c.zoomTarget; // a pinch tracks the fingers, unsmoothed
+          panBy(mx - pinchX, my - pinchY);
         }
         pinchDist = d;
+        pinchX = mx;
+        pinchY = my;
         e.preventDefault();
         return;
       }
-      // 0.006 rad per CSS pixel: a drag across a 400px canvas is about 140 degrees
-      const dyaw = dx * 0.006;
-      const dpitch = dy * 0.006;
+
+      if (c.panning) {
+        panBy(dx, dy);
+        e.preventDefault();
+        return;
+      }
+
+      // Rotation is quoted per canvas rather than per pixel: 2.4 radians, about 138 degrees, for a
+      // drag across the full width. Fixed radians per pixel made the same gesture spin a phone-sized
+      // map a third as far as a desktop one.
+      const rect = cv.getBoundingClientRect();
+      const perPx = 2.4 / Math.max(160, rect.width);
+      const dyaw = dx * perPx;
+      const dpitch = dy * perPx;
       c.yaw += dyaw;
       c.pitch = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, c.pitch + dpitch));
-      // velocity for the throw, in radians per second, smoothed over the last few moves
-      c.velYaw = c.velYaw * 0.6 + dyaw * 60 * 0.4;
-      c.velPitch = c.velPitch * 0.6 + dpitch * 60 * 0.4;
+      // Velocity for the throw, in radians per second, from the real interval between moves rather
+      // than from an assumed 60 Hz: on a 120 Hz screen the assumption doubled every throw.
+      const now = performance.now();
+      const dt = Math.min(0.1, Math.max(0.004, (now - lastMoveAt) / 1000));
+      lastMoveAt = now;
+      const blend = 0.45;
+      c.velYaw = c.velYaw * (1 - blend) + (dyaw / dt) * blend;
+      c.velPitch = c.velPitch * (1 - blend) + (dpitch / dt) * blend;
       e.preventDefault();
     };
 
     const onUp = (e: PointerEvent) => {
       active.delete(e.pointerId);
-      if (active.size === 0) c.dragging = false;
+      if (active.size === 0) {
+        c.dragging = false;
+        c.panning = false;
+        cv.classList.remove('is-grabbing');
+      }
       if (active.size < 2) pinchDist = 0;
       mark();
       try {
@@ -920,50 +1036,61 @@ function BrainMapInner({
     };
 
     /**
-     * The wheel zooms, but it must never trap the page.
+     * The wheel never zooms this map, and never blocks the page.
      *
-     * This map sits in a sticky rail that a reader's pointer passes over constantly, so a wheel
-     * that always zoomed would stop the page dead every time the cursor crossed it. The rule:
-     *  - a pinch on a trackpad arrives as ctrl+wheel, and always zooms;
-     *  - a wheel that arrives while the page is already scrolling passes straight through, so a
-     *    scroll that happens to sweep over the map keeps scrolling the page;
-     *  - a wheel that starts with the pointer resting on the map zooms;
-     *  - at either end of the zoom range the wheel is not swallowed at all.
+     * It used to zoom whenever the pointer happened to be resting on the canvas, which is the
+     * behaviour every embedded map has been criticised for: the panel sits in a sticky rail that a
+     * reader's pointer crosses on the way down every page, and a wheel that stops the page there
+     * feels broken even when it is doing what it was told. So a plain wheel scrolls the page, as it
+     * does over any other part of the document, and zooming is an explicit gesture: a trackpad
+     * pinch (which arrives as ctrl+wheel), the +/- keys or buttons, or two fingers on a touchscreen.
+     * A reader who scrolls over the map is told once, quietly, where the zoom went.
      */
-    let lastPageScroll = 0;
-    const onPageScroll = () => {
-      lastPageScroll = performance.now();
-    };
     const onWheel = (e: WheelEvent) => {
-      // Cmd+wheel is the browser's own page-zoom gesture on macOS. It is the reader's, not the
-      // map's: the wheel passes straight through untouched, so the page zooms as it would anywhere
-      // else. (It used to be read as a pinch, which zoomed the point cloud and called
-      // preventDefault, swallowing the gesture entirely.)
-      if (e.metaKey) return;
-      // A trackpad pinch arrives as ctrl+wheel on every platform, and always zooms the map.
-      const pinch = e.ctrlKey;
-      if (!pinch && performance.now() - lastPageScroll < 260) return; // the page is mid-scroll
-      const before = c.zoomTarget;
-      const factor = Math.exp(-(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) * (pinch ? 0.01 : 0.0016));
-      const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, before * factor));
-      c.zoomTarget = next;
+      if (e.metaKey) return; // the browser's own page zoom, which belongs to the reader
+      if (!e.ctrlKey) {
+        const hint = hintRef.current;
+        if (hint) {
+          hint.classList.add('is-on');
+          window.clearTimeout(hintTimer.current);
+          hintTimer.current = window.setTimeout(() => hint.classList.remove('is-on'), 1600);
+        }
+        return; // the page scrolls
+      }
+      const changed = zoomAt(Math.exp(-(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) * 0.01), e.clientX, e.clientY);
       mark();
-      if (Math.abs(next - before) > 1e-6) e.preventDefault();
+      if (changed) e.preventDefault();
     };
+
+    /** Double click recentres: the fastest way back from a pan that went somewhere odd. */
+    const onDouble = (e: MouseEvent) => {
+      c.tx = 0;
+      c.ty = 0;
+      c.tz = 0;
+      c.zoomTarget = 1;
+      mark();
+      e.preventDefault();
+    };
+
+    /** A right-drag pans, so the context menu must not interrupt it. */
+    const onContext = (e: MouseEvent) => e.preventDefault();
 
     cv.addEventListener('pointerdown', onDown);
     cv.addEventListener('pointermove', onMove, { passive: false });
     cv.addEventListener('pointerup', onUp);
     cv.addEventListener('pointercancel', onUp);
     cv.addEventListener('wheel', onWheel, { passive: false });
-    window.addEventListener('scroll', onPageScroll, { passive: true });
+    cv.addEventListener('dblclick', onDouble);
+    cv.addEventListener('contextmenu', onContext);
     return () => {
       cv.removeEventListener('pointerdown', onDown);
       cv.removeEventListener('pointermove', onMove);
       cv.removeEventListener('pointerup', onUp);
       cv.removeEventListener('pointercancel', onUp);
       cv.removeEventListener('wheel', onWheel);
-      window.removeEventListener('scroll', onPageScroll);
+      cv.removeEventListener('dblclick', onDouble);
+      cv.removeEventListener('contextmenu', onContext);
+      window.clearTimeout(hintTimer.current);
     };
   }, []);
 
@@ -1015,7 +1142,7 @@ function BrainMapInner({
           ref={canvasRef}
           role="img"
           tabIndex={0}
-          aria-label={`${source.text}. Interactive 3D view: drag to orbit, scroll or pinch to zoom, arrow keys to turn, 0 to reset.`}
+          aria-label={`${source.text}. Interactive 3D view: drag to orbit, shift-drag or two fingers to pan, pinch or ctrl and scroll to zoom, arrow keys to turn, plus and minus to zoom, 0 to reset.`}
           style={{ width: view.cw, height: 'auto', aspectRatio: `${view.cw} / ${view.ch}`, maxWidth: '100%', background: C?.bgCss }}
           className="map3d__canvas block mx-auto"
           onKeyDown={onKeyDown}
@@ -1026,10 +1153,17 @@ function BrainMapInner({
         <div className="map3d__orient">
           <span ref={orientRef}>azimuth 0°, elevation 0°, 1.00×</span>
         </div>
+        <div className="map3d__hint" ref={hintRef} aria-hidden="true">
+          pinch, or hold ctrl and scroll, to zoom
+        </div>
       </div>
 
       <div className="map3d__controls small">
-        <span className="muted">drag to orbit · scroll or pinch to zoom</span>
+        {/* The rail is 380px wide and the full sentence wraps onto three lines there, pushing the
+            buttons below the fold of the panel. The inline map has the room for it. */}
+        <span className="muted">
+          {variant === 'panel' ? 'drag to orbit · pinch to zoom' : 'drag to orbit · shift-drag to pan · pinch to zoom · double click to recentre'}
+        </span>
         <span className="map3d__buttons">
           <button type="button" className="control" onClick={() => zoomBy(1.3)} title="zoom in" aria-label="zoom in">
             +

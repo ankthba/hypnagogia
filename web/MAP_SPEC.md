@@ -135,3 +135,57 @@ Reported by the owner: "dont have that have an individual scroll just let it use
 No `max-height` and no `overflow-y` on `.rail`. It is sized to its content and scrolls with the page. When
 the panel is taller than the viewport its sticky offset is set to minus its overflow, so it travels with the
 page and pins by its bottom; pinning by the top would make its own provenance line permanently unreachable.
+
+## The map has to look like something, and the gestures have to feel like everyone else's
+
+Reported by the owner: "the fly neuron map is still so shitty make it look good and also the scrolling and
+zooming and all like natural."
+
+Two separate complaints, and they had two separate causes.
+
+### Why it looked flat
+
+Every soma was a flat disc of one colour, with depth carried only by fading the far ones. 126,109 flat discs
+is a scatter plot, not a brain. Four changes, none of which touches what is drawn or how many:
+
+- **Somata are shaded as spheres.** The fragment shader computes the normal a hemisphere would have at that
+  point of the sprite and lights it from the upper left. A point one device pixel across loses 7% of its
+  brightness to this and nothing else, which is the entire effect on the two background populations; the
+  named populations, which are drawn at 0.8 to 3.3 px, read as beads instead of dots.
+- **Atmospheric depth.** Far points are mixed toward the page background as well as faded, because fading
+  alone reads as *sparser* rather than as *further away*. The cloud gained a front and a back.
+- **A halo under each spiking soma.** Two passes: a soft gaussian at 4.2x the radius and half the opacity,
+  then the point itself on top. The halo is scaled by the spike's own decay so it dies with the tail, and it
+  is never floored, so a sub-pixel optic-lobe point cannot acquire a glow it has not earned. This is the same
+  rule the lit radius already follows and for the same reason.
+- **A near fade, and a ceiling on sprite size.** Zoomed in, the camera ends up inside the cloud, where a soma
+  a few micrometres from the eye was drawn as a disc the width of the panel. Points nearer than 12% of the
+  eye distance now fade out, fully present again by 42%, and no sprite exceeds 40 device pixels.
+
+The light-theme background palette also changed: `optic` `#d6d2c8` to `#c6c0b2` (alpha 0.55 to 0.5) and
+`other` `#cdc9bf` to `#b5afa1`. The old pair sat 4% and 8% off the page background, so in the light theme the
+brain had no silhouette at all. The dark values moved a shade lighter to match: `#38342e` to `#3d3931`,
+`#413e38` to `#4a463e`.
+
+### Why the gestures felt wrong
+
+- **A plain wheel now scrolls the page. Always.** It used to zoom whenever the pointer happened to be resting
+  on the canvas, which is the behaviour every embedded map has been criticised for: this panel sits in a
+  sticky rail that the pointer crosses on the way down every page. A reader who wheels over the map is told
+  once, in a pill that fades after 1.6 s, that pinching or ctrl+scroll is how to zoom. The previous rule (a
+  wheel passes through only if the page is *already* scrolling) still trapped the page whenever the reader
+  paused.
+- **Zoom is anchored on the cursor.** Previously the camera always looked at the box centre, so zooming in
+  magnified the middle of the brain and there was no way to bring anything else into the frame. The camera
+  now has a look-at point, and a pinch or ctrl+scroll moves it so the world point under the cursor stays
+  under the cursor. Exact on the plane through the look-at point, which is where the reader is looking.
+- **Panning.** Shift-drag, middle or right drag, or two fingers. The look-at point is clamped to 85% of the
+  scene radius, so a pan can never lose the cloud off-frame. Double click recentres.
+- **Rotation is quoted per canvas, not per pixel.** 2.4 radians for a drag across the full width, whatever
+  the width. The old fixed 0.006 rad/px spun a phone-sized map a third as far as a desktop one for the same
+  gesture.
+- **Throw velocity comes from the real interval between pointer moves** rather than an assumed 60 Hz, which
+  doubled every throw on a 120 Hz screen.
+
+The control legend is shortened to "drag to orbit · pinch to zoom" in the rail, where the full sentence wrapped
+onto three lines and pushed the buttons out of the panel.

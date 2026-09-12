@@ -1923,8 +1923,33 @@ input[type='range'] {
   outline-offset: 2px;
 }
 
-.map3d__canvas:active {
+.map3d__canvas.is-grabbing {
   cursor: grabbing;
+}
+
+/* Shown for a moment when a plain wheel crosses the canvas, because a plain wheel scrolls the page
+   and a reader who expected it to zoom needs to be told once where the zoom went. */
+.map3d__hint {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.map3d__hint.is-on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* The scale bar is only true at the depth of the box centre, and it says so. */

@@ -32,6 +32,14 @@ export interface Camera {
   pitch: number;
   /** eye distance from the box centre, in the atlas's own micrometres */
   dist: number;
+  /**
+   * What the camera looks at, in world units, default the box centre.
+   *
+   * Without this the eye always looked at the origin, so zooming in only ever magnified the middle
+   * of the brain: a reader who wanted a closer look at the mushroom body had no way to bring it
+   * into the frame. With it, the wheel can anchor on the cursor and a drag can pan.
+   */
+  target?: [number, number, number];
 }
 
 /** The neurons lit by spikes in the current window, as parallel arrays. */
@@ -104,13 +112,16 @@ function perspective(fovY: number, aspect: number, near: number, far: number): M
   return m;
 }
 
-/** view matrix for an eye looking at the origin with up = +Y */
-function lookAtOrigin(ex: number, ey: number, ez: number): Mat4 {
-  // forward = normalize(eye - target) = normalize(eye)
-  const l = Math.hypot(ex, ey, ez) || 1;
-  const zx = ex / l;
-  const zy = ey / l;
-  const zz = ez / l;
+/** view matrix for an eye looking at a target with up = +Y */
+function lookAt(ex: number, ey: number, ez: number, tx = 0, ty = 0, tz = 0): Mat4 {
+  // forward = normalize(eye - target)
+  const dx = ex - tx;
+  const dy = ey - ty;
+  const dz = ez - tz;
+  const l = Math.hypot(dx, dy, dz) || 1;
+  const zx = dx / l;
+  const zy = dy / l;
+  const zz = dz / l;
   // right = normalize(cross(up, forward)), up = (0,1,0)
   let xx = zz * 1 - 0 * zy;
   let xy = 0 * zx - zz * 0;
@@ -146,7 +157,38 @@ function lookAtOrigin(ex: number, ey: number, ez: number): Mat4 {
 /** The eye position for an orbit camera looking at the origin. */
 export function eyeOf(cam: Camera): [number, number, number] {
   const cp = Math.cos(cam.pitch);
-  return [cam.dist * cp * Math.sin(cam.yaw), cam.dist * Math.sin(cam.pitch), cam.dist * cp * Math.cos(cam.yaw)];
+  const t = cam.target ?? ZERO3;
+  return [t[0] + cam.dist * cp * Math.sin(cam.yaw), t[1] + cam.dist * Math.sin(cam.pitch), t[2] + cam.dist * cp * Math.cos(cam.yaw)];
+}
+
+const ZERO3: [number, number, number] = [0, 0, 0];
+
+/**
+ * The camera's right and up axes in world units.
+ *
+ * A drag that pans, and a wheel that zooms toward the cursor, both need to convert a screen offset
+ * into a world offset, and both need the same two vectors the view matrix is built from. Deriving
+ * them twice, once here and once in the matrix, is how a pan ends up subtly not tracking the mouse.
+ */
+export function basisOf(cam: Camera): { right: [number, number, number]; up: [number, number, number] } {
+  const cp = Math.cos(cam.pitch);
+  const zx = cp * Math.sin(cam.yaw);
+  const zy = Math.sin(cam.pitch);
+  const zz = cp * Math.cos(cam.yaw);
+  let rx = zz;
+  const ry = 0;
+  let rz = -zx;
+  const rl = Math.hypot(rx, ry, rz) || 1;
+  rx /= rl;
+  rz /= rl;
+  return { right: [rx, ry, rz], up: [zy * rz - zz * ry, zz * rx - zx * rz, zx * ry - zy * rx] };
+}
+
+/** The view matrix for a camera, looking at its target rather than always at the origin. */
+export function viewOf(cam: Camera): Mat4 {
+  const [ex, ey, ez] = eyeOf(cam);
+  const t = cam.target ?? ZERO3;
+  return lookAt(ex, ey, ez, t[0], t[1], t[2]);
 }
 
 /** Vertical field of view of both back ends, radians. Shared so the two agree pixel for pixel. */
@@ -156,6 +198,18 @@ export const FOV_Y = (32 * Math.PI) / 180;
 
 /** floats per vertex in the interleaved lit attribute buffer: age, radius, r, g, b, alpha */
 const LIT_STRIDE = 6;
+
+/**
+ * The halo under a spiking soma: this multiple of the point's radius, at this fraction of its
+ * opacity, faded out by the spike's own tail.
+ *
+ * Deliberately soft and wide rather than bright: the halo is a rendering cue for where a spike is,
+ * and it must not be readable as more neurons firing than actually fired. It is never floored, so a
+ * point smaller than a device pixel gets a halo scaled by the same sub-pixel area factor as the
+ * point, which is to say almost none.
+ */
+const GLOW_SCALE = 4.2;
+const GLOW_ALPHA = 0.5;
 
 const VERT = `
 precision highp float;
@@ -171,35 +225,66 @@ uniform vec3 uAccent;
 uniform float uLitGain;
 uniform vec2 uFog;         // near, far distance for the depth cue
 uniform float uMaxSize;
+uniform vec3 uBg;          // the page background, mixed into far points as an atmospheric cue
+uniform vec2 uNearFade;    // a soma this close to the eye dissolves rather than filling the frame
+uniform float uGlow;       // 1.0 on the glow pass that lays a halo under each spiking soma
+uniform float uGlowScale;  // radius multiplier on that pass
+uniform float uGlowAlpha;  // opacity multiplier on that pass
 varying vec4 vColor;
+varying float vSoft;
 void main() {
   vec4 mv = uView * vec4(aPos, 1.0);
   gl_Position = uProj * mv;
   float dist = max(1.0, -mv.z);
   float grow = 1.0 + (uLitGain - 1.0) * aAge;
-  float size = aRadius * grow * uPointScale / dist;
+  float size = aRadius * grow * mix(1.0, uGlowScale, uGlow) * uPointScale / dist;
   // A point smaller than one device pixel is drawn at one pixel with its alpha scaled by the area
   // it should have covered, rather than being floored: a floor would systematically exaggerate the
   // 90,805 optic-lobe cells, which are the smallest points on the map.
   float shrink = min(1.0, size);
   gl_PointSize = clamp(size, 1.0, uMaxSize);
-  float fog = clamp((uFog.y - dist) / max(1.0, uFog.y - uFog.x), 0.30, 1.0);
+  // Depth is carried two ways now. Alpha alone made the far half of the cloud simply thinner, which
+  // reads as sparser rather than as further away; mixing the far points toward the page background
+  // as well is what atmospheric perspective actually does, and the brain gains a front and a back.
+  float fogT = clamp((uFog.y - dist) / max(1.0, uFog.y - uFog.x), 0.0, 1.0);
+  // Zoomed in, the camera ends up inside the cloud, and a soma a few micrometres from the eye is
+  // drawn as a disc the width of the panel. Fading out the few points nearer than a fraction of the
+  // eye distance is what a shallow depth of field does, and it is the difference between flying
+  // into the brain and flying into a wall of beach balls.
+  float nearFade = smoothstep(uNearFade.x, uNearFade.y, dist);
   vec3 rgb = mix(aColor, uAccent, aAge);
+  rgb = mix(uBg, rgb, mix(0.58, 1.0, fogT));
   float a = aAlpha + (1.0 - aAlpha) * aAge;
-  vColor = vec4(rgb, a * fog * shrink * shrink);
+  a *= mix(0.42, 1.0, fogT) * shrink * shrink * nearFade;
+  // The halo belongs to the spike, not to the soma: it is scaled by the tail so it dies with it,
+  // and it is never floored, so a sub-pixel optic-lobe point cannot acquire a visible glow it has
+  // not earned. Only the populations the spec already draws large glow visibly.
+  a *= mix(1.0, uGlowAlpha * aAge, uGlow);
+  vSoft = uGlow;
+  vColor = vec4(rgb, a);
 }
 `;
 
 const FRAG = `
 precision mediump float;
 varying vec4 vColor;
+varying float vSoft;
 void main() {
   vec2 d = gl_PointCoord - vec2(0.5);
   float r2 = dot(d, d);
   if (r2 > 0.25) discard;
-  float edge = smoothstep(0.25, 0.14, r2);
-  float a = vColor.a * edge;
-  gl_FragColor = vec4(vColor.rgb * a, a);
+  float disc = smoothstep(0.25, 0.12, r2);
+  float halo = exp(-r2 * 13.0) - 0.037;   // zero at the sprite edge, so the halo has no seam
+  float a = vColor.a * mix(disc, max(halo, 0.0), vSoft);
+  // A soma is a sphere, so shade it as one: the normal a hemisphere would have at this point on the
+  // sprite, lit from the upper left. Flat discs are why 126,109 of them read as a scatter plot; at
+  // one device pixel this costs 7% of the brightness and nothing else, and the two background
+  // populations are almost entirely at that size.
+  float nz = sqrt(max(0.0, 1.0 - 4.0 * r2));
+  vec3 n = normalize(vec3(2.0 * d.x, -2.0 * d.y, nz + 0.001));
+  float shade = 0.70 + 0.30 * clamp(dot(n, vec3(-0.42, 0.42, 0.84)), 0.0, 1.0);
+  vec3 rgb = vColor.rgb * mix(shade, 1.0, vSoft);
+  gl_FragColor = vec4(rgb * a, a);
 }
 `;
 
@@ -233,16 +318,24 @@ class WebGLCloud implements CloudRenderer {
   private h = 1;
   private dpr = 1;
   private maxPointSize = 64;
+  /**
+   * Hard ceiling on a point sprite, in device pixels.
+   *
+   * The GL implementation's own limit is in the hundreds, and at the far end of the zoom range a
+   * soma near the eye would use all of it. Nothing on this map means anything at that size.
+   */
+  private static readonly SIZE_CEIL = 40;
 
   constructor(gl: WebGLRenderingContext, prog: WebGLProgram) {
     this.gl = gl;
     this.prog = prog;
-    for (const u of ['uProj', 'uView', 'uPointScale', 'uAccent', 'uLitGain', 'uFog', 'uMaxSize']) {
+    for (const u of ['uProj', 'uView', 'uPointScale', 'uAccent', 'uLitGain', 'uFog', 'uMaxSize', 'uBg', 'uGlow', 'uGlowScale', 'uGlowAlpha', 'uNearFade']) {
       this.loc[u] = gl.getUniformLocation(prog, u);
     }
     for (const a of ['aPos', 'aAge', 'aRadius', 'aColor', 'aAlpha']) this.att[a] = gl.getAttribLocation(prog, a);
     const range = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE) as Float32Array | null;
-    if (range && range.length === 2 && Number.isFinite(range[1])) this.maxPointSize = Math.min(96, Math.max(2, range[1]));
+    if (range && range.length === 2 && Number.isFinite(range[1]))
+      this.maxPointSize = Math.min(WebGLCloud.SIZE_CEIL, Math.max(2, range[1]));
   }
 
   static create(canvas: HTMLCanvasElement): WebGLCloud | null {
@@ -312,8 +405,7 @@ class WebGLCloud implements CloudRenderer {
     const near = Math.max(0.5, cam.dist * 0.02);
     const far = cam.dist + o.sceneRadius * 3 + 10;
     const proj = perspective(FOV_Y, aspect, near, far);
-    const [ex, ey, ez] = eyeOf(cam);
-    const view = lookAtOrigin(ex, ey, ez);
+    const view = viewOf(cam);
 
     gl.useProgram(this.prog);
     gl.disable(gl.DEPTH_TEST);
@@ -328,6 +420,11 @@ class WebGLCloud implements CloudRenderer {
     gl.uniform3f(this.loc.uAccent, o.accent[0], o.accent[1], o.accent[2]);
     gl.uniform1f(this.loc.uMaxSize, this.maxPointSize);
     gl.uniform1f(this.loc.uLitGain, o.litGain);
+    gl.uniform3f(this.loc.uBg, o.bg[0], o.bg[1], o.bg[2]);
+    gl.uniform2f(this.loc.uNearFade, cam.dist * 0.12, cam.dist * 0.42);
+    gl.uniform1f(this.loc.uGlow, 0);
+    gl.uniform1f(this.loc.uGlowScale, GLOW_SCALE);
+    gl.uniform1f(this.loc.uGlowAlpha, GLOW_ALPHA);
     gl.uniform2f(this.loc.uFog, Math.max(1, cam.dist - o.sceneRadius), cam.dist + o.sceneRadius);
     // A point of radius r CSS px at the fit distance keeps that radius: size = 2 r * dpr * fit / d.
     gl.uniform1f(this.loc.uPointScale, 2 * o.radiusScale * this.dpr * o.fitDist);
@@ -346,6 +443,12 @@ class WebGLCloud implements CloudRenderer {
     }
 
     if (lit && lit.n > 0) {
+      // Two passes: a soft halo laid down first, then the point itself on top of it. One pass drew
+      // flat discs on a flat cloud, which is the whole reason the map read as a scatter plot rather
+      // than as a brain lighting up.
+      gl.uniform1f(this.loc.uGlow, 1);
+      this.drawLit(lit);
+      gl.uniform1f(this.loc.uGlow, 0);
       this.drawLit(lit);
     }
   }
@@ -514,8 +617,7 @@ class Canvas2DCloud implements CloudRenderer {
     ctx.fillStyle = `rgb(${Math.round(o.bg[0] * 255)}, ${Math.round(o.bg[1] * 255)}, ${Math.round(o.bg[2] * 255)})`;
     ctx.fillRect(0, 0, this.w, this.h);
 
-    const [ex, ey, ez] = eyeOf(cam);
-    const view = lookAtOrigin(ex, ey, ez);
+    const view = viewOf(cam);
     const halfH = this.h / 2;
     const halfW = this.w / 2;
     const focal = halfH / Math.tan(FOV_Y / 2);
