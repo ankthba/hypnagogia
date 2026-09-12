@@ -28,8 +28,7 @@ def main():
                               "config": cfg, "name": f"odor_{gs['name'].replace(' ', '')}_{rate}_{sd}",
                               "connectome": {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"]},
                               "drive_groups": {"odor": {"selector": {"cell_type": gs["types"]}}},
-                              "record": {"selectors": [{"cell_class": "Kenyon_Cell"}, {"cell_class": "MBON"}, {"cell_type": "APL"},
-                                                       {"cell_class": "ALPN"}, {"cell_type": {"regex": r"^ORN_"}}]},
+                              "record": "all",   # population rates must be over the whole network, not the recorded subset
                               "epochs": [{"name": "pre", "duration_s": 0.5},
                                          {"name": "odor", "duration_s": oc["odor_s"], "drives": {"odor": float(rate)}},
                                          {"name": "post", "duration_s": oc["post_s"]}],

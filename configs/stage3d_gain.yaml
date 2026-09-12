@@ -1,0 +1,18 @@
+extends: stage3b_odor.yaml
+gain_sensitivity:
+  # WHAT THIS IS. Stages 3b and 3c showed that with the published parameters this network ignites from any
+  # olfactory input, so there is no sparse Kenyon-cell ensemble to store a memory in and no quiet background for
+  # it to reappear against. This scan asks a single, clearly separate question: HOW FAR from the published
+  # parameters would the model have to be for sparse odour coding to exist at all?
+  #
+  # `gain` multiplies every synaptic weight (equivalently, it rescales W_syn). gain = 1.0 is the published model.
+  # THIS IS AN UNCITED FREE PARAMETER INTRODUCED BY THIS PROJECT. It has no source in Shiu et al. 2024, in the
+  # connectome data, or in the mushroom-body plasticity literature. It is reported as a sensitivity analysis and
+  # is NEVER used to restate the primary result, which stands at gain = 1.0.
+  gains: [1.0, 0.8, 0.6, 0.5, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1]
+  glomerulus_set: ["ORN_DM1", "ORN_DM4", "ORN_VA2", "ORN_DM2"]
+  rate_hz: 150.0
+  odor_s: 1.0
+  post_s: 2.0
+  seeds: [0, 1, 2]
+  target_frac_kc: [0.05, 0.10]

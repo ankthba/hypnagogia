@@ -1,0 +1,262 @@
+{
+ "glomerulus": "ORN_DM1",
+ "rate_hz": 50.0,
+ "grid": [
+  {
+   "n_driven": 1,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.5270498605033898,
+   "pop_rate_post_mean": 2.8808072542860246
+  },
+  {
+   "n_driven": 2,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.5591768428692614,
+   "pop_rate_post_mean": 2.87932714940738
+  },
+  {
+   "n_driven": 3,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.711497433123684,
+   "pop_rate_post_mean": 2.8851466351691726
+  },
+  {
+   "n_driven": 5,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.674867726702217,
+   "pop_rate_post_mean": 2.8824753579103173
+  },
+  {
+   "n_driven": 8,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.7233390426395023,
+   "pop_rate_post_mean": 2.880877368572311
+  },
+  {
+   "n_driven": 12,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.742108097737774,
+   "pop_rate_post_mean": 2.8788201691834616
+  },
+  {
+   "n_driven": 20,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.7730100063102854,
+   "pop_rate_post_mean": 2.880668566686776
+  },
+  {
+   "n_driven": 35,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.795641511047623,
+   "pop_rate_post_mean": 2.8816586420480768
+  },
+  {
+   "n_driven": 74,
+   "n_seeds": 3,
+   "fraction_ignited": 1.0,
+   "pop_rate_odor_mean": 2.8526860320784415,
+   "pop_rate_post_mean": 2.8803056674687433
+  }
+ ],
+ "per_run": [
+  {
+   "n": 1,
+   "seed": 0,
+   "pop_rate_odor": 2.466718443370386,
+   "pop_rate_post": 2.8759416310123966,
+   "ignited": true
+  },
+  {
+   "n": 1,
+   "seed": 1,
+   "pop_rate_odor": 2.51303316713936,
+   "pop_rate_post": 2.888062927186699,
+   "ignited": true
+  },
+  {
+   "n": 1,
+   "seed": 2,
+   "pop_rate_odor": 2.601397971000423,
+   "pop_rate_post": 2.878417204658979,
+   "ignited": true
+  },
+  {
+   "n": 2,
+   "seed": 0,
+   "pop_rate_odor": 2.4625439466330117,
+   "pop_rate_post": 2.879600672172564,
+   "ignited": true
+  },
+  {
+   "n": 2,
+   "seed": 1,
+   "pop_rate_odor": 2.623983246538011,
+   "pop_rate_post": 2.881533052722091,
+   "ignited": true
+  },
+  {
+   "n": 2,
+   "seed": 2,
+   "pop_rate_odor": 2.591003335436762,
+   "pop_rate_post": 2.876847723327485,
+   "ignited": true
+  },
+  {
+   "n": 3,
+   "seed": 0,
+   "pop_rate_odor": 2.7174517540514116,
+   "pop_rate_post": 2.877633619723226,
+   "ignited": true
+  },
+  {
+   "n": 3,
+   "seed": 1,
+   "pop_rate_odor": 2.7244554778134513,
+   "pop_rate_post": 2.895066650948739,
+   "ignited": true
+  },
+  {
+   "n": 3,
+   "seed": 2,
+   "pop_rate_odor": 2.692585067506189,
+   "pop_rate_post": 2.882739634835551,
+   "ignited": true
+  },
+  {
+   "n": 5,
+   "seed": 0,
+   "pop_rate_odor": 2.6676004965016054,
+   "pop_rate_post": 2.877247605905318,
+   "ignited": true
+  },
+  {
+   "n": 5,
+   "seed": 1,
+   "pop_rate_odor": 2.638483035039422,
+   "pop_rate_post": 2.8830979111336092,
+   "ignited": true
+  },
+  {
+   "n": 5,
+   "seed": 2,
+   "pop_rate_odor": 2.7185196485656236,
+   "pop_rate_post": 2.8870805566920232,
+   "ignited": true
+  },
+  {
+   "n": 8,
+   "seed": 0,
+   "pop_rate_odor": 2.6993807598693564,
+   "pop_rate_post": 2.8795775575726896,
+   "ignited": true
+  },
+  {
+   "n": 8,
+   "seed": 1,
+   "pop_rate_odor": 2.704477529141732,
+   "pop_rate_post": 2.8787038256974253,
+   "ignited": true
+  },
+  {
+   "n": 8,
+   "seed": 2,
+   "pop_rate_odor": 2.766158838907419,
+   "pop_rate_post": 2.884350722446819,
+   "ignited": true
+  },
+  {
+   "n": 12,
+   "seed": 0,
+   "pop_rate_odor": 2.7398220638101645,
+   "pop_rate_post": 2.882057754139247,
+   "ignited": true
+  },
+  {
+   "n": 12,
+   "seed": 1,
+   "pop_rate_odor": 2.7660132169282083,
+   "pop_rate_post": 2.8755949120142756,
+   "ignited": true
+  },
+  {
+   "n": 12,
+   "seed": 2,
+   "pop_rate_odor": 2.7204890124749497,
+   "pop_rate_post": 2.8788078413968616,
+   "ignited": true
+  },
+  {
+   "n": 20,
+   "seed": 0,
+   "pop_rate_odor": 2.775665873835891,
+   "pop_rate_post": 2.881325021323218,
+   "ignited": true
+  },
+  {
+   "n": 20,
+   "seed": 1,
+   "pop_rate_odor": 2.775769889535327,
+   "pop_rate_post": 2.8799427682507104,
+   "ignited": true
+  },
+  {
+   "n": 20,
+   "seed": 2,
+   "pop_rate_odor": 2.767594255559639,
+   "pop_rate_post": 2.8807379104864004,
+   "ignited": true
+  },
+  {
+   "n": 35,
+   "seed": 0,
+   "pop_rate_odor": 2.7924054670651626,
+   "pop_rate_post": 2.8851805365823213,
+   "ignited": true
+  },
+  {
+   "n": 35,
+   "seed": 1,
+   "pop_rate_odor": 2.803292443606155,
+   "pop_rate_post": 2.8792285271145817,
+   "ignited": true
+  },
+  {
+   "n": 35,
+   "seed": 2,
+   "pop_rate_odor": 2.7912266224715516,
+   "pop_rate_post": 2.8805668624473277,
+   "ignited": true
+  },
+  {
+   "n": 74,
+   "seed": 0,
+   "pop_rate_odor": 2.858885367764841,
+   "pop_rate_post": 2.8806986156666134,
+   "ignited": true
+  },
+  {
+   "n": 74,
+   "seed": 1,
+   "pop_rate_odor": 2.8555846029027316,
+   "pop_rate_post": 2.8789696435959846,
+   "ignited": true
+  },
+  {
+   "n": 74,
+   "seed": 2,
+   "pop_rate_odor": 2.843588125567752,
+   "pop_rate_post": 2.8812487431436318,
+   "ignited": true
+  }
+ ],
+ "smallest_igniting_drive": 1,
+ "finding": "As few as 1 receptor neurons driven at 50.0 Hz are enough to ignite the whole network into a self-sustaining state."
+}

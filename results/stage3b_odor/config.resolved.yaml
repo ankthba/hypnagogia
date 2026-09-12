@@ -132,3 +132,20 @@ odor_calibration:
   criterion: at least one (glomerulus set, rate) gives a mean Kenyon-cell response
     fraction inside 5-10% AND activity that does not outlast the odour (post-odour
     population rate below 1% of the during-odour rate)
+  ignition_threshold:
+    glomerulus: ORN_DM1
+    n_neurons:
+    - 1
+    - 2
+    - 3
+    - 5
+    - 8
+    - 12
+    - 20
+    - 35
+    - 74
+    rate_hz: 50.0
+    seeds:
+    - 0
+    - 1
+    - 2
