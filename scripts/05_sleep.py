@@ -50,7 +50,8 @@ def main():
         # Kenyon-cell -> output-neuron synapses, which are downstream of the Kenyon cells whose reactivation is being
         # measured, so learning cannot change which Kenyon cells switch on. Without this arm a positive result could
         # not be attributed to the memory at all: it would only show that some ensembles reactivate more than others.
-        arms = list(s5["conditions"]) + (["sleep_naive"] if s5.get("naive_weight_arm", True) else [])
+        # The unlearned-weights arm is only needed on the real network: no comparison uses it on the shuffled one.
+        arms = list(s5["conditions"]) + (["sleep_naive"] if (s5.get("naive_weight_arm", True) and not a.shuffled) else [])
         for cond in arms:
             for rate in (rates if cond.startswith("sleep") else [0.0]):
                 sub = f"{cond}_seed{sd}" + (f"_rate{rate}" if cond == "sleep" and rate != s5["dfb_clamp_rate_hz"] else "")
@@ -97,7 +98,7 @@ def main():
                      "carryover_before_reset": carry, "file": sp["out_dir"] + "/spikes.npz"})
     ok = [r for r in rows if "error" not in r]
     summary = []
-    for cond in list(s5["conditions"]) + (["sleep_naive"] if s5.get("naive_weight_arm", True) else []):
+    for cond in list(s5["conditions"]) + (["sleep_naive"] if (s5.get("naive_weight_arm", True) and not a.shuffled) else []):
         g = [r for r in ok if r["condition"] == cond and (cond == "wake" or r["dfb_rate_clamp_hz"] == s5["dfb_clamp_rate_hz"])]
         if g:
             summary.append({"condition": cond, "n_seeds": len(g), **{f"{k}_mean": float(np.mean([r[k] for r in g])) for k in ("pop_rate_hz", "kc_rate_hz", "mbon_rate_hz", "dfb_rate_hz", "frac_kc_active")},
