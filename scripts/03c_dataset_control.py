@@ -20,6 +20,11 @@ CONDITIONS = [
 ]
 RATES = [10.0, 50.0, 150.0]
 SEEDS = [0, 1, 2]
+# Internal control: the SAME code, parameters and datasets, driven through the gustatory pathway that Shiu et
+# al. actually benchmarked, instead of the olfactory one. If sugar neurons do not ignite the network and
+# olfactory receptor neurons do, the runaway is a property of the pathway, not of the stimulation method.
+PATHWAYS = {"olfactory": {"cell_type": "ORN_DM1"}, "gustatory": {"cell_type": {"regex": r"^LB3[a-d]?$"}}}
+PATHWAYS_FLYWIRE = {"olfactory": {"cell_type": "ORN_DM1"}, "gustatory": {"cell_type": "LB3"}}
 
 
 def main():
@@ -28,25 +33,28 @@ def main():
     specs, meta = [], []
     for cond in CONDITIONS:
         conn = load_connectome(cond["dataset"], cond["version"], scope=cond["scope"], weight_scale=cond["weight_scale"])
-        orn = conn.select(cell_type="ORN_DM1")
+        sel = PATHWAYS_FLYWIRE if cond["dataset"] == "flywire" else PATHWAYS
         kc = conn.select(cell_class="Kenyon_Cell")
+        drives = {pw: conn.select(**s_) for pw, s_ in sel.items()}
         if cond["dataset"] == "flywire" and cond["version"] == "630":
             # v630 has no annotation table, so the same neurons are addressed by their v783 root ids
             c783 = load_connectome("flywire", "783")
-            orn_ids = c783.ids[c783.select(cell_type="ORN_DM1")]
-            kc_ids = c783.ids[c783.select(cell_class="Kenyon_Cell")]
-            orn = conn.index_of(orn_ids, missing="drop"); kc = conn.index_of(kc_ids, missing="drop")
-        for rate in RATES:
-            for sd in SEEDS:
-                specs.append({"out_dir": str(OUT / f"{cond['name']}_{int(rate)}Hz_seed{sd}"), "seed": 900 + sd, "config": cfg,
-                              "name": f"ctl_{cond['name']}_{int(rate)}_{sd}",
-                              "connectome": {k: cond[k] for k in ("dataset", "version", "scope", "weight_scale")},
-                              "drive_groups": {"odor": {"index": [int(x) for x in orn]}}, "record": "all",
-                              "epochs": [{"name": "pre", "duration_s": 0.5},
-                                         {"name": "odor", "duration_s": 1.0, "drives": {"odor": rate}},
-                                         {"name": "post", "duration_s": 3.0}]})
-                meta.append({"condition": cond["name"], "rate_hz": rate, "seed": sd, "n_orn": int(len(orn)),
-                             "n_kc": int(len(kc)), "n_neurons": conn.N, "kc_index": kc})
+            kc = conn.index_of(c783.ids[c783.select(cell_class="Kenyon_Cell")], missing="drop")
+            drives = {pw: conn.index_of(c783.ids[c783.select(**s_)], missing="drop") for pw, s_ in PATHWAYS_FLYWIRE.items()}
+        for pw, idx in drives.items():
+            if len(idx) == 0:
+                continue
+            for rate in RATES:
+                for sd in SEEDS:
+                    tag = f"{cond['name']}_{pw}_{int(rate)}Hz_seed{sd}"
+                    specs.append({"out_dir": str(OUT / tag), "seed": 900 + sd, "config": cfg, "name": f"ctl_{tag}",
+                                  "connectome": {k: cond[k] for k in ("dataset", "version", "scope", "weight_scale")},
+                                  "drive_groups": {"odor": {"index": [int(x) for x in idx]}}, "record": "all",
+                                  "epochs": [{"name": "pre", "duration_s": 0.5},
+                                             {"name": "odor", "duration_s": 1.0, "drives": {"odor": rate}},
+                                             {"name": "post", "duration_s": 3.0}]})
+                    meta.append({"condition": cond["name"], "pathway": pw, "rate_hz": rate, "seed": sd,
+                                 "n_orn": int(len(idx)), "n_kc": int(len(kc)), "n_neurons": conn.N, "kc_index": kc})
     t0 = time.time()
     res = run_jobs(specs, n_parallel=cfg["run"]["n_parallel"])
     rows = []
@@ -67,18 +75,27 @@ def main():
         rows.append({**base, "odor": od, "post": po, "ignited": bool(od["pop_rate_hz"] > 0 and po["pop_rate_hz"] > 0.01 * od["pop_rate_hz"])})
     grid = []
     for cond in CONDITIONS:
+      for pw in PATHWAYS:
         for rate in RATES:
-            g = [r for r in rows if r["condition"] == cond["name"] and r["rate_hz"] == rate and "error" not in r]
+            g = [r for r in rows if r["condition"] == cond["name"] and r.get("pathway") == pw and r["rate_hz"] == rate and "error" not in r]
             if g:
-                grid.append({"condition": cond["name"], "rate_hz": rate, "n_seeds": len(g), "n_orn": g[0]["n_orn"],
+                grid.append({"condition": cond["name"], "pathway": pw, "rate_hz": rate, "n_seeds": len(g), "n_orn": g[0]["n_orn"],
                              "n_neurons": g[0]["n_neurons"], "n_kc": g[0]["n_kc"],
                              "frac_ignited": float(np.mean([r["ignited"] for r in g])),
                              "frac_kc_odor": float(np.mean([r["odor"]["frac_kc"] for r in g])),
                              "n_active_odor": float(np.mean([r["odor"]["n_active"] for r in g])),
                              "pop_rate_odor": float(np.mean([r["odor"]["pop_rate_hz"] for r in g])),
                              "pop_rate_post": float(np.mean([r["post"]["pop_rate_hz"] for r in g]))})
-    mc = [g for g in grid if g["condition"] == "malecns_scaled" and g["frac_ignited"] > 0]
-    fw = [g for g in grid if g["condition"].startswith("flywire") and g["frac_ignited"] > 0]
+    olf = [g for g in grid if g["pathway"] == "olfactory"]
+    gus = [g for g in grid if g["pathway"] == "gustatory"]
+    mc = [g for g in olf if g["condition"] == "malecns_scaled" and g["frac_ignited"] > 0]
+    fw = [g for g in olf if g["condition"].startswith("flywire") and g["frac_ignited"] > 0]
+    gus_ign = [g for g in gus if g["frac_ignited"] > 0]
+    pathway_note = ("The gustatory control never ignites any network at any rate tested, with the same code and the same "
+                    "parameters, so the runaway is specific to the olfactory pathway and is not an artefact of how the "
+                    "stimulus is delivered." if gus and not gus_ign else
+                    ("The gustatory pathway also ignites, so the effect is not specific to the olfactory pathway."
+                     if gus_ign else "No gustatory control was run."))
     if mc and not fw:
         finding = ("Olfactory input ignites the male CNS network but NOT the FlyWire networks that Shiu et al. simulated, "
                    "at identical parameters and the same stimulus. The runaway is a property of this dataset at this scale, "
@@ -92,15 +109,16 @@ def main():
     else:
         finding = "The FlyWire networks ignite but the male CNS does not."
     out = {"status": "passed", "criterion": "descriptive control, no pass/fail: the same olfactory stimulus is run on every dataset",
-           "conditions": CONDITIONS, "rates_hz": RATES, "seeds": SEEDS, "grid": grid, "per_run": rows, "finding": finding,
+           "conditions": CONDITIONS, "pathways": {k: str(v) for k, v in PATHWAYS.items()}, "rates_hz": RATES, "seeds": SEEDS,
+           "grid": grid, "per_run": rows, "finding": finding, "pathway_control": pathway_note,
            "walltime_s": round(time.time() - t0, 1),
            "provenance": {"config": "configs/stage3b_odor.yaml", "results_dir": "results/stage3c_control",
                           "files": [s["out_dir"] for s in specs][:40]}}
     json.dump(out, open(OUT / "stage3c.json", "w"), indent=1, default=str)
-    print(finding); print()
-    print(f"{'condition':18s} {'rate':>5s} {'nORN':>5s} {'neurons':>8s} {'P(ignite)':>10s} {'fracKC':>8s} {'nActive':>9s} {'rateOdor':>9s} {'ratePost':>9s}")
+    print(finding); print(); print(pathway_note); print()
+    print(f"{'condition':18s} {'pathway':>10s} {'rate':>5s} {'nORN':>5s} {'neurons':>8s} {'P(ignite)':>10s} {'fracKC':>8s} {'nActive':>9s} {'rateOdor':>9s} {'ratePost':>9s}")
     for g in grid:
-        print(f"{g['condition']:18s} {int(g['rate_hz']):5d} {g['n_orn']:5d} {g['n_neurons']:8d} {g['frac_ignited']:10.2f} "
+        print(f"{g['condition']:18s} {g['pathway']:>10s} {int(g['rate_hz']):5d} {g['n_orn']:5d} {g['n_neurons']:8d} {g['frac_ignited']:10.2f} "
               f"{g['frac_kc_odor']:8.1%} {g['n_active_odor']:9.0f} {g['pop_rate_odor']:9.4f} {g['pop_rate_post']:9.4f}")
 
 

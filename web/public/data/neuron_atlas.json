@@ -141,6 +141,14 @@
  "subsampled": false,
  "n_with_soma_position": 126109,
  "source": "male CNS v1.0 body-annotations somaLocation (8 nm voxels)",
+ "provenance": {
+  "config": "configs/base.yaml",
+  "results_dir": "data/cache",
+  "files": [
+   "data/raw/malecns/body-annotations-male-cns-v1.0-minconf-0.5.feather"
+  ],
+  "written_by": "src/hypnagogia/atlas.py via scripts/export_web.py"
+ },
  "row_to_sim_index": "see neuron_atlas_index.bin (uint32, one simulation index per atlas row)",
  "atlas_fingerprint": "sha256:723055c4acfbbaa08b4d077a804b1ee02830ac4dc0545c0a6f9770d1ee3f5c3f",
  "n_atlas_rows": 126109
