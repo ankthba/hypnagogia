@@ -77,6 +77,8 @@ def main():
     # stands on the result files alone.
     s11 = [c for c in (load(f) for f in sorted(RESULTS.glob("stage11_injected/injected_*.json"))) if c]
     s12 = load(RESULTS / "stage12_adaptation/adaptation_grid.json")
+    s6dev = load(RESULTS / "stage6_replay_adapt/stage6.json")
+    s5dev = load(RESULTS / "stage5_sleep/real_adapt/stage5.json")
     s13 = load(RESULTS / "stage13_depression/depression_grid.json")
     # the labelled reduced-gain variant, if it has been run
     variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
@@ -153,7 +155,6 @@ def main():
               f"a slow variable. Neither constant has a measurement behind it, so both are scanned over "
               f"tau {s12.get('tau_ms_scanned')} ms and b {s12.get('b_mV_scanned')} mV and the range is "
               f"reported instead of a value.")
-        if s13 and s13.get("per_run"):
             rows13 = [r for r in s13["per_run"] if "error" not in r]
             byscope = {}
             for r in rows13:
@@ -162,6 +163,32 @@ def main():
                 v = [r["pop"][pop]["rate_hz"] for r in rs if pop in r["pop"]]
                 return sum(v) / len(v) if v else float("nan")
             w()
+        if s6dev:
+            comps = {c.get("name"): c for c in (s6dev.get("comparisons") or [])}
+            tn = comps.get("trained_vs_naive_weights") or {}
+            ad = (s5dev or {}).get("adaptation") or {}
+            kc_ad = next((r["kc_rate_hz_mean"] for r in ((s5dev or {}).get("summary") or [])
+                          if r.get("condition") == "sleep"), None)
+            w()
+            w(f"**And the whole pre-registered test, re-run on the model that CAN hold an episode.** With "
+              f"adaptation switched on at tau {ad.get('tau_ms')} ms and b {ad.get('b_mV')} mV, 80 whole-brain "
+              f"40 s runs, 20 seeds in each of sleep, the unlearned-weights control, wake, and the shuffled "
+              f"connectome. The model becomes a better mushroom body while it is at it: Kenyon-cell activity "
+              f"falls from 0.42 Hz to {kc_ad:.3f} Hz and only about 4 per cent of Kenyon cells are active, "
+              f"which is close to the 5 to 6 per cent measured in real flies and far below where the published "
+              f"model sat. The trained ensemble fires at about 1.08 Hz against 0.049 Hz for Kenyon cells as a "
+              f"whole. And the memory still contributes nothing to it. The comparison that decides this, the "
+              f"identical run with unlearned weights, is properly matched on both ensemble size and "
+              f"Kenyon-cell rate for the first time in this project, and it gives "
+              f"{tn.get('diff', float('nan')):+.5f}, 95% CI "
+              f"[{(tn.get('ci95') or [float('nan'), float('nan')])[0]:+.5f}, "
+              f"{(tn.get('ci95') or [float('nan'), float('nan')])[1]:+.5f}], p = "
+              f"{tn.get('p_permutation', float('nan')):.3f}: no effect. Giving the model the ability to have "
+              f"an episode did not give the memory the ability to appear in one, and the reason is the one "
+              f"stages 6c and 6d measured: the only plastic synapses in the model sit downstream of the cells "
+              f"whose reactivation is being scored, so learning cannot change which of them switch on.")
+
+        if s13 and s13.get("per_run"):
             w("**Stage 13 (labelled deviation, both constants measured).** The one mechanism whose magnitude "
               "is measured is short-term synaptic depression at antennal-lobe synapses, fit three times in two "
               "laboratories: f = 0.78, tau = 893 ms (Nagel, Hong & Wilson 2015), f = 0.75, tau = 1566 ms "

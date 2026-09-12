@@ -1,0 +1,1640 @@
+{
+ "status": "passed",
+ "criterion": "both conditions run to completion for every seed with the learned weights loaded; the dFB clamp is applied in the sleep condition and not in the wake condition, which means the dFB cells fire above 1 Hz in sleep and are either silent in wake or at least three times slower there than in sleep (this network is self-sustaining, so nothing in it is silent and the wake rate is whatever the network gives the cells on its own); and KC activity is non-zero in at least one condition, or the replay test has no data",
+ "criterion_config": "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)",
+ "checks": {
+  "all_runs_completed": true,
+  "dfb_active_in_sleep": true,
+  "dfb_clamp_off_in_wake": true,
+  "kc_activity_present": true
+ },
+ "dfb_check_note": "The dFB cells are not silent in the wake condition: they fire at 0.58 Hz there with no drive applied, because the network is self-sustaining and drives them. The clamp raises them to 16.94 Hz, 29.1 times that, so the manipulation is applied and the check is on the ratio rather than on silence. An earlier version of this check required under 0.5 Hz in wake and failed on a property of the network rather than of the manipulation.",
+ "network": "real_adapt",
+ "gain": 1.0,
+ "gain_note": "published parameters",
+ "dfb": {
+  "population": "dFB",
+  "cell_types": [
+   "FB6A_a",
+   "FB6A_b",
+   "FB6A_c",
+   "FB6C_a",
+   "FB6C_b",
+   "FB6E",
+   "FB6G",
+   "FB6I",
+   "FB6Z",
+   "FB7A",
+   "FB7K"
+  ],
+  "n_neurons": 32,
+  "selection_source": "Hulse et al. 2021 eLife 10:e66039 Fig. 48 (R23E10 -> FB6A, FB6C_a/b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K)",
+  "clamp_rate_hz": 17.0,
+  "rate_source": "no dFB firing rate exists in the literature (Donlea 2014 / Pimentel 2016 report a binary ON/OFF switch); 17 Hz is taken from the UP state of the connected helicon cells ExR1, 16.9 +/- 3.6 Hz (Donlea et al. 2018 Neuron 97:378) - an approximation, not a dFB measurement",
+  "nt_in_model": {
+   "glutamate": 32
+  }
+ },
+ "conditions": {
+  "sleep": {
+   "description": "dFB clamped active at 17.0 Hz Poisson drive, background noise on, no odour input, learned weights loaded"
+  },
+  "wake": {
+   "description": "dFB off, background noise on, no odour input, learned weights loaded (identical in every other respect)"
+  },
+  "sleep_naive": {
+   "description": "identical to sleep but with the UNLEARNED weights, to test whether the memory contributes anything to reactivation at all"
+  }
+ },
+ "sigma_mV": 1.55,
+ "sigma_source": "stage 2 operating point",
+ "plastic_during_sleep": false,
+ "duration_s": 40.0,
+ "reset_at_offline_onset": true,
+ "reset_note": "Membrane potentials and synaptic conductances are reset to rest at the start of the offline period; learned synaptic weights are not touched. The model has no adaptation or short-term depression, so once conditioning has pushed it into its self-sustaining state it never returns to baseline (stage 3b). Without the reset the offline period would inherit the conditioning activity and any apparent reactivation would be persistence, not replay. The 'carryover' epoch measures the state that was discarded, so the size of that confound is on the record.",
+ "engram_reaches_the_kenyon_cells": {
+  "anatomical_path": {
+   "conditioning_dan": "PPL101",
+   "dan_mbon_min_synapses": 5,
+   "n_mbons_gated": 17,
+   "n_gated_that_fire_offline": 10,
+   "n_gated_that_fire_and_reach_kenyon_cells": 10,
+   "synapses_back_onto_kenyon_cells_from_those": 1732,
+   "per_mbon": [
+    {
+     "mbon": "MBON11",
+     "gating_synapses_from_dan": 1391,
+     "transmitter": "gaba",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 640,
+     "n_kenyon_cells_contacted": 484
+    },
+    {
+     "mbon": "MBON11",
+     "gating_synapses_from_dan": 920,
+     "transmitter": "gaba",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 514,
+     "n_kenyon_cells_contacted": 405
+    },
+    {
+     "mbon": "MBON30",
+     "gating_synapses_from_dan": 64,
+     "transmitter": "glutamate",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 110,
+     "n_kenyon_cells_contacted": 82
+    },
+    {
+     "mbon": "MBON20",
+     "gating_synapses_from_dan": 62,
+     "transmitter": "gaba",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 117,
+     "n_kenyon_cells_contacted": 106
+    },
+    {
+     "mbon": "MBON30",
+     "gating_synapses_from_dan": 37,
+     "transmitter": "glutamate",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 111,
+     "n_kenyon_cells_contacted": 87
+    },
+    {
+     "mbon": "MBON25",
+     "gating_synapses_from_dan": 36,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 23,
+     "n_kenyon_cells_contacted": 20
+    },
+    {
+     "mbon": "MBON25",
+     "gating_synapses_from_dan": 34,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 21,
+     "n_kenyon_cells_contacted": 19
+    },
+    {
+     "mbon": "MBON20",
+     "gating_synapses_from_dan": 31,
+     "transmitter": "gaba",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 140,
+     "n_kenyon_cells_contacted": 126
+    },
+    {
+     "mbon": "MBON35",
+     "gating_synapses_from_dan": 25,
+     "transmitter": "acetylcholine",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 30,
+     "n_kenyon_cells_contacted": 19
+    },
+    {
+     "mbon": "MBON35",
+     "gating_synapses_from_dan": 23,
+     "transmitter": "acetylcholine",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 2,
+     "n_kenyon_cells_contacted": 2
+    },
+    {
+     "mbon": "MBON25-like",
+     "gating_synapses_from_dan": 17,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 47,
+     "n_kenyon_cells_contacted": 38
+    },
+    {
+     "mbon": "MBON25-like",
+     "gating_synapses_from_dan": 14,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 14,
+     "n_kenyon_cells_contacted": 12
+    },
+    {
+     "mbon": "MBON25-like",
+     "gating_synapses_from_dan": 12,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 13,
+     "n_kenyon_cells_contacted": 11
+    },
+    {
+     "mbon": "MBON32",
+     "gating_synapses_from_dan": 11,
+     "transmitter": "gaba",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 36,
+     "n_kenyon_cells_contacted": 20
+    },
+    {
+     "mbon": "MBON05",
+     "gating_synapses_from_dan": 11,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 1237,
+     "n_kenyon_cells_contacted": 566
+    },
+    {
+     "mbon": "MBON05",
+     "gating_synapses_from_dan": 10,
+     "transmitter": "glutamate",
+     "fires_offline": false,
+     "synapses_back_onto_kenyon_cells": 1565,
+     "n_kenyon_cells_contacted": 594
+    },
+    {
+     "mbon": "MBON32",
+     "gating_synapses_from_dan": 8,
+     "transmitter": "gaba",
+     "fires_offline": true,
+     "synapses_back_onto_kenyon_cells": 32,
+     "n_kenyon_cells_contacted": 26
+    }
+   ],
+   "note": "10 of the 17 MBONs the conditioning dopaminergic neuron gates both fire during the offline period and project back onto Kenyon cells, with 1,732 synapses between them. A path from the engram to the Kenyon cells therefore exists, and whether it carries anything is what the spike-level comparison below measures."
+  },
+  "n_seeds": 20,
+  "n_seeds_identical": 0,
+  "engram_reaches_the_kenyon_cells": true,
+  "per_seed": [
+   {
+    "seed": 0,
+    "n_kc_spikes_trained": 8390,
+    "n_kc_spikes_naive": 8474,
+    "spike_trains_identical": false,
+    "first_divergence_s": 2.153,
+    "n_kc_active_trained": 170,
+    "n_kc_active_naive": 170,
+    "jaccard_active_kcs": 0.8994413407821229
+   },
+   {
+    "seed": 1,
+    "n_kc_spikes_trained": 7840,
+    "n_kc_spikes_naive": 7901,
+    "spike_trains_identical": false,
+    "first_divergence_s": 5.4341,
+    "n_kc_active_trained": 169,
+    "n_kc_active_naive": 174,
+    "jaccard_active_kcs": 0.9055555555555556
+   },
+   {
+    "seed": 2,
+    "n_kc_spikes_trained": 8493,
+    "n_kc_spikes_naive": 8516,
+    "spike_trains_identical": false,
+    "first_divergence_s": 2.1444,
+    "n_kc_active_trained": 183,
+    "n_kc_active_naive": 186,
+    "jaccard_active_kcs": 0.8730964467005076
+   },
+   {
+    "seed": 3,
+    "n_kc_spikes_trained": 8113,
+    "n_kc_spikes_naive": 8138,
+    "spike_trains_identical": false,
+    "first_divergence_s": 4.6538,
+    "n_kc_active_trained": 187,
+    "n_kc_active_naive": 178,
+    "jaccard_active_kcs": 0.9109947643979057
+   },
+   {
+    "seed": 4,
+    "n_kc_spikes_trained": 7385,
+    "n_kc_spikes_naive": 7394,
+    "spike_trains_identical": false,
+    "first_divergence_s": 7.9476,
+    "n_kc_active_trained": 195,
+    "n_kc_active_naive": 190,
+    "jaccard_active_kcs": 0.9154228855721394
+   },
+   {
+    "seed": 5,
+    "n_kc_spikes_trained": 8845,
+    "n_kc_spikes_naive": 8865,
+    "spike_trains_identical": false,
+    "first_divergence_s": 0.7269,
+    "n_kc_active_trained": 171,
+    "n_kc_active_naive": 176,
+    "jaccard_active_kcs": 0.8858695652173914
+   },
+   {
+    "seed": 6,
+    "n_kc_spikes_trained": 8952,
+    "n_kc_spikes_naive": 8826,
+    "spike_trains_identical": false,
+    "first_divergence_s": 0.2687,
+    "n_kc_active_trained": 170,
+    "n_kc_active_naive": 170,
+    "jaccard_active_kcs": 0.9101123595505618
+   },
+   {
+    "seed": 7,
+    "n_kc_spikes_trained": 7803,
+    "n_kc_spikes_naive": 7680,
+    "spike_trains_identical": false,
+    "first_divergence_s": 6.3563,
+    "n_kc_active_trained": 187,
+    "n_kc_active_naive": 190,
+    "jaccard_active_kcs": 0.8944723618090452
+   },
+   {
+    "seed": 8,
+    "n_kc_spikes_trained": 8234,
+    "n_kc_spikes_naive": 8184,
+    "spike_trains_identical": false,
+    "first_divergence_s": 3.2747,
+    "n_kc_active_trained": 187,
+    "n_kc_active_naive": 182,
+    "jaccard_active_kcs": 0.9119170984455959
+   },
+   {
+    "seed": 9,
+    "n_kc_spikes_trained": 8808,
+    "n_kc_spikes_naive": 8855,
+    "spike_trains_identical": false,
+    "first_divergence_s": 0.3205,
+    "n_kc_active_trained": 171,
+    "n_kc_active_naive": 166,
+    "jaccard_active_kcs": 0.8516483516483516
+   },
+   {
+    "seed": 10,
+    "n_kc_spikes_trained": 8663,
+    "n_kc_spikes_naive": 8704,
+    "spike_trains_identical": false,
+    "first_divergence_s": 1.2752000000000001,
+    "n_kc_active_trained": 183,
+    "n_kc_active_naive": 189,
+    "jaccard_active_kcs": 0.8979591836734694
+   },
+   {
+    "seed": 11,
+    "n_kc_spikes_trained": 8139,
+    "n_kc_spikes_naive": 8085,
+    "spike_trains_identical": false,
+    "first_divergence_s": 4.0584,
+    "n_kc_active_trained": 174,
+    "n_kc_active_naive": 173,
+    "jaccard_active_kcs": 0.8858695652173914
+   },
+   {
+    "seed": 12,
+    "n_kc_spikes_trained": 8887,
+    "n_kc_spikes_naive": 8760,
+    "spike_trains_identical": false,
+    "first_divergence_s": 0.3457,
+    "n_kc_active_trained": 172,
+    "n_kc_active_naive": 166,
+    "jaccard_active_kcs": 0.9096045197740112
+   },
+   {
+    "seed": 13,
+    "n_kc_spikes_trained": 7888,
+    "n_kc_spikes_naive": 7882,
+    "spike_trains_identical": false,
+    "first_divergence_s": 5.281000000000001,
+    "n_kc_active_trained": 179,
+    "n_kc_active_naive": 179,
+    "jaccard_active_kcs": 0.8645833333333334
+   },
+   {
+    "seed": 14,
+    "n_kc_spikes_trained": 8682,
+    "n_kc_spikes_naive": 8631,
+    "spike_trains_identical": false,
+    "first_divergence_s": 0.9217000000000001,
+    "n_kc_active_trained": 171,
+    "n_kc_active_naive": 173,
+    "jaccard_active_kcs": 0.8901098901098901
+   },
+   {
+    "seed": 15,
+    "n_kc_spikes_trained": 8220,
+    "n_kc_spikes_naive": 8203,
+    "spike_trains_identical": false,
+    "first_divergence_s": 4.172000000000001,
+    "n_kc_active_trained": 181,
+    "n_kc_active_naive": 177,
+    "jaccard_active_kcs": 0.8842105263157894
+   },
+   {
+    "seed": 16,
+    "n_kc_spikes_trained": 8252,
+    "n_kc_spikes_naive": 8284,
+    "spike_trains_identical": false,
+    "first_divergence_s": 3.2870000000000004,
+    "n_kc_active_trained": 185,
+    "n_kc_active_naive": 191,
+    "jaccard_active_kcs": 0.9381443298969072
+   },
+   {
+    "seed": 17,
+    "n_kc_spikes_trained": 8424,
+    "n_kc_spikes_naive": 8380,
+    "spike_trains_identical": false,
+    "first_divergence_s": 2.0332,
+    "n_kc_active_trained": 169,
+    "n_kc_active_naive": 166,
+    "jaccard_active_kcs": 0.8926553672316384
+   },
+   {
+    "seed": 18,
+    "n_kc_spikes_trained": 8366,
+    "n_kc_spikes_naive": 8324,
+    "spike_trains_identical": false,
+    "first_divergence_s": 3.0546,
+    "n_kc_active_trained": 179,
+    "n_kc_active_naive": 179,
+    "jaccard_active_kcs": 0.8645833333333334
+   },
+   {
+    "seed": 19,
+    "n_kc_spikes_trained": 8828,
+    "n_kc_spikes_naive": 8777,
+    "spike_trains_identical": false,
+    "first_divergence_s": 0.5660000000000001,
+    "n_kc_active_trained": 185,
+    "n_kc_active_naive": 177,
+    "jaccard_active_kcs": 0.8756476683937824
+   }
+  ],
+  "mean_jaccard_active_kcs": 0.8930949223479361,
+  "note": "The learned weights change the offline Kenyon-cell activity in 20 of 20 seeds, so the engram does reach the Kenyon cells and a reactivation difference measured downstream can in principle be real."
+ },
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19
+ ],
+ "per_seed": [
+  {
+   "seed": 0,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.106004652968955,
+   "n_spikes": 6379833,
+   "kc_rate_hz": 0.04808070866141732,
+   "n_kc_active": 156,
+   "mbon_rate_hz": 2.515721649484536,
+   "dfb_rate_hz": 16.70234375,
+   "frac_kc_active": 0.038385826771653545,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0027113425653045235,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed0/spikes.npz"
+  },
+  {
+   "seed": 0,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1101682280578882,
+   "n_spikes": 6403850,
+   "kc_rate_hz": 0.04850516732283464,
+   "n_kc_active": 157,
+   "mbon_rate_hz": 2.5332474226804123,
+   "dfb_rate_hz": 0.63125,
+   "frac_kc_active": 0.03863188976377953,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0027113425653045235,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed0/spikes.npz"
+  },
+  {
+   "seed": 0,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1105726757691963,
+   "n_spikes": 6406183,
+   "kc_rate_hz": 0.04857283464566929,
+   "n_kc_active": 153,
+   "mbon_rate_hz": 2.55979381443299,
+   "dfb_rate_hz": 16.728125,
+   "frac_kc_active": 0.03764763779527559,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0027113425653045235,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed0/spikes.npz"
+  },
+  {
+   "seed": 1,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0736536901302969,
+   "n_spikes": 6193221,
+   "kc_rate_hz": 0.048166830708661415,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 2.4324742268041235,
+   "dfb_rate_hz": 16.95546875,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0037514995596668725,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed1/spikes.npz"
+  },
+  {
+   "seed": 1,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.075645070696004,
+   "n_spikes": 6204708,
+   "kc_rate_hz": 0.04819758858267716,
+   "n_kc_active": 165,
+   "mbon_rate_hz": 2.475257731958763,
+   "dfb_rate_hz": 0.5625,
+   "frac_kc_active": 0.0406003937007874,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0037514995596668725,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed1/spikes.npz"
+  },
+  {
+   "seed": 1,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0714504642567384,
+   "n_spikes": 6180512,
+   "kc_rate_hz": 0.04854207677165354,
+   "n_kc_active": 164,
+   "mbon_rate_hz": 2.4306701030927838,
+   "dfb_rate_hz": 16.965625,
+   "frac_kc_active": 0.040354330708661415,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0037514995596668725,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed1/spikes.npz"
+  },
+  {
+   "seed": 2,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1055322483340153,
+   "n_spikes": 6377108,
+   "kc_rate_hz": 0.04860359251968504,
+   "n_kc_active": 156,
+   "mbon_rate_hz": 2.493556701030928,
+   "dfb_rate_hz": 17.1109375,
+   "frac_kc_active": 0.038385826771653545,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002607326865868288,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed2/spikes.npz"
+  },
+  {
+   "seed": 2,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.107713110832195,
+   "n_spikes": 6389688,
+   "kc_rate_hz": 0.0484621062992126,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 2.5152061855670103,
+   "dfb_rate_hz": 0.59296875,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002607326865868288,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed2/spikes.npz"
+  },
+  {
+   "seed": 2,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1133332524322337,
+   "n_spikes": 6422107,
+   "kc_rate_hz": 0.04868971456692913,
+   "n_kc_active": 158,
+   "mbon_rate_hz": 2.5420103092783504,
+   "dfb_rate_hz": 17.08515625,
+   "frac_kc_active": 0.03887795275590551,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002607326865868288,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed2/spikes.npz"
+  },
+  {
+   "seed": 3,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0958619087574284,
+   "n_spikes": 6321326,
+   "kc_rate_hz": 0.04980930118110236,
+   "n_kc_active": 174,
+   "mbon_rate_hz": 2.4992268041237113,
+   "dfb_rate_hz": 16.821875,
+   "frac_kc_active": 0.04281496062992126,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0027460144651166017,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed3/spikes.npz"
+  },
+  {
+   "seed": 3,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.0972106456601183,
+   "n_spikes": 6329106,
+   "kc_rate_hz": 0.05001845472440945,
+   "n_kc_active": 171,
+   "mbon_rate_hz": 2.5414948453608246,
+   "dfb_rate_hz": 0.55078125,
+   "frac_kc_active": 0.04207677165354331,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0027460144651166017,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed3/spikes.npz"
+  },
+  {
+   "seed": 3,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0940851472515585,
+   "n_spikes": 6311077,
+   "kc_rate_hz": 0.0499630905511811,
+   "n_kc_active": 165,
+   "mbon_rate_hz": 2.500257731958763,
+   "dfb_rate_hz": 16.8234375,
+   "frac_kc_active": 0.0406003937007874,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0027460144651166017,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed3/spikes.npz"
+  },
+  {
+   "seed": 4,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0076536485240173,
+   "n_spikes": 5812509,
+   "kc_rate_hz": 0.045374015748031495,
+   "n_kc_active": 187,
+   "mbon_rate_hz": 2.297164948453608,
+   "dfb_rate_hz": 16.865625,
+   "frac_kc_active": 0.04601377952755906,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002468639266619975,
+    "kc_rate_hz": 0.0006151574803149606,
+    "n_kc_active": 5
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed4/spikes.npz"
+  },
+  {
+   "seed": 4,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.0078426103779932,
+   "n_spikes": 5813599,
+   "kc_rate_hz": 0.04546628937007874,
+   "n_kc_active": 182,
+   "mbon_rate_hz": 2.318041237113402,
+   "dfb_rate_hz": 0.55859375,
+   "frac_kc_active": 0.04478346456692913,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002468639266619975,
+    "kc_rate_hz": 0.0006151574803149606,
+    "n_kc_active": 5
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed4/spikes.npz"
+  },
+  {
+   "seed": 4,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0075161744412624,
+   "n_spikes": 5811716,
+   "kc_rate_hz": 0.045429379921259845,
+   "n_kc_active": 182,
+   "mbon_rate_hz": 2.3231958762886595,
+   "dfb_rate_hz": 16.8640625,
+   "frac_kc_active": 0.04478346456692913,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002468639266619975,
+    "kc_rate_hz": 0.0006151574803149606,
+    "n_kc_active": 5
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed4/spikes.npz"
+  },
+  {
+   "seed": 5,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1131559056646951,
+   "n_spikes": 6421084,
+   "kc_rate_hz": 0.0492556594488189,
+   "n_kc_active": 153,
+   "mbon_rate_hz": 2.5543814432989693,
+   "dfb_rate_hz": 16.846875,
+   "frac_kc_active": 0.03764763779527559,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8207012045017995,
+    "kc_rate_hz": 0.05696358267716536,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed5/spikes.npz"
+  },
+  {
+   "seed": 5,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1053219632616549,
+   "n_spikes": 6375895,
+   "kc_rate_hz": 0.04898499015748031,
+   "n_kc_active": 162,
+   "mbon_rate_hz": 2.508762886597938,
+   "dfb_rate_hz": 0.578125,
+   "frac_kc_active": 0.03986220472440945,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8207012045017995,
+    "kc_rate_hz": 0.05696358267716536,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed5/spikes.npz"
+  },
+  {
+   "seed": 5,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1069841341386462,
+   "n_spikes": 6385483,
+   "kc_rate_hz": 0.04936023622047244,
+   "n_kc_active": 160,
+   "mbon_rate_hz": 2.5345360824742267,
+   "dfb_rate_hz": 16.8453125,
+   "frac_kc_active": 0.03937007874015748,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.812886158284157,
+    "kc_rate_hz": 0.054749015748031496,
+    "n_kc_active": 107
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed5/spikes.npz"
+  },
+  {
+   "seed": 6,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.111482639779764,
+   "n_spikes": 6411432,
+   "kc_rate_hz": 0.04942790354330709,
+   "n_kc_active": 155,
+   "mbon_rate_hz": 2.5350515463917525,
+   "dfb_rate_hz": 16.8296875,
+   "frac_kc_active": 0.03813976377952756,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0727104410959094,
+    "kc_rate_hz": 0.06619094488188976,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed6/spikes.npz"
+  },
+  {
+   "seed": 6,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.104349416471926,
+   "n_spikes": 6370285,
+   "kc_rate_hz": 0.04911417322834646,
+   "n_kc_active": 164,
+   "mbon_rate_hz": 2.5054123711340206,
+   "dfb_rate_hz": 0.53671875,
+   "frac_kc_active": 0.040354330708661415,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0727104410959094,
+    "kc_rate_hz": 0.06619094488188976,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed6/spikes.npz"
+  },
+  {
+   "seed": 6,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1118510287152674,
+   "n_spikes": 6413557,
+   "kc_rate_hz": 0.04859744094488189,
+   "n_kc_active": 157,
+   "mbon_rate_hz": 2.5592783505154637,
+   "dfb_rate_hz": 16.82734375,
+   "frac_kc_active": 0.03863188976377953,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.061761055135255,
+    "kc_rate_hz": 0.06680610236220473,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed6/spikes.npz"
+  },
+  {
+   "seed": 7,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0463951625765382,
+   "n_spikes": 6035984,
+   "kc_rate_hz": 0.04795152559055118,
+   "n_kc_active": 179,
+   "mbon_rate_hz": 2.361340206185567,
+   "dfb_rate_hz": 17.01328125,
+   "frac_kc_active": 0.04404527559055118,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002517179926356885,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed7/spikes.npz"
+  },
+  {
+   "seed": 7,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.0499327365143645,
+   "n_spikes": 6056390,
+   "kc_rate_hz": 0.047170275590551175,
+   "n_kc_active": 177,
+   "mbon_rate_hz": 2.4118556701030927,
+   "dfb_rate_hz": 0.57890625,
+   "frac_kc_active": 0.04355314960629921,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002517179926356885,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed7/spikes.npz"
+  },
+  {
+   "seed": 7,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.0521250407394822,
+   "n_spikes": 6069036,
+   "kc_rate_hz": 0.047194881889763785,
+   "n_kc_active": 182,
+   "mbon_rate_hz": 2.408762886597938,
+   "dfb_rate_hz": 17.00390625,
+   "frac_kc_active": 0.04478346456692913,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002517179926356885,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed7/spikes.npz"
+  },
+  {
+   "seed": 8,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1115729600787747,
+   "n_spikes": 6411953,
+   "kc_rate_hz": 0.04858513779527559,
+   "n_kc_active": 161,
+   "mbon_rate_hz": 2.5463917525773194,
+   "dfb_rate_hz": 17.10546875,
+   "frac_kc_active": 0.039616141732283464,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002527581496300508,
+    "kc_rate_hz": 0.0012303149606299212,
+    "n_kc_active": 10
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed8/spikes.npz"
+  },
+  {
+   "seed": 8,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.106467522831446,
+   "n_spikes": 6382503,
+   "kc_rate_hz": 0.04843134842519685,
+   "n_kc_active": 156,
+   "mbon_rate_hz": 2.5175257731958762,
+   "dfb_rate_hz": 0.58984375,
+   "frac_kc_active": 0.038385826771653545,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002527581496300508,
+    "kc_rate_hz": 0.0012303149606299212,
+    "n_kc_active": 10
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed8/spikes.npz"
+  },
+  {
+   "seed": 8,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1067674347648206,
+   "n_spikes": 6384233,
+   "kc_rate_hz": 0.04823449803149606,
+   "n_kc_active": 158,
+   "mbon_rate_hz": 2.51159793814433,
+   "dfb_rate_hz": 17.0890625,
+   "frac_kc_active": 0.03887795275590551,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002527581496300508,
+    "kc_rate_hz": 0.0012303149606299212,
+    "n_kc_active": 10
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed8/spikes.npz"
+  },
+  {
+   "seed": 9,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1137605835974176,
+   "n_spikes": 6424572,
+   "kc_rate_hz": 0.048271407480314964,
+   "n_kc_active": 158,
+   "mbon_rate_hz": 2.5582474226804126,
+   "dfb_rate_hz": 17.05703125,
+   "frac_kc_active": 0.03887795275590551,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0451358791753635,
+    "kc_rate_hz": 0.06803641732283465,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed9/spikes.npz"
+  },
+  {
+   "seed": 9,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.10841140289441,
+   "n_spikes": 6393716,
+   "kc_rate_hz": 0.048240649606299216,
+   "n_kc_active": 162,
+   "mbon_rate_hz": 2.556958762886598,
+   "dfb_rate_hz": 0.5890625,
+   "frac_kc_active": 0.03986220472440945,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0451358791753635,
+    "kc_rate_hz": 0.06803641732283465,
+    "n_kc_active": 117
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed9/spikes.npz"
+  },
+  {
+   "seed": 9,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1066504171029548,
+   "n_spikes": 6383558,
+   "kc_rate_hz": 0.04865280511811024,
+   "n_kc_active": 158,
+   "mbon_rate_hz": 2.5275773195876288,
+   "dfb_rate_hz": 17.06171875,
+   "frac_kc_active": 0.03887795275590551,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0089592189114411,
+    "kc_rate_hz": 0.06779035433070867,
+    "n_kc_active": 112
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed9/spikes.npz"
+  },
+  {
+   "seed": 10,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1005580442274754,
+   "n_spikes": 6348415,
+   "kc_rate_hz": 0.04859128937007874,
+   "n_kc_active": 167,
+   "mbon_rate_hz": 2.472680412371134,
+   "dfb_rate_hz": 17.21484375,
+   "frac_kc_active": 0.04109251968503937,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.4989078351559195,
+    "kc_rate_hz": 0.043061023622047244,
+    "n_kc_active": 111
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed10/spikes.npz"
+  },
+  {
+   "seed": 10,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1088730592404081,
+   "n_spikes": 6396379,
+   "kc_rate_hz": 0.04924950787401575,
+   "n_kc_active": 162,
+   "mbon_rate_hz": 2.5487113402061854,
+   "dfb_rate_hz": 0.60078125,
+   "frac_kc_active": 0.03986220472440945,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.4989078351559195,
+    "kc_rate_hz": 0.043061023622047244,
+    "n_kc_active": 111
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed10/spikes.npz"
+  },
+  {
+   "seed": 10,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1106148021274678,
+   "n_spikes": 6406426,
+   "kc_rate_hz": 0.04879429133858268,
+   "n_kc_active": 166,
+   "mbon_rate_hz": 2.5278350515463917,
+   "dfb_rate_hz": 17.221875,
+   "frac_kc_active": 0.04084645669291338,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.5131371828387965,
+    "kc_rate_hz": 0.04478346456692913,
+    "n_kc_active": 120
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed10/spikes.npz"
+  },
+  {
+   "seed": 11,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1116724684312351,
+   "n_spikes": 6412527,
+   "kc_rate_hz": 0.050030757874015744,
+   "n_kc_active": 169,
+   "mbon_rate_hz": 2.544845360824742,
+   "dfb_rate_hz": 17.025,
+   "frac_kc_active": 0.04158464566929134,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0023611563772025323,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed11/spikes.npz"
+  },
+  {
+   "seed": 11,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1150316554445285,
+   "n_spikes": 6431904,
+   "kc_rate_hz": 0.04969857283464567,
+   "n_kc_active": 168,
+   "mbon_rate_hz": 2.5835051546391754,
+   "dfb_rate_hz": 0.60859375,
+   "frac_kc_active": 0.04133858267716536,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0023611563772025323,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed11/spikes.npz"
+  },
+  {
+   "seed": 11,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.117235054677586,
+   "n_spikes": 6444614,
+   "kc_rate_hz": 0.04969857283464567,
+   "n_kc_active": 168,
+   "mbon_rate_hz": 2.5860824742268043,
+   "dfb_rate_hz": 17.03828125,
+   "frac_kc_active": 0.04133858267716536,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0023611563772025323,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed11/spikes.npz"
+  },
+  {
+   "seed": 12,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1059311485413532,
+   "n_spikes": 6379409,
+   "kc_rate_hz": 0.04882504921259843,
+   "n_kc_active": 151,
+   "mbon_rate_hz": 2.515721649484536,
+   "dfb_rate_hz": 16.84140625,
+   "frac_kc_active": 0.037155511811023625,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0303864529953055,
+    "kc_rate_hz": 0.0671751968503937,
+    "n_kc_active": 125
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed12/spikes.npz"
+  },
+  {
+   "seed": 12,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1091766117232629,
+   "n_spikes": 6398130,
+   "kc_rate_hz": 0.04819143700787402,
+   "n_kc_active": 152,
+   "mbon_rate_hz": 2.562628865979381,
+   "dfb_rate_hz": 0.60234375,
+   "frac_kc_active": 0.03740157480314961,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0303864529953055,
+    "kc_rate_hz": 0.0671751968503937,
+    "n_kc_active": 125
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed12/spikes.npz"
+  },
+  {
+   "seed": 12,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1117634821682418,
+   "n_spikes": 6413052,
+   "kc_rate_hz": 0.04824680118110236,
+   "n_kc_active": 153,
+   "mbon_rate_hz": 2.547164948453608,
+   "dfb_rate_hz": 16.85,
+   "frac_kc_active": 0.03764763779527559,
+   "carryover_before_reset": {
+    "pop_rate_hz": 1.0401812646922175,
+    "kc_rate_hz": 0.06508366141732283,
+    "n_kc_active": 122
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed12/spikes.npz"
+  },
+  {
+   "seed": 13,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.075636922799548,
+   "n_spikes": 6204661,
+   "kc_rate_hz": 0.04845595472440945,
+   "n_kc_active": 170,
+   "mbon_rate_hz": 2.4716494845360826,
+   "dfb_rate_hz": 16.90078125,
+   "frac_kc_active": 0.041830708661417325,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002673203475511237,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed13/spikes.npz"
+  },
+  {
+   "seed": 13,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.080953338557233,
+   "n_spikes": 6235328,
+   "kc_rate_hz": 0.048874261811023625,
+   "n_kc_active": 169,
+   "mbon_rate_hz": 2.4850515463917526,
+   "dfb_rate_hz": 0.56640625,
+   "frac_kc_active": 0.04158464566929134,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002673203475511237,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed13/spikes.npz"
+  },
+  {
+   "seed": 13,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.079001483957312,
+   "n_spikes": 6224069,
+   "kc_rate_hz": 0.04841904527559055,
+   "n_kc_active": 170,
+   "mbon_rate_hz": 2.486340206185567,
+   "dfb_rate_hz": 16.8921875,
+   "frac_kc_active": 0.041830708661417325,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002673203475511237,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed13/spikes.npz"
+  },
+  {
+   "seed": 14,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.106825683556505,
+   "n_spikes": 6384569,
+   "kc_rate_hz": 0.04854207677165354,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 2.510824742268041,
+   "dfb_rate_hz": 17.06484375,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.6985590358438101,
+    "kc_rate_hz": 0.0500738188976378,
+    "n_kc_active": 118
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed14/spikes.npz"
+  },
+  {
+   "seed": 14,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1090727693833256,
+   "n_spikes": 6397531,
+   "kc_rate_hz": 0.048252952755905514,
+   "n_kc_active": 161,
+   "mbon_rate_hz": 2.54819587628866,
+   "dfb_rate_hz": 0.59765625,
+   "frac_kc_active": 0.039616141732283464,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.6985590358438101,
+    "kc_rate_hz": 0.0500738188976378,
+    "n_kc_active": 118
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed14/spikes.npz"
+  },
+  {
+   "seed": 14,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1078433038159894,
+   "n_spikes": 6390439,
+   "kc_rate_hz": 0.04813607283464567,
+   "n_kc_active": 157,
+   "mbon_rate_hz": 2.504381443298969,
+   "dfb_rate_hz": 17.0671875,
+   "frac_kc_active": 0.03863188976377953,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.6680824359089932,
+    "kc_rate_hz": 0.051919291338582675,
+    "n_kc_active": 120
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed14/spikes.npz"
+  },
+  {
+   "seed": 15,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1151790110187298,
+   "n_spikes": 6432754,
+   "kc_rate_hz": 0.050498277559055116,
+   "n_kc_active": 170,
+   "mbon_rate_hz": 2.5737113402061857,
+   "dfb_rate_hz": 16.73515625,
+   "frac_kc_active": 0.041830708661417325,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002416631416901858,
+    "kc_rate_hz": 0.0006151574803149606,
+    "n_kc_active": 5
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed15/spikes.npz"
+  },
+  {
+   "seed": 15,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1079591079613615,
+   "n_spikes": 6391107,
+   "kc_rate_hz": 0.050055364173228346,
+   "n_kc_active": 164,
+   "mbon_rate_hz": 2.533762886597938,
+   "dfb_rate_hz": 0.59453125,
+   "frac_kc_active": 0.040354330708661415,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002416631416901858,
+    "kc_rate_hz": 0.0006151574803149606,
+    "n_kc_active": 5
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed15/spikes.npz"
+  },
+  {
+   "seed": 15,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1090186812196188,
+   "n_spikes": 6397219,
+   "kc_rate_hz": 0.05039370078740158,
+   "n_kc_active": 166,
+   "mbon_rate_hz": 2.527319587628866,
+   "dfb_rate_hz": 16.74296875,
+   "frac_kc_active": 0.04084645669291338,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002416631416901858,
+    "kc_rate_hz": 0.0006151574803149606,
+    "n_kc_active": 5
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed15/spikes.npz"
+  },
+  {
+   "seed": 16,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1095827930295614,
+   "n_spikes": 6400473,
+   "kc_rate_hz": 0.048529773622047245,
+   "n_kc_active": 156,
+   "mbon_rate_hz": 2.530154639175258,
+   "dfb_rate_hz": 17.10234375,
+   "frac_kc_active": 0.038385826771653545,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.00262119562579312,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed16/spikes.npz"
+  },
+  {
+   "seed": 16,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1028744738539202,
+   "n_spikes": 6361777,
+   "kc_rate_hz": 0.04846825787401575,
+   "n_kc_active": 160,
+   "mbon_rate_hz": 2.48659793814433,
+   "dfb_rate_hz": 0.55546875,
+   "frac_kc_active": 0.03937007874015748,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.00262119562579312,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed16/spikes.npz"
+  },
+  {
+   "seed": 16,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.110325811842534,
+   "n_spikes": 6404759,
+   "kc_rate_hz": 0.04865280511811024,
+   "n_kc_active": 163,
+   "mbon_rate_hz": 2.539175257731959,
+   "dfb_rate_hz": 17.10703125,
+   "frac_kc_active": 0.04010826771653543,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.00262119562579312,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed16/spikes.npz"
+  },
+  {
+   "seed": 17,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.109421395335936,
+   "n_spikes": 6399542,
+   "kc_rate_hz": 0.048203740157480315,
+   "n_kc_active": 151,
+   "mbon_rate_hz": 2.524484536082474,
+   "dfb_rate_hz": 16.98203125,
+   "frac_kc_active": 0.037155511811023625,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.025161397693625225,
+    "kc_rate_hz": 0.002829724409448819,
+    "n_kc_active": 23
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed17/spikes.npz"
+  },
+  {
+   "seed": 17,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1081487632533336,
+   "n_spikes": 6392201,
+   "kc_rate_hz": 0.04804379921259842,
+   "n_kc_active": 152,
+   "mbon_rate_hz": 2.522164948453608,
+   "dfb_rate_hz": 0.5890625,
+   "frac_kc_active": 0.03740157480314961,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.025161397693625225,
+    "kc_rate_hz": 0.002829724409448819,
+    "n_kc_active": 23
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed17/spikes.npz"
+  },
+  {
+   "seed": 17,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1135967588708056,
+   "n_spikes": 6423627,
+   "kc_rate_hz": 0.047933070866141736,
+   "n_kc_active": 148,
+   "mbon_rate_hz": 2.5639175257731956,
+   "dfb_rate_hz": 16.978125,
+   "frac_kc_active": 0.03641732283464567,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.025161397693625225,
+    "kc_rate_hz": 0.002829724409448819,
+    "n_kc_active": 23
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed17/spikes.npz"
+  },
+  {
+   "seed": 18,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.113296846937431,
+   "n_spikes": 6421897,
+   "kc_rate_hz": 0.04893577755905512,
+   "n_kc_active": 151,
+   "mbon_rate_hz": 2.5458762886597937,
+   "dfb_rate_hz": 16.75546875,
+   "frac_kc_active": 0.037155511811023625,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002472106456601183,
+    "kc_rate_hz": 0.0008612204724409449,
+    "n_kc_active": 7
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed18/spikes.npz"
+  },
+  {
+   "seed": 18,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1088947291777906,
+   "n_spikes": 6396504,
+   "kc_rate_hz": 0.0491572342519685,
+   "n_kc_active": 157,
+   "mbon_rate_hz": 2.536082474226804,
+   "dfb_rate_hz": 0.58203125,
+   "frac_kc_active": 0.03863188976377953,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002472106456601183,
+    "kc_rate_hz": 0.0008612204724409449,
+    "n_kc_active": 7
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed18/spikes.npz"
+  },
+  {
+   "seed": 18,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1148196367771774,
+   "n_spikes": 6430681,
+   "kc_rate_hz": 0.04856053149606299,
+   "n_kc_active": 152,
+   "mbon_rate_hz": 2.5706185567010307,
+   "dfb_rate_hz": 16.74921875,
+   "frac_kc_active": 0.03740157480314961,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.002472106456601183,
+    "kc_rate_hz": 0.0008612204724409449,
+    "n_kc_active": 7
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed18/spikes.npz"
+  },
+  {
+   "seed": 19,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1106139353299724,
+   "n_spikes": 6406421,
+   "kc_rate_hz": 0.04889271653543307,
+   "n_kc_active": 170,
+   "mbon_rate_hz": 2.5239690721649484,
+   "dfb_rate_hz": 16.903125,
+   "frac_kc_active": 0.041830708661417325,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.9025199536783418,
+    "kc_rate_hz": 0.06016240157480315,
+    "n_kc_active": 111
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed19/spikes.npz"
+  },
+  {
+   "seed": 19,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 1.1137926551047437,
+   "n_spikes": 6424757,
+   "kc_rate_hz": 0.04864050196850394,
+   "n_kc_active": 165,
+   "mbon_rate_hz": 2.5739690721649486,
+   "dfb_rate_hz": 0.5703125,
+   "frac_kc_active": 0.0406003937007874,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.9025199536783418,
+    "kc_rate_hz": 0.06016240157480315,
+    "n_kc_active": 111
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed19/spikes.npz"
+  },
+  {
+   "seed": 19,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 1.1144977081874226,
+   "n_spikes": 6428824,
+   "kc_rate_hz": 0.04861589566929134,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 2.5639175257731956,
+   "dfb_rate_hz": 16.89609375,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8985569555298213,
+    "kc_rate_hz": 0.0593011811023622,
+    "n_kc_active": 111
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed19/spikes.npz"
+  }
+ ],
+ "summary": [
+  {
+   "condition": "sleep",
+   "n_seeds": 20,
+   "pop_rate_hz_mean": 1.0971895824809823,
+   "kc_rate_hz_mean": 0.0486515748031496,
+   "mbon_rate_hz_mean": 2.500373711340206,
+   "dfb_rate_hz_mean": 16.941679687499995,
+   "frac_kc_active_mean": 0.04000984251968504,
+   "pop_rate_hz_sd": 0.02730127276117931,
+   "kc_rate_hz_sd": 0.0010260619465448247
+  },
+  {
+   "condition": "wake",
+   "n_seeds": 20,
+   "pop_rate_hz_mean": 1.096891993564895,
+   "kc_rate_hz_mean": 0.0485611466535433,
+   "mbon_rate_hz_mean": 2.513221649484536,
+   "dfb_rate_hz_mean": 0.581796875,
+   "frac_kc_active_mean": 0.040169783464566934,
+   "pop_rate_hz_sd": 0.026128748968088356,
+   "kc_rate_hz_sd": 0.0010092844052524766
+  },
+  {
+   "condition": "sleep_naive",
+   "n_seeds": 20,
+   "pop_rate_hz_mean": 1.098502624662816,
+   "kc_rate_hz_mean": 0.04853438730314961,
+   "mbon_rate_hz_mean": 2.5157216494845365,
+   "dfb_rate_hz_mean": 16.9418359375,
+   "frac_kc_active_mean": 0.03984990157480315,
+   "pop_rate_hz_sd": 0.027215019675832963,
+   "kc_rate_hz_sd": 0.0010210851049075992
+  }
+ ],
+ "manipulation_strength": {
+  "pop_rate_relative_change": 0.0002713019311227338,
+  "kc_rate_relative_change": 0.0018621502134504885,
+  "frac_kc_active_relative_change": 0.003981623277182297,
+  "n_dfb_clamped": 32,
+  "n_neurons": 144209,
+  "dfb_fraction_of_brain": 0.00022190015879730113,
+  "state_is_distinguishable": false,
+  "note": "Clamping the 32 dFB neurons changes the rest of the brain by less than 5%: population rate 1.0972 vs 1.0969 Hz per neuron and Kenyon-cell rate 0.049 vs 0.049 Hz. Those 32 cells are 0.022% of the network, and the network is already in its self-sustaining state, so the sleep manipulation does not produce a distinct global state. A sleep-versus-wake comparison downstream is therefore testing a difference the model does not have. What a distinct sleep state would take is a global change rather than a local one: Nitz, van Swinderen, Tononi & Greenspan (2002) Curr Biol 12:1934-1940 measure local field potential power between the mushroom bodies, across 3 to 50 Hz, falling by 60.5 per cent on average (range 39.5 to 77.6) during extended rest, which is a brain-wide attenuation and not something 32 cells can produce here. That arm was not run: implementing it means choosing what to attenuate and by how much, and no measurement fixes that choice, so it is named as the next experiment rather than guessed at."
+ },
+ "memory_visible_offline": {
+  "mbon_rate_trained": 2.500373711340206,
+  "mbon_rate_naive": 2.5157216494845365,
+  "relative_reduction": 0.006100809343305258,
+  "note": "The learned weights are measurable offline: with no odour present, the mushroom-body output neurons fire more slowly in the trained network than in the identical run with unlearned weights. This confirms the engram is loaded and active during the offline period, independently of whether it changes which Kenyon cells reactivate."
+ },
+ "walltime_s": 5699.5,
+ "provenance": {
+  "config": "configs/stage5_sleep.yaml",
+  "results_dir": "results/stage5_sleep/real_adapt",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed0/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed0/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed0/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed1/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed1/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed1/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed2/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed2/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed2/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed3/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed3/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed3/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed4/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed4/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed4/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed5/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed5/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed5/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed6/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed6/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed6/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed7/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed7/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed7/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed8/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed8/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed8/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed9/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed9/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed9/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed10/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed10/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed10/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed11/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed11/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed11/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed12/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed12/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed12/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed13/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed13/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed13/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed14/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed14/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed14/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed15/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed15/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed15/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed16/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed16/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed16/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed17/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed17/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed17/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed18/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed18/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed18/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_seed19/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/wake_seed19/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_adapt/sleep_naive_seed19/spikes.npz"
+  ]
+ },
+ "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term with tau = 200 ms and b = 0.5 mV. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be. This operating point was selected from the scan in scripts/12_adaptation.py as the one at which the trained ensemble switches on and off repeatedly; that selection is itself part of the deviation and is stated wherever these numbers are.",
+ "adaptation": {
+  "tau_ms": 200.0,
+  "b_mV": 0.5,
+  "deviation": "spike_frequency_adaptation",
+  "status": "unsourced"
+ }
+}

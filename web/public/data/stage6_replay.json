@@ -7827,8 +7827,8 @@
    "results/stage5_sleep/real/sleep_seed8/spikes.npz",
    "results/stage5_sleep/real/sleep_seed9/spikes.npz"
   ],
-  "git_commit": "6bb2700",
-  "generated_at": "2026-09-12T21:25:44+00:00"
+  "git_commit": "89a062a",
+  "generated_at": "2026-09-12T23:42:17+00:00"
  },
  "source_file": "results/stage6_replay/stage6.json",
  "structure_confound": {
@@ -9289,6 +9289,267 @@
     }
    ],
    "source_file": "results/stage13_depression/depression_grid.json"
+  },
+  "scored_replay_on_the_deviated_model": {
+   "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term with tau = 200 ms and b = 0.5 mV. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be. This operating point was selected from the scan in scripts/12_adaptation.py as the one at which the trained ensemble switches on and off repeatedly; that selection is itself part of the deviation and is stated wherever these numbers are.",
+   "deviation_settings": {
+    "tau_ms": 200.0,
+    "b_mV": 0.5,
+    "deviation": "spike_frequency_adaptation",
+    "status": "unsourced"
+   },
+   "status": "failed",
+   "headline": "No evidence of memory replay, and no basis for calling what was measured an artifact either. The odour-A ensemble does score above size-matched random ensembles, but the comparison that would say whether that is structure rather than memory, the degree-preserving shuffled connectome, cannot answer it here. The two arms differ by 3.8 times in ensemble size and 26.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.03990, 95% CI [-0.01001, +0.08952]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
+   "criterion": "a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such.",
+   "reasons": null,
+   "window_ms": 100.0,
+   "n_seeds": 20,
+   "networks_analysed": [
+    "real_adapt",
+    "shuffled_adapt"
+   ],
+   "continuity_check": {
+    "bin_ms": 100.0,
+    "fraction_of_bins_called_events": {
+     "real_adapt/sleep/A": 0.9886250000000001,
+     "real_adapt/sleep/B": 0.9886250000000001,
+     "real_adapt/sleep_naive/A": 0.9886250000000001,
+     "real_adapt/sleep_naive/B": 0.9886250000000001,
+     "real_adapt/wake/A": 0.9886250000000001,
+     "real_adapt/wake/B": 0.9886250000000001,
+     "shuffled_adapt/sleep/A": 0.8791250000000002,
+     "shuffled_adapt/sleep/B": 0.8779999999999999
+    },
+    "kc_fraction_active_during_offline": 0.36119655715301635,
+    "events_are_discrete": false,
+    "note": "In the real network 99% of all time bins clear the reactivation threshold. The ensemble is effectively on continuously, so 'reactivation events' are not discrete episodes and the template correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory reappeared. Every comparison below must be read with that in mind."
+   },
+   "arm_matching": [
+    {
+     "comparison": "A_vs_B_sleep",
+     "arm_a": {
+      "arm": [
+       "real_adapt",
+       "sleep",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 178.35,
+      "kc_rate_hz_mean": 0.0486515749245882,
+      "n_spikes_total_kc_mean": 7908.8
+     },
+     "arm_b": {
+      "arm": [
+       "real_adapt",
+       "sleep",
+       "B"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 61.35,
+      "kc_rate_hz_mean": 0.0486515749245882,
+      "n_spikes_total_kc_mean": 7908.8
+     },
+     "ensemble_size_ratio": 2.907090464547677,
+     "kc_rate_ratio": 1.0,
+     "tolerance": 1.5,
+     "arms_are_matched": false,
+     "note": "The two arms differ by 2.9 times in ensemble size and 1.0 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
+    },
+    {
+     "comparison": "sleep_vs_wake_A",
+     "arm_a": {
+      "arm": [
+       "real_adapt",
+       "sleep",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 178.35,
+      "kc_rate_hz_mean": 0.0486515749245882,
+      "n_spikes_total_kc_mean": 7908.8
+     },
+     "arm_b": {
+      "arm": [
+       "real_adapt",
+       "wake",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 178.35,
+      "kc_rate_hz_mean": 0.04856114685535431,
+      "n_spikes_total_kc_mean": 7894.1
+     },
+     "ensemble_size_ratio": 1.0,
+     "kc_rate_ratio": 1.0018621485506354,
+     "tolerance": 1.5,
+     "arms_are_matched": true,
+     "note": "The two arms are within tolerance on ensemble size and Kenyon-cell rate."
+    },
+    {
+     "comparison": "real_vs_shuffled",
+     "arm_a": {
+      "arm": [
+       "real_adapt",
+       "sleep",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 178.35,
+      "kc_rate_hz_mean": 0.0486515749245882,
+      "n_spikes_total_kc_mean": 7908.8
+     },
+     "arm_b": {
+      "arm": [
+       "shuffled_adapt",
+       "sleep",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 669.75,
+      "kc_rate_hz_mean": 1.2990391194820403,
+      "n_spikes_total_kc_mean": 211171.8
+     },
+     "ensemble_size_ratio": 3.7552565180824224,
+     "kc_rate_ratio": 26.700864699562153,
+     "tolerance": 1.5,
+     "arms_are_matched": false,
+     "note": "The two arms differ by 3.8 times in ensemble size and 26.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
+    },
+    {
+     "comparison": "trained_vs_naive_weights",
+     "arm_a": {
+      "arm": [
+       "real_adapt",
+       "sleep",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 178.35,
+      "kc_rate_hz_mean": 0.0486515749245882,
+      "n_spikes_total_kc_mean": 7908.8
+     },
+     "arm_b": {
+      "arm": [
+       "real_adapt",
+       "sleep_naive",
+       "A"
+      ],
+      "n_seeds": 20,
+      "ensemble_size_mean": 178.35,
+      "kc_rate_hz_mean": 0.0485343873500824,
+      "n_spikes_total_kc_mean": 7889.75
+     },
+     "ensemble_size_ratio": 1.0,
+     "kc_rate_ratio": 1.0024145267078477,
+     "tolerance": 1.5,
+     "arms_are_matched": true,
+     "note": "The two arms are within tolerance on ensemble size and Kenyon-cell rate."
+    }
+   ],
+   "comparisons": [
+    {
+     "name": "A_vs_B_sleep",
+     "label": "trained (A) vs unpaired (B) ensemble, during sleep",
+     "diff": -10.627477856364541,
+     "ci95": [
+      -12.750609242727316,
+      -8.734716094324776
+     ],
+     "hedges_g": -2.164742583569014,
+     "p_permutation": 0.0,
+     "n": 20,
+     "survives": false,
+     "available": true,
+     "note": null
+    },
+    {
+     "name": "sleep_vs_wake_A",
+     "label": "sleep vs wake, odour-A ensemble",
+     "diff": 0.055515021815648956,
+     "ci95": [
+      0.0029125784044779176,
+      0.11247325256641615
+     ],
+     "hedges_g": 0.4161084275755739,
+     "p_permutation": 0.0657,
+     "n": 20,
+     "survives": true,
+     "available": true,
+     "note": null
+    },
+    {
+     "name": "real_vs_shuffled",
+     "label": "real vs degree-preserving shuffled connectome, odour-A ensemble in sleep",
+     "diff": -26.50319484448397,
+     "ci95": [
+      -28.014833350036223,
+      -25.167631871798243
+     ],
+     "hedges_g": -7.579864400727402,
+     "p_permutation": 0.0,
+     "n": 20,
+     "survives": false,
+     "available": true,
+     "note": null
+    },
+    {
+     "name": "A_vs_random_ensembles",
+     "label": "odour-A ensemble vs size-matched random KC ensembles, during sleep",
+     "diff": 0.27458698813603755,
+     "ci95": [
+      0.27326562108646313,
+      0.2758707295906288
+     ],
+     "hedges_g": 86.27435257919136,
+     "p_permutation": 0.0,
+     "n": 20,
+     "survives": true,
+     "available": true,
+     "note": null
+    },
+    {
+     "name": "trained_vs_naive_weights",
+     "label": "learned vs unlearned synaptic weights, odour-A ensemble in sleep",
+     "diff": 0.03989899884585153,
+     "ci95": [
+      -0.010013478301327776,
+      0.08952199725921281
+     ],
+     "hedges_g": 0.3265896949735342,
+     "p_permutation": 0.1444,
+     "n": 20,
+     "survives": false,
+     "available": true,
+     "note": null
+    },
+    {
+     "name": "trained_vs_naive_spike_share",
+     "label": "learned vs unlearned weights, share of offline Kenyon-cell spikes falling in the odour-A ensemble",
+     "diff": 0.03906825273918173,
+     "ci95": [
+      -0.01642970021920144,
+      0.09977191919458703
+     ],
+     "hedges_g": 0.2708316354311641,
+     "p_permutation": 0.2339,
+     "n": 20,
+     "survives": false,
+     "available": true,
+     "note": null
+    }
+   ],
+   "ensemble_sizes": {
+    "real_adapt": {
+     "sleep": 178.35,
+     "wake": 178.35,
+     "sleep_naive": 178.35
+    },
+    "shuffled_adapt": {
+     "sleep": 669.75
+    }
+   },
+   "encoding_note": "The memory was encoded by stage 4 in the model as published; the deviation is applied to the offline period only. If it changed the odour response it would change which Kenyon cells the ensemble contains, and that would have to be re-encoded.",
+   "source_file": "results/stage6_replay_adapt/stage6.json"
   }
  },
  "detector_control": {

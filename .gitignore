@@ -35,3 +35,5 @@ results/_archive_prev/
 
 # the dev-server launch config the Browser pane writes; not part of the pipeline
 .claude/launch.json
+# the deviated arm's per-run activity binaries: nothing reads them, the viewer plays the published arm
+results/stage6_replay_adapt/replay/
