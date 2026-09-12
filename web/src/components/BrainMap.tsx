@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad } from '../lib/binary';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { checkAtlasIdentity, loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad } from '../lib/binary';
 import { CHART_FONT, SERIES, resolveColors, useThemeVersion } from '../lib/colors';
-import { fmtInt, fmtNum } from '../lib/format';
+import { fmtInt, fmtNum, fmtPct } from '../lib/format';
 import type { Manifest, Provenance } from '../types';
 
 /**
@@ -23,6 +23,9 @@ const PROJECTION_AXES: Record<Projection, [0 | 1 | 2, 0 | 1 | 2]> = {
   sagittal: [2, 1], // z vs y: looking at it from the side
 };
 const PROJECTION_LABEL: Record<Projection, string> = { frontal: 'frontal (x, y)', dorsal: 'dorsal (x, z)', sagittal: 'sagittal (z, y)' };
+/** The three projections in a fixed order, and their one-word names for the narrow rail control. */
+export const PROJECTIONS: Projection[] = ['frontal', 'dorsal', 'sagittal'];
+export const PROJECTION_SHORT: Record<Projection, string> = { frontal: 'frontal', dorsal: 'dorsal', sagittal: 'sagittal' };
 const AXIS_KEY = ['x', 'y', 'z'] as const;
 
 /**
@@ -45,9 +48,18 @@ const GROUP_STYLE: Record<string, { color: string; dim: number; z: number }> = {
 const GROUP_FALLBACK = { color: 'var(--color-muted)', dim: 0.3, z: 2 };
 const styleFor = (label: string) => GROUP_STYLE[label] ?? GROUP_FALLBACK;
 
+/**
+ * Ink curve for the background layer. The raw `dim` values above are a painting order as much as an
+ * opacity, and applied literally they leave the map almost blank: two thirds of the atlas rows are
+ * optic lobe at 0.05. A gamma lifts the faint groups into view while keeping their order, so the
+ * named populations still read through the background instead of being flattened into it.
+ */
+const dimCurve = (dim: number, gamma: number) => Math.min(1, Math.pow(dim, gamma));
+
 const PAD = 10;
 const BOTTOM = 26;
 const FONT_SM = `10.5px ${CHART_FONT}`;
+const FONT_XS = `9.5px ${CHART_FONT}`;
 /** Time bucket for the spike index; a scrub window is then a range of buckets, not a rescan. */
 const BIN_MS = 16;
 
@@ -120,7 +132,7 @@ export function atlasProvenance(m: Manifest | null, extraFiles: string[] = []): 
 
 // ---------------------------------------------------------------- the map
 
-export default function BrainMap({
+function BrainMapInner({
   atlas,
   activity = null,
   timeMs = null,
@@ -128,6 +140,11 @@ export default function BrainMap({
   height = 420,
   projection: projectionProp,
   onProjectionChange,
+  variant = 'figure',
+  background = 'mat',
+  showProjectionControl = true,
+  showLegend = true,
+  showStatus = true,
 }: {
   atlas: AtlasData;
   /** spikes to light up; null renders the populations only (no activity) */
@@ -139,27 +156,58 @@ export default function BrainMap({
   height?: number;
   projection?: Projection;
   onProjectionChange?: (p: Projection) => void;
+  /** 'panel' is the compact instrument in the right-hand rail: smaller type, denser ink */
+  variant?: 'figure' | 'panel';
+  /** 'mat' paints the white figure mat behind the points, 'page' paints the page background */
+  background?: 'mat' | 'page';
+  showProjectionControl?: boolean;
+  showLegend?: boolean;
+  showStatus?: boolean;
 }) {
+  // The rail panel is small and sits on the page background rather than the white mat, so its
+  // background layer is drawn with more ink; the figure variant keeps the quieter curve.
+  const gamma = variant === 'panel' ? 0.5 : 0.62;
+
   const [projInner, setProjInner] = useState<Projection>('frontal');
   const projection = projectionProp ?? projInner;
   const setProjection = (p: Projection) => (onProjectionChange ? onProjectionChange(p) : setProjInner(p));
 
-  const wrapRef = useRef<HTMLDivElement>(null);
+  // The wrapper is state, not a ref, so the colour resolution below can depend on it existing.
+  const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgRef = useRef<HTMLCanvasElement | null>(null);
   const [width, setWidth] = useState(600);
   const themeVersion = useThemeVersion();
 
+  // Width changes are coalesced to one per frame: dragging a window edge otherwise rebuilds the
+  // whole background layer once per pixel.
   useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => setWidth(Math.max(240, Math.floor(entries[0].contentRect.width))));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+    if (!wrap) return;
+    let raf = 0;
+    let pending = 0;
+    const ro = new ResizeObserver((entries) => {
+      pending = Math.max(240, Math.floor(entries[0].contentRect.width));
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setWidth((w) => (w === pending ? w : pending));
+      });
+    });
+    ro.observe(wrap);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [wrap]);
 
-  // Group codes actually present, in painting order, with the label the sidecar gives each code.
+  /**
+   * Group codes actually present, in painting order, with the label the sidecar gives each code, and
+   * the rows of each group gathered once. Drawing then touches each row once per repaint instead of
+   * scanning all n rows per group. Counts come from the binary; the sidecar's own figure is kept
+   * beside them so the legend can report a disagreement rather than quietly preferring one.
+   */
   const groups = useMemo(() => {
+    const gc = atlas.sidecar.group_counts;
     const counts = new Map<number, number>();
     for (let i = 0; i < atlas.n; i++) counts.set(atlas.group[i], (counts.get(atlas.group[i]) ?? 0) + 1);
     const list = (atlas.sidecar.groups ?? []).map((g) => ({
@@ -167,15 +215,31 @@ export default function BrainMap({
       label: g.label,
       /** neurons of this group in the map, counted from the binary itself */
       inMap: counts.get(g.code) ?? 0,
-      /** what the sidecar says it wrote for this group */
-      sidecarCount: atlas.sidecar.group_counts?.[g.label] ?? null,
-      noSoma: atlas.sidecar.n_without_soma_position_by_group?.[g.label] ?? null,
+      /** what the sidecar says it wrote for this group; null when the sidecar states nothing */
+      sidecarCount: gc && Object.prototype.hasOwnProperty.call(gc, g.label) ? gc[g.label] : null,
       ...styleFor(g.label),
     }));
     // codes present in the binary but absent from groups[] are reported, never silently dropped
     const known = new Set(list.map((g) => g.code));
     const unknown = [...counts.keys()].filter((c) => !known.has(c)).sort((a, b) => a - b);
-    return { list, byPaint: [...list].sort((a, b) => a.z - b.z), unknown, unknownTotal: unknown.reduce((s, c) => s + (counts.get(c) ?? 0), 0) };
+    const unknownSet = new Set(unknown);
+    // one pass over the binary fills every group's row list (and the unknown-code list)
+    const rows = new Map<number, Uint32Array>();
+    const fill = new Map<number, number>();
+    for (const g of list) rows.set(g.code, new Uint32Array(g.inMap));
+    const unknownTotal = unknown.reduce((sum, c) => sum + (counts.get(c) ?? 0), 0);
+    const unknownRows = new Uint32Array(unknownTotal);
+    let uk = 0;
+    for (let i = 0; i < atlas.n; i++) {
+      const code = atlas.group[i];
+      const arr = rows.get(code);
+      if (arr) {
+        const k = fill.get(code) ?? 0;
+        arr[k] = i;
+        fill.set(code, k + 1);
+      } else if (unknownSet.has(code)) unknownRows[uk++] = i;
+    }
+    return { list, byPaint: [...list].sort((a, b) => a.z - b.z), unknown, unknownTotal, rows, unknownRows };
   }, [atlas]);
 
   /**
@@ -277,38 +341,56 @@ export default function BrainMap({
     return { rows, alphas, spikes, oob, nNeurons: rows.length };
   }, [activity, index, timeMs, decayMs, atlas.n]);
 
-  // Background layer: all atlas neurons, dim, drawn once per size / projection / theme.
-  const [bgVersion, setBgVersion] = useState(0);
-  useEffect(() => {
-    const dpr = window.devicePixelRatio || 1;
-    const off = document.createElement('canvas');
-    off.width = Math.round(canvasW * dpr);
-    off.height = Math.round(canvasH * dpr);
-    const ctx = off.getContext('2d');
-    const wrap = wrapRef.current;
-    if (!ctx || !wrap) return;
-    const vars: Record<string, string> = { bg: SERIES.mat, axis: SERIES.axis };
+  /**
+   * The palette as literal canvas colours. Resolving one `var()` costs a DOM insertion and a forced
+   * style recalculation, so it happens once per theme / group / background change, never per frame.
+   */
+  const C = useMemo(() => {
+    if (!wrap) return null;
+    const vars: Record<string, string> = {
+      bg: background === 'page' ? 'var(--color-bg)' : SERIES.mat,
+      axis: SERIES.axis,
+      fallback: GROUP_FALLBACK.color,
+    };
     for (const g of groups.list) vars[`g${g.code}`] = g.color;
-    vars.fallback = GROUP_FALLBACK.color;
-    const C = resolveColors(wrap, vars);
+    return resolveColors(wrap, vars);
+    // themeVersion is the signal that the same var() now resolves to a different colour
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wrap, groups, background, themeVersion]);
+
+  // Background layer: all atlas neurons, dim, drawn once per size / projection / theme.
+  useEffect(() => {
+    if (!C) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(canvasW * dpr);
+    const h = Math.round(canvasH * dpr);
+    // the offscreen canvas is reused: a theme or projection change at an unchanged size only repaints
+    const off = bgRef.current ?? document.createElement('canvas');
+    if (off.width !== w) off.width = w;
+    if (off.height !== h) off.height = h;
+    const ctx = off.getContext('2d');
+    if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = C.bg;
     ctx.fillRect(0, 0, canvasW, canvasH);
-    const size = 1.4;
+    const size = variant === 'panel' ? 1.5 : 1.4;
+    // each group draws only its own rows (gathered once in the groups memo), so a repaint is one
+    // pass over the atlas in total rather than one pass per group
     for (const g of groups.byPaint) {
+      const rows = groups.rows.get(g.code);
+      if (!rows || rows.length === 0) continue;
       ctx.fillStyle = C[`g${g.code}`] ?? C.fallback;
-      ctx.globalAlpha = g.dim;
-      for (let i = 0; i < atlas.n; i++) {
-        if (atlas.group[i] !== g.code) continue;
+      ctx.globalAlpha = dimCurve(g.dim, gamma);
+      for (let k = 0; k < rows.length; k++) {
+        const i = rows[k];
         ctx.fillRect(view.px(i) - size / 2, view.py(i) - size / 2, size, size);
       }
     }
-    if (groups.unknown.length > 0) {
+    if (groups.unknownRows.length > 0) {
       ctx.fillStyle = C.fallback;
-      ctx.globalAlpha = GROUP_FALLBACK.dim;
-      const unknownSet = new Set(groups.unknown);
-      for (let i = 0; i < atlas.n; i++) {
-        if (!unknownSet.has(atlas.group[i])) continue;
+      ctx.globalAlpha = dimCurve(GROUP_FALLBACK.dim, gamma);
+      for (let k = 0; k < groups.unknownRows.length; k++) {
+        const i = groups.unknownRows[k];
         ctx.fillRect(view.px(i) - size / 2, view.py(i) - size / 2, size, size);
       }
     }
@@ -316,7 +398,7 @@ export default function BrainMap({
 
     // Axis note and a scale bar, both in the sidecar's own micrometres.
     ctx.fillStyle = C.axis;
-    ctx.font = FONT_SM;
+    ctx.font = variant === 'panel' ? FONT_XS : FONT_SM;
     ctx.textAlign = 'left';
     const hAxis = AXIS_KEY[view.ui];
     const vAxis = AXIS_KEY[view.vi];
@@ -336,16 +418,15 @@ export default function BrainMap({
       ctx.fillText(`${nice} µm`, x1, canvasH - 3);
     }
     bgRef.current = off;
-    // force the foreground pass to repaint against the new background
-    setBgVersion((v) => v + 1);
-  }, [atlas, groups, view, canvasW, canvasH, themeVersion]);
+    // No version bump: this effect is declared before the foreground one, so within the same commit
+    // the foreground blits the background this pass has just written.
+  }, [groups, view, canvasW, canvasH, C, variant, gamma]);
 
   // Foreground: blit the background, then draw only the lit neurons.
   useEffect(() => {
     const cv = canvasRef.current;
-    const wrap = wrapRef.current;
     const bg = bgRef.current;
-    if (!cv || !wrap) return;
+    if (!cv || !C) return;
     const dpr = window.devicePixelRatio || 1;
     const w = Math.round(canvasW * dpr);
     const h = Math.round(canvasH * dpr);
@@ -358,12 +439,8 @@ export default function BrainMap({
     if (bg) ctx.drawImage(bg, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (!lit || lit.rows.length === 0) return;
-    const vars: Record<string, string> = {};
-    for (const g of groups.list) vars[`g${g.code}`] = g.color;
-    vars.fallback = GROUP_FALLBACK.color;
-    const C = resolveColors(wrap, vars);
-    const size = 3.2;
-    const halo = 5.2;
+    const size = variant === 'panel' ? 3.6 : 3.2;
+    const halo = variant === 'panel' ? 6.4 : 5.2;
     for (let k = 0; k < lit.rows.length; k++) {
       const i = lit.rows[k];
       const a = lit.alphas[k];
@@ -377,35 +454,55 @@ export default function BrainMap({
       ctx.fillRect(x - size / 2, y - size / 2, size, size);
     }
     ctx.globalAlpha = 1;
-  }, [lit, view, canvasW, canvasH, bgVersion, atlas, groups]);
+  }, [lit, view, canvasW, canvasH, atlas, C, variant]);
 
   const sc = atlas.sidecar;
+  /**
+   * What ties this activity file to this atlas, if anything: `atlas_row` values exported against a
+   * different atlas are all in range and all land on real somata, so only the exporter's stamp can
+   * tell a current pairing from a stale one. A mismatch is the caller's to refuse; an unstamped file
+   * is reported here, because it cannot be checked either way.
+   */
+  const identity = useMemo(() => (activity ? checkAtlasIdentity(activity.sidecar, atlas) : null), [activity, atlas]);
+  /** the fraction of its spikes the activity file actually carries, when it carries a sample */
+  const sampleFrac =
+    activity && activity.sidecar.downsampled && activity.sidecar.n_spikes_total > 0
+      ? activity.sidecar.n_spikes_exported / activity.sidecar.n_spikes_total
+      : null;
+  const rowsDisagree = atlas.n !== sc.n_neurons_in_map;
 
   return (
-    <div ref={wrapRef} className="w-full">
-      <div className="flex flex-wrap items-center gap-3 mb-3 small">
-        <span className="label">projection</span>
-        <div className="segmented" role="tablist" aria-label="projection">
-          {(Object.keys(PROJECTION_AXES) as Projection[]).map((p) => (
-            <button
-              key={p}
-              type="button"
-              role="tab"
-              aria-selected={projection === p}
-              className="segmented__option"
-              data-text={PROJECTION_LABEL[p]}
-              onClick={() => setProjection(p)}
-            >
-              {PROJECTION_LABEL[p]}
-            </button>
-          ))}
+    <div ref={setWrap} className="w-full">
+      {showProjectionControl && (
+        <div className="flex flex-wrap items-center gap-3 mb-3 small">
+          <span className="label">projection</span>
+          <div className="segmented" role="tablist" aria-label="projection">
+            {(Object.keys(PROJECTION_AXES) as Projection[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                role="tab"
+                aria-selected={projection === p}
+                className="segmented__option"
+                data-text={PROJECTION_LABEL[p]}
+                onClick={() => setProjection(p)}
+              >
+                {PROJECTION_LABEL[p]}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       <canvas ref={canvasRef} style={{ width: canvasW, height: canvasH }} className="block mx-auto border border-rule" />
-      <div className="legend mt-3">
+      {showLegend && (
+      <div className={variant === 'panel' ? 'legend legend--tight mt-2' : 'legend mt-3'}>
         {groups.list.map((g) => (
           <span key={g.code}>
             <i className="swatch" style={{ background: g.color }} /> {g.label} ({fmtInt(g.inMap)})
+            {/* the count is the binary's own; when the sidecar states a different one, both are shown */}
+            {g.sidecarCount !== null && g.sidecarCount !== g.inMap && (
+              <span className="tone-failed"> · neuron_atlas.json says {fmtInt(g.sidecarCount)}</span>
+            )}
           </span>
         ))}
         {groups.unknown.length > 0 && (
@@ -415,13 +512,26 @@ export default function BrainMap({
           </span>
         )}
       </div>
-      <div className="legend mt-1">
+      )}
+      {showStatus && (
+      <div className={variant === 'panel' ? 'legend legend--tight mt-1' : 'legend mt-1'}>
         {activity && lit ? (
           <>
             <span>
               <strong>{fmtInt(lit.nNeurons)}</strong> neurons spiking in the last {fmtInt(decayMs)} ms
               {timeMs !== null && <> at t = {fmtNum(timeMs / 1000, 2)} s</>} · {fmtInt(lit.spikes)} spikes in that window
+              {/* both counts are counts of what the file holds; when it holds a sample, they are sample counts */}
+              {sampleFrac !== null && (
+                <>
+                  {' '}
+                  — counted in the {fmtPct(sampleFrac)} of the spikes this file carries ({fmtInt(activity.sidecar.n_spikes_exported)} of{' '}
+                  {fmtInt(activity.sidecar.n_spikes_total)}), so the true numbers are higher
+                </>
+              )}
             </span>
+            {identity && identity.state === 'unverified' && (
+              <span className="tone-failed">activity not verified against this atlas: {identity.message}</span>
+            )}
             {lit.oob > 0 && (
               <span className="tone-failed">
                 {fmtInt(lit.oob)} spikes reference an atlas_row outside the {fmtInt(atlas.n)} rows of neuron_atlas.bin and are not drawn
@@ -432,15 +542,23 @@ export default function BrainMap({
           <span>no activity file loaded: populations only, nothing is lit</span>
         )}
         <span>
-          {fmtInt(sc.n_neurons_in_map)} somata in the map of {fmtInt(sc.n_neurons_simulated)} neurons simulated
-          {atlas.n !== sc.n_neurons_in_map && (
+          {fmtInt(rowsDisagree ? atlas.n : sc.n_neurons_in_map)} somata in the map of {fmtInt(sc.n_neurons_simulated)} neurons simulated
+          {rowsDisagree && (
             <span className="tone-failed"> · the binary holds {fmtInt(atlas.n)} rows, not the {fmtInt(sc.n_neurons_in_map)} the sidecar states</span>
           )}
         </span>
       </div>
+      )}
     </div>
   );
 }
+
+/**
+ * Memoised: the Replay page's play loop re-renders the page ~60 times a second, and the map's own
+ * work (the lit-neuron pass and the canvas blit) should run only when its own props change.
+ */
+const BrainMap = memo(BrainMapInner);
+export default BrainMap;
 
 /**
  * The caption that must accompany the map. Every number in it is read from the sidecar, and the
@@ -451,7 +569,14 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
   const noSoma = Object.entries(sc.n_without_soma_position_by_group ?? {})
     .filter(([, v]) => (v ?? 0) > 0)
     .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
-  const emptyGroups = (sc.groups ?? []).filter((g) => (sc.group_counts?.[g.label] ?? 0) === 0).map((g) => g.label);
+  const gc = sc.group_counts;
+  const listed = sc.groups ?? [];
+  // A group the sidecar states as 0 is a fact about the export. A group the sidecar says NOTHING
+  // about is not a zero, and is never written up as one.
+  const emptyGroups = gc ? listed.filter((g) => gc[g.label] === 0).map((g) => g.label) : [];
+  const uncounted = listed.filter((g) => !gc || !Object.prototype.hasOwnProperty.call(gc, g.label)).map((g) => g.label);
+  // the count the map is actually drawn from is the binary's row count
+  const rowsDisagree = atlas.n !== sc.n_neurons_in_map;
   return (
     <>
       Each dot is one neuron's <em>soma position</em> — the cell body, not the neurites: this is not a morphology rendering, and a
@@ -460,11 +585,17 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
       {sc.axes?.note}.{' '}
       {sc.subsampled ? (
         <>
-          The map is <em>subsampled</em>: it shows {fmtInt(sc.n_neurons_in_map)} of the {fmtInt(sc.n_neurons_simulated)} neurons simulated.
+          The map is <em>subsampled</em>: it shows {fmtInt(atlas.n)} of the {fmtInt(sc.n_neurons_simulated)} neurons simulated.
         </>
       ) : (
-        <>It shows all {fmtInt(sc.n_neurons_in_map)} neurons that have a soma position, of {fmtInt(sc.n_neurons_simulated)} simulated.</>
+        <>It shows all {fmtInt(atlas.n)} neurons that have a soma position, of {fmtInt(sc.n_neurons_simulated)} simulated.</>
       )}{' '}
+      {rowsDisagree && (
+        <span className="tone-failed">
+          That count is the {fmtInt(atlas.n)} rows neuron_atlas.bin actually holds; the sidecar states {fmtInt(sc.n_neurons_in_map)}, which does
+          not match, so one of the two files is stale.{' '}
+        </span>
+      )}
       {fmtInt(sc.n_without_soma_position)} simulated neurons have no soma position in the volume and are absent from the map although they are
       still simulated
       {noSoma.length > 0 && <> ({noSoma.map(([k, v]) => `${k} ${fmtInt(v)}`).join(', ')})</>}. {sc.soma_outside_brain_note}
@@ -474,11 +605,27 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
           The groups {emptyGroups.join(', ')} have a count of 0 in this export, so they appear in the legend with no dots on the map.
         </>
       )}
+      {uncounted.length > 0 && (
+        <span className="tone-failed">
+          {' '}
+          neuron_atlas.json states no group_counts for {uncounted.join(', ')}: the counts in the legend are counted from neuron_atlas.bin and
+          nothing in the sidecar corroborates them. This is an absent number, not a zero.
+        </span>
+      )}
       {activity && (
         <>
           {' '}
           Activity: {fmtInt(activity.sidecar.n_spikes_exported)} of {fmtInt(activity.sidecar.n_spikes_total)} spikes over{' '}
-          {fmtNum(activity.sidecar.duration_s, 2)} s.
+          {fmtNum(activity.sidecar.duration_s, 2)} s, indexing{' '}
+          {typeof activity.sidecar.atlas_fingerprint === 'string' || typeof activity.sidecar.n_atlas_rows === 'number' ? (
+            <>
+              the atlas it names ({typeof activity.sidecar.n_atlas_rows === 'number' ? `${fmtInt(activity.sidecar.n_atlas_rows)} rows` : 'no row count'},{' '}
+              {activity.sidecar.atlas_fingerprint ?? 'no fingerprint'})
+            </>
+          ) : (
+            <span className="tone-failed">an atlas it does not name, so the pairing cannot be checked</span>
+          )}
+          .
           {activity.sidecar.downsampled && (
             <span>
               {' '}

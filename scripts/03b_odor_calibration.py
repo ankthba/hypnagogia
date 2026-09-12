@@ -96,5 +96,63 @@ def main():
               f"{g['pop_rate_hz_odor']:8.4f} {g['pop_rate_hz_post']:8.4f} {g['apl_rate_hz_odor']:7.1f} {str(g['sparse']):6s} {g['transient']}")
 
 
+
+
+def ignition_threshold():
+    """Smallest number of driven receptor neurons whose activity outlasts the stimulus (i.e. ignites the network)."""
+    cfg = load_config("stage3b_odor"); it = cfg["odor_calibration"]["ignition_threshold"]
+    conn = load_connectome("malecns", "v1.0", "brain")
+    pool = conn.ids[conn.select(cell_type=it["glomerulus"])]
+    specs = []
+    for n in it["n_neurons"]:
+        for sd in it["seeds"]:
+            rng = np.random.default_rng(1000 + sd)
+            ids = [int(x) for x in rng.choice(pool, size=min(n, len(pool)), replace=False)]
+            specs.append({"out_dir": str(OUT / f"ignite_n{n}_seed{sd}"), "seed": 800 + sd, "config": cfg, "name": f"ignite_{n}_{sd}",
+                          "connectome": {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"]},
+                          "drive_groups": {"odor": {"ids": ids}}, "record": "all",
+                          "epochs": [{"name": "pre", "duration_s": 0.5},
+                                     {"name": "odor", "duration_s": 1.0, "drives": {"odor": float(it["rate_hz"])}},
+                                     {"name": "post", "duration_s": 3.0}],
+                          "_meta": {"n": n, "seed": sd}})
+    res = run_jobs(specs, n_parallel=cfg["run"]["n_parallel"])
+    rows = []
+    for sp, r in zip(specs, res):
+        mm = sp["_meta"]
+        if r is None or "error" in r:
+            rows.append({**mm, "error": (r or {}).get("error", "")[-200:]}); continue
+        i, ts, meta = load_spikes(sp["out_dir"])
+        def rate(ep):
+            ii, _, eps = spikes_in_epoch(i, ts, meta, ep)
+            return float(len(ii) / sum(e["duration_s"] for e in eps) / meta["n_neurons"])
+        od, po = rate("odor"), rate("post")
+        rows.append({**mm, "pop_rate_odor": od, "pop_rate_post": po, "ignited": bool(od > 0 and po > 0.01 * od)})
+    grid = []
+    for n in it["n_neurons"]:
+        g = [r for r in rows if r.get("n") == n and "error" not in r]
+        if g:
+            grid.append({"n_driven": n, "n_seeds": len(g), "fraction_ignited": float(np.mean([r["ignited"] for r in g])),
+                         "pop_rate_odor_mean": float(np.mean([r["pop_rate_odor"] for r in g])),
+                         "pop_rate_post_mean": float(np.mean([r["pop_rate_post"] for r in g]))})
+    ign = [g for g in grid if g["fraction_ignited"] > 0]
+    out = {"glomerulus": it["glomerulus"], "rate_hz": it["rate_hz"], "grid": grid, "per_run": rows,
+           "smallest_igniting_drive": (min(g["n_driven"] for g in ign) if ign else None),
+           "finding": (f"As few as {min(g['n_driven'] for g in ign)} receptor neurons driven at {it['rate_hz']} Hz are enough "
+                       f"to ignite the whole network into a self-sustaining state." if ign else
+                       f"No drive up to {max(it['n_neurons'])} receptor neurons at {it['rate_hz']} Hz ignited the network.")}
+    json.dump(out, open(OUT / "ignition_threshold.json", "w"), indent=1, default=str)
+    print("\n=== IGNITION THRESHOLD ===")
+    print(out["finding"])
+    print(f"{'n driven':>9s} {'P(ignite)':>10s} {'rate during':>12s} {'rate after':>11s}")
+    for g in grid:
+        print(f"{g['n_driven']:9d} {g['fraction_ignited']:10.2f} {g['pop_rate_odor_mean']:12.4f} {g['pop_rate_post_mean']:11.4f}")
+    return out
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--ignition-only" in sys.argv:
+        ignition_threshold()
+    else:
+        main()
+        ignition_threshold()

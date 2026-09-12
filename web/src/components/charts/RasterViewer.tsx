@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { RasterData, TraceData } from '../../lib/binary';
 import { SERIES, CHART_FONT, resolveColors, useThemeVersion } from '../../lib/colors';
 import { fmtNum, fmtInt } from '../../lib/format';
@@ -42,7 +42,7 @@ function lowerBound(n: number, key: (i: number) => number, target: number): numb
  * drawn beneath on an identically-mapped time axis. Columns are resolved by name from
  * each sidecar's `columns`, never assumed positionally.
  */
-export default function RasterViewer({
+function RasterViewerInner({
   raster,
   trace,
   startS,
@@ -144,29 +144,58 @@ export default function RasterViewer({
 
   const rasterRef = useRef<HTMLCanvasElement>(null);
   const traceRef = useRef<HTMLCanvasElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  // state rather than a ref, so the colour resolution below can depend on the wrapper existing
+  const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(800);
 
   useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => setWidth(Math.max(320, Math.floor(entries[0].contentRect.width))));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+    if (!wrap) return;
+    let raf = 0;
+    let pending = 0;
+    const ro = new ResizeObserver((entries) => {
+      // 280 is below the ~301px content box of the figure mat at a 375px viewport, so the canvas
+      // does not overflow its mat on a phone; anything narrower still scrolls inside the mat.
+      pending = Math.max(280, Math.floor(entries[0].contentRect.width));
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setWidth((w) => (w === pending ? w : pending));
+      });
+    });
+    ro.observe(wrap);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [wrap]);
 
   const rasterH = 300;
   const traceH = 150;
   const themeVersion = useThemeVersion();
 
+  /**
+   * The palette as literal canvas colours. Each entry costs a DOM insertion and a forced style
+   * recalculation, so it is resolved once per theme change rather than on every animation frame.
+   */
+  const C = useMemo(() => {
+    if (!wrap) return null;
+    return resolveColors(wrap, CANVAS_VARS);
+    // themeVersion is the signal that the same var() now resolves to a different colour
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wrap, themeVersion]);
+
+  /** true when the canvas backing store already has this size: reassigning it clears the canvas. */
+  const sizeCanvas = (cv: HTMLCanvasElement, w: number, h: number, dpr: number) => {
+    if (cv.width !== Math.round(w * dpr)) cv.width = Math.round(w * dpr);
+    if (cv.height !== Math.round(h * dpr)) cv.height = Math.round(h * dpr);
+  };
+
   useEffect(() => {
     const cv = rasterRef.current;
-    if (!cv || !wrapRef.current) return;
-    const C = resolveColors(wrapRef.current, CANVAS_VARS);
+    if (!cv || !C) return;
     const groupColor: Record<string, string> = { ensemble_A: C.A, ensemble_B: C.B, other_kc: C.other };
     const dpr = window.devicePixelRatio || 1;
-    cv.width = width * dpr;
-    cv.height = rasterH * dpr;
+    sizeCanvas(cv, width, rasterH, dpr);
     const ctx = cv.getContext('2d')!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = C.bg;
@@ -237,15 +266,13 @@ export default function RasterViewer({
       const tt = t0 + (windowS * k) / 4;
       ctx.fillText(`${fmtNum(tt, 2)} s`, LEFT + (plotW * k) / 4, rasterH - 6);
     }
-  }, [raster, rc, spikeIndex, rowOrder, start, windowS, width, themeVersion]);
+  }, [raster, rc, spikeIndex, rowOrder, start, windowS, width, C]);
 
   useEffect(() => {
     const cv = traceRef.current;
-    if (!cv || !wrapRef.current) return;
-    const C = resolveColors(wrapRef.current, CANVAS_VARS);
+    if (!cv || !C) return;
     const dpr = window.devicePixelRatio || 1;
-    cv.width = width * dpr;
-    cv.height = traceH * dpr;
+    sizeCanvas(cv, width, traceH, dpr);
     const ctx = cv.getContext('2d')!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = C.bg;
@@ -313,16 +340,19 @@ export default function RasterViewer({
       ctx.stroke();
       ctx.setLineDash([]);
     }
-    const dt = trace.sidecar.dt_s || 0;
+    // t_s is non-decreasing, so the first visible bin is found once and shared by both lines; the
+    // loop then costs the visible window rather than the whole file, on every frame of playback.
+    const dt = trace.sidecar.dt_s;
+    const firstBin = lowerBound(trace.nBins, (i) => trace.values[i * nc + iT], t0 - dt);
     const drawLine = (ci: number, color: string) => {
       if (ci < 0) return;
       ctx.strokeStyle = color;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       let started = false;
-      for (let i = 0; i < trace.nBins; i++) {
+      for (let i = firstBin; i < trace.nBins; i++) {
         const t = trace.values[i * nc + iT];
-        if (t < t0 - dt || t > t1 + dt) continue;
+        if (t > t1 + dt) break;
         const yv = trace.values[i * nc + ci];
         if (!Number.isFinite(yv)) {
           started = false;
@@ -344,12 +374,12 @@ export default function RasterViewer({
     ctx.fillText(fmtNum(hi, 2), LEFT - 4, top + 9);
     ctx.fillText(fmtNum(lo, 2), LEFT - 4, bottom);
     drawTimeTicks();
-  }, [trace, tc, traceRange, start, windowS, width, themeVersion]);
+  }, [trace, tc, traceRange, start, windowS, width, C]);
 
   const rasterCols = raster?.sidecar.columns ?? [];
 
   return (
-    <div ref={wrapRef} className="w-full">
+    <div ref={setWrap} className="w-full">
       <canvas ref={rasterRef} style={{ width, height: rasterH }} className="block border border-rule" />
       <canvas ref={traceRef} style={{ width, height: traceH }} className="block border border-t-0 border-rule" />
       <div className="legend mt-3">
@@ -377,3 +407,7 @@ export default function RasterViewer({
     </div>
   );
 }
+
+/** Memoised: the page's play loop re-renders its parent on every frame, this only on its own props. */
+const RasterViewer = memo(RasterViewerInner);
+export default RasterViewer;

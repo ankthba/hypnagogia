@@ -31,6 +31,9 @@ def main():
     s0x = load(RESULTS / "stage0_engine_check" / "crossmatch_report.json")
     s1 = load(RESULTS / "stage1_noise" / "stage1.json")
     s2 = load(RESULTS / "stage2_criticality" / "full" / "stage2.json")
+    s3b = load(RESULTS / "stage3b_odor" / "stage3b.json")
+    s3bi = load(RESULTS / "stage3b_odor" / "ignition_threshold.json")
+    s3c = load(RESULTS / "stage3c_control" / "stage3c.json")
     s3 = load(RESULTS / "stage3_plasticity" / "stage3.json")
     s4 = load(RESULTS / "stage4_learning" / "stage4.json")
     s5 = load(RESULTS / "stage5_sleep" / "stage5.json")
@@ -52,6 +55,24 @@ def main():
     w()
     if s6:
         w(f"**Stage 6 ({s6['status']}).** {s6['headline']}")
+    elif s3b and s3b["status"] == "failed":
+        w("**The replay test as specified cannot be run on this model, and the reason is itself the result.**")
+        w()
+        w("Two independent findings block it, and neither came from tuning anything:")
+        w()
+        w("1. *There is no critical regime, because the network is bistable.* Sweeping the background noise never "
+          "produces a sustained intermediate activity level. Seeds at the same noise amplitude either stay silent or "
+          "ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls "
+          "inside a gap of more than four orders of magnitude that the model cannot occupy.")
+        w("2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a "
+          "single glomerulus driven at 10 Hz, makes more than half of all Kenyon cells fire, and the activity "
+          "outlasts the stimulus because the network ignites. In a real fly about 5 to 10 per cent of Kenyon cells "
+          "respond to an odour, each with a few spikes.")
+        w()
+        w("A memory needs a sparse, odour-specific ensemble, and a replay test needs a quiet background for that "
+          "ensemble to reappear against. This model, at this scale and with the published parameters, provides "
+          "neither. Reporting that is the honest outcome; the alternative would have been to change parameters until "
+          "the plots looked right, which this project does not do.")
     elif s2 and not s2.get("has_critical_regime"):
         w("**The replay test has not been reached yet.** The most important result so far is negative and it "
           "comes from stage 2: the model has no background-activity regime that is both self-sustaining and "
@@ -225,6 +246,48 @@ def main():
         w("**Not run.**")
         w()
 
+    w("## Stage 3b - is there a sparse odour code to build a memory on? No.")
+    w()
+    if s3b:
+        w(f"**{s3b['status']}.** {s3b['reference']}")
+        w()
+        w(f"{s3b['finding']}")
+        w()
+        w("| glomeruli driven | receptor neurons | drive | Kenyon cells responding | spikes per responding cell | rate during | rate after |")
+        w("|---|---|---|---|---|---|---|")
+        for g in s3b["grid"]:
+            w(f"| {g['set']} | {g['n_orn']} | {g['rate_hz']} Hz | **{g['frac_kc_active']:.1%}** | {g['spikes_per_active_kc']:.0f} | "
+              f"{g['pop_rate_hz_odor']:.4f} Hz/neuron | {g['pop_rate_hz_post']:.4f} Hz/neuron |")
+        w()
+        w("The last two columns are the important ones: the population rate after the odour ends is the same as the "
+          "rate during it. The stimulus does not drive a response, it triggers a transition, and the network stays "
+          "in the new state afterwards. Before the odour the network is exactly silent.")
+        w()
+    else:
+        w("**Not run.**")
+        w()
+    if s3bi:
+        w(f"**How little input does it take?** {s3bi['finding']}")
+        w()
+        w("| receptor neurons driven | probability of ignition | rate during stimulus | rate after |")
+        w("|---|---|---|---|")
+        for g in s3bi["grid"]:
+            w(f"| {g['n_driven']} | {g['fraction_ignited']:.0%} | {g['pop_rate_odor_mean']:.4f} Hz/neuron | {g['pop_rate_post_mean']:.4f} Hz/neuron |")
+        w()
+    w("## Stage 3c - is the runaway the model, or this dataset?")
+    w()
+    if s3c:
+        w(f"{s3c['finding']}")
+        w()
+        w("| network | neurons | drive | probability of ignition | Kenyon cells responding | neurons active | rate during | rate after |")
+        w("|---|---|---|---|---|---|---|---|")
+        for g in s3c["grid"]:
+            w(f"| {g['condition']} | {g['n_neurons']:,} | {int(g['rate_hz'])} Hz | {g['frac_ignited']:.0%} | {g['frac_kc_odor']:.1%} | "
+              f"{g['n_active_odor']:.0f} | {g['pop_rate_odor']:.4f} | {g['pop_rate_post']:.4f} |")
+        w()
+    else:
+        w("**Not run.**")
+        w()
     for name, obj, title in [("Stage 3", s3, "Stage 3 - dopamine-gated plasticity"),
                              ("Stage 4", s4, "Stage 4 - encoding a memory"),
                              ("Stage 5", s5, "Stage 5 - the sleep state"),

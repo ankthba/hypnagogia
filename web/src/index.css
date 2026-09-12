@@ -77,6 +77,9 @@
   --measure-wide: 1400px;
   --gutter: var(--space-md);
 
+  /* Width of the sticky right-hand rail that carries the neuron map. */
+  --rail-w: 380px;
+
   --transition-fast: 0.15s ease;
 
   color-scheme: light;
@@ -314,12 +317,57 @@ a.masthead__name:hover {
    multi-column tables use the whole of it, and headings and their hairline rules span it.
    Only running prose is held to the reading measure, and it starts at the left edge of the
    page rather than floating in the centre of it. */
-.page {
+/* The body of every page: content on the left, the neuron map in the rail on the right.
+   Both tracks are minmax(0, ...) so a canvas or a scrolling table inside either can never push
+   the document wider than the viewport. Below 1100px the rail is a normal full-width block
+   underneath the content. */
+.shell {
   flex: 1;
   width: 100%;
   max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: var(--space-lg) var(--gutter) var(--space-xl);
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: start;
+}
+
+.page {
+  min-width: 0;
+  width: 100%;
+  padding: var(--space-lg) 0 var(--space-xl);
+}
+
+.rail {
+  min-width: 0;
+  width: 100%;
+  padding: 0 0 var(--space-lg);
+}
+
+@media (min-width: 1100px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--rail-w));
+    column-gap: var(--space-md);
+  }
+
+  /* Sticky beside the text. The masthead scrolls away with the page, so the offset is a small
+     margin rather than a nav height; the rail keeps its own scrollbar when it is taller than
+     the viewport. */
+  .rail {
+    position: sticky;
+    top: var(--space-sm);
+    max-height: calc(100svh - 2 * var(--space-sm));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-lg) 0 var(--space-sm);
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --rail-w: 420px;
+  }
 }
 
 .measure {
@@ -439,19 +487,13 @@ a.masthead__name:hover {
   margin-right: 0;
 }
 
-/* Side-by-side content wherever the wide page leaves room (map beside raster, etc.).
-   Both tracks are minmax(0, 1fr) so a canvas or a scrolling table inside a column can
-   never push the page wider than the viewport. */
+/* Side-by-side content wherever the main column leaves room. auto-fit rather than a viewport
+   media query, because the main column is now narrower than the window: the pair splits when the
+   column itself is wide enough, and stacks when it is not. */
 .cols-2 {
   display: grid;
   gap: var(--space-md);
-  grid-template-columns: minmax(0, 1fr);
-}
-
-@media (min-width: 1100px) {
-  .cols-2 {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
 }
 
 .page .prose p,
@@ -1012,7 +1054,251 @@ pre.equations {
 }
 
 /* ---------------------------------------------------------
-   9. Responsive & motion
+   10. Neuron-map rail panel
+   --------------------------------------------------------- */
+
+/* An instrument beside the text, not a hero image: a hairline box, no shadow, no fill. */
+.map-panel {
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 0.9rem 0.9rem 0.75rem;
+  background: var(--color-bg);
+}
+
+.map-panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.map-panel canvas {
+  max-width: 100%;
+}
+
+.legend--tight {
+  gap: 0.15rem 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.map-panel__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.map-panel__controls .segmented {
+  font-size: 0.9rem;
+  gap: 0.85rem;
+}
+
+.map-panel__play {
+  font-size: 0.85rem;
+  padding: 0.1rem 0.55rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.map-panel__select {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.map-panel__select select {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.map-panel__source {
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.map-panel__source p {
+  margin-top: 0.35rem;
+  max-width: none;
+}
+
+.map-panel__title {
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.3;
+  color: var(--color-fg);
+}
+
+.map-panel__facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.1rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.map-panel__facts dt {
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+}
+
+.map-panel__facts dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.map-panel .provenance {
+  margin-top: 0.6rem;
+  overflow-wrap: anywhere;
+}
+
+/* The not-run panel inside the rail must not keep the prose measure. */
+.map-panel .notrun {
+  max-width: none;
+}
+
+.colophon__switches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.5rem;
+}
+
+/* ---------------------------------------------------------
+   11. The fly (decoration)
+   --------------------------------------------------------- */
+
+/* Fixed to the viewport, never interactive, and painted *behind* the page content: z-index -1
+   puts it above the page background and below everything in normal flow, so it cannot cover a
+   control or a number. */
+.fly {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.fly svg {
+  display: block;
+  overflow: visible;
+}
+
+.fly__abdomen {
+  fill: #2b2724;
+}
+
+.fly__thorax {
+  fill: #453d36;
+}
+
+.fly__scutellum {
+  fill: #5a5047;
+}
+
+.fly__head {
+  fill: #3a332d;
+}
+
+.fly__bands {
+  fill: none;
+  stroke: #6d6258;
+  stroke-width: 0.7;
+  opacity: 0.55;
+}
+
+.fly__eye {
+  fill: #a8322a;
+}
+
+.fly__glint {
+  fill: #e0857c;
+  opacity: 0.75;
+}
+
+.fly__legs {
+  fill: none;
+  stroke: #2b2724;
+  stroke-width: 0.85;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fly__arista {
+  fill: none;
+  stroke: #2b2724;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+
+.fly__wings ellipse {
+  fill: #e8eef2;
+  fill-opacity: 0.42;
+  stroke: #9aa7ae;
+  stroke-width: 0.4;
+  stroke-opacity: 0.55;
+}
+
+.fly__wing {
+  transform-box: view-box;
+  transform-origin: 21px 16px;
+}
+
+/* Fast flapping, hinged at the thorax. Stopped while the fly is sitting. */
+.fly__wings[data-flying='true'] .fly__wing--upper {
+  animation: fly-wing-upper 0.06s linear infinite;
+}
+
+.fly__wings[data-flying='true'] .fly__wing--lower {
+  animation: fly-wing-lower 0.06s linear infinite;
+}
+
+@keyframes fly-wing-upper {
+  0%,
+  100% {
+    transform: rotate(-13deg);
+  }
+  50% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes fly-wing-lower {
+  0%,
+  100% {
+    transform: rotate(13deg);
+  }
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
+/* The fly is decoration; a browser asking for reduced motion does not get one at all (the Layout
+   also refuses to mount it, this is the belt to that's braces). */
+@media (prefers-reduced-motion: reduce) {
+  .fly {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   12. Responsive & motion
    --------------------------------------------------------- */
 
 @media (max-width: 640px) {

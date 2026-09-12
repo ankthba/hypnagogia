@@ -116,16 +116,16 @@
   {
    "name": "spontaneous_ignition",
    "title": "Spontaneous ignition (whole-brain runaway)",
-   "description": "Background membrane noise only, at the amplitude where the network ignites. This is the model's only self-sustaining spontaneous state, and the stage 2 result is that it is not biologically plausible: about three quarters of Kenyon cells end up firing above 30 Hz.",
+   "description": "Background membrane noise only, at an amplitude above the ignition threshold measured in stage 2. This is the model's only self-sustaining spontaneous state, and the stage 2 result is that it is not biologically plausible: about three quarters of Kenyon cells end up firing above 30 Hz.",
    "file": "clips/spontaneous_ignition.json",
-   "duration_s": 8.0,
-   "n_spikes_total": 1383,
-   "n_spikes_exported": 1383,
-   "downsampled": false,
-   "sigma_mV": 1.6,
+   "duration_s": 10.0,
+   "n_spikes_total": 5153197,
+   "n_spikes_exported": 300000,
+   "downsampled": true,
+   "sigma_mV": 2.0,
    "seed": 13,
    "n_neurons_simulated": 144209,
-   "n_active_neurons": 1646,
+   "n_active_neurons": 89833,
    "epochs": [
     {
      "name": "warmup",
@@ -136,7 +136,7 @@
     {
      "name": "spontaneous",
      "t_start_s": 0.5,
-     "t_end_s": 8.5,
+     "t_end_s": 10.5,
      "drives": {}
     }
    ],
@@ -150,5 +150,5 @@
   }
  ],
  "note": "Real simulations of this model, not demonstrations. Each was run by scripts/07_reference_clips.py with configs/reference_clips.yaml and carries its own provenance. The map plays one of these only when the replay stage has no activity of its own, and always says which simulation is on screen.",
- "walltime_s": 0.0
+ "walltime_s": 219.9
 }

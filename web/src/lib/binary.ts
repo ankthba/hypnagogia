@@ -25,12 +25,52 @@ export interface AtlasData {
   xUm: Float32Array;
   yUm: Float32Array;
   zUm: Float32Array;
-  /** group code per atlas row; the label is sidecar.groups[code] */
-  group: Uint8Array;
+  /** group code per atlas row (uint16, as the contract and the writer declare it); the label is sidecar.groups[code] */
+  group: Uint16Array;
   /** label per group code, from the sidecar (index = code) */
   groupLabels: string[];
   lo: [number, number, number];
   hi: [number, number, number];
+}
+
+/**
+ * Whether an activity (or clip) file can be shown to index the atlas that is loaded.
+ *
+ * `atlas_row` values are plain row numbers: a file exported against a different atlas still lands in
+ * range and still lights real somata, just the wrong ones, so an out-of-range check cannot catch it.
+ * The only thing that can is the identity the exporter stamps into both sidecars.
+ */
+export type IdentityCheck =
+  | { state: 'verified' }
+  | { state: 'unverified'; message: string }
+  | { state: 'mismatch'; message: string };
+
+export function checkAtlasIdentity(sidecar: ActivitySidecar, atlas: AtlasData): IdentityCheck {
+  const rows = sidecar.n_atlas_rows;
+  const fp = sidecar.atlas_fingerprint;
+  const atlasFp = atlas.sidecar.atlas_fingerprint;
+  if (typeof rows === 'number' && rows !== atlas.n) {
+    return {
+      state: 'mismatch',
+      message: `the spike file was exported against an atlas of ${rows} rows, but neuron_atlas.bin holds ${atlas.n}; its atlas_row values would light the wrong neurons`,
+    };
+  }
+  if (typeof fp === 'string' && typeof atlasFp === 'string' && fp !== atlasFp) {
+    return {
+      state: 'mismatch',
+      message: `the spike file names atlas ${fp} but the loaded neuron_atlas.json is ${atlasFp}; the atlas was re-exported since these spikes were written, so their atlas_row values index a different row order`,
+    };
+  }
+  if (typeof rows !== 'number' && typeof fp !== 'string') {
+    return {
+      state: 'unverified',
+      message: 'the spike sidecar carries neither n_atlas_rows nor atlas_fingerprint, so nothing ties its atlas_row values to this atlas',
+    };
+  }
+  if (typeof fp === 'string' && typeof atlasFp !== 'string') {
+    return { state: 'unverified', message: 'neuron_atlas.json carries no atlas_fingerprint, so the spike file\'s own fingerprint cannot be checked against it' };
+  }
+  return { state: 'verified' };
 }
 
 /** Activity: spikes as (t_ms, atlas_row), sorted ascending in time so a window is a range. */
@@ -153,6 +193,11 @@ export async function loadTrace(sidecarPath: string): Promise<BinLoad<TraceData>
     if (typeof sc.data.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
     binPath = dirOf(sidecarPath) + sc.data.bin;
     if (sc.data.dtype !== 'float32') return fail(binPath, `unexpected dtype ${JSON.stringify(sc.data.dtype)} (contract: float32)`);
+    // dt_s is the trace's bin width; without it the time axis has no length, so it is reported rather
+    // than silently treated as 0 (which would collapse every bin onto t = 0).
+    if (typeof sc.data.dt_s !== 'number' || !Number.isFinite(sc.data.dt_s) || sc.data.dt_s <= 0) {
+      return fail(sidecarPath, `dt_s missing or not a positive number in the sidecar: ${JSON.stringify(sc.data.dt_s)} (contract: the bin width in seconds)`);
+    }
     const buf = await fetchBinary(binPath);
     if (!buf) return fail(binPath, `${binPath} not found`, true);
     const layout = checkLayout(sc.data, buf, TRACE_COLUMNS, binPath);
@@ -200,7 +245,7 @@ export async function loadAtlas(sidecarPath = 'neuron_atlas.json'): Promise<BinL
     const xUm = new Float32Array(nRows);
     const yUm = new Float32Array(nRows);
     const zUm = new Float32Array(nRows);
-    const group = new Uint8Array(nRows);
+    const group = new Uint16Array(nRows);
     const sx = (q.hi_um[0] - q.lo_um[0]) / q.scale;
     const sy = (q.hi_um[1] - q.lo_um[1]) / q.scale;
     const sz = (q.hi_um[2] - q.lo_um[2]) / q.scale;

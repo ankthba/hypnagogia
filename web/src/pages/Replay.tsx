@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useDataFile } from '../lib/data';
-import { loadRaster, loadTrace, rasterMaxTimeMs, type ActivityData, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
+import { checkAtlasIdentity, loadRaster, loadTrace, rasterMaxTimeMs, type ActivityData, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
 import type { Comparison, Manifest, Stage5, Stage6 } from '../types';
 import StageGate from '../components/StageGate';
 import StatusBanner from '../components/StatusBanner';
@@ -14,6 +14,7 @@ import NotRunPanel from '../components/NotRunPanel';
 import BrainMap, { AtlasCaption, atlasProvenance, useActivity, useAtlas, type Loadable } from '../components/BrainMap';
 import type { AtlasData } from '../lib/binary';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
+import { usePublishReplayActivity } from '../lib/mapSource';
 
 type Cond = 'sleep' | 'wake';
 
@@ -29,13 +30,17 @@ interface Timeline {
   setPlaying: (v: boolean) => void;
   maxStart: number;
   durationS: number;
+  /** false when no loaded file reports a duration; the controls then say so instead of showing one */
+  durationKnown: boolean;
 }
 
 /**
  * The single clock of the Replay page. It was previously private to the raster; it is lifted here
  * so the raster, the correlation trace and the brain map are scrubbed and played together.
  */
-function useTimeline(durationS: number): Timeline {
+function useTimeline(duration: number | null): Timeline {
+  const durationKnown = duration !== null && Number.isFinite(duration) && duration > 0;
+  const durationS = durationKnown ? (duration as number) : 0;
   const [windowS, setWindowS] = useState(2);
   const [start, setStart] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -69,12 +74,12 @@ function useTimeline(durationS: number): Timeline {
     return () => cancelAnimationFrame(raf);
   }, [playing, maxStart]);
 
-  return { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS };
+  return { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS, durationKnown };
 }
 
 /** Play / pause, scrubber and window length: one set of controls for every panel below it. */
 function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled: boolean }) {
-  const { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS } = timeline;
+  const { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS, durationKnown } = timeline;
   return (
     <div className="card">
       <div className="flex flex-wrap items-center gap-3 small">
@@ -103,7 +108,14 @@ function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled
           disabled={disabled}
         />
         <span className="tabular-nums muted">
-          {fmtNum(start, 2)} – {fmtNum(start + windowS, 2)} s / {fmtNum(durationS, 2)} s
+          {durationKnown ? (
+            <>
+              {fmtNum(start, 2)} – {fmtNum(start + windowS, 2)} s / {fmtNum(durationS, 2)} s
+            </>
+          ) : (
+            /* no raster, trace or activity file reports a duration: none is shown rather than a made-up one */
+            <span className="tone-failed">duration unknown: no loaded file reports one</span>
+          )}
         </span>
         <label className="flex items-center gap-2 muted">
           window
@@ -128,7 +140,9 @@ function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled
  * The map figure: the atlas when it exists, and the explicit missing-file panel for whichever of
  * the two files is absent. It never draws a map from anything but the files it names.
  */
-function BrainMapBlock({
+const ACTIVITY_PATTERN = 'replay/activity_<condition>_seed<k>.json';
+
+function BrainMapBlockInner({
   activity,
   activityPath,
   timeMs,
@@ -136,8 +150,12 @@ function BrainMapBlock({
   height,
 }: {
   activity: Loadable<ActivityData> | null;
-  /** the activity sidecar this map would animate from; named in the panel when it is absent */
-  activityPath: string;
+  /**
+   * The concrete activity sidecar this map would animate from, named in the panel when it is absent.
+   * `null` means no concrete file is identified yet (stage 6 has listed no seed), and the panel then
+   * shows the naming convention labelled as one rather than a path with a placeholder in it.
+   */
+  activityPath: string | null;
   timeMs: number | null;
   decayMs: number;
   height?: number;
@@ -173,14 +191,20 @@ function BrainMapBlock({
       {activity === null && (
         <div className="mb-3">
           <NotRunPanel
-            file={activityPath}
+            file={activityPath ?? undefined}
+            filePattern={activityPath === null ? ACTIVITY_PATTERN : undefined}
+            patternSource={
+              <>
+                the <span className="mono">rasters[]</span> / <span className="mono">traces[]</span> entries of{' '}
+                <span className="mono">stage6_replay.json</span>, which list the conditions and seeds that exist
+              </>
+            }
             script="scripts/06_replay.py"
-            reason="not_run"
+            reason={activityPath === null ? 'unnamed' : 'not_run'}
             title="Brain-map activity"
             note={
               <span>
-                No activity sidecar is loaded, so nothing on the map is lit. The condition and seed of the file to load come from{' '}
-                <span className="mono">stage6_replay.json</span>; the populations below are the atlas itself and are real.
+                No activity sidecar is loaded, so nothing on the map is lit. The populations below are the atlas itself and are real.
               </span>
             }
           />
@@ -196,7 +220,8 @@ function BrainMapBlock({
             title="Brain-map activity for this condition and seed"
             note={
               <span>
-                The populations below are the real atlas; nothing is lit because the spikes that would light them have not been exported.{' '}
+                The populations below are the real atlas; nothing is lit, because the spikes that would light them{' '}
+                {activity.missing ? 'have not been exported' : 'were not usable'}.{' '}
                 {!activity.missing && <span className="tone-failed mono">{activity.message}</span>}
               </span>
             }
@@ -207,6 +232,9 @@ function BrainMapBlock({
     </Figure>
   );
 }
+
+/** Memoised so the play loop's clock, which lives below, cannot re-render the whole figure. */
+const BrainMapBlock = memo(BrainMapBlockInner);
 
 /** What the stage's status enum means for the memory claim; the raw string is shown for any value outside the contract. */
 function statusSentence(status: Stage6['status'] | string): string {
@@ -327,6 +355,12 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
   const activityPath = seed !== null ? `replay/activity_${cond}_seed${seed}.json` : null;
   const activity = useActivity(activityPath);
   const act = activity !== null && activity.state === 'ready' ? activity.data : null;
+
+  // Hand the loaded activity to the persistent map panel in the rail. The contract gives this file
+  // priority over the reference clips: while it is loaded the panel plays the replay result and
+  // stops offering clips. Publishing nothing (no file for this seed/condition) leaves the panel on
+  // a reference clip, which it labels as such.
+  usePublishReplayActivity(act && activityPath && seed !== null ? { path: activityPath, condition: cond, seed, data: act } : null);
 
   const rasterData = raster !== null && raster !== 'loading' && raster.ok ? raster.data : null;
   const traceData = trace !== null && trace !== 'loading' && trace.ok ? trace.data : null;

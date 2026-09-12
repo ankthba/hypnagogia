@@ -340,9 +340,14 @@ export interface AtlasSidecar {
   n_without_soma_position: number;
   n_without_soma_position_by_group: Record<string, number>;
   subsampled: boolean;
+  /** neurons that HAVE a soma position, i.e. the population `subsampled` was decided against */
+  n_with_soma_position?: number;
   soma_outside_brain_note: string;
   source: string;
   row_to_sim_index?: string;
+  /** identity of this row numbering (sha256 of neuron_atlas_index.bin); absent in atlases exported before it existed */
+  atlas_fingerprint?: string;
+  n_atlas_rows?: number;
 }
 
 /** `replay/activity_<condition>_seed<k>.json`: whole-brain spikes for the map animation. */
@@ -358,6 +363,12 @@ export interface ActivitySidecar {
   n_spikes_exported: number;
   downsampled: boolean;
   downsample_note?: string;
+  /**
+   * Identity of the atlas whose rows `atlas_row` indexes, written by scripts/export_web.py. Absent in
+   * files exported before it existed, which is why the viewer distinguishes "unverified" from "matches".
+   */
+  n_atlas_rows?: number;
+  atlas_fingerprint?: string;
 }
 
 export interface RasterSidecar {
@@ -399,7 +410,8 @@ export interface ReferenceClip {
   n_neurons_simulated: number;
   n_active_neurons: number;
   epochs?: ReferenceClipEpoch[];
-  provenance: Provenance & { results_dir?: string };
+  /** the clip's own provenance block; it carries no git_commit of its own, the manifest's is used */
+  provenance: { config: string; results_dir?: string; files: string[]; git_commit?: string; generated_at?: string };
 }
 
 export interface ReferenceClipsFile {
