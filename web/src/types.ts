@@ -401,6 +401,8 @@ export interface Stage6 extends StageBase {
   gain?: number;
   gain_note?: string;
   metric_note?: string;
+  /** mean odour-A ensemble size per network and condition, written by scripts/06_replay.py */
+  ensemble_sizes?: Record<string, { sleep?: number; wake?: number; sleep_naive?: number }>;
   per_seed: Stage6PerSeed[];
   traces: { seed: number; condition: string; file: string }[];
   rasters: { seed: number; condition: string; file: string }[];

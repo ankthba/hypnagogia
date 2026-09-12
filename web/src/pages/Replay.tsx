@@ -571,6 +571,30 @@ function Stage6View({ d }: { d: Stage6 }) {
         <ForestPlot comparisons={comparisons} required={d.required_four} note={d.fifth_comparison_note} />
       </Figure>
 
+      {d.ensemble_sizes && Object.keys(d.ensemble_sizes).length > 0 && (
+        <div className="card">
+          <div className="label label--ink mb-2">How big the ensembles being compared actually are</div>
+          <p className="smaller muted measure">
+            The template correlation depends on how many Kenyon cells the template holds, so two networks whose
+            ensembles differ in size cannot be compared on the raw metric. This is why the four required comparisons use
+            the z-score against size-matched random ensembles drawn from the same run. The sizes are printed here so the
+            size difference the standardisation is correcting for is visible rather than implied.
+          </p>
+          <DataTable
+            columns={[
+              { key: 'n', header: 'network', render: (r) => r.network },
+              { key: 's', header: 'sleep', render: (r) => (isNum(r.sleep) ? fmtNum(r.sleep, 1) : NOT_MEASURED) },
+              { key: 'w', header: 'wake', render: (r) => (isNum(r.wake) ? fmtNum(r.wake, 1) : NOT_MEASURED) },
+              { key: 'sn', header: 'sleep, unlearned weights', render: (r) => (isNum(r.sleep_naive) ? fmtNum(r.sleep_naive, 1) : NOT_MEASURED) },
+            ]}
+            rows={Object.entries(d.ensemble_sizes).map(([network, v]) => ({ network, ...v }))}
+            rowKey={(r) => r.network}
+            empty="the stage file lists no ensemble sizes"
+          />
+          <ProvenanceFooter provenance={d.provenance} />
+        </div>
+      )}
+
       <div className="card">
         <div className="label label--ink mb-2">Comparison values</div>
         <DataTable<CompRow>
