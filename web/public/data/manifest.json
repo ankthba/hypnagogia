@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T02:11:46+00:00",
- "git_commit": "f44e209",
+ "generated_at": "2026-09-12T04:58:22+00:00",
+ "git_commit": "b95f2f5",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -226,16 +226,22 @@
    "source_file": "results/stage3_plasticity_gain0.6/stage3.json"
   },
   "stage4_learning": {
-   "status": "not_run",
+   "status": "passed",
    "file": "stage4_learning.json",
    "title": "Stage 4 - Learning",
-   "summary": "not run"
+   "summary": "MBON11 response to odour A must fall relative to odour B from before to after conditioning: the paired difference of deltas (deltaA - deltaB) must be negative w",
+   "gain": 0.6,
+   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value there is no sparse odour code to store a memory in (stage 3b) and two odours leave indistinguishable ensembles (stage 3e).",
+   "source_file": "results/stage4_learning/real_gain0.6/stage4.json"
   },
   "stage5_sleep": {
-   "status": "not_run",
+   "status": "passed",
    "file": "stage5_sleep.json",
    "title": "Stage 5 - Sleep",
-   "summary": "not run"
+   "summary": "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC ",
+   "gain": 0.6,
+   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value (stage 3b/3d).",
+   "source_file": "results/stage5_sleep/real_gain0.6/stage5.json"
   },
   "stage6_replay": {
    "status": "not_run",

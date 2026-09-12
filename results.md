@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T02:11:45+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T04:58:24+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -275,11 +275,33 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 
 ## Stage 4 - encoding a memory
 
-**Not run.**
+**passed.** Criterion: MBON11 response to odour A must fall relative to odour B from before to after conditioning: the paired difference of deltas (deltaA - deltaB) must be negative with a 95% CI excluding 0 across >= 20 seeds
+
+**Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value there is no sparse odour code to store a memory in (stage 3b) and two odours leave indistinguishable ensembles (stage 3e).
+
+*Membrane potentials and synaptic conductances are reset to rest before every odour presentation; learned weights are not. The model never returns to baseline on its own (stage 3b), so without this the second odour would be delivered into the first odour's ongoing activity and every later measurement would be contaminated.*
+
+- Learning verified: **True**.
+- Output-neuron response to the trained odour A went from 16.95 to 0.00 Hz; to the control odour B from 0.00 to 0.00 Hz.
+- Difference of changes (A minus B): -16.950 Hz, 95% CI [-18.800, -15.200], Hedges' g = -3.84, permutation p = 0.0000, over 20 seeds.
+- The control odour never drove the readout MBON before conditioning (mean 0.00 Hz), so 'no change in the control' is a floor effect and carries no information. The specificity of the plasticity is therefore established synaptically instead: see synaptic_specificity, which splits the weight change by which odour drove the presynaptic Kenyon cell.
 
 ## Stage 5 - the sleep state
 
-**Not run.**
+**passed.** Criterion: both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)
+
+**Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value (stage 3b/3d).
+
+*Membrane potentials and synaptic conductances are reset to rest at the start of the offline period; learned synaptic weights are not touched. The model has no adaptation or short-term depression, so once conditioning has pushed it into its self-sustaining state it never returns to baseline (stage 3b). Without the reset the offline period would inherit the conditioning activity and any apparent reactivation would be persistence, not replay. The 'carryover' epoch measures the state that was discarded, so the size of that confound is on the record.*
+
+| condition | population rate | Kenyon-cell rate | output-neuron rate | dFB rate |
+|---|---|---|---|---|
+| sleep | 0.9622 Hz | 2.3112 Hz | 5.4706 Hz | 16.92 Hz |
+| wake | 0.9543 Hz | 2.3165 Hz | 5.5001 Hz | 0.01 Hz |
+| sleep_naive | 0.9670 Hz | 2.3764 Hz | 6.6385 Hz | 16.92 Hz |
+
+- The dFB population is 32 neurons of types FB6A_a, FB6A_b, FB6A_c, FB6C_a, FB6C_b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K. Hulse et al. 2021 eLife 10:e66039 Fig. 48 (R23E10 -> FB6A, FB6C_a/b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K)
+- Clamp rate: 17.0 Hz. no dFB firing rate exists in the literature (Donlea 2014 / Pimentel 2016 report a binary ON/OFF switch); 17 Hz is taken from the UP state of the connected helicon cells ExR1, 16.9 +/- 3.6 Hz (Donlea et al. 2018 Neuron 97:378) - an approximation, not a dFB measurement
 
 ## Stage 6 - the replay test
 

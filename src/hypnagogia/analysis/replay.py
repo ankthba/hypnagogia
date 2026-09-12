@@ -65,52 +65,61 @@ def coactivation(M: np.ndarray, members: np.ndarray) -> float:
 
 def sequence_score(i: np.ndarray, t_step: np.ndarray, dt_s: float, members: np.ndarray, order_rank: np.ndarray,
                    events: list[tuple[float, float]], n_shuffle: int = 200, seed: int = 0) -> dict:
-    """Spearman rho between within-event first-spike order and the template order, averaged over events,
-    with a cell-identity shuffle null."""
+    """Spearman rho between within-event first-spike order and the template order, averaged over events, with a
+    cell-identity shuffle null.
+
+    The per-event first-spike times are extracted ONCE and reused for every shuffle; only the rank assignment is
+    permuted. Recomputing them inside the shuffle loop makes this quadratic in the number of events and was the
+    dominant cost of the whole replay analysis.
+    """
     rng = np.random.default_rng(seed)
-    pos = {int(m): k for k, m in enumerate(members)}
-    rhos = []
+    pos = np.full(int(members.max()) + 2, -1, dtype=np.int64) if len(members) else np.zeros(1, dtype=np.int64)
+    if len(members):
+        pos[members] = np.arange(len(members))
+    t = t_step.astype(np.float64) * dt_s
+    keep = np.isin(i, members)
+    ii, tt = i[keep], t[keep]
+    order_t = np.argsort(tt, kind="stable")
+    ii, tt = ii[order_t], tt[order_t]
+
+    # one pass per event: the member index and first spike time of each participating neuron
+    per_event = []
     for (a, b) in events:
-        t = t_step.astype(np.float64) * dt_s
-        m = (t >= a) & (t < b) & np.isin(i, members)
-        if m.sum() < 4:
+        lo, hi = np.searchsorted(tt, a), np.searchsorted(tt, b)
+        if hi - lo < 4:
             continue
-        first = {}
-        for nid, tt in zip(i[m], t[m]):
-            if nid not in first or tt < first[nid]:
-                first[nid] = tt
-        if len(first) < 4:
+        ev_i, ev_t = ii[lo:hi], tt[lo:hi]
+        # spikes are time-sorted, so the first occurrence of each neuron is its first spike
+        _, first_idx = np.unique(ev_i, return_index=True)
+        rows = pos[ev_i[first_idx]]
+        times = ev_t[first_idx]
+        ok = rows >= 0
+        if ok.sum() < 4:
             continue
-        ids = np.array(list(first)); times = np.array([first[x] for x in ids])
-        ranks = np.array([order_rank[pos[int(x)]] for x in ids])
-        if len(np.unique(ranks)) < 3:
-            continue
-        rhos.append(float(stats.spearmanr(times, ranks).statistic))
+        per_event.append((rows[ok], times[ok]))
+    if not per_event:
+        return {"rho_mean": None, "n_events_scored": 0, "p": None,
+                "note": "no event had at least four ensemble members with distinct template ranks"}
+
+    def score(ranks_of_member: np.ndarray) -> list[float]:
+        out = []
+        for rows, times in per_event:
+            r = ranks_of_member[rows]
+            if len(np.unique(r)) < 3:
+                continue
+            out.append(float(stats.spearmanr(times, r).statistic))
+        return out
+
+    rhos = score(order_rank)
     if not rhos:
-        return {"rho_mean": None, "n_events_scored": 0, "p": None, "note": "no event had >= 4 ensemble members with distinct template ranks"}
+        return {"rho_mean": None, "n_events_scored": 0, "p": None,
+                "note": "no event had at least three distinct template ranks among its participating members"}
     obs = float(np.mean(np.abs(rhos)))
     null = []
     for _ in range(n_shuffle):
-        perm = rng.permutation(order_rank)
-        vals = []
-        for (a, b) in events:
-            t = t_step.astype(np.float64) * dt_s
-            m = (t >= a) & (t < b) & np.isin(i, members)
-            if m.sum() < 4:
-                continue
-            first = {}
-            for nid, tt in zip(i[m], t[m]):
-                if nid not in first or tt < first[nid]:
-                    first[nid] = tt
-            if len(first) < 4:
-                continue
-            ids = np.array(list(first)); times = np.array([first[x] for x in ids])
-            ranks = np.array([perm[pos[int(x)]] for x in ids])
-            if len(np.unique(ranks)) < 3:
-                continue
-            vals.append(abs(float(stats.spearmanr(times, ranks).statistic)))
-        if vals:
-            null.append(float(np.mean(vals)))
+        v = score(rng.permutation(order_rank))
+        if v:
+            null.append(float(np.mean(np.abs(v))))
     p = float((np.array(null) >= obs).mean()) if null else None
     return {"rho_mean": float(np.mean(rhos)), "rho_abs_mean": obs, "n_events_scored": len(rhos), "p": p,
             "null_mean": (float(np.mean(null)) if null else None), "n_shuffle": len(null)}
