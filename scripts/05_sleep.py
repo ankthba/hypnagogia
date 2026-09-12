@@ -31,6 +31,11 @@ def main():
                          "MECHANISM_DEVIATIONS['short_term_depression_excitatory'] and scripts/13_depression.py. "
                          "SCOPE is one of the arms 13_depression.py defines. Requires --tag, so that a deviated "
                          "arm can never be written over the published one.")
+    ap.add_argument("--adaptation", default=None, metavar="TAU_MS:B_MV",
+                    help="run the offline period with spike-triggered adaptation, a LABELLED DEVIATION whose "
+                         "two constants have no measurement behind them and are therefore SCANNED by "
+                         "scripts/12_adaptation.py, not chosen: see "
+                         "MECHANISM_DEVIATIONS['spike_frequency_adaptation']. Requires --tag.")
     a = ap.parse_args()
     cfg = load_config("stage5_sleep"); s5 = cfg["stage5"]; s4 = cfg["stage4"]
     cfg = with_deviations(cfg)
@@ -70,6 +75,22 @@ def main():
         dep_note = (s13.BANNER + f" Scope arm: {scope_name} ({sc['what']}). Applied to the offline period only; "
                     f"the memory was encoded by stage 4 in the model as published.")
         print(dep_note, flush=True)
+    if a.adaptation:
+        if not a.tag:
+            raise SystemExit("--adaptation requires --tag: a deviated arm must not overwrite the published one")
+        from hypnagogia.populations import MECHANISM_DEVIATIONS
+        dev = MECHANISM_DEVIATIONS["spike_frequency_adaptation"]
+        tau_str, b_str = a.adaptation.split(":")
+        c["adaptation"] = {"tau_ms": float(tau_str), "b_mV": float(b_str),
+                           "deviation": "spike_frequency_adaptation", "status": dev["status"]}
+        note = ("LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered "
+                f"adaptation term with tau = {tau_str} ms and b = {b_str} mV. "
+                + dev["why_it_is_a_deviation_and_not_a_correction"] + " " + dev["how_it_must_be_reported"]
+                + " This operating point was selected from the scan in scripts/12_adaptation.py as the one "
+                  "at which the trained ensemble switches on and off repeatedly; that selection is itself "
+                  "part of the deviation and is stated wherever these numbers are.")
+        dep_note = note if dep_note is None else dep_note + " ALSO: " + note
+        print(note, flush=True)
     pl = cfg["plasticity"]; p = {k: v for k, v in pl.items() if k not in ("pre", "post", "dan")}
     p["eta_ltd"] = eta; p["pre"], p["post"], p["dan"] = pl["pre"], pl["post"], pl["dan"]
     specs = []
@@ -351,7 +372,10 @@ def main():
         # The label goes in the result file, not only in the console: anything read out of this directory
         # has to carry the deviation with it.
         out_d["IS_A_LABELLED_DEVIATION"] = dep_note
-        out_d["depression"] = {k: v for k, v in c["depression"].items() if k not in ("pre_idx", "post_idx")}
+        if "depression" in c:
+            out_d["depression"] = {k: v for k, v in c["depression"].items() if k not in ("pre_idx", "post_idx")}
+        if "adaptation" in c:
+            out_d["adaptation"] = c["adaptation"]
     json.dump(out_d, open(out / "stage5.json", "w"), indent=1, default=str)
     if tag == "real":
         json.dump(out_d, open(OUT / "stage5.json", "w"), indent=1, default=str)

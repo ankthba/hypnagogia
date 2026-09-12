@@ -1,0 +1,775 @@
+{
+ "status": "failed",
+ "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Excitatory synapses depress with use. The two constants are measured (ORN->PN, glomeruli DM6 and VM2: f=0.78, tau=893 ms; ORN->LN (GABAergic antennal-lobe local neurons): f=0.75, tau=1566 ms; ORN->PN, glomerulus DM4: f=0.72, tau=2400 ms). The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding depression changes what a synapse is, so no run with it switched on is a property of the published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. Applying the same two constants to any other synapse is an extrapolation the measurements do not license, which is why the scope is an arm of the experiment and not a setting.",
+ "deviation": {
+  "what": "Make excitatory synapses depress with use. Each arriving spike delivers the synapse's weight times a resource variable A and then multiplies A by f; between spikes A recovers exponentially toward 1 with time constant tau. Both constants are measured. Which synapses it is applied to is NOT measured, and is reported as an arm.",
+  "constants": {
+   "f": {
+    "what": "fraction of the releasable resource left after one spike",
+    "status": "measured"
+   },
+   "tau_ms": {
+    "what": "recovery time constant of the resource",
+    "status": "measured"
+   },
+   "scope": {
+    "what": "which synapses depress",
+    "status": "NOT MEASURED, reported as an arm"
+   }
+  },
+  "measurement": [
+   {
+    "synapse": "ORN->PN, glomeruli DM6 and VM2",
+    "f": 0.78,
+    "tau_ms": 893,
+    "n": "19 PNs from 19 flies",
+    "source": "Nagel KI, Hong EJ, Wilson RI (2015) Nature Neuroscience 18:56-65, DOI 10.1038/nn.3895, PMID 25485755. Fit to mean normalised EPSC amplitudes during a 10 Hz train."
+   },
+   {
+    "synapse": "ORN->LN (GABAergic antennal-lobe local neurons)",
+    "f": 0.75,
+    "tau_ms": 1566,
+    "n": "9 LNs",
+    "source": "Nagel KI, Wilson RI (2016) Journal of Neuroscience 36:4325-4338, DOI 10.1523/JNEUROSCI.3887-15.2016. Fit to mean normalised EPSC amplitudes during a 10 Hz train."
+   },
+   {
+    "synapse": "ORN->PN, glomerulus DM4",
+    "f": 0.72,
+    "tau_ms": 2400,
+    "n": "not stated in the entry",
+    "source": "Kazama H, Wilson RI (2009) Nature Neuroscience 12:1136-1144, DOI 10.1038/nn.2376, PMID 19684589."
+   }
+  ],
+  "status": "constants measured, scope declared",
+  "why_it_is_a_deviation_and_not_a_correction": "The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding depression changes what a synapse is, so no run with it switched on is a property of the published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. Applying the same two constants to any other synapse is an extrapolation the measurements do not license, which is why the scope is an arm of the experiment and not a setting.",
+  "how_it_must_be_reported": "The two constants are cited. The scope is stated in the same sentence as any number derived from it, and results are given for every scope arm run, not only the one that worked.",
+  "why_this_mechanism_for_this_failure": "Depression is rate-selective, and the offline state's problem is a rate. At the measured constants the steady-state weight scaling A* = (1 - exp(-1/(r*tau))) / (1 - f*exp(-1/(r*tau))) removes 94 to 99 per cent of the excitatory drive from the antennal-lobe populations that run away at 122 and 75 Hz, and 2 to 14 per cent from the Kenyon cells at 0.42 Hz whose reactivation is the thing being measured. Nothing was chosen to make that happen: it follows from the measured constants and the model's own measured rates. Depression also acts on the recurrent excitatory loop that carries the runaway, which is where a slow negative feedback has to act to turn a bistable switch into a relaxation oscillator."
+ },
+ "sigma_mV": 1.55,
+ "duration_s": 20.0,
+ "scopes_run": [
+  "orn_only",
+  "al_local",
+  "al_all"
+ ],
+ "scope_definitions": {
+  "orn_only": "exactly the synapses the constants were measured at: ORN onto antennal-lobe cells",
+  "al_local": "every excitatory synapse inside the antennal lobe, which is the loop that runs away",
+  "al_all": "every excitatory synapse onto an antennal-lobe cell, whatever the source",
+  "brain": "every excitatory synapse in the brain"
+ },
+ "fits_run": [
+  "0.78_893",
+  "0.75_1566",
+  "0.72_2400"
+ ],
+ "seeds": [
+  0
+ ],
+ "predicted_steady_state_scaling": {
+  "0.78_893": {
+   "ALLN": 0.04022803134240016,
+   "ALPN": 0.06400092680320364,
+   "KC": 0.9838303989193462,
+   "optic": 0.9999999999999999
+  },
+  "0.75_1566": {
+   "ALLN": 0.020560009828270727,
+   "ALPN": 0.03307132315175051,
+   "KC": 0.9346246605206303,
+   "optic": 0.9999999998575383
+  },
+  "0.72_2400": {
+   "ALLN": 0.012070868597224858,
+   "ALPN": 0.019508339273166406,
+   "KC": 0.8583564781266843,
+   "optic": 0.99999973981005
+  }
+ },
+ "n_runs_with_brain_episodes": 0,
+ "n_runs_with_ensemble_episodes": 0,
+ "per_run": [
+  {
+   "scope": "orn_only",
+   "fit": "0.78_893",
+   "f": 0.78,
+   "tau_ms": 893,
+   "seed": 0,
+   "n_pre": 2635,
+   "n_post": 1144,
+   "n_depressing_synapses": 156820,
+   "pop": {
+    "brain": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.012465267080224093,
+     "rate_hz": 1.8807494677863377
+    },
+    "KC": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.0679621457844916,
+     "rate_hz": 0.4274975393700787
+    },
+    "ALLN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.0039627652294135065,
+     "rate_hz": 126.62416666666664
+    },
+    "ALPN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.0057435960971245386,
+     "rate_hz": 78.45349854227405
+    },
+    "MBON": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.07906411455582563,
+     "rate_hz": 6.671134020618556
+    },
+    "ensemble": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.06235711589697197,
+     "rate_hz": 7.73153409090909,
+     "ratio_to_other_kcs": 79.81998020566792,
+     "corr_with_brain": -0.008786997677435904
+    }
+   }
+  },
+  {
+   "scope": "orn_only",
+   "fit": "0.75_1566",
+   "f": 0.75,
+   "tau_ms": 1566,
+   "seed": 0,
+   "n_pre": 2635,
+   "n_post": 1144,
+   "n_depressing_synapses": 156820,
+   "pop": {
+    "brain": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.011703281759901448,
+     "rate_hz": 1.8822635896511315
+    },
+    "KC": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.06899123868903605,
+     "rate_hz": 0.42883858267716535
+    },
+    "ALLN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.004280697751476765,
+     "rate_hz": 126.55845238095236
+    },
+    "ALPN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.005998749783049533,
+     "rate_hz": 78.45109329446063
+    },
+    "MBON": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.08017694561043014,
+     "rate_hz": 6.689690721649485
+    },
+    "ensemble": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.06325714383939686,
+     "rate_hz": 7.767613636363636,
+     "ratio_to_other_kcs": 80.38456699010331,
+     "corr_with_brain": 0.16965131559141475
+    }
+   }
+  },
+  {
+   "scope": "orn_only",
+   "fit": "0.72_2400",
+   "f": 0.72,
+   "tau_ms": 2400,
+   "seed": 0,
+   "n_pre": 2635,
+   "n_post": 1144,
+   "n_depressing_synapses": 156820,
+   "pop": {
+    "brain": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.013079802764935915,
+     "rate_hz": 1.8796635438842235
+    },
+    "KC": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.06701460198848234,
+     "rate_hz": 0.4275221456692913
+    },
+    "ALLN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.00389559606707343,
+     "rate_hz": 126.61619047619045
+    },
+    "ALPN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.006073087710414806,
+     "rate_hz": 78.42937317784258
+    },
+    "MBON": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.07126014118887872,
+     "rate_hz": 6.660824742268041
+    },
+    "ensemble": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.060545415746225975,
+     "rate_hz": 7.7460227272727264,
+     "ratio_to_other_kcs": 80.49321492352362,
+     "corr_with_brain": 0.19209382607797332
+    }
+   }
+  },
+  {
+   "scope": "al_local",
+   "fit": "0.78_893",
+   "f": 0.78,
+   "tau_ms": 893,
+   "seed": 0,
+   "n_pre": 1144,
+   "n_post": 1144,
+   "n_depressing_synapses": 104163,
+   "pop": {
+    "brain": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.26485558009424065,
+     "rate_hz": 0.30309412033922983
+    },
+    "KC": {
+     "frac_on": 0.0,
+     "n_episodes": 0,
+     "mean_s": 0.0,
+     "max_s": 0.0,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 0.9638520883725901,
+     "rate_hz": 0.0027928149606299213
+    },
+    "ALLN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.028009521851055486,
+     "rate_hz": 3.7977380952380946
+    },
+    "ALPN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.03168318700593624,
+     "rate_hz": 2.3392128279883377
+    },
+    "MBON": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.38611793920911913,
+     "rate_hz": 1.9061855670103092
+    },
+    "ensemble": {
+     "frac_on": 0.06,
+     "n_episodes": 11,
+     "mean_s": 0.10909090909090911,
+     "max_s": 0.2,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 3.958114029012639,
+     "rate_hz": 0.003409090909090909,
+     "ratio_to_other_kcs": 1.232980972515856,
+     "corr_with_brain": -0.002485744105522779
+    }
+   }
+  },
+  {
+   "scope": "al_local",
+   "fit": "0.75_1566",
+   "f": 0.75,
+   "tau_ms": 1566,
+   "seed": 0,
+   "n_pre": 1144,
+   "n_post": 1144,
+   "n_depressing_synapses": 104163,
+   "pop": {
+    "brain": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.2632515030161699,
+     "rate_hz": 0.29948026822181695
+    },
+    "KC": {
+     "frac_on": 0.0,
+     "n_episodes": 0,
+     "mean_s": 0.0,
+     "max_s": 0.0,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 1.0023509415932206,
+     "rate_hz": 0.002731299212598425
+    },
+    "ALLN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.027163245446345328,
+     "rate_hz": 3.7644047619047614
+    },
+    "ALPN": {
+     "frac_on": 1.0,
+     "n_episodes": 1,
+     "mean_s": 20.0,
+     "max_s": 20.0,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 0.035107784170942534,
+     "rate_hz": 2.290087463556851
+    },
+    "MBON": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.35524584553496213,
+     "rate_hz": 2.5592783505154637
+    },
+    "ensemble": {
+     "frac_on": 0.045,
+     "n_episodes": 8,
+     "mean_s": 0.1125,
+     "max_s": 0.2,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 4.606758320361751,
+     "rate_hz": 0.002556818181818182,
+     "ratio_to_other_kcs": 0.9334186939820744,
+     "corr_with_brain": 0.009101505240510887
+    }
+   }
+  },
+  {
+   "scope": "al_local",
+   "fit": "0.72_2400",
+   "f": 0.72,
+   "tau_ms": 2400,
+   "seed": 0,
+   "n_pre": 1144,
+   "n_post": 1144,
+   "n_depressing_synapses": 104163,
+   "pop": {
+    "brain": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.36973068175111296,
+     "rate_hz": 0.31585892697404455
+    },
+    "KC": {
+     "frac_on": 0.0,
+     "n_episodes": 0,
+     "mean_s": 0.0,
+     "max_s": 0.0,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 1.0262615426796398,
+     "rate_hz": 0.0027928149606299213
+    },
+    "ALLN": {
+     "frac_on": 0.005,
+     "n_episodes": 1,
+     "mean_s": 0.1,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 2.464052096522109,
+     "rate_hz": 0.7619047619047618
+    },
+    "ALPN": {
+     "frac_on": 0.15,
+     "n_episodes": 1,
+     "mean_s": 3.0,
+     "max_s": 3.0,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 2.423017765580274,
+     "rate_hz": 0.3935131195335277
+    },
+    "MBON": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.3797953972584081,
+     "rate_hz": 2.3510309278350516
+    },
+    "ensemble": {
+     "frac_on": 0.045,
+     "n_episodes": 9,
+     "mean_s": 0.1,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 5.205686655352874,
+     "rate_hz": 0.003125,
+     "ratio_to_other_kcs": 1.125,
+     "corr_with_brain": 0.0831980091663643
+    }
+   }
+  },
+  {
+   "scope": "al_all",
+   "fit": "0.78_893",
+   "f": 0.78,
+   "tau_ms": 893,
+   "seed": 0,
+   "n_pre": 144209,
+   "n_post": 1144,
+   "n_depressing_synapses": 298181,
+   "pop": {
+    "brain": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.3614565904641479,
+     "rate_hz": 0.3014530993211242
+    },
+    "KC": {
+     "frac_on": 0.0,
+     "n_episodes": 0,
+     "mean_s": 0.0,
+     "max_s": 0.0,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 1.0054174245212104,
+     "rate_hz": 0.002768208661417323
+    },
+    "ALLN": {
+     "frac_on": 0.02,
+     "n_episodes": 4,
+     "mean_s": 0.1,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 6.216745328460045,
+     "rate_hz": 0.5263095238095238
+    },
+    "ALPN": {
+     "frac_on": 0.02,
+     "n_episodes": 4,
+     "mean_s": 0.1,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 6.58707003732126,
+     "rate_hz": 0.16909620991253643
+    },
+    "MBON": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.4122273305055098,
+     "rate_hz": 1.961855670103093
+    },
+    "ensemble": {
+     "frac_on": 0.065,
+     "n_episodes": 13,
+     "mean_s": 0.10000000000000002,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 3.9149113160127778,
+     "rate_hz": 0.003977272727272727,
+     "ratio_to_other_kcs": 1.4657475226195602,
+     "corr_with_brain": 0.15063197351707258
+    }
+   }
+  },
+  {
+   "scope": "al_all",
+   "fit": "0.75_1566",
+   "f": 0.75,
+   "tau_ms": 1566,
+   "seed": 0,
+   "n_pre": 144209,
+   "n_post": 1144,
+   "n_depressing_synapses": 298181,
+   "pop": {
+    "brain": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.33484183479165236,
+     "rate_hz": 0.27670845786324016
+    },
+    "KC": {
+     "frac_on": 0.0,
+     "n_episodes": 0,
+     "mean_s": 0.0,
+     "max_s": 0.0,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 1.0054174245212104,
+     "rate_hz": 0.002768208661417323
+    },
+    "ALLN": {
+     "frac_on": 0.02,
+     "n_episodes": 2,
+     "mean_s": 0.2,
+     "max_s": 0.2,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 7.112877526517353,
+     "rate_hz": 0.2421428571428571
+    },
+    "ALPN": {
+     "frac_on": 0.02,
+     "n_episodes": 2,
+     "mean_s": 0.2,
+     "max_s": 0.2,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 6.965700601126498,
+     "rate_hz": 0.07806122448979591
+    },
+    "MBON": {
+     "frac_on": 0.89,
+     "n_episodes": 1,
+     "mean_s": 17.8,
+     "max_s": 17.8,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.3831035627575572,
+     "rate_hz": 2.3932989690721644
+    },
+    "ensemble": {
+     "frac_on": 0.05,
+     "n_episodes": 10,
+     "mean_s": 0.1,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 4.898979485566356,
+     "rate_hz": 0.003409090909090909,
+     "ratio_to_other_kcs": 1.2445582586427657,
+     "corr_with_brain": 0.06665102465528357
+    }
+   }
+  },
+  {
+   "scope": "al_all",
+   "fit": "0.72_2400",
+   "f": 0.72,
+   "tau_ms": 2400,
+   "seed": 0,
+   "n_pre": 144209,
+   "n_post": 1144,
+   "n_depressing_synapses": 298181,
+   "pop": {
+    "brain": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.35464091040634393,
+     "rate_hz": 0.2699727478867477
+    },
+    "KC": {
+     "frac_on": 0.0,
+     "n_episodes": 0,
+     "mean_s": 0.0,
+     "max_s": 0.0,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 1.0397715770282865,
+     "rate_hz": 0.0026451771653543303
+    },
+    "ALLN": {
+     "frac_on": 0.02,
+     "n_episodes": 2,
+     "mean_s": 0.2,
+     "max_s": 0.2,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 7.142915855244895,
+     "rate_hz": 0.21154761904761904
+    },
+    "ALPN": {
+     "frac_on": 0.02,
+     "n_episodes": 2,
+     "mean_s": 0.2,
+     "max_s": 0.2,
+     "one_way": false,
+     "too_sparse": false,
+     "cv": 6.890138165869621,
+     "rate_hz": 0.07106413994169096
+    },
+    "MBON": {
+     "frac_on": 0.895,
+     "n_episodes": 1,
+     "mean_s": 17.900000000000002,
+     "max_s": 17.900000000000002,
+     "one_way": true,
+     "too_sparse": false,
+     "cv": 0.3736378884679101,
+     "rate_hz": 2.4438144329896905
+    },
+    "ensemble": {
+     "frac_on": 0.05,
+     "n_episodes": 10,
+     "mean_s": 0.1,
+     "max_s": 0.1,
+     "one_way": false,
+     "too_sparse": true,
+     "cv": 4.898979485566356,
+     "rate_hz": 0.003409090909090909,
+     "ratio_to_other_kcs": 1.3058665472458577,
+     "corr_with_brain": 0.1095497678756015
+    }
+   }
+  }
+ ],
+ "finding": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Excitatory synapses depress with use. The two constants are measured (ORN->PN, glomeruli DM6 and VM2: f=0.78, tau=893 ms; ORN->LN (GABAergic antennal-lobe local neurons): f=0.75, tau=1566 ms; ORN->PN, glomerulus DM4: f=0.72, tau=2400 ms). The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding depression changes what a synapse is, so no run with it switched on is a property of the published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. Applying the same two constants to any other synapse is an extrapolation the measurements do not license, which is why the scope is an arm of the experiment and not a setting. The brain has up and down states in 0 of 9 runs and the trained Kenyon-cell ensemble in 6. Every constant behind the mechanism is measured; the scope is an arm and the arms are reported separately, because the recordings are at ORN to PN and ORN to LN synapses and say nothing about any other synapse.",
+ "provenance": {
+  "config": "configs/stage5_sleep.yaml",
+  "results_dir": "results/stage13_depression",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_orn_only_0.78_893_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_orn_only_0.75_1566_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_orn_only_0.72_2400_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_local_0.78_893_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_local_0.75_1566_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_local_0.72_2400_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_all_0.78_893_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_all_0.75_1566_seed0",
+   "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_all_0.72_2400_seed0"
+  ]
+ }
+}
