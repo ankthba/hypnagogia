@@ -1,5 +1,13 @@
 {
  "status": "passed",
+ "how_much_of_this_is_just_more_inhibition": {
+  "APL_spiking_rate_hz": 305.6666666666667,
+  "APL_max_rate_hz_from_refractory": 454.5454545454545,
+  "spiking_APL_as_fraction_of_its_own_maximum": 0.6724666666666668,
+  "extra_inhibition_the_correction_delivers": 1.4870625557648456,
+  "change_in_KC_response_fraction": 11.585895117540685,
+  "note": "The spiking APL already runs at most of the maximum rate its refractory period allows, so the corrected APL delivers only a little more inhibition in total, while the odour code changes by more than an order of magnitude. What the correction changes is that the inhibition is continuous instead of arriving in pulses that Kenyon cells can fire between."
+ },
  "question": "What does modelling APL as a spiking neuron do to the mushroom body?",
  "correction": "APL does not fire action potentials; it releases transmitter in proportion to membrane depolarisation (Amin et al. 2020 eLife 9:e56954). It is modelled here as non-spiking, with release rectified at rest and saturating at the spike threshold. The scaling introduces no free parameter: a neuron held at threshold delivers exactly what a spiking synapse delivers at its maximum refractory-limited rate.",
  "why_it_matters": {
@@ -19,48 +27,48 @@
    "condition": "apl_spiking",
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 3.4495419842034822,
-    "kc_rate_hz": 39.96555118110236,
-    "frac_kc": 0.6751968503937008,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 2.801988780173221,
+    "kc_rate_hz": 23.440944881889763,
+    "frac_kc": 0.5236220472440944,
+    "apl_rate_hz": 305.0
    },
    "post": {
-    "pop_rate_hz": 2.877694873412894,
-    "kc_rate_hz": 32.304872047244096,
-    "frac_kc": 0.6232775590551181,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 2.3480746694034353,
+    "kc_rate_hz": 18.0591781496063,
+    "frac_kc": 0.4271653543307087,
+    "apl_rate_hz": 297.5
    }
   },
   {
    "condition": "apl_spiking",
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 3.4690483950377575,
-    "kc_rate_hz": 40.195127952755904,
-    "frac_kc": 0.6791338582677166,
-    "apl_rate_hz": 354.0
+    "pop_rate_hz": 2.779833436193303,
+    "kc_rate_hz": 22.545521653543307,
+    "frac_kc": 0.5297736220472441,
+    "apl_rate_hz": 306.0
    },
    "post": {
-    "pop_rate_hz": 2.8727818652095225,
-    "kc_rate_hz": 32.11183562992126,
-    "frac_kc": 0.6072834645669292,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 2.358531714386758,
+    "kc_rate_hz": 17.9966781496063,
+    "frac_kc": 0.43380905511811024,
+    "apl_rate_hz": 297.75
    }
   },
   {
    "condition": "apl_spiking",
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 3.474242245629607,
-    "kc_rate_hz": 40.110236220472444,
-    "frac_kc": 0.6774114173228346,
-    "apl_rate_hz": 354.5
+    "pop_rate_hz": 2.817126531631174,
+    "kc_rate_hz": 23.156496062992126,
+    "frac_kc": 0.5231299212598425,
+    "apl_rate_hz": 306.0
    },
    "post": {
-    "pop_rate_hz": 2.896566788480608,
-    "kc_rate_hz": 32.46715059055118,
-    "frac_kc": 0.6203248031496063,
-    "apl_rate_hz": 354.25
+    "pop_rate_hz": 2.3588957693347847,
+    "kc_rate_hz": 18.126968503937007,
+    "frac_kc": 0.4286417322834646,
+    "apl_rate_hz": 298.5
    }
   },
   {
@@ -115,16 +123,16 @@
  "summary": {
   "apl_spiking": {
    "odor": {
-    "pop_rate_hz": 3.464277541623616,
-    "kc_rate_hz": 40.09030511811024,
-    "frac_kc": 0.677247375328084,
-    "apl_rate_hz": 354.3333333333333
+    "pop_rate_hz": 2.7996495826658996,
+    "kc_rate_hz": 23.047654199475062,
+    "frac_kc": 0.525508530183727,
+    "apl_rate_hz": 305.6666666666667
    },
    "post": {
-    "pop_rate_hz": 2.882347842367675,
-    "kc_rate_hz": 32.294619422572175,
-    "frac_kc": 0.6169619422572178,
-    "apl_rate_hz": 354.4166666666667
+    "pop_rate_hz": 2.3551673843749925,
+    "kc_rate_hz": 18.06094160104987,
+    "frac_kc": 0.4298720472440945,
+    "apl_rate_hz": 297.9166666666667
    },
    "n_seeds": 3
   },
@@ -144,8 +152,8 @@
    "n_seeds": 3
   }
  },
- "finding": "Modelling APL as a spiking neuron takes the odour response from 4.5% of Kenyon cells at 0.79 Hz to 67.7% at 40.1 Hz, and the offline rate from 0.13 Hz to 32.3 Hz. Real Kenyon cells respond at 6 +/- 5% and idle near 0.1 Hz, so the corrected model matches the measurement and the published one is off by more than two orders of magnitude. Everything else is identical.",
- "walltime_s": 0.3,
+ "finding": "With APL modelled as a spiking neuron, as the published model does, an odour drives 52.6% of Kenyon cells at 23.0 Hz and they idle afterwards at 18.1 Hz. Correcting APL to non-spiking release gives 4.54% at 0.79 Hz, idling at 0.134 Hz. Real Kenyon cells respond at 6 +/- 5% of the population and idle near 0.1 Hz, so the corrected model lands on the measurement and the published one misses it by more than two orders of magnitude. Nothing else differs between the two: same connectome, same parameters, same stimulus, same seeds.",
+ "walltime_s": 25.6,
  "provenance": {
   "config": "configs/base.yaml",
   "results_dir": "results/stage3a_apl",

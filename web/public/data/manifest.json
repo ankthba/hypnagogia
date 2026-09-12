@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T07:29:38+00:00",
- "git_commit": "86f66bf",
+ "generated_at": "2026-09-12T11:31:06+00:00",
+ "git_commit": "0f93eee",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -220,7 +220,7 @@
    "status": "passed",
    "file": "stage3b_feasibility.json",
    "title": "Stage 3b - Is there a sparse odour code to encode a memory in?",
-   "summary": "Modelling APL as a spiking neuron takes the odour response from 4.5% of Kenyon cells at 0.79 Hz to 67.7% at 40.1 Hz, and the offline rate from 0.13 Hz to 32.3 Hz. Real Kenyon cells respond at 6 +/- 5% and idle near 0.1 H"
+   "summary": "With APL modelled as a spiking neuron, as the published model does, an odour drives 52.6% of Kenyon cells at 23.0 Hz and they idle afterwards at 18.1 Hz. Correcting APL to non-spiking release gives 4.54% at 0.79 Hz, idli"
   },
   "stage3_plasticity": {
    "status": "passed",
@@ -236,27 +236,27 @@
    "file": "stage4_learning.json",
    "title": "Stage 4 - Learning",
    "summary": "MBON11 response to odour A must fall relative to odour B from before to after conditioning: the paired difference of deltas (deltaA - deltaB) must be negative w",
-   "gain": 0.6,
-   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value there is no sparse odour code to store a memory in (stage 3b) and two odours leave indistinguishable ensembles (stage 3e).",
-   "source_file": "results/stage4_learning/real_gain0.6/stage4.json"
+   "gain": 1.0,
+   "gain_note": "published parameters",
+   "source_file": "results/stage4_learning/stage4.json"
   },
   "stage5_sleep": {
    "status": "passed",
    "file": "stage5_sleep.json",
    "title": "Stage 5 - Sleep",
-   "summary": "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC ",
-   "gain": 0.6,
-   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value (stage 3b/3d).",
-   "source_file": "results/stage5_sleep/real_gain0.6/stage5.json"
+   "summary": "both conditions run to completion for every seed with the learned weights loaded; the dFB clamp is applied in the sleep condition and not in the wake condition,",
+   "gain": 1.0,
+   "gain_note": "published parameters",
+   "source_file": "results/stage5_sleep/stage5.json"
   },
   "stage6_replay": {
-   "status": "failed",
+   "status": "artifact",
    "file": "stage6_replay.json",
    "title": "Stage 6 - Replay",
-   "summary": "In the real network 95% of all time bins clear the reactivation threshold. The ensemble is effectively on continuously, so 'reactivation events' are not discrete episodes and the template correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory reappeared. Every comparison below must be read with that in mind. No evidence of memory replay: the odour-A ensemble did not reactivate above chance during simulated sleep. Comparisons that did not show the predicted effect: A_vs_B_sleep, sleep_vs_wake_A. The learned weights did increase reactivation relative to the identical run with unlearned weights (difference +0.14072, 95% CI [+0.10463, +0.17492]).",
-   "gain": 0.6,
-   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has neither a sparse odour code nor a quiet background (stages 2 and 3b). This is an uncited free parameter introduced by this project.",
-   "source_file": "/Users/ankthba/Developer/fly/results/stage6_replay_gain0.6/replay/activity_sleep_naive_seed2.json"
+   "summary": "A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
+   "gain": 1.0,
+   "gain_note": "published parameters",
+   "source_file": "/Users/ankthba/Developer/fly/results/stage6_replay/replay/activity_sleep_naive_seed2.json"
   }
  },
  "atlas": {

@@ -935,8 +935,12 @@ function BrainMapInner({
       lastPageScroll = performance.now();
     };
     const onWheel = (e: WheelEvent) => {
-      // A trackpad pinch arrives as ctrl+wheel on every platform. Cmd+wheel is the browser's own
-      // page zoom on macOS, and treating it as a pinch here called preventDefault and swallowed it.
+      // Cmd+wheel is the browser's own page-zoom gesture on macOS. It is the reader's, not the
+      // map's: the wheel passes straight through untouched, so the page zooms as it would anywhere
+      // else. (It used to be read as a pinch, which zoomed the point cloud and called
+      // preventDefault, swallowing the gesture entirely.)
+      if (e.metaKey) return;
+      // A trackpad pinch arrives as ctrl+wheel on every platform, and always zooms the map.
       const pinch = e.ctrlKey;
       if (!pinch && performance.now() - lastPageScroll < 260) return; // the page is mid-scroll
       const before = c.zoomTarget;

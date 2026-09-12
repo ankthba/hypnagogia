@@ -50,6 +50,20 @@ def main():
     s4 = pick("stage4_learning", "stage4.json")
     s5 = pick("stage5_sleep", "stage5.json")
     s6 = pick("stage6_replay", "stage6.json")
+    # The same runs re-analysed at a shorter bin, if any such analysis has been written. The exporter attaches
+    # these to the web copy; the document reads the result directories directly so it does not depend on the
+    # exporter having run first.
+    if s6 is not None:
+        rb = []
+        for cand in sorted(RESULTS.glob("stage6_replay_bin*/stage6.json")):
+            r = load(cand)
+            if not r:
+                continue
+            rb.append({"bin_ms": r.get("window_ms"), "status": r.get("status"),
+                       "events_are_discrete": (r.get("continuity_check") or {}).get("events_are_discrete"),
+                       "comparisons": r.get("comparisons") or []})
+        if rb:
+            s6["bin_robustness"] = sorted(rb, key=lambda x: x.get("bin_ms") or 0)
     # the labelled reduced-gain variant, if it has been run
     variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
     s6v = load(variant_dirs[-1] / "stage6.json") if variant_dirs else None
@@ -573,8 +587,9 @@ def main():
             if eg.get("applied"):
                 w(f"*The verdict is decided before the comparisons are read: {eg.get('rule', '')}*")
                 w()
-            if obj.get("sleep_state_is_distinguishable") is False:
-                w(f"*{obj.get('sleep_vs_wake_arm_note', '')}*")
+            wn = str(obj.get("sleep_vs_wake_arm_note", "")).strip()
+            if obj.get("sleep_state_is_distinguishable") is False and wn and wn not in str(obj.get("headline", "")):
+                w(f"*{wn}*")
                 w()
             if obj.get("metric_note"):
                 w(f"*{obj['metric_note']}*")

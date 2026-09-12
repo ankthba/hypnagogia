@@ -219,7 +219,7 @@
   }
  },
  "finding": "The substitution changes nothing measurable, because DPM never fires a single spike in either condition and so never releases anything for the sign to apply to. The reason is the other correction: APL modelled as non-spiking sits at its saturating release level and delivers a steady 290 mV of hyperpolarising drive to DPM through 1,595 synapses, which is 41 times DPM's threshold gap. Both runs give 4.45% of Kenyon cells at 0.778 Hz during the odour and 0.138 Hz after it. The transmitter assignment is still wrong and is still corrected everywhere, but in this model it is inert: DPM is one of the cells the corrected APL switches off. The same happens to the readout MBON. Both cells have measured odour responses in the fly, so a model in which APL silences them is not reproducing them.",
- "walltime_s": 0.2,
+ "walltime_s": 0.1,
  "provenance": {
   "config": "configs/base.yaml",
   "results_dir": "results/stage3f_dpm",

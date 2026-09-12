@@ -104,6 +104,37 @@ function useClockTime(clock: Clock): number {
 }
 
 /**
+ * True once `el` is within `margin` pixels of the viewport, and true from then on.
+ *
+ * Measured rather than observed; see the call site for why. The scroll listener is passive and
+ * coalesced to one measurement per frame, and it unsubscribes the moment the answer is yes.
+ */
+function useNearViewport(el: HTMLElement | null, margin = 600): boolean {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    if (!el || near) return;
+    let raf = 0;
+    const test = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      if (r.bottom > -margin && r.top < window.innerHeight + margin) setNear(true);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(test);
+    };
+    test();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [el, near, margin]);
+  return near;
+}
+
+/**
  * True once `ready` is true and the browser has had an idle moment since.
  *
  * It is how the panel keeps a three-megabyte fetch off the critical path without giving up
@@ -158,28 +189,19 @@ export default function MapPanel() {
   /**
    * Whether the panel has come within reach of the viewport.
    *
-   * The activity binary is 3 MB, and this panel is mounted by the Layout on every route. On a
-   * phone the map sits inside the page, often well below the fold, and on a short window the rail
-   * can start off screen too; fetching three megabytes of spikes for a picture nobody has scrolled
-   * to is the reader's bandwidth spent on nothing. Once the panel has been near the viewport the
-   * flag stays set: scrolling past the map must not cancel a run that is already playing.
+   * The activity binary is 3 MB and this panel is mounted by the Layout on every route, so a map
+   * the reader has not scrolled anywhere near is three megabytes of their bandwidth spent on
+   * nothing. Once the panel has been near the viewport the flag stays set: scrolling past the map
+   * must not cancel a run that is already playing.
+   *
+   * It is a plain rectangle test on mount and on scroll, not an IntersectionObserver. The observer
+   * is the tidier API and the wrong one here: it delivers nothing at all while the page is not
+   * being composited (a background tab, a hidden preview pane), and this gate fails closed, so on
+   * those pages the map would simply never load its run - which is exactly what MAP_SPEC.md's
+   * "the map must be live on every page" forbids. A rect test answers the same question
+   * synchronously and always answers it.
    */
-  const [near, setNear] = useState(false);
-  useEffect(() => {
-    if (!wrap || near) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      setNear(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (es) => {
-        if (es.some((e) => e.isIntersecting)) setNear(true);
-      },
-      { rootMargin: '600px' },
-    );
-    io.observe(wrap);
-    return () => io.disconnect();
-  }, [wrap, near]);
+  const near = useNearViewport(wrap);
   const narrow = useMediaQuery('(max-width: 699px)');
   const railed = useMediaQuery('(min-width: 1100px)');
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
@@ -654,7 +676,9 @@ const SourceLine = memo(function SourceLine({
         </p>
       )}
       <div className="map-panel__path mono">web/public/data/{path}</div>
-      {canPlay && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
+      {/* nothing is lit on a mismatch, so "playing at 1x real time" would describe a clock the
+          reader cannot see moving on the map */}
+      {canPlay && identity?.state !== 'mismatch' && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
     </div>
   );
 });

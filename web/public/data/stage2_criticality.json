@@ -5668,7 +5668,7 @@
    "results/stage2_criticality/full/sigma4.0_seed1/spikes.npz",
    "results/stage2_criticality/full/sigma4.0_seed2/spikes.npz"
   ],
-  "git_commit": "86f66bf",
-  "generated_at": "2026-09-12T07:29:38+00:00"
+  "git_commit": "0f93eee",
+  "generated_at": "2026-09-12T11:31:06+00:00"
  }
 }

@@ -1,0 +1,1079 @@
+{
+ "status": "failed",
+ "criterion": "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)",
+ "checks": {
+  "all_runs_completed": false,
+  "dfb_active_in_sleep": true,
+  "dfb_silent_in_wake": true,
+  "kc_activity_present": true
+ },
+ "network": "real_gain0.6_sparse",
+ "gain": 0.6,
+ "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value (stage 3b/3d).",
+ "dfb": {
+  "population": "dFB",
+  "cell_types": [
+   "FB6A_a",
+   "FB6A_b",
+   "FB6A_c",
+   "FB6C_a",
+   "FB6C_b",
+   "FB6E",
+   "FB6G",
+   "FB6I",
+   "FB6Z",
+   "FB7A",
+   "FB7K"
+  ],
+  "n_neurons": 32,
+  "selection_source": "Hulse et al. 2021 eLife 10:e66039 Fig. 48 (R23E10 -> FB6A, FB6C_a/b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K)",
+  "clamp_rate_hz": 17.0,
+  "rate_source": "no dFB firing rate exists in the literature (Donlea 2014 / Pimentel 2016 report a binary ON/OFF switch); 17 Hz is taken from the UP state of the connected helicon cells ExR1, 16.9 +/- 3.6 Hz (Donlea et al. 2018 Neuron 97:378) - an approximation, not a dFB measurement",
+  "nt_in_model": {
+   "glutamate": 32
+  }
+ },
+ "conditions": {
+  "sleep": {
+   "description": "dFB clamped active at 17.0 Hz Poisson drive, background noise on, no odour input, learned weights loaded"
+  },
+  "wake": {
+   "description": "dFB off, background noise on, no odour input, learned weights loaded (identical in every other respect)"
+  },
+  "sleep_naive": {
+   "description": "identical to sleep but with the UNLEARNED weights, to test whether the memory contributes anything to reactivation at all"
+  }
+ },
+ "sigma_mV": 1.48,
+ "sigma_source": "--sigma override: the offline period is run in the sparse regime, where activity arrives as discrete avalanches rather than continuously, which is the only regime in which a discrete reactivation could be observed",
+ "plastic_during_sleep": false,
+ "duration_s": 40.0,
+ "reset_at_offline_onset": true,
+ "reset_note": "Membrane potentials and synaptic conductances are reset to rest at the start of the offline period; learned synaptic weights are not touched. The model has no adaptation or short-term depression, so once conditioning has pushed it into its self-sustaining state it never returns to baseline (stage 3b). Without the reset the offline period would inherit the conditioning activity and any apparent reactivation would be persistence, not replay. The 'carryover' epoch measures the state that was discarded, so the size of that confound is on the record.",
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19
+ ],
+ "per_seed": [
+  {
+   "seed": 0,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.7801139318627824,
+   "n_spikes": 4499978,
+   "kc_rate_hz": 1.7451218011811025,
+   "n_kc_active": 2128,
+   "mbon_rate_hz": 4.044072164948453,
+   "dfb_rate_hz": 16.6828125,
+   "frac_kc_active": 0.5236220472440944,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010609601342495961,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed0/spikes.npz"
+  },
+  {
+   "seed": 0,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.7777680311214973,
+   "n_spikes": 4486446,
+   "kc_rate_hz": 1.7485420767716535,
+   "n_kc_active": 2137,
+   "mbon_rate_hz": 4.089690721649484,
+   "dfb_rate_hz": 0.0015625,
+   "frac_kc_active": 0.5258366141732284,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010609601342495961,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed0/spikes.npz"
+  },
+  {
+   "seed": 0,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.7821420646422901,
+   "n_spikes": 4511677,
+   "kc_rate_hz": 1.7993417814960628,
+   "n_kc_active": 2161,
+   "mbon_rate_hz": 4.934020618556701,
+   "dfb_rate_hz": 16.6828125,
+   "frac_kc_active": 0.531742125984252,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010609601342495961,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed0/spikes.npz"
+  },
+  {
+   "seed": 1,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.0047386085473167415,
+   "n_spikes": 27334,
+   "kc_rate_hz": 0.001015009842519685,
+   "n_kc_active": 163,
+   "mbon_rate_hz": 0.001288659793814433,
+   "dfb_rate_hz": 16.93828125,
+   "frac_kc_active": 0.04010826771653543,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010193538544751022,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed1/spikes.npz"
+  },
+  {
+   "seed": 1,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.0009836417976686613,
+   "n_spikes": 5674,
+   "kc_rate_hz": 0.001015009842519685,
+   "n_kc_active": 163,
+   "mbon_rate_hz": 0.001288659793814433,
+   "dfb_rate_hz": 0.00078125,
+   "frac_kc_active": 0.04010826771653543,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010193538544751022,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed1/spikes.npz"
+  },
+  {
+   "seed": 1,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.0047386085473167415,
+   "n_spikes": 27334,
+   "kc_rate_hz": 0.001015009842519685,
+   "n_kc_active": 163,
+   "mbon_rate_hz": 0.001288659793814433,
+   "dfb_rate_hz": 16.93828125,
+   "frac_kc_active": 0.04010826771653543,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010193538544751022,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed1/spikes.npz"
+  },
+  {
+   "seed": 2,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.3126236920025796,
+   "n_spikes": 1803326,
+   "kc_rate_hz": 0.6989911417322834,
+   "n_kc_active": 1956,
+   "mbon_rate_hz": 1.6030927835051547,
+   "dfb_rate_hz": 17.06953125,
+   "frac_kc_active": 0.4812992125984252,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010158866644938943,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed2/spikes.npz"
+  },
+  {
+   "seed": 2,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.3088853677648413,
+   "n_spikes": 1781762,
+   "kc_rate_hz": 0.7009657972440945,
+   "n_kc_active": 1958,
+   "mbon_rate_hz": 1.6280927835051549,
+   "dfb_rate_hz": 0.0,
+   "frac_kc_active": 0.48179133858267714,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010158866644938943,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed2/spikes.npz"
+  },
+  {
+   "seed": 2,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.31610596426020565,
+   "n_spikes": 1823413,
+   "kc_rate_hz": 0.7168061023622047,
+   "n_kc_active": 1978,
+   "mbon_rate_hz": 1.9567010309278352,
+   "dfb_rate_hz": 17.06953125,
+   "frac_kc_active": 0.4867125984251969,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010158866644938943,
+    "kc_rate_hz": 0.00036909448818897637,
+    "n_kc_active": 3
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed2/spikes.npz"
+  },
+  {
+   "seed": 3,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.7270087165156127,
+   "n_spikes": 4193648,
+   "kc_rate_hz": 1.6179441437007873,
+   "n_kc_active": 2132,
+   "mbon_rate_hz": 3.7523195876288664,
+   "dfb_rate_hz": 16.79609375,
+   "frac_kc_active": 0.5246062992125984,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010990992240428822,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed3/spikes.npz"
+  },
+  {
+   "seed": 3,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.7172971173782496,
+   "n_spikes": 4137628,
+   "kc_rate_hz": 1.6245816929133858,
+   "n_kc_active": 2138,
+   "mbon_rate_hz": 3.787113402061856,
+   "dfb_rate_hz": 0.003125,
+   "frac_kc_active": 0.5260826771653543,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010990992240428822,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed3/spikes.npz"
+  },
+  {
+   "seed": 3,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.7245511722569327,
+   "n_spikes": 4179472,
+   "kc_rate_hz": 1.6681902066929133,
+   "n_kc_active": 2166,
+   "mbon_rate_hz": 4.578608247422681,
+   "dfb_rate_hz": 16.79609375,
+   "frac_kc_active": 0.5329724409448819,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010990992240428822,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed3/spikes.npz"
+  },
+  {
+   "seed": 4,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.8868158367369582,
+   "n_spikes": 5115473,
+   "kc_rate_hz": 1.9708538385826773,
+   "n_kc_active": 2174,
+   "mbon_rate_hz": 4.546134020618557,
+   "dfb_rate_hz": 16.85,
+   "frac_kc_active": 0.5349409448818898,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009569444348133611,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed4/spikes.npz"
+  },
+  {
+   "seed": 4,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.8816651526603749,
+   "n_spikes": 5085762,
+   "kc_rate_hz": 1.9855314960629922,
+   "n_kc_active": 2177,
+   "mbon_rate_hz": 4.617268041237113,
+   "dfb_rate_hz": 0.00078125,
+   "frac_kc_active": 0.5356791338582677,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009569444348133611,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed4/spikes.npz"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_naive_4_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed4/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_5_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed5/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_wake_5_0.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed5/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_naive_5_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed5/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_6_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed6/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_wake_6_0.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed6/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_naive_6_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed6/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_7_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed7/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_wake_7_0.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed7/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_naive_7_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed7/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_8_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed8/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_wake_8_0.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed8/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_naive_8_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed8/spikes.npz'"
+  },
+  {
+   "name": "sleep_real_gain0.6_sparse_sleep_9_17.0",
+   "error": "[Errno 2] No such file or directory: '/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed9/spikes.npz'"
+  },
+  {
+   "seed": 9,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.9782369685664557,
+   "n_spikes": 5642823,
+   "kc_rate_hz": 2.2002460629921257,
+   "n_kc_active": 2177,
+   "mbon_rate_hz": 5.14381443298969,
+   "dfb_rate_hz": 0.00234375,
+   "frac_kc_active": 0.5356791338582677,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8324931176278874,
+    "kc_rate_hz": 1.8972687007874016,
+    "n_kc_active": 1406
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed9/spikes.npz"
+  },
+  {
+   "seed": 9,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.9765021600593583,
+   "n_spikes": 5632816,
+   "kc_rate_hz": 2.2568528543307087,
+   "n_kc_active": 2215,
+   "mbon_rate_hz": 6.209536082474227,
+   "dfb_rate_hz": 17.0328125,
+   "frac_kc_active": 0.5450295275590551,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8330235976950121,
+    "kc_rate_hz": 1.9109251968503937,
+    "n_kc_active": 1417
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed9/spikes.npz"
+  },
+  {
+   "seed": 10,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.9829351843504913,
+   "n_spikes": 5669924,
+   "kc_rate_hz": 2.188029035433071,
+   "n_kc_active": 2186,
+   "mbon_rate_hz": 5.075515463917526,
+   "dfb_rate_hz": 17.18671875,
+   "frac_kc_active": 0.5378937007874016,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000981214764681816,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed10/spikes.npz"
+  },
+  {
+   "seed": 10,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.9793872088427215,
+   "n_spikes": 5649458,
+   "kc_rate_hz": 2.202294537401575,
+   "n_kc_active": 2192,
+   "mbon_rate_hz": 5.132474226804124,
+   "dfb_rate_hz": 0.003125,
+   "frac_kc_active": 0.5393700787401575,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000981214764681816,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed10/spikes.npz"
+  },
+  {
+   "seed": 10,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.9848709165169997,
+   "n_spikes": 5681090,
+   "kc_rate_hz": 2.261115895669291,
+   "n_kc_active": 2224,
+   "mbon_rate_hz": 6.21159793814433,
+   "dfb_rate_hz": 17.18671875,
+   "frac_kc_active": 0.547244094488189,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000981214764681816,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed10/spikes.npz"
+  },
+  {
+   "seed": 11,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.013958213426346485,
+   "n_spikes": 80516,
+   "kc_rate_hz": 0.000984251968503937,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 0.001288659793814433,
+   "dfb_rate_hz": 16.99453125,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000960411624794569,
+    "kc_rate_hz": 0.0014763779527559055,
+    "n_kc_active": 12
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed11/spikes.npz"
+  },
+  {
+   "seed": 11,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.007499878648350658,
+   "n_spikes": 43262,
+   "kc_rate_hz": 0.000984251968503937,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 0.0010309278350515464,
+   "dfb_rate_hz": 0.00234375,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000960411624794569,
+    "kc_rate_hz": 0.0014763779527559055,
+    "n_kc_active": 12
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed11/spikes.npz"
+  },
+  {
+   "seed": 11,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.013958213426346485,
+   "n_spikes": 80516,
+   "kc_rate_hz": 0.000984251968503937,
+   "n_kc_active": 159,
+   "mbon_rate_hz": 0.001288659793814433,
+   "dfb_rate_hz": 16.99453125,
+   "frac_kc_active": 0.039124015748031496,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000960411624794569,
+    "kc_rate_hz": 0.0014763779527559055,
+    "n_kc_active": 12
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed11/spikes.npz"
+  },
+  {
+   "seed": 12,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.98254061813063,
+   "n_spikes": 5667648,
+   "kc_rate_hz": 2.1910740649606297,
+   "n_kc_active": 2181,
+   "mbon_rate_hz": 5.070876288659794,
+   "dfb_rate_hz": 16.82421875,
+   "frac_kc_active": 0.5366633858267716,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8291091402062285,
+    "kc_rate_hz": 1.8550688976377954,
+    "n_kc_active": 1385
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed12/spikes.npz"
+  },
+  {
+   "seed": 12,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.9790644134554708,
+   "n_spikes": 5647596,
+   "kc_rate_hz": 2.194709645669291,
+   "n_kc_active": 2185,
+   "mbon_rate_hz": 5.099484536082474,
+   "dfb_rate_hz": 0.0,
+   "frac_kc_active": 0.5376476377952756,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8291091402062285,
+    "kc_rate_hz": 1.8550688976377954,
+    "n_kc_active": 1385
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed12/spikes.npz"
+  },
+  {
+   "seed": 12,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.9847022377244138,
+   "n_spikes": 5680117,
+   "kc_rate_hz": 2.2590120570866143,
+   "n_kc_active": 2210,
+   "mbon_rate_hz": 6.187628865979382,
+   "dfb_rate_hz": 16.82421875,
+   "frac_kc_active": 0.5437992125984252,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.8281938020511896,
+    "kc_rate_hz": 1.8809055118110236,
+    "n_kc_active": 1380
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed12/spikes.npz"
+  },
+  {
+   "seed": 13,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.9515068407658329,
+   "n_spikes": 5488634,
+   "kc_rate_hz": 2.133753690944882,
+   "n_kc_active": 2159,
+   "mbon_rate_hz": 4.947422680412371,
+   "dfb_rate_hz": 16.871875,
+   "frac_kc_active": 0.53125,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010921648440804666,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed13/spikes.npz"
+  },
+  {
+   "seed": 13,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.9471886290037377,
+   "n_spikes": 5463725,
+   "kc_rate_hz": 2.129509104330709,
+   "n_kc_active": 2165,
+   "mbon_rate_hz": 4.958762886597938,
+   "dfb_rate_hz": 0.0,
+   "frac_kc_active": 0.5327263779527559,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010921648440804666,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed13/spikes.npz"
+  },
+  {
+   "seed": 13,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.9466865798944588,
+   "n_spikes": 5460829,
+   "kc_rate_hz": 2.192599655511811,
+   "n_kc_active": 2192,
+   "mbon_rate_hz": 6.000257731958762,
+   "dfb_rate_hz": 16.871875,
+   "frac_kc_active": 0.5393700787401575,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010921648440804666,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed13/spikes.npz"
+  },
+  {
+   "seed": 14,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.23192952589644195,
+   "n_spikes": 1337853,
+   "kc_rate_hz": 0.509208907480315,
+   "n_kc_active": 1901,
+   "mbon_rate_hz": 1.1927835051546392,
+   "dfb_rate_hz": 17.04375,
+   "frac_kc_active": 0.46776574803149606,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010609601342495961,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed14/spikes.npz"
+  },
+  {
+   "seed": 14,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.22678334916683426,
+   "n_spikes": 1308168,
+   "kc_rate_hz": 0.5110236220472442,
+   "n_kc_active": 1897,
+   "mbon_rate_hz": 1.2005154639175257,
+   "dfb_rate_hz": 0.0015625,
+   "frac_kc_active": 0.46678149606299213,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010609601342495961,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed14/spikes.npz"
+  },
+  {
+   "seed": 14,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.23274154179004086,
+   "n_spikes": 1342537,
+   "kc_rate_hz": 0.5271468996062991,
+   "n_kc_active": 1920,
+   "mbon_rate_hz": 1.447422680412371,
+   "dfb_rate_hz": 17.04375,
+   "frac_kc_active": 0.47244094488188976,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010609601342495961,
+    "kc_rate_hz": 0.0011072834645669291,
+    "n_kc_active": 9
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed14/spikes.npz"
+  },
+  {
+   "seed": 15,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.5604336414509496,
+   "n_spikes": 3232783,
+   "kc_rate_hz": 1.2461306594488188,
+   "n_kc_active": 2085,
+   "mbon_rate_hz": 2.8693298969072165,
+   "dfb_rate_hz": 16.7078125,
+   "frac_kc_active": 0.5130413385826772,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009950835246066473,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed15/spikes.npz"
+  },
+  {
+   "seed": 15,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.5551952374678417,
+   "n_spikes": 3202566,
+   "kc_rate_hz": 1.2522699311023624,
+   "n_kc_active": 2092,
+   "mbon_rate_hz": 2.902061855670103,
+   "dfb_rate_hz": 0.00078125,
+   "frac_kc_active": 0.514763779527559,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009950835246066473,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed15/spikes.npz"
+  },
+  {
+   "seed": 15,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.5604076375260906,
+   "n_spikes": 3232633,
+   "kc_rate_hz": 1.2869894192913385,
+   "n_kc_active": 2122,
+   "mbon_rate_hz": 3.4966494845360825,
+   "dfb_rate_hz": 16.7078125,
+   "frac_kc_active": 0.5221456692913385,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009950835246066473,
+    "kc_rate_hz": 0.0007381889763779527,
+    "n_kc_active": 6
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed15/spikes.npz"
+  },
+  {
+   "seed": 16,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.14615731334382737,
+   "n_spikes": 843088,
+   "kc_rate_hz": 0.30981791338582676,
+   "n_kc_active": 1791,
+   "mbon_rate_hz": 0.7092783505154638,
+   "dfb_rate_hz": 17.08359375,
+   "frac_kc_active": 0.4406988188976378,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010678945142120117,
+    "kc_rate_hz": 0.0015994094488188976,
+    "n_kc_active": 13
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed16/spikes.npz"
+  },
+  {
+   "seed": 16,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.14238934463174976,
+   "n_spikes": 821353,
+   "kc_rate_hz": 0.311226624015748,
+   "n_kc_active": 1810,
+   "mbon_rate_hz": 0.7157216494845361,
+   "dfb_rate_hz": 0.0,
+   "frac_kc_active": 0.4453740157480315,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010678945142120117,
+    "kc_rate_hz": 0.0015994094488188976,
+    "n_kc_active": 13
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed16/spikes.npz"
+  },
+  {
+   "seed": 16,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.14653350345678842,
+   "n_spikes": 845258,
+   "kc_rate_hz": 0.3151082677165354,
+   "n_kc_active": 1804,
+   "mbon_rate_hz": 0.8487113402061855,
+   "dfb_rate_hz": 17.08359375,
+   "frac_kc_active": 0.4438976377952756,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010678945142120117,
+    "kc_rate_hz": 0.0015994094488188976,
+    "n_kc_active": 13
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed16/spikes.npz"
+  },
+  {
+   "seed": 17,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.7449242072270108,
+   "n_spikes": 4296991,
+   "kc_rate_hz": 1.6726870078740157,
+   "n_kc_active": 2133,
+   "mbon_rate_hz": 3.8837628865979386,
+   "dfb_rate_hz": 16.95703125,
+   "frac_kc_active": 0.5248523622047244,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010470913743247648,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed17/spikes.npz"
+  },
+  {
+   "seed": 17,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.7442888446629544,
+   "n_spikes": 4293326,
+   "kc_rate_hz": 1.6642408956692913,
+   "n_kc_active": 2117,
+   "mbon_rate_hz": 3.8788659793814433,
+   "dfb_rate_hz": 0.0015625,
+   "frac_kc_active": 0.5209153543307087,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010470913743247648,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed17/spikes.npz"
+  },
+  {
+   "seed": 17,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.7438604733407762,
+   "n_spikes": 4290855,
+   "kc_rate_hz": 1.7183132381889765,
+   "n_kc_active": 2150,
+   "mbon_rate_hz": 4.711340206185567,
+   "dfb_rate_hz": 16.95703125,
+   "frac_kc_active": 0.5290354330708661,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0010470913743247648,
+    "kc_rate_hz": 0.000984251968503937,
+    "n_kc_active": 8
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed17/spikes.npz"
+  },
+  {
+   "seed": 18,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.41511417456608113,
+   "n_spikes": 2394528,
+   "kc_rate_hz": 0.9287155511811024,
+   "n_kc_active": 2038,
+   "mbon_rate_hz": 2.1487113402061855,
+   "dfb_rate_hz": 16.71640625,
+   "frac_kc_active": 0.5014763779527559,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000981214764681816,
+    "kc_rate_hz": 0.0012303149606299212,
+    "n_kc_active": 10
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed18/spikes.npz"
+  },
+  {
+   "seed": 18,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.41125120484851846,
+   "n_spikes": 2372245,
+   "kc_rate_hz": 0.930548720472441,
+   "n_kc_active": 2048,
+   "mbon_rate_hz": 2.1672680412371133,
+   "dfb_rate_hz": 0.0,
+   "frac_kc_active": 0.5039370078740157,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000981214764681816,
+    "kc_rate_hz": 0.0012303149606299212,
+    "n_kc_active": 10
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed18/spikes.npz"
+  },
+  {
+   "seed": 18,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.4172718068913868,
+   "n_spikes": 2406974,
+   "kc_rate_hz": 0.9538016732283464,
+   "n_kc_active": 2075,
+   "mbon_rate_hz": 2.618298969072165,
+   "dfb_rate_hz": 16.71640625,
+   "frac_kc_active": 0.5105807086614174,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.000981214764681816,
+    "kc_rate_hz": 0.0012303149606299212,
+    "n_kc_active": 10
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed18/spikes.npz"
+  },
+  {
+   "seed": 19,
+   "condition": "sleep",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.43213530362182667,
+   "n_spikes": 2492712,
+   "kc_rate_hz": 0.9441437007874016,
+   "n_kc_active": 2024,
+   "mbon_rate_hz": 2.1853092783505152,
+   "dfb_rate_hz": 16.8734375,
+   "frac_kc_active": 0.49803149606299213,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009985507145878552,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed19/spikes.npz"
+  },
+  {
+   "seed": 19,
+   "condition": "wake",
+   "dfb_rate_clamp_hz": 0.0,
+   "pop_rate_hz": 0.4287242821183144,
+   "n_spikes": 2473036,
+   "kc_rate_hz": 0.9472071850393701,
+   "n_kc_active": 2020,
+   "mbon_rate_hz": 2.2069587628865976,
+   "dfb_rate_hz": 0.00078125,
+   "frac_kc_active": 0.4970472440944882,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009985507145878552,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed19/spikes.npz"
+  },
+  {
+   "seed": 19,
+   "condition": "sleep_naive",
+   "dfb_rate_clamp_hz": 17.0,
+   "pop_rate_hz": 0.4335187124243286,
+   "n_spikes": 2500692,
+   "kc_rate_hz": 0.9765317421259843,
+   "n_kc_active": 2052,
+   "mbon_rate_hz": 2.672164948453608,
+   "dfb_rate_hz": 16.8734375,
+   "frac_kc_active": 0.5049212598425197,
+   "carryover_before_reset": {
+    "pop_rate_hz": 0.0009985507145878552,
+    "kc_rate_hz": 0.0004921259842519685,
+    "n_kc_active": 4
+   },
+   "file": "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed19/spikes.npz"
+  }
+ ],
+ "summary": [
+  {
+   "condition": "sleep",
+   "n_seeds": 15,
+   "pop_rate_hz_mean": 0.5448623872296459,
+   "kc_rate_hz_mean": 1.210564714566929,
+   "mbon_rate_hz_mean": 2.802079037800687,
+   "dfb_rate_hz_mean": 16.906406249999996,
+   "frac_kc_active_mean": 0.4463582677165354,
+   "pop_rate_hz_sd": 0.3493373429222932,
+   "kc_rate_hz_sd": 0.7862728775274446
+  },
+  {
+   "condition": "wake",
+   "n_seeds": 16,
+   "pop_rate_hz_mean": 0.5679130420084738,
+   "kc_rate_hz_mean": 1.2753060408464567,
+   "mbon_rate_hz_mean": 2.9706507731958762,
+   "dfb_rate_hz_mean": 0.001171875,
+   "frac_kc_active_mean": 0.45267901082677164,
+   "pop_rate_hz_sd": 0.3550174576438043,
+   "kc_rate_hz_sd": 0.8004006564528863
+  },
+  {
+   "condition": "sleep_naive",
+   "n_seeds": 15,
+   "pop_rate_hz_mean": 0.5512394395171822,
+   "kc_rate_hz_mean": 1.262253937007874,
+   "mbon_rate_hz_mean": 3.458367697594502,
+   "dfb_rate_hz_mean": 16.91859375,
+   "frac_kc_active_mean": 0.45260826771653545,
+   "pop_rate_hz_sd": 0.3559041104984512,
+   "kc_rate_hz_sd": 0.8281285743768565
+  }
+ ],
+ "manipulation_strength": {
+  "pop_rate_relative_change": 0.04058835257120933,
+  "kc_rate_relative_change": 0.05076532550301191,
+  "frac_kc_active_relative_change": 0.013962969254289125,
+  "n_dfb_clamped": 32,
+  "n_neurons": 144209,
+  "dfb_fraction_of_brain": 0.00022190015879730113,
+  "state_is_distinguishable": true,
+  "note": "Clamping the 32 dFB neurons measurably changes the rest of the brain: population rate 0.5449 vs 0.5679 Hz per neuron."
+ },
+ "memory_visible_offline": {
+  "mbon_rate_trained": 2.802079037800687,
+  "mbon_rate_naive": 3.458367697594502,
+  "relative_reduction": 0.18976832921794362,
+  "note": "The learned weights are measurable offline: with no odour present, the mushroom-body output neurons fire more slowly in the trained network than in the identical run with unlearned weights. This confirms the engram is loaded and active during the offline period, independently of whether it changes which Kenyon cells reactivate."
+ },
+ "walltime_s": 7574.0,
+ "provenance": {
+  "config": "configs/stage5_sleep.yaml",
+  "results_dir": "results/stage5_sleep/real_gain0.6_sparse",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed0/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed0/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed0/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed1/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed1/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed1/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed2/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed2/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed2/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed3/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed3/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed3/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed4/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed4/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed4/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed5/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed5/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed5/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed6/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed6/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed6/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed7/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed7/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed7/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed8/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed8/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed8/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed9/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed9/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed9/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed10/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed10/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed10/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed11/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed11/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed11/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed12/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed12/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed12/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed13/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed13/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed13/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed14/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed14/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed14/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed15/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed15/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed15/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed16/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed16/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed16/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed17/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed17/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed17/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed18/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed18/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed18/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_seed19/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/wake_seed19/spikes.npz",
+   "/Users/ankthba/Developer/fly/results/stage5_sleep/real_gain0.6_sparse/sleep_naive_seed19/spikes.npz"
+  ]
+ }
+}

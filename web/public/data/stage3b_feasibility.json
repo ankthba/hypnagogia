@@ -1,9 +1,17 @@
 {
  "status": "passed",
  "criterion": "at least one (glomerulus set, rate) gives a mean Kenyon-cell response fraction inside 5-10% AND activity that does not outlast the odour (post-odour population rate below 1% of the during-odour rate)",
- "headline": "Modelling APL as a spiking neuron takes the odour response from 4.5% of Kenyon cells at 0.79 Hz to 67.7% at 40.1 Hz, and the offline rate from 0.13 Hz to 32.3 Hz. Real Kenyon cells respond at 6 +/- 5% and idle near 0.1 Hz, so the corrected model matches the measurement and the published one is off by more than two orders of magnitude. Everything else is identical. The substitution changes nothing measurable, because DPM never fires a single spike in either condition and so never releases anything for the sign to apply to. The reason is the other correction: APL modelled as non-spiking sits at its saturating release level and delivers a steady 290 mV of hyperpolarising drive to DPM through 1,595 synapses, which is 41 times DPM's threshold gap. Both runs give 4.45% of Kenyon cells at 0.778 Hz during the odour and 0.138 Hz after it. The transmitter assignment is still wrong and is still corrected everywhere, but in this model it is inert: DPM is one of the cells the corrected APL switches off. The same happens to the readout MBON. Both cells have measured odour responses in the fly, so a model in which APL silences them is not reproducing them. Sparse, transient Kenyon-cell odour coding is reproduced at 4 glomeruli / 150 Hz: 4.4% of Kenyon cells respond at 0.77 Hz, falling to 0.14 Hz once the odour stops. The rest of the network does not return to baseline (1.69 vs 2.00 Hz per neuron), so the mushroom body recovers while the wider brain does not.",
+ "headline": "With APL modelled as a spiking neuron, as the published model does, an odour drives 52.6% of Kenyon cells at 23.0 Hz and they idle afterwards at 18.1 Hz. Correcting APL to non-spiking release gives 4.54% at 0.79 Hz, idling at 0.134 Hz. Real Kenyon cells respond at 6 +/- 5% of the population and idle near 0.1 Hz, so the corrected model lands on the measurement and the published one misses it by more than two orders of magnitude. Nothing else differs between the two: same connectome, same parameters, same stimulus, same seeds. The substitution changes nothing measurable, because DPM never fires a single spike in either condition and so never releases anything for the sign to apply to. The reason is the other correction: APL modelled as non-spiking sits at its saturating release level and delivers a steady 290 mV of hyperpolarising drive to DPM through 1,595 synapses, which is 41 times DPM's threshold gap. Both runs give 4.45% of Kenyon cells at 0.778 Hz during the odour and 0.138 Hz after it. The transmitter assignment is still wrong and is still corrected everywhere, but in this model it is inert: DPM is one of the cells the corrected APL switches off. The same happens to the readout MBON. Both cells have measured odour responses in the fly, so a model in which APL silences them is not reproducing them. Sparse, transient Kenyon-cell odour coding is reproduced at 4 glomeruli / 150 Hz: 4.4% of Kenyon cells respond at 0.77 Hz, falling to 0.14 Hz once the odour stops. The rest of the network does not return to baseline (1.69 vs 2.00 Hz per neuron), so the mushroom body recovers while the wider brain does not.",
  "apl_correction": {
   "status": "passed",
+  "how_much_of_this_is_just_more_inhibition": {
+   "APL_spiking_rate_hz": 305.6666666666667,
+   "APL_max_rate_hz_from_refractory": 454.5454545454545,
+   "spiking_APL_as_fraction_of_its_own_maximum": 0.6724666666666668,
+   "extra_inhibition_the_correction_delivers": 1.4870625557648456,
+   "change_in_KC_response_fraction": 11.585895117540685,
+   "note": "The spiking APL already runs at most of the maximum rate its refractory period allows, so the corrected APL delivers only a little more inhibition in total, while the odour code changes by more than an order of magnitude. What the correction changes is that the inhibition is continuous instead of arriving in pulses that Kenyon cells can fire between."
+  },
   "question": "What does modelling APL as a spiking neuron do to the mushroom body?",
   "correction": "APL does not fire action potentials; it releases transmitter in proportion to membrane depolarisation (Amin et al. 2020 eLife 9:e56954). It is modelled here as non-spiking, with release rectified at rest and saturating at the spike threshold. The scaling introduces no free parameter: a neuron held at threshold delivers exactly what a spiking synapse delivers at its maximum refractory-limited rate.",
   "why_it_matters": {
@@ -21,16 +29,16 @@
   "summary": {
    "apl_spiking": {
     "odor": {
-     "pop_rate_hz": 3.464277541623616,
-     "kc_rate_hz": 40.09030511811024,
-     "frac_kc": 0.677247375328084,
-     "apl_rate_hz": 354.3333333333333
+     "pop_rate_hz": 2.7996495826658996,
+     "kc_rate_hz": 23.047654199475062,
+     "frac_kc": 0.525508530183727,
+     "apl_rate_hz": 305.6666666666667
     },
     "post": {
-     "pop_rate_hz": 2.882347842367675,
-     "kc_rate_hz": 32.294619422572175,
-     "frac_kc": 0.6169619422572178,
-     "apl_rate_hz": 354.4166666666667
+     "pop_rate_hz": 2.3551673843749925,
+     "kc_rate_hz": 18.06094160104987,
+     "frac_kc": 0.4298720472440945,
+     "apl_rate_hz": 297.9166666666667
     },
     "n_seeds": 3
    },
@@ -50,8 +58,8 @@
     "n_seeds": 3
    }
   },
-  "finding": "Modelling APL as a spiking neuron takes the odour response from 4.5% of Kenyon cells at 0.79 Hz to 67.7% at 40.1 Hz, and the offline rate from 0.13 Hz to 32.3 Hz. Real Kenyon cells respond at 6 +/- 5% and idle near 0.1 Hz, so the corrected model matches the measurement and the published one is off by more than two orders of magnitude. Everything else is identical.",
-  "walltime_s": 0.3,
+  "finding": "With APL modelled as a spiking neuron, as the published model does, an odour drives 52.6% of Kenyon cells at 23.0 Hz and they idle afterwards at 18.1 Hz. Correcting APL to non-spiking release gives 4.54% at 0.79 Hz, idling at 0.134 Hz. Real Kenyon cells respond at 6 +/- 5% of the population and idle near 0.1 Hz, so the corrected model lands on the measurement and the published one misses it by more than two orders of magnitude. Nothing else differs between the two: same connectome, same parameters, same stimulus, same seeds.",
+  "walltime_s": 25.6,
   "provenance": {
    "config": "configs/base.yaml",
    "results_dir": "results/stage3a_apl",
@@ -140,7 +148,7 @@
    }
   },
   "finding": "The substitution changes nothing measurable, because DPM never fires a single spike in either condition and so never releases anything for the sign to apply to. The reason is the other correction: APL modelled as non-spiking sits at its saturating release level and delivers a steady 290 mV of hyperpolarising drive to DPM through 1,595 synapses, which is 41 times DPM's threshold gap. Both runs give 4.45% of Kenyon cells at 0.778 Hz during the odour and 0.138 Hz after it. The transmitter assignment is still wrong and is still corrected everywhere, but in this model it is inert: DPM is one of the cells the corrected APL switches off. The same happens to the readout MBON. Both cells have measured odour responses in the fly, so a model in which APL silences them is not reproducing them.",
-  "walltime_s": 0.2,
+  "walltime_s": 0.1,
   "provenance": {
    "config": "configs/base.yaml",
    "results_dir": "results/stage3f_dpm",
@@ -1569,115 +1577,60 @@
     "gain": 1.0,
     "epoch": "odor",
     "n_seeds": 3,
-    "frac_kc_A": 0.6824967191601049,
-    "frac_kc_B": 0.6480479002624672,
-    "jaccard_observed": 0.9430389609627644,
-    "jaccard_chance": 0.49862637252743003,
-    "excess_over_chance": 0.4444125884353344,
-    "discriminable": false
+    "frac_kc_A": 0.04338910761154855,
+    "frac_kc_B": 0.014599737532808398,
+    "jaccard_observed": 0.2784763023893459,
+    "jaccard_chance": 0.011373729695007087,
+    "excess_over_chance": 0.2671025726943388,
+    "discriminable": true
    },
    {
     "gain": 1.0,
     "epoch": "post",
     "n_seeds": 3,
-    "frac_kc_A": 0.610482283464567,
-    "frac_kc_B": 0.5931758530183727,
-    "jaccard_observed": 0.9412207630120477,
-    "jaccard_chance": 0.4297561689041875,
-    "excess_over_chance": 0.5114645941078602,
-    "discriminable": false
+    "frac_kc_A": 0.01369750656167979,
+    "frac_kc_B": 0.011646981627296589,
+    "jaccard_observed": 0.7676273712394858,
+    "jaccard_chance": 0.005523515062628447,
+    "excess_over_chance": 0.7621038561768573,
+    "discriminable": true
    },
    {
     "gain": 0.8,
     "epoch": "odor",
     "n_seeds": 3,
-    "frac_kc_A": 0.343503937007874,
-    "frac_kc_B": 0.2103018372703412,
-    "jaccard_observed": 0.5820414729469686,
-    "jaccard_chance": 0.14979451224471718,
-    "excess_over_chance": 0.43224696070225144,
+    "frac_kc_A": 0.011811023622047244,
+    "frac_kc_B": 0.0017224409448818895,
+    "jaccard_observed": 0.14587554880108072,
+    "jaccard_chance": 0.0006006493506493507,
+    "excess_over_chance": 0.14527489945043137,
     "discriminable": true
    },
    {
     "gain": 0.8,
     "epoch": "post",
     "n_seeds": 3,
-    "frac_kc_A": 0.19972112860892388,
-    "frac_kc_B": 0.1760990813648294,
-    "jaccard_observed": 0.8270876165087645,
-    "jaccard_chance": 0.10247154861649195,
-    "excess_over_chance": 0.7246160678922725,
+    "frac_kc_A": 0.002952755905511811,
+    "frac_kc_B": 0.0014763779527559055,
+    "jaccard_observed": 0.5023310023310024,
+    "jaccard_chance": 0.0018575851393188853,
+    "excess_over_chance": 0.5004734171916835,
     "discriminable": true
    },
    {
     "gain": 0.6,
     "epoch": "odor",
-    "n_seeds": 3,
-    "frac_kc_A": 0.07833005249343832,
-    "frac_kc_B": 0.050032808398950135,
-    "jaccard_observed": 0.49616818286179204,
-    "jaccard_chance": 0.032122263858941576,
-    "excess_over_chance": 0.46404591900285047,
-    "discriminable": true
-   },
-   {
-    "gain": 0.6,
-    "epoch": "post",
-    "n_seeds": 3,
-    "frac_kc_A": 0.048556430446194225,
-    "frac_kc_B": 0.04576771653543307,
-    "jaccard_observed": 0.8790991024949367,
-    "jaccard_chance": 0.023352549696378122,
-    "excess_over_chance": 0.8557465527985586,
-    "discriminable": true
-   },
-   {
-    "gain": 0.5,
-    "epoch": "odor",
-    "n_seeds": 3,
-    "frac_kc_A": 0.027723097112860893,
-    "frac_kc_B": 0.015994094488188976,
-    "jaccard_observed": 0.3427561150939364,
-    "jaccard_chance": 0.009673843310728663,
-    "excess_over_chance": 0.3330822717832077,
-    "discriminable": true
-   },
-   {
-    "gain": 0.5,
-    "epoch": "post",
-    "n_seeds": 3,
-    "frac_kc_A": 0.015091863517060369,
-    "frac_kc_B": 0.014107611548556429,
-    "jaccard_observed": 0.8553250028659866,
-    "jaccard_chance": 0.009464727204123334,
-    "excess_over_chance": 0.8458602756618633,
-    "discriminable": true
-   },
-   {
-    "gain": 0.4,
-    "epoch": "odor",
-    "n_seeds": 3,
-    "frac_kc_A": 0.004101049868766404,
-    "frac_kc_B": 0.0008202099737532808,
-    "jaccard_observed": 0.11134044260979244,
-    "jaccard_chance": 0.0008333333333333334,
-    "excess_over_chance": 0.1105071092764591,
-    "discriminable": true
-   },
-   {
-    "gain": 0.4,
-    "epoch": "post",
-    "n_seeds": 3,
-    "frac_kc_A": 0.0009022309711286089,
-    "frac_kc_B": 0.0006561679790026247,
-    "jaccard_observed": 0.6055555555555555,
+    "n_seeds": 1,
+    "frac_kc_A": 0.0004921259842519685,
+    "frac_kc_B": 0.00024606299212598425,
+    "jaccard_observed": 0.0,
     "jaccard_chance": 0.0,
-    "excess_over_chance": 0.6055555555555555,
+    "excess_over_chance": 0.0,
     "discriminable": true
    }
   ],
-  "finding": "The two odours remain discriminable at gain(s) [0.4, 0.5, 0.6, 0.8] in the self-sustaining state after the stimulus.",
-  "walltime_s": 191.2,
+  "finding": "The two odours remain discriminable at gain(s) [0.8, 1.0] in the self-sustaining state after the stimulus.",
+  "walltime_s": 121.3,
   "provenance": {
    "config": "configs/stage3d_gain.yaml",
    "results_dir": "results/stage3e_discrim",
@@ -1727,7 +1680,7 @@
    "results/stage3c_control/stage3c.json",
    "results/stage3d_gain/stage3d.json"
   ],
-  "git_commit": "86f66bf",
-  "generated_at": "2026-09-12T07:29:38+00:00"
+  "git_commit": "0f93eee",
+  "generated_at": "2026-09-12T11:31:06+00:00"
  }
 }

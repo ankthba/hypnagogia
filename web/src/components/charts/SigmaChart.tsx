@@ -75,25 +75,38 @@ function symlogTickValues(lo: number, hi: number, T: number, dense: boolean): nu
   const add = (v: number) => {
     if (v >= lo - 1e-12 && v <= hi + 1e-12) out.add(v);
   };
-  if (dense) {
-    add(T / 2);
-    add(-T / 2);
-  }
+  add(T / 2);
+  add(-T / 2);
   add(T);
   add(-T);
+  const decades = new Set<number>();
   const m = Math.max(Math.abs(lo), Math.abs(hi));
   for (let d = 1; T * Math.pow(10, d - 1) <= m * 1.0001 && d < 12; d++) {
     const dec = T * Math.pow(10, d);
-    if (dense) {
-      add(0.2 * dec);
-      add(-0.2 * dec);
-      add(0.5 * dec);
-      add(-0.5 * dec);
-    }
+    add(0.2 * dec);
+    add(-0.2 * dec);
+    add(0.5 * dec);
+    add(-0.5 * dec);
     add(dec);
     add(-dec);
+    decades.add(dec);
+    decades.add(-dec);
   }
-  return [...out].sort((a, b) => a - b);
+  const all = [...out].sort((a, b) => a - b);
+  if (dense) return all;
+  /**
+   * Narrow: a 111px plot cannot carry seven labels, but it must still carry one above the linear
+   * edge, or the whole logarithmic half of the axis is unlabelled and the reader cannot tell how
+   * high the top of the data is. Keep zero, the linear edge, every decade, and the extreme on each
+   * side, and drop the rest.
+   */
+  const keep = new Set<number>([0]);
+  for (const v of all) if (v === T || v === -T || decades.has(v)) keep.add(v);
+  const pos = all.filter((v) => v > 0);
+  const neg = all.filter((v) => v < 0);
+  if (pos.length) keep.add(pos[pos.length - 1]);
+  if (neg.length) keep.add(neg[0]);
+  return [...keep].sort((a, b) => a - b);
 }
 
 /** Geometric band edges around each sigma on a log axis. */
@@ -177,7 +190,10 @@ export default function SigmaChart({
   return (
     <div ref={boxRef}>
       <ResponsiveContainer width="100%" height={h} minHeight={190}>
-        <ScatterChart margin={narrow ? { top: 8, right: 10, bottom: 24, left: 0 } : { top: 10, right: 16, bottom: 28, left: 8 }}>
+        {/* Wide: a refY label sits in the right margin (position "right"), and at 16px of margin
+            "m = 1" ran 16px past the edge of the SVG, where the root's own overflow clip cut it.
+            The margin is widened to hold it whenever such a label is drawn. */}
+        <ScatterChart margin={narrow ? { top: 8, right: 10, bottom: 24, left: 0 } : { top: 10, right: refY && refY.length > 0 ? 48 : 16, bottom: 28, left: 8 }}>
           <CartesianGrid stroke={SERIES.grid} />
           {edges.map((e) => (
             <ReferenceArea key={e.s} x1={e.lo} x2={e.hi} fill={classBand(bandCls.get(e.s))} fillOpacity={1} stroke="none" ifOverflow="hidden" />
@@ -255,11 +271,16 @@ export default function SigmaChart({
           </Scatter>
         </ScatterChart>
       </ResponsiveContainer>
-      {narrow && <div className="smaller muted">vertical axis: {yLabel}.</div>}
-      {T !== null && (
+      {(narrow || T !== null) && (
         <div className="smaller muted">
-          Vertical axis is a symmetric log axis: linear within ±{fmtNum(T, 3)} of zero, logarithmic beyond it. The values are the file's own;
-          only their position on the axis is transformed.
+          Vertical axis{narrow ? <>: {yLabel}</> : null}
+          {T !== null && (
+            <>
+              {narrow ? ', on a' : ' is a'} symmetric log scale: linear within ±{fmtNum(T, 3)} of zero, logarithmic beyond it. The values are the
+              file's own; only their position on the axis is transformed
+            </>
+          )}
+          .
         </div>
       )}
       {dropped > 0 && (

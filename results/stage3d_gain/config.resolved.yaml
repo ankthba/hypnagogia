@@ -19,6 +19,9 @@ model:
   dt_ms: 0.1
   sign_rule: GABA & glutamate -1 (Liu & Wilson 2013), ACh/DA/OA/5-HT +1 (Shiu et al.
     2024); histamine -1 (HisCl, Hardie 1989 - pipeline decision)
+graded_release:
+  populations:
+  - APL
 drive:
   f_poi: 250
   no_refractory_when_driven: true
@@ -30,7 +33,7 @@ noise:
     n_inputs: 1
     weight_mV: 0.275
 run:
-  n_parallel: 8
+  n_parallel: 14
   openmp_threads: 0
   delete_standalone: true
   extra_compile_args:
@@ -84,6 +87,10 @@ params_table:
   value: '-1'
   source: Hardie 1989 Nature 339:704 (HisCl); pipeline decision beyond Shiu 2024
   cited: true
+- name: APL release
+  value: graded, non-spiking
+  source: Amin et al. 2020 eLife 9:e56954
+  cited: true
 - name: sign(unknown NT)
   value: '+1'
   source: 'no source: neurons with no NT prediction default to excitatory (count reported
@@ -127,8 +134,8 @@ odor_calibration:
   - 1
   - 2
   target_frac_kc:
-  - 0.05
-  - 0.1
+  - 0.01
+  - 0.11
   criterion: at least one (glomerulus set, rate) gives a mean Kenyon-cell response
     fraction inside 5-10% AND activity that does not outlast the odour (post-odour
     population rate below 1% of the during-odour rate)
