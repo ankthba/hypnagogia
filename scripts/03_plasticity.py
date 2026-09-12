@@ -14,10 +14,11 @@ from hypnagogia.jobs import run_jobs
 OUT = RESULTS / "stage3_plasticity"   # suffixed with the gain when it is not 1.0
 
 
-def operating_sigma(cfg):
+def operating_sigma(cfg, gain=1.0):
     if cfg["noise"].get("sigma_mV") is not None:
         return float(cfg["noise"]["sigma_mV"]), "config"
-    p = RESULTS / "stage2_criticality" / "full" / "stage2.json"
+    net = "full" if gain == 1.0 else f"full_gain{gain}"
+    p = RESULTS / "stage2_criticality" / net / "stage2.json"
     if p.exists():
         s2 = json.load(open(p))
         if s2.get("operating_sigma_mV") is not None:
@@ -62,7 +63,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     t0 = time.time()
     ut = unit_test(cfg, pl); print("unit test:", ut["passed"], ut["results"])
-    sigma, sigma_src = operating_sigma(cfg)
+    sigma, sigma_src = operating_sigma(cfg, gain=a.gain)
     conn = load_connectome("malecns", "v1.0", "brain")
     kc, mbon, dan = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON"), conn.select(cell_class="DAN")
     ro = conn.select(cell_type=cal["readout_mbon_type"]); dsel = conn.select(cell_type=cal["dan_type"])

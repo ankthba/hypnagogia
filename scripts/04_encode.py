@@ -16,7 +16,8 @@ from hypnagogia.analysis.stats import paired_effect
 OUT = RESULTS / "stage4_learning"
 
 
-def operating_sigma(cfg, network="full"):
+def operating_sigma(cfg, network="full", gain=1.0):
+    network = network if gain == 1.0 else f"{network}_gain{gain}"
     if cfg["noise"].get("sigma_mV") is not None:
         return float(cfg["noise"]["sigma_mV"]), "config"
     p = RESULTS / "stage2_criticality" / network / "stage2.json"
@@ -77,7 +78,7 @@ def main():
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s4["seeds"]
     tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
-    sigma, sigma_src = operating_sigma(cfg)
+    sigma, sigma_src = operating_sigma(cfg, gain=a.gain)
     eta, eta_src = eta_from_stage3(cfg)
     conn = load_connectome("malecns", "v1.0", "brain")
     kc, mbon = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON")
