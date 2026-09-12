@@ -608,6 +608,22 @@ def main():
                 for net, conds in obj["ensemble_sizes"].items():
                     w(f"- {net}: " + ", ".join(f"{c} {v:.0f}" for c, v in conds.items()))
                 w()
+            rb = obj.get("bin_robustness") or []
+            if rb:
+                w("**Does the verdict depend on the time bin?** The primary bin is the cited one (Kudrimoti et al. "
+                  "1999). The same runs re-analysed at shorter bins:")
+                w()
+                w("| bin | events are discrete | verdict | comparisons that showed the predicted effect |")
+                w("|---|---|---|---|")
+                for r in rb:
+                    surv = [c["name"] for c in (r.get("comparisons") or []) if c.get("available") and c.get("survives")]
+                    w(f"| {r.get('bin_ms', 0):.0f} ms | {'yes' if r.get('events_are_discrete') else 'no'} | "
+                      f"{r.get('status')} | {', '.join(surv) if surv else 'none'} |")
+                w()
+                for r in rb:
+                    if r.get("headline"):
+                        w(f"At {r.get('bin_ms', 0):.0f} ms: {r['headline']}")
+                        w()
             sc = obj.get("structure_confound")
             if sc:
                 w("**Is this wiring rather than memory?** " + sc["finding"])

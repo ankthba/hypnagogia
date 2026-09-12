@@ -39,6 +39,9 @@ def tagged(base, suffix):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", default=None); ap.add_argument("--bin-ms", type=float, default=None)
     ap.add_argument("--gain", type=float, default=1.0); ap.add_argument("--tag", default="")
+    # --tag selects which stage-5 directories to read. --out-tag changes only where the result is written, so
+    # the same runs can be re-analysed at a different bin without overwriting the primary, pre-registered one.
+    ap.add_argument("--out-tag", default="")
     a = ap.parse_args()
     gain_suffix = "" if a.gain == 1.0 else f"_gain{a.gain}"
     suffix = gain_suffix + (a.tag or "")     # stage 5 directories carry the tag; stage 4 directories do not
@@ -46,8 +49,8 @@ def main():
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s6["seeds"]
     bin_s = (a.bin_ms or s6["bin_ms"]) / 1e3
     global OUT
-    if a.gain != 1.0 or a.tag:
-        OUT = RESULTS / f"stage6_replay_gain{a.gain}{a.tag or ''}"
+    if a.gain != 1.0 or a.tag or a.out_tag:
+        OUT = RESULTS / (f"stage6_replay" + ("" if a.gain == 1.0 else f"_gain{a.gain}") + (a.tag or "") + (a.out_tag or ""))
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     conn = load_connectome("malecns", "v1.0", "brain")
     kc = conn.select(cell_class="Kenyon_Cell")

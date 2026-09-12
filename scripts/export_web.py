@@ -204,6 +204,23 @@ def main():
             d = conform(key, d)
             if key == "stage6_replay" and s6b:
                 d["structure_confound"] = s6b
+            if key == "stage6_replay":
+                # The same runs re-analysed at shorter bins, written by 06_replay.py --bin-ms with --out-tag.
+                # The primary bin is the cited one; these say whether the verdict depends on that choice.
+                rb = []
+                for cand in sorted(RESULTS.glob("stage6_replay_bin*/stage6.json")):
+                    r = load_json(cand)
+                    if not r:
+                        continue
+                    rb.append({"bin_ms": r.get("window_ms"), "status": r.get("status"),
+                               "headline": r.get("headline"),
+                               "events_are_discrete": (r.get("continuity_check") or {}).get("events_are_discrete"),
+                               "fraction_of_bins_called_events": (r.get("continuity_check") or {}).get("fraction_of_bins_called_events"),
+                               "comparisons": [{k: c.get(k) for k in ("name", "label", "diff", "ci95", "hedges_g", "p_permutation", "n", "survives", "available")}
+                                               for c in (r.get("comparisons") or [])],
+                               "source_file": str(cand.relative_to(RESULTS.parent))})
+                if rb:
+                    d["bin_robustness"] = sorted(rb, key=lambda x: x.get("bin_ms") or 0)
             sub_dir = str(Path(src).parent.relative_to("results")) if src else sub_dir
         if d:
             d.setdefault("provenance", {}); d["provenance"].update({"git_commit": commit, "generated_at": now})

@@ -418,6 +418,18 @@ export interface Stage6 extends StageBase {
   gain?: number;
   gain_note?: string;
   metric_note?: string;
+  /**
+   * The same runs re-analysed at shorter time bins. The primary bin is the cited one; these say whether
+   * the verdict depends on that choice. Written by scripts/export_web.py from the stage6_replay_bin<n> result directories.
+   */
+  bin_robustness?: Array<{
+    bin_ms?: number;
+    status?: string;
+    headline?: string;
+    events_are_discrete?: boolean | null;
+    comparisons?: Array<{ name?: string; label?: string; diff?: number; ci95?: [number, number]; hedges_g?: number; p_permutation?: number; n?: number; survives?: boolean; available?: boolean }>;
+    source_file?: string;
+  }>;
   /** mean odour-A ensemble size per network and condition, written by scripts/06_replay.py */
   ensemble_sizes?: Record<string, { sleep?: number; wake?: number; sleep_naive?: number }>;
   per_seed: Stage6PerSeed[];

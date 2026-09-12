@@ -571,6 +571,43 @@ function Stage6View({ d }: { d: Stage6 }) {
         <ForestPlot comparisons={comparisons} required={d.required_four} note={d.fifth_comparison_note} />
       </Figure>
 
+      {d.bin_robustness && d.bin_robustness.length > 0 && (
+        <div className="card">
+          <div className="label label--ink mb-2">Does the verdict depend on the time bin?</div>
+          <p className="smaller muted measure">
+            The primary bin is the one Kudrimoti et al. 1999 used. These are the same runs re-analysed at shorter
+            bins, which matters here because at the primary bin the ensemble is active in almost every bin, so
+            reactivation is not a set of discrete episodes.
+          </p>
+          <DataTable
+            columns={[
+              { key: 'b', header: 'bin', render: (r) => (isNum(r.bin_ms) ? `${fmtNum(r.bin_ms, 0)} ms` : NOT_MEASURED) },
+              { key: 'e', header: 'events are discrete', render: (r) => (r.events_are_discrete == null ? NOT_MEASURED : r.events_are_discrete ? 'yes' : 'no') },
+              { key: 's', header: 'verdict', render: (r) => r.status ?? NOT_MEASURED },
+              {
+                key: 'c',
+                header: 'comparisons that showed the predicted effect',
+                render: (r) => {
+                  const surv = (r.comparisons ?? []).filter((c) => c.available && c.survives).map((c) => c.name).filter(Boolean);
+                  return surv.length ? surv.join(', ') : 'none';
+                },
+              },
+            ]}
+            rows={d.bin_robustness}
+            rowKey={(r, i) => `${r.bin_ms}-${i}`}
+            empty="no shorter-bin analysis has been written"
+          />
+          {d.bin_robustness.map((r, i) =>
+            r.headline ? (
+              <p key={i} className="smaller mt-3 measure">
+                <strong>At {isNum(r.bin_ms) ? `${fmtNum(r.bin_ms, 0)} ms` : 'that bin'}:</strong> {r.headline}
+              </p>
+            ) : null,
+          )}
+          <ProvenanceFooter provenance={d.provenance} />
+        </div>
+      )}
+
       {d.ensemble_sizes && Object.keys(d.ensemble_sizes).length > 0 && (
         <div className="card">
           <div className="label label--ink mb-2">How big the ensembles being compared actually are</div>
