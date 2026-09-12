@@ -18365,7 +18365,9 @@
   "A_post_mean": 0.0,
   "B_pre_mean": 0.0,
   "B_post_mean": 0.0,
-  "n_seeds": 20
+  "n_seeds": 20,
+  "diff_of_deltas": -16.95,
+  "p_paired": 0.0
  },
  "notes": [
   "The control odour never drove the readout MBON before conditioning (mean 0.00 Hz), so 'no change in the control' is a floor effect and carries no information. The specificity of the plasticity is therefore established synaptically instead: see synaptic_specificity, which splits the weight change by which odour drove the presynaptic Kenyon cell."
@@ -18430,8 +18432,8 @@
    "results/stage4_learning/real_gain0.6/seed18/plastic_w.npz",
    "results/stage4_learning/real_gain0.6/seed19/plastic_w.npz"
   ],
-  "git_commit": "dc0d27f",
-  "generated_at": "2026-09-12T05:19:17+00:00"
+  "git_commit": "7471545",
+  "generated_at": "2026-09-12T05:22:49+00:00"
  },
  "source_file": "results/stage4_learning/real_gain0.6/stage4.json"
 }

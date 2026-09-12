@@ -43,5 +43,6 @@ python -u scripts/06_replay.py --gain "$G" --seeds "$SEEDS" 2>&1 | tail -25
 
 log "export + results.md"
 python -u scripts/export_web.py 2>&1 | tail -12
+python -u scripts/validate_export.py 2>&1 | tail -20
 python -u scripts/make_results.py 2>&1 | tail -3
 log "variant $G complete"

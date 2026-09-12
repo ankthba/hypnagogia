@@ -159,6 +159,28 @@ def main():
             return load_json(variants[-1]), str(variants[-1].relative_to(RESULTS.parent))
         return None, None
 
+    def conform(key, d):
+        """Emit the field names web/DATA_CONTRACT.md promises alongside the pipeline's own.
+
+        The analysis functions name things after the statistic they compute (diff, p_permutation, n); the
+        contract names them after what the page shows (diff_of_deltas, p_paired, n_seeds). Where those differ
+        the viewer renders "null", which reads as a legitimate missing measurement rather than a wiring bug.
+        scripts/validate_export.py fails the build if any promised field is missing or null.
+        """
+        if key == "stage4_learning" and isinstance(d.get("effect"), dict):
+            e = d["effect"]
+            e.setdefault("diff_of_deltas", e.get("diff"))
+            e.setdefault("p_paired", e.get("p_permutation"))
+            e.setdefault("n_seeds", e.get("n"))
+        if key == "stage6_replay":
+            for c in d.get("comparisons", []) or []:
+                if c.get("available"):
+                    c.setdefault("p", c.get("p_permutation"))
+            for c in d.get("comparisons_raw_metric", []) or []:
+                if c.get("available"):
+                    c.setdefault("p", c.get("p_permutation"))
+        return d
+
     for key, sub_dir, fname, title in [("stage3_plasticity", "stage3_plasticity", "stage3.json", "Stage 3 - Plasticity"),
                                        ("stage4_learning", "stage4_learning", "stage4.json", "Stage 4 - Learning"),
                                        ("stage5_sleep", "stage5_sleep", "stage5.json", "Stage 5 - Sleep"),
@@ -166,6 +188,7 @@ def main():
         d, src = pick_stage(sub_dir, fname)
         if d is not None:
             d["source_file"] = src
+            d = conform(key, d)
             sub_dir = str(Path(src).parent.relative_to("results")) if src else sub_dir
         if d:
             d.setdefault("provenance", {}); d["provenance"].update({"git_commit": commit, "generated_at": now})

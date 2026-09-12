@@ -72,7 +72,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.0037
   },
   {
    "name": "sleep_vs_wake_A",
@@ -117,7 +118,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.6954
   },
   {
    "name": "real_vs_shuffled",
@@ -162,7 +164,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.0
   },
   {
    "name": "A_vs_random_ensembles",
@@ -207,7 +210,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.0
   },
   {
    "name": "trained_vs_naive_weights",
@@ -252,7 +256,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.0
   }
  ],
  "comparisons_raw_metric": [
@@ -299,7 +304,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.0
   },
   {
    "name": "sleep_vs_wake_A_raw",
@@ -344,7 +350,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.1894
   },
   {
    "name": "real_vs_shuffled_raw",
@@ -389,7 +396,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "p": 0.0
   }
  ],
  "sequence": {
@@ -5873,8 +5881,8 @@
    "results/stage5_sleep/real_gain0.6/sleep_seed8/spikes.npz",
    "results/stage5_sleep/real_gain0.6/sleep_seed9/spikes.npz"
   ],
-  "git_commit": "dc0d27f",
-  "generated_at": "2026-09-12T05:19:17+00:00"
+  "git_commit": "7471545",
+  "generated_at": "2026-09-12T05:22:49+00:00"
  },
  "source_file": "results/stage6_replay_gain0.6/stage6.json"
 }
