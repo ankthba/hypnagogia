@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T01:21:06+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T01:24:02+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -11,7 +11,8 @@
 Two independent findings block it, and neither came from tuning anything:
 
 1. *There is no critical regime, because the network is bistable.* Sweeping the background noise never produces a sustained intermediate activity level. Seeds at the same noise amplitude either stay silent or ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls inside a gap of more than four orders of magnitude that the model cannot occupy.
-2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a single glomerulus driven at 10 Hz, makes more than half of all Kenyon cells fire, and the activity outlasts the stimulus because the network ignites. In a real fly about 5 to 10 per cent of Kenyon cells respond to an odour, each with a few spikes.
+2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a single receptor neuron driven at 50 Hz, ignites the whole network, and the activity never decays: the population rate after the odour is as high as during it, indefinitely. More than half of all Kenyon cells fire, where a real fly uses 5 to 10 per cent with a few spikes each.
+3. *This is the published model, not this dataset.* Olfactory input ignites BOTH the male CNS and the FlyWire networks at identical parameters. The runaway is a property of the published model when it is driven through the olfactory pathway, not of the male CNS dataset. The published sugar-neuron benchmark does not reveal it because that stimulus is small.
 
 A memory needs a sparse, odour-specific ensemble, and a replay test needs a quiet background for that ensemble to reappear against. This model, at this scale and with the published parameters, provides neither. Reporting that is the honest outcome; the alternative would have been to change parameters until the plots looked right, which this project does not do.
 
@@ -167,9 +168,31 @@ The last two columns are the important ones: the population rate after the odour
 | 35 | 100% | 2.7956 Hz/neuron | 2.8817 Hz/neuron |
 | 74 | 100% | 2.8527 Hz/neuron | 2.8803 Hz/neuron |
 
-## Stage 3d - how far from the published model would you have to go?
+## Stage 3e - do two different odours leave two different ensembles?
 
 **Not run.**
+
+## Stage 3d - how far from the published model would you have to go?
+
+**This section is a labelled deviation from the published parameters.** The gain multiplier is an UNCITED free parameter introduced by this project. It has no source in Shiu et al. 2024, in the connectome data, or in the mushroom-body plasticity literature. gain = 1.0 is the published model and is the primary result everywhere else in this project. Any stage run at gain < 1 is a labelled deviation and is reported as such.
+
+Question asked: How far from the published parameters would the model have to be for sparse Kenyon-cell odour coding to exist?
+
+No gain in the scan produced sparse, transient Kenyon-cell coding.
+
+| gain | effective W_syn | Kenyon cells responding | spikes per responding cell | rate during | rate after | sparse | transient |
+|---|---|---|---|---|---|---|---|
+| 1.00 (published) | 0.15978 mV | 67.5% | 59.4 | 3.4492 | 2.8774 | no | no |
+| 0.80 | 0.12782 mV | 36.8% | 23.8 | 1.8183 | 1.2726 | no | no |
+| 0.60 | 0.09586 mV | 8.2% | 17.0 | 1.1573 | 0.8307 | yes | no |
+| 0.50 | 0.07989 mV | 2.8% | 14.9 | 0.9516 | 0.6472 | no | no |
+| 0.40 | 0.06391 mV | 0.4% | 10.5 | 0.7607 | 0.4695 | no | no |
+| 0.35 | 0.05592 mV | 0.0% | 0.0 | 0.6757 | 0.3922 | no | no |
+| 0.30 | 0.04793 mV | 0.0% | 0.0 | 0.5955 | 0.3161 | no | no |
+| 0.25 | 0.03994 mV | 0.0% | 0.0 | 0.5201 | 0.2460 | no | no |
+| 0.20 | 0.03196 mV | 0.0% | 0.0 | 0.4454 | 0.1737 | no | no |
+| 0.15 | 0.02397 mV | 0.0% | 0.0 | 0.3702 | 0.0978 | no | no |
+| 0.10 | 0.01598 mV | 0.0% | 0.0 | 0.2665 | 0.0000 | no | yes |
 
 ## Stage 3c - is the runaway the model, or this dataset?
 

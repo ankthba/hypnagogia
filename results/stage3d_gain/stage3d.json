@@ -1,0 +1,803 @@
+{
+ "status": "failed",
+ "WARNING": "The gain multiplier is an UNCITED free parameter introduced by this project. It has no source in Shiu et al. 2024, in the connectome data, or in the mushroom-body plasticity literature. gain = 1.0 is the published model and is the primary result everywhere else in this project. Any stage run at gain < 1 is a labelled deviation and is reported as such.",
+ "question": "How far from the published parameters would the model have to be for sparse Kenyon-cell odour coding to exist?",
+ "target_frac_kc": [
+  0.05,
+  0.1
+ ],
+ "protocol": {
+  "gains": [
+   1.0,
+   0.8,
+   0.6,
+   0.5,
+   0.4,
+   0.35,
+   0.3,
+   0.25,
+   0.2,
+   0.15,
+   0.1
+  ],
+  "glomerulus_set": [
+   "ORN_DM1",
+   "ORN_DM4",
+   "ORN_VA2",
+   "ORN_DM2"
+  ],
+  "rate_hz": 150.0,
+  "odor_s": 1.0,
+  "post_s": 2.0,
+  "seeds": [
+   0,
+   1,
+   2
+  ],
+  "target_frac_kc": [
+   0.05,
+   0.1
+  ]
+ },
+ "grid": [
+  {
+   "gain": 1.0,
+   "w_syn_effective_mV": 0.15978,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.67503280839895,
+   "n_kc_active": 2743.3333333333326,
+   "spikes_per_active_kc": 59.406562921047644,
+   "pop_rate_odor": 3.449236871485136,
+   "pop_rate_post": 2.8774221211343725,
+   "mbon_rate_odor": 106.66666666666667,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.8,
+   "w_syn_effective_mV": 0.12782,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.36786417322834647,
+   "n_kc_active": 1495.0,
+   "spikes_per_active_kc": 23.752614275836752,
+   "pop_rate_odor": 1.8183446710445719,
+   "pop_rate_post": 1.2726078122724658,
+   "mbon_rate_odor": 39.735395189003434,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.6,
+   "w_syn_effective_mV": 0.09586,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.08177493438320209,
+   "n_kc_active": 332.3333333333333,
+   "spikes_per_active_kc": 16.98450403274019,
+   "pop_rate_odor": 1.1572532458676874,
+   "pop_rate_post": 0.8307329408474274,
+   "mbon_rate_odor": 2.556701030927835,
+   "sparse": true,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.5,
+   "w_syn_effective_mV": 0.07989,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.028461286089238844,
+   "n_kc_active": 115.66666666666666,
+   "spikes_per_active_kc": 14.926881623119455,
+   "pop_rate_odor": 0.9515749132624641,
+   "pop_rate_post": 0.6472307553620094,
+   "mbon_rate_odor": 1.0412371134020617,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.4,
+   "w_syn_effective_mV": 0.06391,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.003937007874015748,
+   "n_kc_active": 16.0,
+   "spikes_per_active_kc": 10.46111111111111,
+   "pop_rate_odor": 0.7606783672771232,
+   "pop_rate_post": 0.46950259692529595,
+   "mbon_rate_odor": 0.7079037800687286,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.35,
+   "w_syn_effective_mV": 0.05592,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.6757021637576943,
+   "pop_rate_post": 0.39218657180434874,
+   "mbon_rate_odor": 0.5120274914089347,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.3,
+   "w_syn_effective_mV": 0.04793,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.5955037480323697,
+   "pop_rate_post": 0.316050547007006,
+   "mbon_rate_odor": 0.2268041237113402,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.25,
+   "w_syn_effective_mV": 0.03994,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.520129349300899,
+   "pop_rate_post": 0.24598672759675191,
+   "mbon_rate_odor": 0.0,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.2,
+   "w_syn_effective_mV": 0.03196,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.44536517600612074,
+   "pop_rate_post": 0.17372008681843712,
+   "mbon_rate_odor": 0.0,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.15,
+   "w_syn_effective_mV": 0.02397,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.37016644823369776,
+   "pop_rate_post": 0.0977897819599794,
+   "mbon_rate_odor": 0.0,
+   "sparse": false,
+   "transient": false,
+   "usable": false
+  },
+  {
+   "gain": 0.1,
+   "w_syn_effective_mV": 0.01598,
+   "n_seeds": 3,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.266469730275734,
+   "pop_rate_post": 4.969638973064557e-05,
+   "mbon_rate_odor": 0.0,
+   "sparse": false,
+   "transient": true,
+   "usable": false
+  }
+ ],
+ "per_run": [
+  {
+   "gain": 1.0,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 3.4582376966763517,
+    "frac_kc": 0.6729822834645669,
+    "spikes_per_active_kc": 59.32760511882998,
+    "mbon_rate_hz": 106.5360824742268
+   },
+   "post": {
+    "pop_rate_hz": 2.87986533434113,
+    "frac_kc": 0.6154035433070866,
+    "spikes_per_active_kc": 104.88244702119152,
+    "mbon_rate_hz": 98.22680412371135
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 1.0,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 3.465719892655798,
+    "frac_kc": 0.6774114173228346,
+    "spikes_per_active_kc": 59.44605884489648,
+    "mbon_rate_hz": 106.88659793814433
+   },
+   "post": {
+    "pop_rate_hz": 2.8774729732540965,
+    "frac_kc": 0.6126968503937008,
+    "spikes_per_active_kc": 105.20080321285141,
+    "mbon_rate_hz": 98.0979381443299
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 1.0,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 3.4237530251232586,
+    "frac_kc": 0.6747047244094488,
+    "spikes_per_active_kc": 59.446024799416485,
+    "mbon_rate_hz": 106.57731958762886
+   },
+   "post": {
+    "pop_rate_hz": 2.87492805580789,
+    "frac_kc": 0.6077755905511811,
+    "spikes_per_active_kc": 105.77368421052631,
+    "mbon_rate_hz": 97.88659793814433
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.8,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 1.812251662517596,
+    "frac_kc": 0.35482283464566927,
+    "spikes_per_active_kc": 24.407073509015255,
+    "mbon_rate_hz": 39.123711340206185
+   },
+   "post": {
+    "pop_rate_hz": 1.2708187422421624,
+    "frac_kc": 0.2111220472440945,
+    "spikes_per_active_kc": 32.327505827505824,
+    "mbon_rate_hz": 12.685567010309278
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.8,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 1.8208156217711793,
+    "frac_kc": 0.37253937007874016,
+    "spikes_per_active_kc": 23.455085865257598,
+    "mbon_rate_hz": 39.74226804123711
+   },
+   "post": {
+    "pop_rate_hz": 1.272198683854683,
+    "frac_kc": 0.21161417322834647,
+    "spikes_per_active_kc": 31.996511627906976,
+    "mbon_rate_hz": 12.350515463917526
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.8,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 1.8219667288449404,
+    "frac_kc": 0.3762303149606299,
+    "spikes_per_active_kc": 23.39568345323741,
+    "mbon_rate_hz": 40.34020618556701
+   },
+   "post": {
+    "pop_rate_hz": 1.2748060107205514,
+    "frac_kc": 0.1889763779527559,
+    "spikes_per_active_kc": 36.518229166666664,
+    "mbon_rate_hz": 12.608247422680412
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.6,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 1.1538669569860411,
+    "frac_kc": 0.08021653543307086,
+    "spikes_per_active_kc": 17.26073619631902,
+    "mbon_rate_hz": 2.536082474226804
+   },
+   "post": {
+    "pop_rate_hz": 0.8313593465040323,
+    "frac_kc": 0.04896653543307087,
+    "spikes_per_active_kc": 28.889447236180903,
+    "mbon_rate_hz": 1.7628865979381443
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.6,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 1.1593797890561615,
+    "frac_kc": 0.08366141732283465,
+    "spikes_per_active_kc": 16.63235294117647,
+    "mbon_rate_hz": 2.597938144329897
+   },
+   "post": {
+    "pop_rate_hz": 0.8296014811835599,
+    "frac_kc": 0.051181102362204724,
+    "spikes_per_active_kc": 26.942307692307693,
+    "mbon_rate_hz": 1.7474226804123711
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.6,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 1.1585129915608596,
+    "frac_kc": 0.08144685039370078,
+    "spikes_per_active_kc": 17.060422960725077,
+    "mbon_rate_hz": 2.536082474226804
+   },
+   "post": {
+    "pop_rate_hz": 0.8312379948546901,
+    "frac_kc": 0.04749015748031496,
+    "spikes_per_active_kc": 29.82901554404145,
+    "mbon_rate_hz": 1.7989690721649485
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.5,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.9496494670928999,
+    "frac_kc": 0.028297244094488187,
+    "spikes_per_active_kc": 14.921739130434782,
+    "mbon_rate_hz": 1.0721649484536082
+   },
+   "post": {
+    "pop_rate_hz": 0.6475844087400925,
+    "frac_kc": 0.014517716535433071,
+    "spikes_per_active_kc": 23.89830508474576,
+    "mbon_rate_hz": 0.865979381443299
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.5,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.9510640806052327,
+    "frac_kc": 0.028051181102362203,
+    "spikes_per_active_kc": 15.087719298245615,
+    "mbon_rate_hz": 1.0309278350515463
+   },
+   "post": {
+    "pop_rate_hz": 0.6475011961805435,
+    "frac_kc": 0.014517716535433071,
+    "spikes_per_active_kc": 24.83050847457627,
+    "mbon_rate_hz": 0.8711340206185567
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.5,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.9540111920892593,
+    "frac_kc": 0.029035433070866142,
+    "spikes_per_active_kc": 14.771186440677965,
+    "mbon_rate_hz": 1.0206185567010309
+   },
+   "post": {
+    "pop_rate_hz": 0.6466066611653919,
+    "frac_kc": 0.014763779527559055,
+    "spikes_per_active_kc": 24.1,
+    "mbon_rate_hz": 0.8711340206185567
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.4,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.7577127641131968,
+    "frac_kc": 0.004183070866141733,
+    "spikes_per_active_kc": 10.0,
+    "mbon_rate_hz": 0.7010309278350515
+   },
+   "post": {
+    "pop_rate_hz": 0.4693119014763295,
+    "frac_kc": 0.0004921259842519685,
+    "spikes_per_active_kc": 17.5,
+    "mbon_rate_hz": 0.6030927835051546
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.4,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.7618040482910221,
+    "frac_kc": 0.0036909448818897637,
+    "spikes_per_active_kc": 11.133333333333333,
+    "mbon_rate_hz": 0.711340206185567
+   },
+   "post": {
+    "pop_rate_hz": 0.47004001137238316,
+    "frac_kc": 0.0012303149606299212,
+    "spikes_per_active_kc": 7.0,
+    "mbon_rate_hz": 0.5979381443298969
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.4,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.7625182894271508,
+    "frac_kc": 0.003937007874015748,
+    "spikes_per_active_kc": 10.25,
+    "mbon_rate_hz": 0.711340206185567
+   },
+   "post": {
+    "pop_rate_hz": 0.46915587792717517,
+    "frac_kc": 0.000984251968503937,
+    "spikes_per_active_kc": 9.0,
+    "mbon_rate_hz": 0.5979381443298969
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.35,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.672967706592515,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.5154639175257731
+   },
+   "post": {
+    "pop_rate_hz": 0.3925448481024069,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.4175257731958763
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.35,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.6759494899763537,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.5154639175257731
+   },
+   "post": {
+    "pop_rate_hz": 0.39150122391806336,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.41237113402061853
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.35,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.6781892947042141,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.5051546391752577
+   },
+   "post": {
+    "pop_rate_hz": 0.39251364339257605,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.422680412371134
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.3,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.592438752088982,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.2268041237113402
+   },
+   "post": {
+    "pop_rate_hz": 0.31584713852810853,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.17010309278350516
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.3,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.5964398893272957,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.2268041237113402
+   },
+   "post": {
+    "pop_rate_hz": 0.3161106449666803,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.17525773195876287
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.3,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.5976326026808313,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.2268041237113402
+   },
+   "post": {
+    "pop_rate_hz": 0.3161938575262293,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.16494845360824742
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.25,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.5172908764362835,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.2457925649578043,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.25,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.5207441976575664,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.24595899007690228,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.25,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.5223529738088469,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.24620862775554925,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.2,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.44241344160211915,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.17349818665963984,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.2,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.4460262535625377,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.1735813992191888,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.2,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.44765583285370536,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.17408067457648274,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.15,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.36754294114791725,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.09780249498991048,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.15,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.371058671788862,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.09744190723186487,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.15,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.3718977317643143,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.09812494365816281,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.1,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.2637699450103669,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 4.1606279774493965e-05,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": false
+  },
+  {
+   "gain": 0.1,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.267008300452815,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 6.240941966174095e-05,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": false
+  },
+  {
+   "gain": 0.1,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.26863094536402027,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 4.507346975570179e-05,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "mbon_rate_hz": 0.0
+   },
+   "outlasts": false
+  }
+ ],
+ "chosen_gain": null,
+ "finding": "No gain in the scan produced sparse, transient Kenyon-cell coding.",
+ "walltime_s": 243.5,
+ "provenance": {
+  "config": "configs/stage3d_gain.yaml",
+  "results_dir": "results/stage3d_gain",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain1.0_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain1.0_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain1.0_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.8_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.8_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.8_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.6_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.6_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.6_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.5_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.5_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.5_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.4_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.4_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.4_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.35_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.35_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.35_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.3_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.3_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.3_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.25_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.25_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.25_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.2_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.2_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.2_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.15_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.15_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.15_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.1_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.1_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3d_gain/gain0.1_seed2"
+  ]
+ }
+}

@@ -92,5 +92,53 @@ def main():
               f"{g['pop_rate_odor']:9.4f} {g['pop_rate_post']:9.4f} {g['mbon_rate_odor']:8.2f}  {str(g['sparse']):6s} {g['transient']}")
 
 
+def gustatory_cost(gain: float):
+    """What does the reduced gain cost? Re-run the sugar-neuron benchmark that Shiu et al. calibrated W_syn on,
+    at the same gain, and report how far MN9 has moved from the published operating point."""
+    cfg = load_config("stage3d_gain")
+    conn = load_connectome("malecns", "v1.0", "brain")
+    grn = [int(x) for x in conn.ids[conn.select(cell_type={"regex": r"^LB3[a-d]?$"}, side="R")]]
+    mn9 = {str(conn.ann.instance.iloc[i]): int(i) for i in conn.select(cell_type="MN9")}
+    specs = []
+    for g in (1.0, gain):
+        for sd in (0, 1, 2):
+            specs.append({"out_dir": str(OUT / f"gustatory_gain{g}_seed{sd}"), "seed": 1200 + sd, "config": cfg,
+                          "name": f"gust_{g}_{sd}",
+                          "connectome": {"dataset": "malecns", "version": "v1.0", "scope": "brain",
+                                         "weight_scale": cfg["dataset"]["weight_scale"] * float(g)},
+                          "drive_groups": {"sugar": {"ids": grn}}, "record": "all",
+                          "epochs": [{"name": "stim", "duration_s": 1.0, "drives": {"sugar": 200.0}}]})
+    res = run_jobs(specs, n_parallel=cfg["run"]["n_parallel"])
+    out = []
+    for g in (1.0, gain):
+        rows = []
+        for sd in (0, 1, 2):
+            d = OUT / f"gustatory_gain{g}_seed{sd}"
+            if not (d / "spikes.npz").exists():
+                continue
+            z = np.load(d / "spikes.npz"); i = z["i"]
+            rows.append({nm: int((i == j).sum()) for nm, j in mn9.items()} | {"n_active": int(len(np.unique(i)))})
+        if rows:
+            out.append({"gain": float(g), "n_seeds": len(rows),
+                        **{f"{nm}_hz_mean": float(np.mean([r[nm] for r in rows])) for nm in mn9},
+                        "n_active_mean": float(np.mean([r["n_active"] for r in rows]))})
+    doc = {"question": "What does the reduced gain cost on the benchmark the published model was calibrated against?",
+           "protocol": "the male counterparts of the right labellar sugar neurons at 200 Hz for 1 s, the stage 0 benchmark",
+           "runs": out,
+           "finding": ("At the published gain MN9 fires at %.1f Hz with %.0f neurons active; at gain %.2f it fires at %.1f Hz "
+                       "with %.0f neurons active. Lowering the gain to obtain sparse odour coding therefore breaks the "
+                       "gustatory calibration that fixed W_syn in the first place, which is the price of this deviation."
+                       % (out[0][list(mn9)[0] + "_hz_mean"], out[0]["n_active_mean"], gain,
+                          out[1][list(mn9)[0] + "_hz_mean"], out[1]["n_active_mean"]) if len(out) == 2 else "not computed")}
+    json.dump(doc, open(OUT / "gustatory_cost.json", "w"), indent=1, default=str)
+    print("\n=== COST ON THE GUSTATORY BENCHMARK ===")
+    print(doc["finding"])
+    return doc
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--gustatory-cost" in sys.argv:
+        gustatory_cost(float(sys.argv[sys.argv.index("--gustatory-cost") + 1]))
+    else:
+        main()

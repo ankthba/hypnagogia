@@ -35,6 +35,7 @@ def main():
     s3bi = load(RESULTS / "stage3b_odor" / "ignition_threshold.json")
     s3c = load(RESULTS / "stage3c_control" / "stage3c.json")
     s3d = load(RESULTS / "stage3d_gain" / "stage3d.json")
+    s3e = load(RESULTS / "stage3e_discrim" / "stage3e.json")
     s3 = load(RESULTS / "stage3_plasticity" / "stage3.json")
     s4 = load(RESULTS / "stage4_learning" / "stage4.json")
     s5 = load(RESULTS / "stage5_sleep" / "stage5.json")
@@ -56,7 +57,7 @@ def main():
     w()
     if s6:
         w(f"**Stage 6 ({s6['status']}).** {s6['headline']}")
-    elif s3b and s3b["status"] == "failed":
+    elif (s3e and s3e["status"] == "failed") or (s3b and s3b["status"] == "failed"):
         w("**The replay test as specified cannot be run on this model, and the reason is itself the result.**")
         w()
         w("Two independent findings block it, and neither came from tuning anything:")
@@ -66,9 +67,13 @@ def main():
           "ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls "
           "inside a gap of more than four orders of magnitude that the model cannot occupy.")
         w("2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a "
-          "single glomerulus driven at 10 Hz, makes more than half of all Kenyon cells fire, and the activity "
-          "outlasts the stimulus because the network ignites. In a real fly about 5 to 10 per cent of Kenyon cells "
-          "respond to an odour, each with a few spikes.")
+          "single receptor neuron driven at 50 Hz, ignites the whole network, and the activity never decays: the "
+          "population rate after the odour is as high as during it, indefinitely. More than half of all Kenyon "
+          "cells fire, where a real fly uses 5 to 10 per cent with a few spikes each.")
+        if s3c:
+            w(f"3. *This is the published model, not this dataset.* {s3c['finding']}")
+        if s3e and s3e["status"] == "failed":
+            w(f"4. *And the state carries no odour identity.* {s3e['finding']}")
         w()
         w("A memory needs a sparse, odour-specific ensemble, and a replay test needs a quiet background for that "
           "ensemble to reappear against. This model, at this scale and with the published parameters, provides "
@@ -274,6 +279,25 @@ def main():
         w("|---|---|---|---|")
         for g in s3bi["grid"]:
             w(f"| {g['n_driven']} | {g['fraction_ignited']:.0%} | {g['pop_rate_odor_mean']:.4f} Hz/neuron | {g['pop_rate_post_mean']:.4f} Hz/neuron |")
+        w()
+    w("## Stage 3e - do two different odours leave two different ensembles?")
+    w()
+    if s3e:
+        w(f"**{s3e['status']}.** {s3e['question']}")
+        w()
+        w(f"{s3e['finding']}")
+        w()
+        w(f"{s3e['note']}")
+        w()
+        w("| gain | epoch | Kenyon cells in ensemble A | in ensemble B | overlap (Jaccard) | chance overlap | excess | discriminable |")
+        w("|---|---|---|---|---|---|---|---|")
+        for g in s3e["grid"]:
+            w(f"| {g['gain']:.2f}{' (published)' if g['gain'] == 1.0 else ''} | {g['epoch']} | {g['frac_kc_A']:.1%} | {g['frac_kc_B']:.1%} | "
+              f"{g['jaccard_observed']:.3f} | {g['jaccard_chance']:.3f} | {g['excess_over_chance']:+.3f} | "
+              f"{'yes' if g['discriminable'] else '**no**'} |")
+        w()
+    else:
+        w("**Not run.**")
         w()
     w("## Stage 3d - how far from the published model would you have to go?")
     w()

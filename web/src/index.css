@@ -949,10 +949,53 @@ input[type='range'] {
   vertical-align: 0.05em;
 }
 
+/* The neuron-map legend swatches carry MAP_SPEC.md's literal hexes, one per theme. The pair is
+   passed in as custom properties so the swatch follows the theme (and the white figure mat, which
+   forces the light scheme on everything inside it) without JavaScript. */
+.swatch--map {
+  width: 0.62em;
+  height: 0.62em;
+  border-radius: 50%;
+  background: var(--sw-l);
+  background: light-dark(var(--sw-l), var(--sw-d));
+}
+
 .swatch--line {
   width: 1em;
   height: 1.5px;
   vertical-align: 0.3em;
+}
+
+/* The row above the map canvas: projection on the left, the ventral-nerve-cord switch after it. */
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+}
+
+.map-controls__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.map-toggle {
+  cursor: pointer;
+  color: var(--color-muted);
+  gap: 0.45rem;
+}
+
+.map-toggle input {
+  width: 0.95rem;
+  height: 0.95rem;
+  accent-color: var(--color-fg);
+  cursor: pointer;
+}
+
+.map-toggle:hover {
+  color: var(--color-fg);
 }
 
 .chip {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import BrainMap, {
   PROJECTIONS,
   PROJECTION_SHORT,
+  VncToggle,
   atlasProvenance,
   useActivity,
   useAtlas,
@@ -107,10 +108,13 @@ export default function MapPanel() {
     return () => cancelAnimationFrame(raf);
   }, [playing, durationMs]);
 
-  const [projection, setProjection] = useState<Projection>('dorsal');
+  const [projection, setProjection] = useState<Projection>('frontal');
+  // Framed on view_boxes.brain by default; the switch below opens it out to view_boxes.all.
+  const [showVnc, setShowVnc] = useState(false);
 
-  // A tall canvas (~4:5). The map keeps the brain's own aspect, so this is the budget it fits into.
-  const mapHeight = Math.round(Math.min(Math.max(240, width * 1.3), narrow ? 330 : 560));
+  // The canvas takes the projection's own aspect; this is only the ceiling it may not pass, so a
+  // sagittal view (taller than it is wide) does not run off a short screen.
+  const mapHeight = narrow ? Math.round(Math.min(width * 1.5, 460)) : 620;
 
   const provenance: Provenance | undefined = useMemo(() => {
     if (clip) {
@@ -172,9 +176,12 @@ export default function MapPanel() {
         height={mapHeight}
         projection={projection}
         onProjectionChange={setProjection}
+        showVnc={showVnc}
+        onShowVncChange={setShowVnc}
         variant="panel"
         background="page"
         showProjectionControl={false}
+        showVncControl={false}
         showLegend
         showStatus
       />
@@ -210,6 +217,7 @@ export default function MapPanel() {
             {fmtNum(timeMs / 1000, 2)} / {fmtNum(durationMs / 1000, 2)} s
           </span>
         )}
+        {atlas.data.sidecar.view_boxes?.brain && <VncToggle atlas={atlas.data} on={showVnc} set={setShowVnc} compact />}
       </div>
 
       {!replay && clips.length > 1 && (

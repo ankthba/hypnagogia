@@ -2,16 +2,18 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { checkAtlasIdentity, loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad } from '../lib/binary';
 import { CHART_FONT, SERIES, resolveColors, useThemeVersion } from '../lib/colors';
 import { fmtInt, fmtNum, fmtPct } from '../lib/format';
-import type { Manifest, Provenance } from '../types';
+import type { AtlasViewBox, Manifest, Provenance } from '../types';
 
 /**
  * A canvas map of the simulated neurons at their soma positions, which lights up the neurons that
  * spike inside the current scrub window.
  *
- * Everything drawn comes from `neuron_atlas.json` + `neuron_atlas.bin` (positions, groups, counts)
- * and, when the map is animated, from one `replay/activity_<cond>_seed<k>.json` + `.bin`. No count,
- * label or position is written into this file; when a file is absent the caller renders the
- * explicit "not yet run" panel instead of a map.
+ * Everything drawn comes from `neuron_atlas.json` + `neuron_atlas.bin` (positions, groups, counts,
+ * framing boxes) and, when the map is animated, from one `replay/activity_<cond>_seed<k>.json` +
+ * `.bin`. No count, label or position is written into this file; when a file is absent the caller
+ * renders the explicit "not yet run" panel instead of a map.
+ *
+ * Framing, colours, radii, alphas and draw order follow web/MAP_SPEC.md exactly.
  */
 
 export type Projection = 'frontal' | 'dorsal' | 'sagittal';
@@ -29,39 +31,75 @@ export const PROJECTION_SHORT: Record<Projection, string> = { frontal: 'frontal'
 const AXIS_KEY = ['x', 'y', 'z'] as const;
 
 /**
- * Group presentation. The named populations of this experiment (KC, MBON, DAN, dFB) carry the
- * palette's ink / Prussian blue / status colours; everything else is background and is drawn very
- * faint, 'other' and 'optic' faintest of all, so the named cells read through them. `z` is the
- * painting order (low first). Labels come from the sidecar; an unlisted label gets the fallback.
+ * Group presentation, verbatim from MAP_SPEC.md. `r` is the point radius in CSS pixels at a canvas
+ * width of REF_W and is scaled linearly with the canvas width (no floor: on a phone the points get
+ * genuinely smaller rather than merging into a single mush). `order` is the painting order, low
+ * first, so the 32 dFB cells land on top of the 90,805 optic-lobe cells rather than under them.
+ * `rLight` overrides the radius in the light theme where the spec gives a second figure.
  */
-const GROUP_STYLE: Record<string, { color: string; dim: number; z: number }> = {
-  optic: { color: 'var(--color-muted)', dim: 0.05, z: 0 },
-  other: { color: 'var(--color-muted)', dim: 0.1, z: 1 },
-  CX: { color: 'var(--color-class-silent)', dim: 0.3, z: 2 },
-  ORN: { color: 'var(--color-class-subcritical)', dim: 0.4, z: 3 },
-  ALPN: { color: 'var(--color-link-hover)', dim: 0.5, z: 4 },
-  KC: { color: 'var(--color-fg)', dim: 0.55, z: 5 },
-  dFB: { color: 'var(--color-passed)', dim: 0.9, z: 6 },
-  DAN: { color: 'var(--color-failed)', dim: 0.9, z: 7 },
-  MBON: { color: 'var(--color-link)', dim: 0.9, z: 8 },
+interface GroupSpec {
+  dark: string;
+  light: string;
+  r: number;
+  rLight?: number;
+  alpha: number;
+  order: number;
+}
+const GROUP_SPEC: Record<string, GroupSpec> = {
+  optic: { dark: '#38342e', light: '#d6d2c8', r: 0.32, alpha: 0.55, order: 1 },
+  other: { dark: '#413e38', light: '#cdc9bf', r: 0.4, alpha: 0.55, order: 2 },
+  ALPN: { dark: '#a49d90', light: '#6f695e', r: 0.8, alpha: 0.95, order: 3 },
+  CX: { dark: '#8fb3d4', light: '#2f5575', r: 0.8, alpha: 0.95, order: 4 },
+  ORN: { dark: '#a49d90', light: '#6f695e', r: 0.8, alpha: 0.95, order: 5 },
+  KC: { dark: '#e8e6df', light: '#3a3632', r: 1.2, rLight: 0.85, alpha: 0.95, order: 6 },
+  DAN: { dark: '#8fbf88', light: '#4f7a4a', r: 1.9, alpha: 1.0, order: 7 },
+  MBON: { dark: '#d98b82', light: '#9a3f35', r: 2.6, alpha: 1.0, order: 8 },
+  dFB: { dark: '#e0b96a', light: '#b07d15', r: 3.3, alpha: 1.0, order: 9 },
 };
-const GROUP_FALLBACK = { color: 'var(--color-muted)', dim: 0.3, z: 2 };
-const styleFor = (label: string) => GROUP_STYLE[label] ?? GROUP_FALLBACK;
+/** A group code the sidecar lists with a label the spec does not cover, and unlisted codes. */
+const GROUP_FALLBACK: GroupSpec = { dark: '#413e38', light: '#cdc9bf', r: 0.4, alpha: 0.55, order: 2.5 };
+const specFor = (label: string): GroupSpec => GROUP_SPEC[label] ?? GROUP_FALLBACK;
+const specColor = (s: GroupSpec, dark: boolean) => (dark ? s.dark : s.light);
+const specRadius = (s: GroupSpec, dark: boolean) => (dark ? s.r : s.rLight ?? s.r);
 
-/**
- * Ink curve for the background layer. The raw `dim` values above are a painting order as much as an
- * opacity, and applied literally they leave the map almost blank: two thirds of the atlas rows are
- * optic lobe at 0.05. A gamma lifts the faint groups into view while keeping their order, so the
- * named populations still read through the background instead of being flattened into it.
- */
-const dimCurve = (dim: number, gamma: number) => Math.min(1, Math.pow(dim, gamma));
+/** The accent a spiking neuron is drawn in (`--color-link`), per MAP_SPEC.md. */
+const ACCENT = { dark: '#8fb3d4', light: '#2f5575' };
+/** Point radii are quoted at this canvas width and scale linearly with it. */
+const REF_W = 400;
+/** Fraction of the view box padded onto each side, so an edge soma is not clipped by the frame. */
+const BOX_PAD = 0.015;
+/** A spiking neuron is drawn at this multiple of its group radius, decaying back to 1x. */
+const LIT_GAIN = 2.2;
+/** A lit point never draws smaller than this, so a spiking optic-lobe cell is still visible. */
+const LIT_MIN_R = 1.15;
+const TAU = Math.PI * 2;
 
-const PAD = 10;
-const BOTTOM = 26;
+/** Height reserved under the plot for the axis note and the scale bar. */
+const BOTTOM = 24;
 const FONT_SM = `10.5px ${CHART_FONT}`;
 const FONT_XS = `9.5px ${CHART_FONT}`;
 /** Time bucket for the spike index; a scrub window is then a range of buckets, not a rescan. */
 const BIN_MS = 16;
+
+/** Perceived lightness of a resolved `rgb(...)` string, used only to pick the spec's dark or light column. */
+function isDarkColor(css: string): boolean {
+  const m = css.match(/-?[\d.]+/g);
+  if (!m || m.length < 3) return false;
+  const [r, g, b] = m.slice(0, 3).map(Number);
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+}
+
+/** Linear blend of two `rgb(...)`/hex colours, used for the spike tail. */
+function parseRgb(css: string): [number, number, number] {
+  if (css.startsWith('#')) {
+    const h = css.slice(1);
+    const n = h.length === 3 ? h.split('').map((c) => parseInt(c + c, 16)) : [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+    return [n[0], n[1], n[2]];
+  }
+  const m = css.match(/-?[\d.]+/g);
+  if (!m || m.length < 3) return [128, 128, 128];
+  return [Number(m[0]), Number(m[1]), Number(m[2])];
+}
 
 // ---------------------------------------------------------------- loading hooks
 
@@ -132,17 +170,31 @@ export function atlasProvenance(m: Manifest | null, extraFiles: string[] = []): 
 
 // ---------------------------------------------------------------- the map
 
+/** A framing box the map can be fitted to, and where the sidecar states it came from. */
+type Frame = { lo: [number, number, number]; hi: [number, number, number]; from: 'view_box' | 'quantisation'; box: AtlasViewBox | null };
+
+function frameFor(atlas: AtlasData, key: 'brain' | 'all'): Frame {
+  const box = atlas.sidecar.view_boxes?.[key] ?? null;
+  const ok = (v: unknown): v is [number, number, number] => Array.isArray(v) && v.length === 3 && v.every((x) => typeof x === 'number' && Number.isFinite(x));
+  if (box && ok(box.lo_um) && ok(box.hi_um)) return { lo: box.lo_um, hi: box.hi_um, from: 'view_box', box };
+  // No view_boxes in this export: the quantisation bounds are the only framing the file states.
+  return { lo: atlas.lo, hi: atlas.hi, from: 'quantisation', box: null };
+}
+
 function BrainMapInner({
   atlas,
   activity = null,
   timeMs = null,
   decayMs = 150,
-  height = 420,
+  height = 480,
   projection: projectionProp,
   onProjectionChange,
+  showVnc: showVncProp,
+  onShowVncChange,
   variant = 'figure',
   background = 'mat',
   showProjectionControl = true,
+  showVncControl = true,
   showLegend = true,
   showStatus = true,
 }: {
@@ -153,30 +205,35 @@ function BrainMapInner({
   timeMs?: number | null;
   /** a spike stays lit for this long, fading out */
   decayMs?: number;
+  /** the tallest the plot area may be; the canvas takes the projection's aspect within it */
   height?: number;
   projection?: Projection;
   onProjectionChange?: (p: Projection) => void;
-  /** 'panel' is the compact instrument in the right-hand rail: smaller type, denser ink */
+  /** frame on `view_boxes.all` (somata in the ventral nerve cord included) rather than `.brain` */
+  showVnc?: boolean;
+  onShowVncChange?: (v: boolean) => void;
+  /** 'panel' is the compact instrument in the right-hand rail: smaller type */
   variant?: 'figure' | 'panel';
   /** 'mat' paints the white figure mat behind the points, 'page' paints the page background */
   background?: 'mat' | 'page';
   showProjectionControl?: boolean;
+  showVncControl?: boolean;
   showLegend?: boolean;
   showStatus?: boolean;
 }) {
-  // The rail panel is small and sits on the page background rather than the white mat, so its
-  // background layer is drawn with more ink; the figure variant keeps the quieter curve.
-  const gamma = variant === 'panel' ? 0.5 : 0.62;
-
   const [projInner, setProjInner] = useState<Projection>('frontal');
   const projection = projectionProp ?? projInner;
   const setProjection = (p: Projection) => (onProjectionChange ? onProjectionChange(p) : setProjInner(p));
+
+  const [vncInner, setVncInner] = useState(false);
+  const showVnc = showVncProp ?? vncInner;
+  const setShowVnc = (v: boolean) => (onShowVncChange ? onShowVncChange(v) : setVncInner(v));
 
   // The wrapper is state, not a ref, so the colour resolution below can depend on it existing.
   const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bgRef = useRef<HTMLCanvasElement | null>(null);
-  const [width, setWidth] = useState(600);
+  const [width, setWidth] = useState(400);
   const themeVersion = useThemeVersion();
 
   // Width changes are coalesced to one per frame: dragging a window edge otherwise rebuilds the
@@ -186,7 +243,7 @@ function BrainMapInner({
     let raf = 0;
     let pending = 0;
     const ro = new ResizeObserver((entries) => {
-      pending = Math.max(240, Math.floor(entries[0].contentRect.width));
+      pending = Math.max(200, Math.floor(entries[0].contentRect.width));
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -200,37 +257,54 @@ function BrainMapInner({
     };
   }, [wrap]);
 
+  /** The box the map is framed on: the brain by default, everything when the VNC toggle is on. */
+  const frame = useMemo(() => frameFor(atlas, showVnc ? 'all' : 'brain'), [atlas, showVnc]);
+  const brainFrame = useMemo(() => frameFor(atlas, 'brain'), [atlas]);
+  /** true when this export actually carries the boxes; false means the map is framed on the quantisation bounds. */
+  const hasBoxes = brainFrame.from === 'view_box';
+
   /**
-   * Group codes actually present, in painting order, with the label the sidecar gives each code, and
-   * the rows of each group gathered once. Drawing then touches each row once per repaint instead of
-   * scanning all n rows per group. Counts come from the binary; the sidecar's own figure is kept
-   * beside them so the legend can report a disagreement rather than quietly preferring one.
+   * Rows inside the current frame, gathered per group in the spec's painting order. Drawing then
+   * touches each row once per repaint instead of scanning all n rows per group, and a neuron
+   * outside the box is neither drawn nor counted in the legend.
    */
   const groups = useMemo(() => {
-    const gc = atlas.sidecar.group_counts;
+    const inBox = new Uint8Array(atlas.n);
+    const [lx, ly, lz] = frame.lo;
+    const [hx, hy, hz] = frame.hi;
+    let outside = 0;
+    for (let i = 0; i < atlas.n; i++) {
+      const ok = atlas.xUm[i] >= lx && atlas.xUm[i] <= hx && atlas.yUm[i] >= ly && atlas.yUm[i] <= hy && atlas.zUm[i] >= lz && atlas.zUm[i] <= hz;
+      if (ok) inBox[i] = 1;
+      else outside++;
+    }
     const counts = new Map<number, number>();
-    for (let i = 0; i < atlas.n; i++) counts.set(atlas.group[i], (counts.get(atlas.group[i]) ?? 0) + 1);
-    const list = (atlas.sidecar.groups ?? []).map((g) => ({
+    for (let i = 0; i < atlas.n; i++) if (inBox[i]) counts.set(atlas.group[i], (counts.get(atlas.group[i]) ?? 0) + 1);
+
+    const sc = atlas.sidecar;
+    // Which of the sidecar's own count blocks corroborates the legend depends on the frame in view.
+    const stated = showVnc ? sc.group_counts : sc.group_counts_in_brain_view ?? (hasBoxes ? undefined : sc.group_counts);
+    const list = (sc.groups ?? []).map((g) => ({
       code: g.code,
       label: g.label,
-      /** neurons of this group in the map, counted from the binary itself */
-      inMap: counts.get(g.code) ?? 0,
-      /** what the sidecar says it wrote for this group; null when the sidecar states nothing */
-      sidecarCount: gc && Object.prototype.hasOwnProperty.call(gc, g.label) ? gc[g.label] : null,
-      ...styleFor(g.label),
+      spec: specFor(g.label),
+      /** neurons of this group inside the current frame, counted from the binary itself */
+      inView: counts.get(g.code) ?? 0,
+      /** what the sidecar states for this group in this frame; null when it states nothing */
+      sidecarCount: stated && Object.prototype.hasOwnProperty.call(stated, g.label) ? stated[g.label] : null,
     }));
-    // codes present in the binary but absent from groups[] are reported, never silently dropped
     const known = new Set(list.map((g) => g.code));
     const unknown = [...counts.keys()].filter((c) => !known.has(c)).sort((a, b) => a - b);
     const unknownSet = new Set(unknown);
-    // one pass over the binary fills every group's row list (and the unknown-code list)
+
     const rows = new Map<number, Uint32Array>();
     const fill = new Map<number, number>();
-    for (const g of list) rows.set(g.code, new Uint32Array(g.inMap));
+    for (const g of list) rows.set(g.code, new Uint32Array(g.inView));
     const unknownTotal = unknown.reduce((sum, c) => sum + (counts.get(c) ?? 0), 0);
     const unknownRows = new Uint32Array(unknownTotal);
     let uk = 0;
     for (let i = 0; i < atlas.n; i++) {
+      if (!inBox[i]) continue;
       const code = atlas.group[i];
       const arr = rows.get(code);
       if (arr) {
@@ -239,28 +313,36 @@ function BrainMapInner({
         fill.set(code, k + 1);
       } else if (unknownSet.has(code)) unknownRows[uk++] = i;
     }
-    return { list, byPaint: [...list].sort((a, b) => a.z - b.z), unknown, unknownTotal, rows, unknownRows };
-  }, [atlas]);
+    const inViewTotal = atlas.n - outside;
+    return { list, byPaint: [...list].sort((a, b) => a.spec.order - b.spec.order), unknown, unknownTotal, rows, unknownRows, inBox, inViewTotal, outside };
+  }, [atlas, frame, showVnc, hasBoxes]);
 
   /**
-   * Projection and fit. One scale is applied to both axes (so the brain is never stretched) and the
-   * canvas itself is sized to what that scale draws, rather than leaving a wide empty mat around a
-   * height-fitted brain. `height` is the tallest the canvas may be; the width available is the
-   * container's. The vertical axis always increases downward.
+   * Projection and fit. The canvas takes the aspect of the selected projection of the framing box
+   * (frontal ~1.87:1, dorsal ~2.68:1, sagittal ~0.70:1 for the brain box), so the brain fills the
+   * frame in every projection instead of sitting in a fixed rectangle. One scale is applied to both
+   * axes, the box is padded by 1.5% of its own extent on each side, and the vertical axis always
+   * increases downward. `height` is the tallest the plot may be; beyond that the canvas narrows.
    */
   const view = useMemo(() => {
     const [ui, vi] = PROJECTION_AXES[projection];
-    const uLo = atlas.lo[ui];
-    const vLo = atlas.lo[vi];
-    const uRange = Math.max(1e-6, atlas.hi[ui] - uLo);
-    const vRange = Math.max(1e-6, atlas.hi[vi] - vLo);
-    const availW = Math.max(200, width) - 2 * PAD;
-    const availH = Math.max(160, height - PAD - BOTTOM);
-    const scale = Math.min(availW / uRange, availH / vRange);
-    const plotW = uRange * scale;
-    const plotH = vRange * scale;
-    const cw = Math.round(plotW + 2 * PAD);
-    const ch = Math.round(plotH + PAD + BOTTOM);
+    const uSpan = Math.max(1e-6, frame.hi[ui] - frame.lo[ui]);
+    const vSpan = Math.max(1e-6, frame.hi[vi] - frame.lo[vi]);
+    const uRange = uSpan * (1 + 2 * BOX_PAD);
+    const vRange = vSpan * (1 + 2 * BOX_PAD);
+    const uLo = frame.lo[ui] - uSpan * BOX_PAD;
+    const vLo = frame.lo[vi] - vSpan * BOX_PAD;
+    const aspect = uRange / vRange;
+    const maxH = Math.max(120, height);
+    let plotW = Math.max(160, width);
+    let plotH = plotW / aspect;
+    if (plotH > maxH) {
+      plotH = maxH;
+      plotW = maxH * aspect;
+    }
+    const scale = plotW / uRange;
+    const cw = Math.round(plotW);
+    const ch = Math.round(plotH + BOTTOM);
     const arr = (i: 0 | 1 | 2) => (i === 0 ? atlas.xUm : i === 1 ? atlas.yUm : atlas.zUm);
     const uArr = arr(ui);
     const vArr = arr(vi);
@@ -269,13 +351,15 @@ function BrainMapInner({
       vi,
       cw,
       ch,
-      px: (i: number) => PAD + (uArr[i] - uLo) * scale,
-      py: (i: number) => PAD + (vArr[i] - vLo) * scale,
+      plotH,
+      aspect,
+      px: (i: number) => (uArr[i] - uLo) * scale,
+      py: (i: number) => (vArr[i] - vLo) * scale,
       scale,
-      uRange,
-      vRange,
+      /** the spec's radii are quoted at REF_W and scale linearly with the canvas */
+      rScale: plotW / REF_W,
     };
-  }, [atlas, projection, width, height]);
+  }, [atlas, frame, projection, width, height]);
   const canvasW = view.cw;
   const canvasH = view.ch;
 
@@ -325,9 +409,11 @@ function BrainMapInner({
     const alphas: number[] = [];
     let spikes = 0;
     let oob = 0;
+    let offView = 0;
     if (b1 >= b0) {
       const from = index.starts[b0];
       const to = index.starts[b1 + 1];
+      const inBox = groups.inBox;
       for (let k = from; k < to; k++) {
         const t = activity.tMs[k];
         if (t < t0 || t > t1) continue;
@@ -337,7 +423,12 @@ function BrainMapInner({
           oob++;
           continue;
         }
-        const a = decayMs > 0 ? Math.max(0.12, 1 - (t1 - t) / decayMs) : 1;
+        // a spike on a soma outside the framed box is counted, but there is nowhere to draw it
+        if (!inBox[row]) {
+          offView++;
+          continue;
+        }
+        const a = decayMs > 0 ? Math.max(0.0, 1 - (t1 - t) / decayMs) : 1;
         if (stamp.gen[row] === generation) {
           const p = stamp.pos[row];
           if (a > alphas[p]) alphas[p] = a;
@@ -349,27 +440,24 @@ function BrainMapInner({
         }
       }
     }
-    return { rows, alphas, spikes, oob, nNeurons: rows.length };
-  }, [activity, index, timeMs, decayMs, atlas.n, staleActivity]);
+    return { rows, alphas, spikes, oob, offView, nNeurons: rows.length };
+  }, [activity, index, timeMs, decayMs, atlas.n, staleActivity, groups]);
 
   /**
-   * The palette as literal canvas colours. Resolving one `var()` costs a DOM insertion and a forced
-   * style recalculation, so it happens once per theme / group / background change, never per frame.
+   * The palette as literal canvas colours. Only the background and the axis ink are tokens; the
+   * group colours are the spec's own hexes, chosen by whether the background this canvas sits on
+   * is dark or light (which the white figure mat forces to light in both themes).
    */
   const C = useMemo(() => {
     if (!wrap) return null;
-    const vars: Record<string, string> = {
-      bg: background === 'page' ? 'var(--color-bg)' : SERIES.mat,
-      axis: SERIES.axis,
-      fallback: GROUP_FALLBACK.color,
-    };
-    for (const g of groups.list) vars[`g${g.code}`] = g.color;
-    return resolveColors(wrap, vars);
+    const resolved = resolveColors(wrap, { bg: background === 'page' ? 'var(--color-bg)' : SERIES.mat, axis: SERIES.axis });
+    const dark = isDarkColor(resolved.bg);
+    return { bg: resolved.bg, axis: resolved.axis, dark, accent: dark ? ACCENT.dark : ACCENT.light };
     // themeVersion is the signal that the same var() now resolves to a different colour
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wrap, groups, background, themeVersion]);
+  }, [wrap, background, themeVersion]);
 
-  // Background layer: all atlas neurons, dim, drawn once per size / projection / theme.
+  // Background layer: every neuron in the frame, drawn once per size / projection / frame / theme.
   useEffect(() => {
     if (!C) return;
     const dpr = window.devicePixelRatio || 1;
@@ -384,40 +472,54 @@ function BrainMapInner({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = C.bg;
     ctx.fillRect(0, 0, canvasW, canvasH);
-    const size = variant === 'panel' ? 1.5 : 1.4;
-    // each group draws only its own rows (gathered once in the groups memo), so a repaint is one
-    // pass over the atlas in total rather than one pass per group
+
+    /** One group: sub-pixel points as rects (cheap, and an arc that small is invisible anyway). */
+    const paint = (rows: Uint32Array, spec: GroupSpec) => {
+      if (rows.length === 0) return;
+      const r = specRadius(spec, C.dark) * view.rScale;
+      ctx.fillStyle = specColor(spec, C.dark);
+      ctx.globalAlpha = spec.alpha;
+      if (r >= 1.1) {
+        ctx.beginPath();
+        for (let k = 0; k < rows.length; k++) {
+          const i = rows[k];
+          const x = view.px(i);
+          const y = view.py(i);
+          ctx.moveTo(x + r, y);
+          ctx.arc(x, y, r, 0, TAU);
+        }
+        ctx.fill();
+      } else {
+        const d = 2 * r;
+        for (let k = 0; k < rows.length; k++) {
+          const i = rows[k];
+          ctx.fillRect(view.px(i) - r, view.py(i) - r, d, d);
+        }
+      }
+    };
+
+    // the spec's draw order: the big background populations first, the small named ones last and
+    // largest, so 32 dFB neurons are not lost among 90,805 optic-lobe cells
+    let unknownDrawn = false;
     for (const g of groups.byPaint) {
-      const rows = groups.rows.get(g.code);
-      if (!rows || rows.length === 0) continue;
-      ctx.fillStyle = C[`g${g.code}`] ?? C.fallback;
-      ctx.globalAlpha = dimCurve(g.dim, gamma);
-      for (let k = 0; k < rows.length; k++) {
-        const i = rows[k];
-        ctx.fillRect(view.px(i) - size / 2, view.py(i) - size / 2, size, size);
+      if (!unknownDrawn && g.spec.order > GROUP_FALLBACK.order) {
+        paint(groups.unknownRows, GROUP_FALLBACK);
+        unknownDrawn = true;
       }
+      paint(groups.rows.get(g.code) ?? new Uint32Array(0), g.spec);
     }
-    if (groups.unknownRows.length > 0) {
-      ctx.fillStyle = C.fallback;
-      ctx.globalAlpha = dimCurve(GROUP_FALLBACK.dim, gamma);
-      for (let k = 0; k < groups.unknownRows.length; k++) {
-        const i = groups.unknownRows[k];
-        ctx.fillRect(view.px(i) - size / 2, view.py(i) - size / 2, size, size);
-      }
-    }
+    if (!unknownDrawn) paint(groups.unknownRows, GROUP_FALLBACK);
     ctx.globalAlpha = 1;
 
     // Axis note and a scale bar, both in the sidecar's own micrometres.
     ctx.fillStyle = C.axis;
-    ctx.font = variant === 'panel' ? FONT_XS : FONT_SM;
+    ctx.font = variant === 'panel' || canvasW < 340 ? FONT_XS : FONT_SM;
     ctx.textAlign = 'left';
-    const hAxis = AXIS_KEY[view.ui];
-    const vAxis = AXIS_KEY[view.vi];
-    ctx.fillText(`horizontal: ${hAxis} · vertical: ${vAxis} (increasing downward)`, PAD, canvasH - 8);
-    const nice = [1000, 500, 200, 100, 50, 20].find((u) => u * view.scale < (canvasW - 2 * PAD) / 3);
+    ctx.fillText(`horizontal: ${AXIS_KEY[view.ui]} · vertical: ${AXIS_KEY[view.vi]} (increasing downward)`, 0, canvasH - 8);
+    const nice = [1000, 500, 200, 100, 50, 20].find((u) => u * view.scale < canvasW / 3);
     if (nice) {
       const barPx = nice * view.scale;
-      const x1 = canvasW - PAD;
+      const x1 = canvasW;
       const y = canvasH - 14;
       ctx.strokeStyle = C.axis;
       ctx.lineWidth = 1;
@@ -431,9 +533,9 @@ function BrainMapInner({
     bgRef.current = off;
     // No version bump: this effect is declared before the foreground one, so within the same commit
     // the foreground blits the background this pass has just written.
-  }, [groups, view, canvasW, canvasH, C, variant, gamma]);
+  }, [groups, view, canvasW, canvasH, C, variant]);
 
-  // Foreground: blit the background, then draw only the lit neurons.
+  // Foreground: blit the background, then draw only the lit neurons, on top of everything.
   useEffect(() => {
     const cv = canvasRef.current;
     const bg = bgRef.current;
@@ -450,22 +552,23 @@ function BrainMapInner({
     if (bg) ctx.drawImage(bg, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (!lit || lit.rows.length === 0) return;
-    const size = variant === 'panel' ? 3.6 : 3.2;
-    const halo = variant === 'panel' ? 6.4 : 5.2;
+    const [ar, ag, ab] = parseRgb(C.accent);
+    // a is 1 at the instant of the spike and 0 at the end of the tail, so nothing stays lit
     for (let k = 0; k < lit.rows.length; k++) {
       const i = lit.rows[k];
       const a = lit.alphas[k];
-      const color = C[`g${atlas.group[i]}`] ?? C.fallback;
-      const x = view.px(i);
-      const y = view.py(i);
-      ctx.fillStyle = color;
-      ctx.globalAlpha = a * 0.22;
-      ctx.fillRect(x - halo / 2, y - halo / 2, halo, halo);
-      ctx.globalAlpha = a;
-      ctx.fillRect(x - size / 2, y - size / 2, size, size);
+      const spec = specFor(atlas.groupLabels[atlas.group[i]] ?? '');
+      const [gr, gg, gb] = parseRgb(specColor(spec, C.dark));
+      const base = Math.max(specRadius(spec, C.dark) * view.rScale, LIT_MIN_R);
+      const r = base * (1 + (LIT_GAIN - 1) * a);
+      ctx.fillStyle = `rgb(${Math.round(gr + (ar - gr) * a)}, ${Math.round(gg + (ag - gg) * a)}, ${Math.round(gb + (ab - gb) * a)})`;
+      ctx.globalAlpha = spec.alpha + (1 - spec.alpha) * a;
+      ctx.beginPath();
+      ctx.arc(view.px(i), view.py(i), r, 0, TAU);
+      ctx.fill();
     }
     ctx.globalAlpha = 1;
-  }, [lit, view, canvasW, canvasH, atlas, C, variant]);
+  }, [lit, view, canvasW, canvasH, atlas, C]);
 
   const sc = atlas.sidecar;
   /** the fraction of its spikes the activity file actually carries, when it carries a sample */
@@ -474,90 +577,129 @@ function BrainMapInner({
       ? activity.sidecar.n_spikes_exported / activity.sidecar.n_spikes_total
       : null;
   const rowsDisagree = atlas.n !== sc.n_neurons_in_map;
+  const legendClass = variant === 'panel' ? 'legend legend--tight mt-2' : 'legend mt-3';
+  const statusClass = variant === 'panel' ? 'legend legend--tight mt-1' : 'legend mt-1';
 
   return (
     <div ref={setWrap} className="w-full">
-      {showProjectionControl && (
-        <div className="flex flex-wrap items-center gap-3 mb-3 small">
-          <span className="label">projection</span>
-          <div className="segmented" role="tablist" aria-label="projection">
-            {(Object.keys(PROJECTION_AXES) as Projection[]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                role="tab"
-                aria-selected={projection === p}
-                className="segmented__option"
-                data-text={PROJECTION_LABEL[p]}
-                onClick={() => setProjection(p)}
-              >
-                {PROJECTION_LABEL[p]}
-              </button>
-            ))}
-          </div>
+      {(showProjectionControl || showVncControl) && (
+        <div className="map-controls mb-3 small">
+          {showProjectionControl && (
+            <div className="map-controls__group">
+              <span className="label">projection</span>
+              <div className="segmented" role="tablist" aria-label="projection">
+                {PROJECTIONS.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    role="tab"
+                    aria-selected={projection === p}
+                    className="segmented__option"
+                    data-text={PROJECTION_LABEL[p]}
+                    onClick={() => setProjection(p)}
+                  >
+                    {PROJECTION_LABEL[p]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {showVncControl && hasBoxes && <VncToggle atlas={atlas} on={showVnc} set={setShowVnc} />}
         </div>
       )}
-      <canvas ref={canvasRef} style={{ width: canvasW, height: canvasH }} className="block mx-auto border border-rule" />
+      <canvas ref={canvasRef} style={{ width: canvasW, height: canvasH }} className="block mx-auto max-w-full" />
       {showLegend && (
-      <div className={variant === 'panel' ? 'legend legend--tight mt-2' : 'legend mt-3'}>
-        {groups.list.map((g) => (
-          <span key={g.code}>
-            <i className="swatch" style={{ background: g.color }} /> {g.label} ({fmtInt(g.inMap)})
-            {/* the count is the binary's own; when the sidecar states a different one, both are shown */}
-            {g.sidecarCount !== null && g.sidecarCount !== g.inMap && (
-              <span className="tone-failed"> · neuron_atlas.json says {fmtInt(g.sidecarCount)}</span>
-            )}
-          </span>
-        ))}
-        {groups.unknown.length > 0 && (
-          <span className="tone-failed">
-            <i className="swatch" style={{ background: GROUP_FALLBACK.color }} /> group codes {groups.unknown.join(', ')} not listed in the sidecar's groups[] (
-            {fmtInt(groups.unknownTotal)} neurons)
-          </span>
-        )}
-      </div>
-      )}
-      {showStatus && (
-      <div className={variant === 'panel' ? 'legend legend--tight mt-1' : 'legend mt-1'}>
-        {activity && staleActivity && identity ? (
-          <span className="tone-failed">
-            nothing is lit: this spike file does not belong to this atlas — {identity.message}
-          </span>
-        ) : activity && lit ? (
-          <>
-            <span>
-              <strong>{fmtInt(lit.nNeurons)}</strong> neurons spiking in the last {fmtInt(decayMs)} ms
-              {timeMs !== null && <> at t = {fmtNum(timeMs / 1000, 2)} s</>} · {fmtInt(lit.spikes)} spikes in that window
-              {/* both counts are counts of what the file holds; when it holds a sample, they are sample counts */}
-              {sampleFrac !== null && (
-                <>
-                  {' '}
-                  — counted in the {fmtPct(sampleFrac)} of the spikes this file carries ({fmtInt(activity.sidecar.n_spikes_exported)} of{' '}
-                  {fmtInt(activity.sidecar.n_spikes_total)}), so the true numbers are higher
-                </>
+        <div className={legendClass}>
+          {groups.list.map((g) => (
+            <span key={g.code}>
+              <i className="swatch swatch--map" style={{ ['--sw-l' as string]: g.spec.light, ['--sw-d' as string]: g.spec.dark }} /> {g.label} ({fmtInt(g.inView)})
+              {/* the count is the binary's own, inside the framed box; a differing sidecar figure is shown too */}
+              {g.sidecarCount !== null && g.sidecarCount !== g.inView && (
+                <span className="tone-failed"> · neuron_atlas.json says {fmtInt(g.sidecarCount)}</span>
               )}
             </span>
-            {identity && identity.state === 'unverified' && (
-              <span className="tone-failed">activity not verified against this atlas: {identity.message}</span>
-            )}
-            {lit.oob > 0 && (
-              <span className="tone-failed">
-                {fmtInt(lit.oob)} spikes reference an atlas_row outside the {fmtInt(atlas.n)} rows of neuron_atlas.bin and are not drawn
-              </span>
-            )}
-          </>
-        ) : (
-          <span>no activity file loaded: populations only, nothing is lit</span>
-        )}
-        <span>
-          {fmtInt(rowsDisagree ? atlas.n : sc.n_neurons_in_map)} somata in the map of {fmtInt(sc.n_neurons_simulated)} neurons simulated
-          {rowsDisagree && (
-            <span className="tone-failed"> · the binary holds {fmtInt(atlas.n)} rows, not the {fmtInt(sc.n_neurons_in_map)} the sidecar states</span>
+          ))}
+          {groups.unknown.length > 0 && (
+            <span className="tone-failed">
+              <i className="swatch swatch--map" style={{ ['--sw-l' as string]: GROUP_FALLBACK.light, ['--sw-d' as string]: GROUP_FALLBACK.dark }} /> group codes{' '}
+              {groups.unknown.join(', ')} not listed in the sidecar's groups[] ({fmtInt(groups.unknownTotal)} neurons)
+            </span>
           )}
-        </span>
-      </div>
+        </div>
+      )}
+      {showStatus && (
+        <div className={statusClass}>
+          {activity && staleActivity && identity ? (
+            <span className="tone-failed">nothing is lit: this spike file does not belong to this atlas — {identity.message}</span>
+          ) : activity && lit ? (
+            <>
+              <span>
+                <strong>{fmtInt(lit.nNeurons)}</strong> neurons spiking in the last {fmtInt(decayMs)} ms
+                {timeMs !== null && <> at t = {fmtNum(timeMs / 1000, 2)} s</>} · {fmtInt(lit.spikes)} spikes in that window
+                {/* both counts are counts of what the file holds; when it holds a sample, they are sample counts */}
+                {sampleFrac !== null && (
+                  <>
+                    {' '}
+                    — counted in the {fmtPct(sampleFrac)} of the spikes this file carries ({fmtInt(activity.sidecar.n_spikes_exported)} of{' '}
+                    {fmtInt(activity.sidecar.n_spikes_total)}), so the true numbers are higher
+                  </>
+                )}
+              </span>
+              {identity && identity.state === 'unverified' && (
+                <span className="tone-failed">activity not verified against this atlas: {identity.message}</span>
+              )}
+              {lit.offView > 0 && (
+                <span>
+                  {fmtInt(lit.offView)} of those spikes are on somata outside the framed box and are not drawn
+                  {!showVnc && hasBoxes ? ' (turn on the ventral-nerve-cord somata to see them)' : ''}
+                </span>
+              )}
+              {lit.oob > 0 && (
+                <span className="tone-failed">
+                  {fmtInt(lit.oob)} spikes reference an atlas_row outside the {fmtInt(atlas.n)} rows of neuron_atlas.bin and are not drawn
+                </span>
+              )}
+            </>
+          ) : (
+            <span>no activity file loaded: populations only, nothing is lit</span>
+          )}
+          <span>
+            {fmtInt(groups.inViewTotal)} somata drawn
+            {groups.outside > 0 && <> · {fmtInt(groups.outside)} outside this box</>} · {fmtInt(rowsDisagree ? atlas.n : sc.n_neurons_in_map)} in the map of{' '}
+            {fmtInt(sc.n_neurons_simulated)} neurons simulated
+            {rowsDisagree && (
+              <span className="tone-failed"> · the binary holds {fmtInt(atlas.n)} rows, not the {fmtInt(sc.n_neurons_in_map)} the sidecar states</span>
+            )}
+          </span>
+          {!hasBoxes && (
+            <span className="tone-failed">
+              neuron_atlas.json states no view_boxes, so the map is framed on the quantisation bounds and cannot exclude the somata below the brain.
+            </span>
+          )}
+          {showVnc && hasBoxes && <span className="tone-muted">{sc.soma_outside_brain_note}</span>}
+        </div>
       )}
     </div>
+  );
+}
+
+/**
+ * The ventral-nerve-cord switch. It says how many somata it adds, taken from the sidecar's own
+ * `n_somata_below_brain_plane` (or, absent that, the difference between the two boxes' counts).
+ */
+export function VncToggle({ atlas, on, set, compact = false }: { atlas: AtlasData; on: boolean; set: (v: boolean) => void; compact?: boolean }) {
+  const sc = atlas.sidecar;
+  const brainN = sc.view_boxes?.brain?.n_neurons;
+  const allN = sc.view_boxes?.all?.n_neurons;
+  const extra = typeof sc.n_somata_below_brain_plane === 'number' ? sc.n_somata_below_brain_plane : typeof brainN === 'number' && typeof allN === 'number' ? allN - brainN : null;
+  return (
+    <label className="map-controls__group map-toggle">
+      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} />
+      <span>
+        {compact ? 'VNC somata' : 'show ventral nerve cord somata'}
+        {extra !== null && <span className="muted"> ({fmtInt(extra)})</span>}
+      </span>
+    </label>
   );
 }
 
@@ -585,18 +727,29 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
   const uncounted = listed.filter((g) => !gc || !Object.prototype.hasOwnProperty.call(gc, g.label)).map((g) => g.label);
   // the count the map is actually drawn from is the binary's row count
   const rowsDisagree = atlas.n !== sc.n_neurons_in_map;
+  const brainBox = sc.view_boxes?.brain;
   return (
     <>
       Each dot is one neuron's <em>soma position</em> — the cell body, not the neurites: this is not a morphology rendering, and a
       neuron's arbours may be far from its dot. Positions are {sc.source}, dequantised with the sidecar's own bounds ({fmtNum(atlas.lo[0], 1)}–
       {fmtNum(atlas.hi[0], 1)} µm in x, {fmtNum(atlas.lo[1], 1)}–{fmtNum(atlas.hi[1], 1)} µm in y, {fmtNum(atlas.lo[2], 1)}–{fmtNum(atlas.hi[2], 1)} µm in z);{' '}
       {sc.axes?.note}.{' '}
+      {brainBox && typeof brainBox.n_neurons === 'number' && (
+        <>
+          The default framing is the sidecar's <span className="mono">view_boxes.brain</span>, which holds {fmtInt(brainBox.n_neurons)} somata
+          {typeof sc.brain_z_max_um === 'number' && <> above the brain / ventral-nerve-cord plane at z = {fmtNum(sc.brain_z_max_um, 1)} µm</>}
+          {typeof sc.n_somata_below_brain_plane === 'number' && (
+            <>; the {fmtInt(sc.n_somata_below_brain_plane)} somata below that plane are drawn only with the toggle on</>
+          )}
+          .{' '}
+        </>
+      )}
       {sc.subsampled ? (
         <>
           The map is <em>subsampled</em>: it shows {fmtInt(atlas.n)} of the {fmtInt(sc.n_neurons_simulated)} neurons simulated.
         </>
       ) : (
-        <>It shows all {fmtInt(atlas.n)} neurons that have a soma position, of {fmtInt(sc.n_neurons_simulated)} simulated.</>
+        <>It holds all {fmtInt(atlas.n)} neurons that have a soma position, of {fmtInt(sc.n_neurons_simulated)} simulated.</>
       )}{' '}
       {rowsDisagree && (
         <span className="tone-failed">
