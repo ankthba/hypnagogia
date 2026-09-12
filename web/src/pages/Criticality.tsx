@@ -11,7 +11,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
 import SigmaChart, { type SigmaPoint } from '../components/charts/SigmaChart';
 import CcdfChart, { seedColor } from '../components/charts/CcdfChart';
-import { classColor, CLASS_LABELS } from '../lib/colors';
+import { classInk, CLASS_LABELS } from '../lib/colors';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct, fmtMeanSd, fmtValueCI } from '../lib/format';
 
 export default function Criticality() {
@@ -136,7 +136,7 @@ function Stage2View({ d }: { d: Stage2 }) {
             if (crit === undefined && !used && !['silent', 'critical', 'saturated'].includes(c)) return null;
             return (
               <div key={c} className="contents">
-                <dt style={{ color: classColor(c) }}>{c}</dt>
+                <dt style={{ color: classInk(c) }}>{c}</dt>
                 <dd className="whitespace-normal">{crit ?? (used ? '(no criterion text in file)' : 'no criterion stated in the file')}</dd>
               </div>
             );
@@ -175,7 +175,7 @@ function Stage2View({ d }: { d: Stage2 }) {
               {
                 key: 'c',
                 header: 'class',
-                render: (r) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span>,
+                render: (r) => <span style={{ color: classInk(r.classification) }}>{r.classification}</span>,
               },
               { key: 'm', header: 'm mean ± sd', render: (r) => fmtMeanSd(r.m_mean, r.m_sd) },
               { key: 'r', header: 'rate mean ± sd (Hz)', render: (r) => fmtMeanSd(r.pop_rate_hz_mean, r.pop_rate_hz_sd, 4) },
@@ -223,7 +223,7 @@ function Stage2View({ d }: { d: Stage2 }) {
             <div className="flex flex-wrap gap-2 mb-3">
               {selRows.map((r) => (
                 <span key={r.seed} className="chip">
-                  seed {r.seed}: <span style={{ color: classColor(r.classification) }}>{r.classification}</span> · n avalanches{' '}
+                  seed {r.seed}: <span style={{ color: classInk(r.classification) }}>{r.classification}</span> · n avalanches{' '}
                   {fmtInt(r.avalanches?.n)} · max size {fmtInt(r.avalanches?.max_size)} · bin {fmtNum(r.avalanches?.bin_ms)} ms · time active{' '}
                   {fmtPct(r.avalanches?.frac_time_active)}
                 </span>
@@ -325,7 +325,7 @@ function FitTable({ rows }: { rows: PerSigma[] }) {
     return [
       { key: 'sigma', header: 'sigma (mV)', render: (r: PerSigma) => fmtNum(r.sigma_mV) },
       { key: 'seed', header: 'seed', render: (r: PerSigma) => r.seed },
-      { key: 'cls', header: 'class', render: (r: PerSigma) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span> },
+      { key: 'cls', header: 'class', render: (r: PerSigma) => <span style={{ color: classInk(r.classification) }}>{r.classification}</span> },
       { key: 'm', header: 'm [CI95]', render: (r: PerSigma) => fmtValueCI(r.branching_ratio_mr?.m, r.branching_ratio_mr?.ci95) },
       { key: 'kmax', header: 'k_max', render: (r: PerSigma) => fmtInt(r.branching_ratio_mr?.k_max) },
       { key: 'mrbin', header: 'MR bin (ms)', render: (r: PerSigma) => fmtNum(r.branching_ratio_mr?.bin_ms) },

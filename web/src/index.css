@@ -49,6 +49,16 @@
   --color-class-saturated: var(--color-failed);
   --color-class-indeterminate: #b5afa4;
   --color-class-not-run: var(--color-muted);
+  /* The same six classifications as TEXT. The hues above are chosen for 5px dots and background
+     bands, where a 2.9:1 grey is legible; as 12px words they are not. These are the darkened
+     variants, every one of them at or above 4.5:1 against both --color-bg and the white figure
+     mat (which forces the light palette with color-scheme: light). */
+  --color-class-silent-ink: #5f5a51;
+  --color-class-subcritical-ink: #6b6047;
+  --color-class-critical-ink: var(--color-link);
+  --color-class-saturated-ink: var(--color-failed);
+  --color-class-indeterminate-ink: #757064;
+  --color-class-not-run-ink: var(--color-muted);
   --band-silent: var(--color-bg-alt);
   --band-subcritical: rgba(111, 105, 94, 0.1);
   --band-critical: rgba(47, 85, 117, 0.12);
@@ -129,6 +139,11 @@
     --color-class-silent: light-dark(#9c968a, #7d766a);
     --color-class-subcritical: light-dark(#8a7f6a, #b3a78f);
     --color-class-indeterminate: light-dark(#b5afa4, #6a645a);
+    /* Text-safe variants of the three greys. The blue, the red and the muted already clear 4.5:1
+       in both themes and are left alone. */
+    --color-class-silent-ink: light-dark(#5f5a51, #b0a99c);
+    --color-class-subcritical-ink: light-dark(#6b6047, #c4b697);
+    --color-class-indeterminate-ink: light-dark(#757064, #8f887c);
     --band-subcritical: light-dark(rgba(111, 105, 94, 0.1), rgba(164, 157, 144, 0.12));
     --band-critical: light-dark(rgba(47, 85, 117, 0.12), rgba(143, 179, 212, 0.14));
     --band-saturated: light-dark(rgba(154, 63, 53, 0.1), rgba(217, 139, 130, 0.12));
@@ -312,6 +327,11 @@ a.masthead__name:hover {
   justify-content: center;
   align-items: baseline;
   column-gap: clamp(0.9rem, 3vw, 2rem);
+  /* Under a coarse pointer each link grows to a 44px target with -0.4rem of margin top and bottom
+     (see the touch block below). Without a row gap the two wrapped flex lines sit 39px apart and
+     the boxes overlap by ~10px, so a thumb aimed at the bottom of one link hits the one below it.
+     0.8rem is exactly the two negative margins back. Inert from 620px up, where the nav is a block. */
+  row-gap: 0.8rem;
 }
 
 @media (min-width: 620px) {
@@ -2018,5 +2038,11 @@ input[type='range'] {
   .map-panel__runs-row select.control {
     min-height: 44px;
     padding: 0.5rem 0.7rem;
+  }
+
+  /* The zoom buttons carry one glyph each ("+", "−"), so height alone left them 32px wide. A
+     touch target is 44 square, the same rule .segmented__option already follows. */
+  .map3d__buttons .control {
+    min-width: 44px;
   }
 }

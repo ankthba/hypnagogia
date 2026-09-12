@@ -12,7 +12,7 @@ import {
   Cell,
   Legend,
 } from 'recharts';
-import { CLASS_LABELS, classColor, classBand, SERIES, type ClassLabel } from '../../lib/colors';
+import { CLASS_LABELS, classColor, classInk, classBand, SERIES, type ClassLabel } from '../../lib/colors';
 import { fmtNum } from '../../lib/format';
 import { useNarrowBox } from '../../lib/media';
 
@@ -51,6 +51,51 @@ function thinTicks(ticks: number[], max: number): number[] {
   return out;
 }
 
+/**
+ * A symmetric log transform for the y values, with `T` the half-width of the linear middle.
+ *
+ * A plain log axis is not available here: the silent sigmas are exactly 0, and 0 has no place on a
+ * log axis. Symlog keeps them - it is linear inside +/-T and logarithmic beyond - which is what a
+ * quantity whose interesting range is 0 to 3.5 with three saturated runs at 25 needs. The
+ * construction is the same one ForestPlot uses for Hedges g.
+ */
+function symlogFwd(v: number, T: number): number {
+  const s = v < 0 ? -1 : 1;
+  const a = Math.abs(v);
+  return s * (a <= T ? a / T : 1 + Math.log10(a / T));
+}
+
+/**
+ * Tick values in the ORIGINAL units, chosen so every label is a round number the reader can read
+ * off the axis: 0 and the linear edge, then 1, 2, 5 per decade above it (only the decades
+ * themselves when the plot is too short to carry seven labels).
+ */
+function symlogTickValues(lo: number, hi: number, T: number, dense: boolean): number[] {
+  const out = new Set<number>([0]);
+  const add = (v: number) => {
+    if (v >= lo - 1e-12 && v <= hi + 1e-12) out.add(v);
+  };
+  if (dense) {
+    add(T / 2);
+    add(-T / 2);
+  }
+  add(T);
+  add(-T);
+  const m = Math.max(Math.abs(lo), Math.abs(hi));
+  for (let d = 1; T * Math.pow(10, d - 1) <= m * 1.0001 && d < 12; d++) {
+    const dec = T * Math.pow(10, d);
+    if (dense) {
+      add(0.2 * dec);
+      add(-0.2 * dec);
+      add(0.5 * dec);
+      add(-0.5 * dec);
+    }
+    add(dec);
+    add(-dec);
+  }
+  return [...out].sort((a, b) => a - b);
+}
+
 /** Geometric band edges around each sigma on a log axis. */
 function bandEdges(sigmas: number[]): { s: number; lo: number; hi: number }[] {
   const s = [...new Set(sigmas)].filter((v) => v > 0).sort((a, b) => a - b);
@@ -70,6 +115,7 @@ export default function SigmaChart({
   refY,
   height = 260,
   yDomain,
+  ySymlog,
 }: {
   points: SigmaPoint[];
   bands: SigmaBand[];
@@ -77,6 +123,13 @@ export default function SigmaChart({
   refY?: { y: number; label: string }[];
   height?: number;
   yDomain?: [number | 'auto', number | 'auto'];
+  /**
+   * Draw y on a symmetric log axis, linear within +/-`ySymlog` of zero and logarithmic beyond it.
+   * Set it when a few saturated runs would otherwise stretch a linear axis so far that the whole
+   * transition region is crushed into the bottom of the plot. The tooltip still reports the raw
+   * value; only the position on the axis is transformed, and the axis says so under the plot.
+   */
+  ySymlog?: number;
 }) {
   // narrow is decided by the width of the box this chart is drawn into, not by the window: with
   // the map rail taking 400px and .cols-2 splitting what is left, a figure mat is ~400px wide at a
@@ -103,6 +156,24 @@ export default function SigmaChart({
   const tick = narrow ? TICK_SM : TICK;
   const h = narrow ? Math.max(200, Math.round(height * 0.82)) : height;
   const xTicks = narrow ? thinTicks(xs, 4) : xs;
+
+  // The symlog y axis: the values plotted are the transform, the values written on the ticks and
+  // in the tooltip are the file's own. `yPlot` is added per point rather than replacing `y`, so
+  // nothing downstream of the tooltip ever sees the transformed number.
+  const T = typeof ySymlog === 'number' && ySymlog > 0 ? ySymlog : null;
+  const fwd = (v: number) => (T === null ? v : symlogFwd(v, T));
+  const plotted = T === null ? drawable : drawable.map((p) => ({ ...p, yPlot: fwd(p.y), errPlot: p.err ? ([fwd(p.y) - fwd(p.y - p.err[0]), fwd(p.y + p.err[1]) - fwd(p.y)] as [number, number]) : undefined }));
+  const yKey = T === null ? 'y' : 'yPlot';
+  const errKey = T === null ? 'err' : 'errPlot';
+  const yRaw = drawable.map((p) => p.y);
+  const yLo = yRaw.length ? Math.min(0, ...yRaw) : 0;
+  const yHi = yRaw.length ? Math.max(0, ...yRaw) : 1;
+  const yTickVals = T === null ? null : symlogTickValues(yLo, yHi, T, !narrow);
+  const yTicks = yTickVals === null ? undefined : yTickVals.map((v) => fwd(v));
+  const yPad = T === null ? 0 : Math.max(0.05, (fwd(yHi) - fwd(yLo)) * 0.05);
+  const symDomain: [number, number] | null = T === null ? null : [fwd(yLo) - (yLo < 0 ? yPad : 0), fwd(yHi) + yPad];
+  const yTickFormat = T === null ? (v: number) => fmtNum(v, 3) : (v: number) => fmtNum(yTickVals?.find((o) => Math.abs(fwd(o) - v) < 1e-9) ?? v, 3);
+
   return (
     <div ref={boxRef}>
       <ResponsiveContainer width="100%" height={h} minHeight={190}>
@@ -126,13 +197,15 @@ export default function SigmaChart({
           />
           <YAxis
             type="number"
-            dataKey="y"
-            domain={yDomain ?? ['auto', 'auto']}
+            dataKey={yKey}
+            domain={symDomain ?? yDomain ?? ['auto', 'auto']}
+            allowDataOverflow={symDomain !== null}
+            ticks={yTicks}
             stroke={SERIES.axis}
             tick={tick}
             width={narrow ? 46 : 66}
-            tickCount={narrow ? 4 : undefined}
-            tickFormatter={(v) => fmtNum(v, 3)}
+            tickCount={symDomain !== null ? undefined : narrow ? 4 : undefined}
+            tickFormatter={yTickFormat}
             label={narrow ? undefined : { value: yLabel, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: LABEL_FS.lg }}
           />
           {refY?.map((r) => (
@@ -140,7 +213,7 @@ export default function SigmaChart({
                empty - outside it there is no margin left to render into and it is clipped */
             <ReferenceLine
               key={r.label}
-              y={r.y}
+              y={fwd(r.y)}
               stroke={SERIES.ink}
               strokeDasharray="4 4"
               label={{ value: r.label, fill: SERIES.ink, fontSize: 12, position: narrow ? 'insideBottomLeft' : 'right' }}
@@ -160,7 +233,7 @@ export default function SigmaChart({
                     {yLabel}: {fmtNum(p.y, 4)}
                     {p.ciText ? ` ${p.ciText}` : ''}
                   </div>
-                  <div style={{ color: classColor(p.cls) }}>{p.cls}</div>
+                  <div style={{ color: classInk(p.cls) }}>{p.cls}</div>
                 </div>
               );
             }}

@@ -59,6 +59,40 @@ export default function Methods() {
           </ul>
         </div>
 
+        <h2>Two corrections to the published model</h2>
+        <p>
+          Two cells in the mushroom body are modelled differently here from the way the published model treats them,
+          and both changes follow from a direct measurement on the identified cell rather than from anything this
+          project chose. Neither introduces a numeric parameter. Stage 3b on the Learning page reports what each one
+          does, measured, with everything else held identical.
+        </p>
+        <ol className="space-y-4 list-decimal pl-5">
+          <li>
+            <em>APL releases transmitter continuously, not in spikes.</em> APL is the mushroom body's feedback
+            inhibitory neuron, one per hemisphere, and it does not fire action potentials: it releases in proportion to
+            its membrane depolarisation (Amin et al. 2020, eLife 9:e56954). The published model gives every neuron a
+            spike threshold, which turns the one graded controller of Kenyon-cell sparseness into a threshold device.
+            APL is therefore given no threshold here, and its release is rectified at rest and saturates at the spike
+            threshold. The scaling introduces nothing new: a cell held at threshold delivers exactly what a spiking
+            synapse delivers at the fastest rate the refractory period allows, and proportionally less below it.
+          </li>
+          <li>
+            <em>DPM is inhibitory, not dopaminergic.</em> The connectome's predicted transmitter for DPM is dopamine,
+            which the model's sign rule makes excitatory, so its 32,795 synapses onto 3,989 of the 4,064 Kenyon cells
+            excite them. Haynes, Christmann and Waddell 2015 (eLife 4:e03868) show DPM cell bodies are Gad1-positive,
+            that DPM contains GABA and 5-HT, and that activating it drives a large chloride increase in mushroom-body
+            neurons with no detectable calcium or cAMP increase; Lee et al. 2011 (PNAS 108:13794) report it as
+            serotonergic. The sign rule is untouched: the measured transmitter is put in place of the predicted one and
+            the same rule applied to it.
+          </li>
+        </ol>
+        <p>
+          The two pull against each other, which is itself a result rather than a nuisance. Correcting APL is the only
+          thing that puts Kenyon-cell coding where it is measured, and the same correction holds DPM and the readout
+          MBON below threshold, though both have measured odour responses in the fly. The model gives every neuron the
+          same millivolts per synapse, and APL has 234,026 input and 209,913 output synapses.
+        </p>
+
         <h2>Pipeline stages</h2>
         <ol className="space-y-4 list-decimal pl-5">
           <li>

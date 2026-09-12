@@ -23,6 +23,24 @@ export const CLASS_COLORS: Record<ClassLabel, string> = {
   not_run: 'var(--color-class-not-run)',
 };
 
+/**
+ * The same classifications as *text* colour.
+ *
+ * `CLASS_COLORS` is tuned for 5px markers and background bands, where a light warm grey is right.
+ * Two of those hues are unreadable as small body text: silent is 2.9:1 on the white figure mat and
+ * indeterminate 2.2:1, both below the 4.5:1 floor and below even the 3:1 large-text floor. These
+ * are the darkened variants (defined next to the marker hues in index.css), used wherever the
+ * classification is written as a word rather than drawn as a dot.
+ */
+export const CLASS_INK: Record<ClassLabel, string> = {
+  silent: 'var(--color-class-silent-ink)',
+  subcritical: 'var(--color-class-subcritical-ink)',
+  critical: 'var(--color-class-critical-ink)',
+  saturated: 'var(--color-class-saturated-ink)',
+  indeterminate: 'var(--color-class-indeterminate-ink)',
+  not_run: 'var(--color-class-not-run-ink)',
+};
+
 /** Background band per classification (drawn behind each sigma on the sweep charts). */
 export const CLASS_BAND: Record<ClassLabel, string> = {
   silent: 'var(--band-silent)',
@@ -33,8 +51,14 @@ export const CLASS_BAND: Record<ClassLabel, string> = {
   not_run: 'var(--band-not-run)',
 };
 
+/** For marks and bands: dots, swatches, ReferenceArea fills. Not for text. */
 export function classColor(cls: string | null | undefined): string {
   return CLASS_COLORS[cls as ClassLabel] ?? CLASS_COLORS.indeterminate;
+}
+
+/** For the classification written as a word. Same hue family, dark enough to read. */
+export function classInk(cls: string | null | undefined): string {
+  return CLASS_INK[cls as ClassLabel] ?? CLASS_INK.indeterminate;
 }
 
 export function classBand(cls: string | null | undefined): string {
