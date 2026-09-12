@@ -370,3 +370,40 @@ export interface RasterSidecar {
   neuron_rows: { row: number; root_id: string; group: 'ensemble_A' | 'ensemble_B' | 'other_kc' }[];
   duration_s: number;
 }
+
+/**
+ * `reference_clips.json`. Real simulations of this model exported by
+ * `scripts/07_reference_clips.py` so the neuron map has something true to show before the replay
+ * stage produces activity of its own. They are never demo or synthetic data; each carries its own
+ * provenance and the viewer must always name the clip that is on screen.
+ */
+export interface ReferenceClipEpoch {
+  name: string;
+  t_start_s: number;
+  t_end_s: number;
+  drives?: Record<string, number>;
+}
+
+export interface ReferenceClip {
+  name: string;
+  title: string;
+  description: string;
+  /** path under public/data of the activity sidecar, e.g. "clips/sugar_pulses.json" */
+  file: string;
+  duration_s: number;
+  n_spikes_total: number;
+  n_spikes_exported: number;
+  downsampled: boolean;
+  sigma_mV: number;
+  seed: number;
+  n_neurons_simulated: number;
+  n_active_neurons: number;
+  epochs?: ReferenceClipEpoch[];
+  provenance: Provenance & { results_dir?: string };
+}
+
+export interface ReferenceClipsFile {
+  clips: ReferenceClip[];
+  note?: string;
+  walltime_s?: number;
+}

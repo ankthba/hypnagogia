@@ -6,8 +6,8 @@
    "description": "The male counterparts of the sugar-sensing labellar neurons Shiu et al. used, pulsed at 200 Hz for 1 s every 2 s. This is the validated propagation benchmark from stage 0, run for longer so the cascade repeats.",
    "file": "clips/sugar_pulses.json",
    "duration_s": 12.0,
-   "n_spikes_total": 30326,
-   "n_spikes_exported": 30326,
+   "n_spikes_total": 70306,
+   "n_spikes_exported": 70306,
    "downsampled": false,
    "sigma_mV": 0.0,
    "seed": 11,
@@ -119,11 +119,11 @@
    "description": "Background membrane noise only, at the amplitude where the network ignites. This is the model's only self-sustaining spontaneous state, and the stage 2 result is that it is not biologically plausible: about three quarters of Kenyon cells end up firing above 30 Hz.",
    "file": "clips/spontaneous_ignition.json",
    "duration_s": 8.0,
-   "n_spikes_total": 681,
-   "n_spikes_exported": 681,
+   "n_spikes_total": 1383,
+   "n_spikes_exported": 1383,
    "downsampled": false,
-   "sigma_mV": 1.5,
-   "seed": 12,
+   "sigma_mV": 1.6,
+   "seed": 13,
    "n_neurons_simulated": 144209,
    "n_active_neurons": 1646,
    "epochs": [
@@ -150,5 +150,5 @@
   }
  ],
  "note": "Real simulations of this model, not demonstrations. Each was run by scripts/07_reference_clips.py with configs/reference_clips.yaml and carries its own provenance. The map plays one of these only when the replay stage has no activity of its own, and always says which simulation is on screen.",
- "walltime_s": 129.5
+ "walltime_s": 0.0
 }

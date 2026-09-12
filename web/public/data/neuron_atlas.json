@@ -2,7 +2,7 @@
  "bin": "neuron_atlas.bin",
  "dtype": "uint16",
  "shape": [
-  126109,
+  60000,
   4
  ],
  "columns": [
@@ -14,13 +14,13 @@
  "quantisation": {
   "lo_um": [
    19.744,
-   38.064,
+   38.256,
    81.232
   ],
   "hi_um": [
-   749.344,
+   748.864,
    551.232,
-   1072.704
+   1069.656
   ],
   "scale": 65535,
   "formula": "um = lo + q / 65535 * (hi - lo)"
@@ -70,7 +70,7 @@
   }
  ],
  "group_counts": {
-  "other": 27194,
+  "other": 11919,
   "KC": 4050,
   "MBON": 96,
   "DAN": 340,
@@ -78,9 +78,9 @@
   "ORN": 0,
   "ALPN": 680,
   "CX": 2912,
-  "optic": 90805
+  "optic": 39971
  },
- "n_neurons_in_map": 126109,
+ "n_neurons_in_map": 60000,
  "n_neurons_simulated": 144209,
  "n_without_soma_position": 18100,
  "n_without_soma_position_by_group": {
@@ -95,7 +95,10 @@
   "optic": 12463
  },
  "soma_outside_brain_note": "Ascending neurons are part of the brain-scope network because they carry input into the brain, but their somata sit in the ventral nerve cord, so they appear below the brain in the map. Olfactory receptor neurons have no soma in the volume at all and are absent from the map while still being simulated.",
- "subsampled": false,
+ "subsampled": true,
+ "n_with_soma_position": 126109,
  "source": "male CNS v1.0 body-annotations somaLocation (8 nm voxels)",
- "row_to_sim_index": "see neuron_atlas_index.bin (uint32, one simulation index per atlas row)"
+ "row_to_sim_index": "see neuron_atlas_index.bin (uint32, one simulation index per atlas row)",
+ "atlas_fingerprint": "sha256:f4f39e8b2a695ede66616bd8c4b14ea02669f3aca2b6e2857d745c8c9daf28e2",
+ "n_atlas_rows": 60000
 }

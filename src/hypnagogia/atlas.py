@@ -9,6 +9,7 @@ bounding box given in the JSON sidecar, plus one uint8 group code per neuron.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -19,7 +20,9 @@ from .connectome import Connectome, MALECNS_DIR, MALECNS_FILES
 
 VOXEL_NM = 8.0
 
-# group code -> (label, selector) evaluated in order; first match wins, 0 is the fallback
+# group code -> (label, selector). The code is the value written into the binary's `group` column and
+# the code the sidecar's groups[] publishes; it is NOT the precedence. Precedence is PAINT_ORDER below,
+# because several selectors overlap (every dFB neuron is also cell_class CX). 0 is the fallback.
 GROUPS = [
     ("other", None),
     ("KC", {"cell_class": "Kenyon_Cell"}),
@@ -51,13 +54,33 @@ PAINT_ORDER = ["optic", "CX", "ALPN", "ORN", "DAN", "MBON", "KC", "dFB"]
 
 
 def group_codes(conn: Connectome) -> np.ndarray:
-    g = np.zeros(conn.N, dtype=np.uint8)
+    """One group code per neuron: the LAST group in PAINT_ORDER that matches, i.e. the most specific.
+
+    Assigning in code order instead would let the broad selectors overwrite the narrow ones they contain
+    (dFB is a subset of cell_class CX, so every dFB neuron would be relabelled CX and the sidecar would
+    report dFB: 0 for a population that is present).
+    """
     by_name = {name: (code, sel) for code, (name, sel) in enumerate(GROUPS)}
+    unordered = [n for n, (_c, sel) in by_name.items() if sel is not None and n not in PAINT_ORDER]
+    if unordered:
+        raise ValueError(f"groups {unordered} have a selector but no place in PAINT_ORDER, so their precedence "
+                         f"against the others is undefined; add them to PAINT_ORDER")
+    g = np.zeros(conn.N, dtype=np.uint8)
     for name in PAINT_ORDER:
         code, sel = by_name[name]
         if sel is not None:
             g[conn.select(**sel)] = code
     return g
+
+
+def atlas_fingerprint(atlas_index: np.ndarray) -> str:
+    """Identity of one atlas row numbering: sha256 over the exact bytes of neuron_atlas_index.bin.
+
+    Any change to the filtering, the scope or max_neurons permutes the rows while leaving every row number
+    in range, so a spike file that indexes those rows must carry this for the viewer to be able to tell a
+    stale pairing from a current one.
+    """
+    return "sha256:" + hashlib.sha256(np.asarray(atlas_index, dtype=np.uint32).tobytes()).hexdigest()
 
 
 def build_atlas(conn: Connectome, out_dir: Path, max_neurons: int | None = None, seed: int = 0) -> dict:
@@ -66,6 +89,7 @@ def build_atlas(conn: Connectome, out_dir: Path, max_neurons: int | None = None,
     pos_um, has = soma_positions(conn)
     grp = group_codes(conn)
     idx = np.flatnonzero(has)
+    n_with_soma = int(len(idx))
     n_missing = int((~has).sum())
     missing_by_group = {GROUPS[c][0]: int(((~has) & (grp == c)).sum()) for c in range(len(GROUPS))}
     if max_neurons and len(idx) > max_neurons:
@@ -95,9 +119,14 @@ def build_atlas(conn: Connectome, out_dir: Path, max_neurons: int | None = None,
                                     "brain, but their somata sit in the ventral nerve cord, so they appear below the brain in the "
                                     "map. Olfactory receptor neurons have no soma in the volume at all and are absent from the map "
                                     "while still being simulated."),
-        "subsampled": bool(max_neurons and conn.N > max_neurons),
+        # true only when rows were actually dropped: the test that ran is on the neurons that HAVE a soma
+        # position, not on every simulated neuron
+        "subsampled": bool(max_neurons and n_with_soma > max_neurons),
+        "n_with_soma_position": n_with_soma,
         "source": "male CNS v1.0 body-annotations somaLocation (8 nm voxels)",
         "row_to_sim_index": "see neuron_atlas_index.bin (uint32, one simulation index per atlas row)",
+        "atlas_fingerprint": atlas_fingerprint(idx),
+        "n_atlas_rows": int(len(idx)),
     }
     idx.astype(np.uint32).tofile(out_dir / "neuron_atlas_index.bin")
     json.dump(side, open(out_dir / "neuron_atlas.json", "w"), indent=1)
@@ -125,6 +154,9 @@ def export_activity(i: np.ndarray, t_step: np.ndarray, dt_s: float, atlas_index:
     arr = arr[np.argsort(arr[:, 0])]
     arr.tofile(out_dir / f"{name}.bin")
     side = {"bin": f"{name}.bin", "dtype": "uint32", "shape": [int(len(arr)), 2], "columns": ["t_ms", "atlas_row"],
+            # identity of the atlas whose rows these atlas_row values index: the viewer refuses to animate a
+            # spike file whose fingerprint or row count disagrees with the neuron_atlas.bin it has loaded
+            "n_atlas_rows": int(len(atlas_index)), "atlas_fingerprint": atlas_fingerprint(atlas_index),
             "duration_s": float(t1 - t0), "n_spikes_total": n_total, "n_spikes_exported": int(len(arr)),
             "downsampled": bool(n_total > max_spikes),
             "downsample_note": (f"{n_total} spikes fell in the window; a uniform random sample of {max_spikes} is shown"

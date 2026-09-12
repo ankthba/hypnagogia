@@ -117,11 +117,21 @@ def run_jobs(specs: list[dict], n_parallel: int = 8, skip_existing: bool = True)
 
     def _one(k: int, spec: dict):
         out_dir = Path(spec["out_dir"]); out_dir.mkdir(parents=True, exist_ok=True)
-        if skip_existing and (out_dir / "spikes.npz").exists() and (out_dir / "meta.json").exists():
-            return k, {"spikes": str(out_dir / "spikes.npz"), "meta": str(out_dir / "meta.json"), "skipped": True}
         spec_path = out_dir / "job.json"
+        spec_json = json.dumps(spec, default=str, sort_keys=True)
+        if skip_existing and (out_dir / "spikes.npz").exists() and (out_dir / "meta.json").exists():
+            # Only reuse a result when the job that produced it was IDENTICAL. Reusing on directory name alone
+            # silently returns stale output after a config change, which is a reproducibility bug, not a speed-up.
+            try:
+                prev = json.dumps(json.load(open(spec_path)), default=str, sort_keys=True)
+            except Exception:
+                prev = None
+            if prev == spec_json:
+                return k, {"spikes": str(out_dir / "spikes.npz"), "meta": str(out_dir / "meta.json"), "skipped": True}
+            for stale in ("spikes.npz", "meta.json", "plastic_w.npz", "voltage.npz", "job.result.json"):
+                (out_dir / stale).unlink(missing_ok=True)
         with open(spec_path, "w") as f:
-            json.dump(spec, f, default=str)
+            f.write(spec_json)
         t0 = time.time()
         p = subprocess.run([py, "-m", "hypnagogia.jobs", str(spec_path)], env=env, capture_output=True, text=True)
         (out_dir / "job.log").write_text(p.stdout + "\n--- stderr ---\n" + p.stderr)

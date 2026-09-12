@@ -119,11 +119,11 @@ clips:
   seed: 11
 - name: spontaneous_ignition
   title: Spontaneous ignition (whole-brain runaway)
-  description: 'Background membrane noise only, at the amplitude where the network
-    ignites. This is the model''s only self-sustaining spontaneous state, and the
-    stage 2 result is that it is not biologically plausible: about three quarters
-    of Kenyon cells end up firing above 30 Hz.'
+  description: 'Background membrane noise only, at an amplitude above the ignition
+    threshold measured in stage 2. This is the model''s only self-sustaining spontaneous
+    state, and the stage 2 result is that it is not biologically plausible: about
+    three quarters of Kenyon cells end up firing above 30 Hz.'
   drive: null
-  sigma_mV: 1.5
-  duration_s: 8.0
-  seed: 12
+  sigma_mV: 2.0
+  duration_s: 10.0
+  seed: 13
