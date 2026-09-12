@@ -2,7 +2,7 @@
 learning-rate parameter eta_ltd against Hige et al. 2015's ~80% single-pairing depression of MBON-gamma1pedc (MBON11) by
 PPL1-gamma1pedc (PPL101); (3) documentation of every rule parameter. Outputs results/stage3_plasticity/stage3.json.
 """
-import json, sys, time
+import argparse, json, sys, time
 from pathlib import Path
 import numpy as np, pandas as pd
 from hypnagogia import RESULTS
@@ -11,7 +11,7 @@ from hypnagogia.connectome import Connectome, load_connectome
 from hypnagogia.model import Simulation, load_spikes, spikes_in_epoch
 from hypnagogia.jobs import run_jobs
 
-OUT = RESULTS / "stage3_plasticity"
+OUT = RESULTS / "stage3_plasticity"   # suffixed with the gain when it is not 1.0
 
 
 def operating_sigma(cfg):
@@ -51,7 +51,14 @@ def unit_test(cfg, pl):
 
 
 def main():
-    cfg = load_config("stage3_plasticity"); pl = cfg["plasticity"]; cal = cfg["calibration"]
+    ap = argparse.ArgumentParser(); ap.add_argument("--gain", type=float, default=1.0)
+    a = ap.parse_args()
+    cfg = load_config("stage3_plasticity")
+    cfg["dataset"]["weight_scale"] = cfg["dataset"]["weight_scale"] * a.gain
+    cfg["_gain"] = a.gain; pl = cfg["plasticity"]; cal = cfg["calibration"]
+    global OUT
+    if a.gain != 1.0:
+        OUT = RESULTS / f"stage3_plasticity_gain{a.gain}"
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     t0 = time.time()
     ut = unit_test(cfg, pl); print("unit test:", ut["passed"], ut["results"])

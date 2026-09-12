@@ -62,11 +62,11 @@ def build_epochs(s4, plastic_conditioning=True):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", default=None); ap.add_argument("--shuffled", action="store_true")
-    ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--analyse-only", action="store_true"); ap.add_argument("--gain", type=float, default=1.0)
     a = ap.parse_args()
     cfg = load_config("stage4_encode"); s4 = cfg["stage4"]; pl = cfg["plasticity"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s4["seeds"]
-    tag = "shuffled" if a.shuffled else "real"
+    tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
     sigma, sigma_src = operating_sigma(cfg)
     eta, eta_src = eta_from_stage3(cfg)
@@ -78,7 +78,7 @@ def main():
     p["pre"], p["post"], p["dan"] = pl["pre"], pl["post"], pl["dan"]
     specs = []
     for sd in seeds:
-        cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"]}
+        cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"] * a.gain}
         if a.shuffled:
             cspec["shuffle"] = {"seed": sd, "strata": "cell_class", "swaps_per_edge": 10}
         specs.append({"out_dir": str(out / f"seed{sd}"), "seed": 400 + sd, "config": c, "name": f"encode_{tag}_{sd}",

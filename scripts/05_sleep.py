@@ -18,14 +18,17 @@ OUT = RESULTS / "stage5_sleep"
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", default=None); ap.add_argument("--shuffled", action="store_true")
     ap.add_argument("--rates", default=None, help="comma-separated dFB clamp rates (default: the configured rate)")
-    ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--analyse-only", action="store_true"); ap.add_argument("--gain", type=float, default=1.0)
     a = ap.parse_args()
     cfg = load_config("stage5_sleep"); s5 = cfg["stage5"]; s4 = cfg["stage4"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s5["seeds"]
     rates = [float(x) for x in a.rates.split(",")] if a.rates else [s5["dfb_clamp_rate_hz"]]
-    tag = "shuffled" if a.shuffled else "real"
+    tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
-    s4j = json.load(open(RESULTS / "stage4_learning" / tag / "stage4.json"))
+    s4dir = RESULTS / "stage4_learning" / tag
+    if not (s4dir / "stage4.json").exists():
+        raise SystemExit(f"no stage-4 result at {s4dir}: run scripts/04_encode.py with the same --gain first")
+    s4j = json.load(open(s4dir / "stage4.json"))
     sigma = s4j["protocol"]["sigma_mV"]; eta = s4j["protocol"]["eta_ltd"]
     conn = load_connectome("malecns", "v1.0", "brain")
     dfb = conn.select(**POPULATIONS[s5["dfb_population"]]["selector"])
@@ -35,10 +38,10 @@ def main():
     p["eta_ltd"] = eta; p["pre"], p["post"], p["dan"] = pl["pre"], pl["post"], pl["dan"]
     specs = []
     for sd in seeds:
-        wfile = str(RESULTS / "stage4_learning" / tag / f"seed{sd}" / "plastic_w.npz")
+        wfile = str(s4dir / f"seed{sd}" / "plastic_w.npz")
         if not Path(wfile).exists():
             print(f"seed {sd}: no stage-4 weights ({wfile}); skipped"); continue
-        cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"]}
+        cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"] * a.gain}
         if a.shuffled:
             cspec["shuffle"] = {"seed": sd, "strata": "cell_class", "swaps_per_edge": 10}
         for cond in s5["conditions"]:

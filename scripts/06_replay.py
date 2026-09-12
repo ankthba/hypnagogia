@@ -32,26 +32,35 @@ def run_dir(tag, cond, seed):
     return RESULTS / "stage5_sleep" / tag / f"{cond}_seed{seed}"
 
 
+def tagged(base, suffix):
+    return base + suffix
+
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", default=None); ap.add_argument("--bin-ms", type=float, default=None)
+    ap.add_argument("--gain", type=float, default=1.0)
     a = ap.parse_args()
+    suffix = "" if a.gain == 1.0 else f"_gain{a.gain}"
     cfg = load_config("stage6_replay"); s6 = cfg["stage6"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s6["seeds"]
     bin_s = (a.bin_ms or s6["bin_ms"]) / 1e3
+    global OUT
+    if a.gain != 1.0:
+        OUT = RESULTS / f"stage6_replay_gain{a.gain}"
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     conn = load_connectome("malecns", "v1.0", "brain")
     kc = conn.select(cell_class="Kenyon_Cell")
     t0 = time.time()
     tmpl = {}
-    for tag in ("real", "shuffled"):
+    for tag in (f"real{suffix}", f"shuffled{suffix}"):
         p = RESULTS / "stage4_learning" / tag / "kc_templates.json"
         if p.exists():
             tmpl[tag] = json.load(open(p))
-    if "real" not in tmpl:
+    if f"real{suffix}" not in tmpl:
         raise SystemExit("stage 4 templates missing: run scripts/04_encode.py first")
     id2idx = {int(conn.ids[x]): int(x) for x in kc}
     rows, exports = [], {"traces": [], "rasters": []}
-    for tag in ("real", "shuffled"):
+    for tag in (f"real{suffix}", f"shuffled{suffix}"):
         if tag not in tmpl:
             continue
         for sd in seeds:
@@ -73,7 +82,7 @@ def main():
                     rows.append({"network": tag, "condition": cond, "seed": sd, "ensemble": nm, "bin_ms": bin_s * 1e3,
                                  "kc_rate_hz": res["kc_rate_hz"], "n_active_bins": res["n_active_bins"], "n_bins": res["n_bins"],
                                  "file": str(d / "spikes.npz").replace(str(RESULTS.parent) + "/", ""), **e})
-                if tag == "real" and sd in s6["export_seeds"]:
+                if tag == f"real{suffix}" and sd in s6["export_seeds"]:
                     M = binned_matrix(i, ts, meta["dt_ms"] * 1e-3, kc, w[0], min(w[1], w[0] + s6["export_window_s"]), bin_s)
                     pos = np.full(int(kc.max()) + 2, -1, dtype=np.int64); pos[kc] = np.arange(len(kc))
                     tr = {}
@@ -137,9 +146,10 @@ def main():
                 "survives": bool(surv), "seeds": common}
 
     comparisons = []
-    A_sleep = pick("real", "sleep", "A"); B_sleep = pick("real", "sleep", "B")
-    A_wake = pick("real", "wake", "A"); A_sleep_sh = pick("shuffled", "sleep", "A")
-    A_rand = {r["seed"]: r.get("null_corr_mean") for r in rows if r["network"] == "real" and r["condition"] == "sleep" and r["ensemble"] == "A"}
+    REAL, SHUF = f"real{suffix}", f"shuffled{suffix}"
+    A_sleep = pick(REAL, "sleep", "A"); B_sleep = pick(REAL, "sleep", "B")
+    A_wake = pick(REAL, "wake", "A"); A_sleep_sh = pick(SHUF, "sleep", "A")
+    A_rand = {r["seed"]: r.get("null_corr_mean") for r in rows if r["network"] == REAL and r["condition"] == "sleep" and r["ensemble"] == "A"}
     comparisons.append(paired(A_sleep, B_sleep, "A_vs_B_sleep", "trained (A) vs unpaired (B) ensemble, during sleep", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_wake, "sleep_vs_wake_A", "sleep vs wake, odour-A ensemble", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_sleep_sh, "real_vs_shuffled", "real vs degree-preserving shuffled connectome, odour-A ensemble in sleep", "greater", "template_corr_mean"))
@@ -163,7 +173,11 @@ def main():
                          "coactivation": "mean zero-lag pairwise correlation among ensemble members, standardised against size-matched random KC ensembles (Wilson & McNaughton 1994)",
                          "sequence": "Spearman rank correlation between within-event first-spike order and the odour-response order, with a cell-identity shuffle null (Foster & Wilson 2006)",
                          "reactivation_event": "a bin whose template correlation exceeds the 95th percentile of the size-matched random-ensemble null"},
-             "window_ms": bin_s * 1e3, "n_seeds": len(set(r["seed"] for r in rows)),
+             "window_ms": bin_s * 1e3, "n_seeds": len(set(r["seed"] for r in rows)), "gain": a.gain,
+             "gain_note": ("published parameters" if a.gain == 1.0 else
+                           f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
+                           f"published value the network has neither a sparse odour code nor a quiet background (stages 2 "
+                           f"and 3b). This is an uncited free parameter introduced by this project."),
              "comparisons": comparisons, "per_seed": rows, "traces": exports["traces"], "rasters": exports["rasters"],
              "activity": exports.get("activity", []),
              "networks_analysed": sorted(set(r["network"] for r in rows)),

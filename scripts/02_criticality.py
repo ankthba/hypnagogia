@@ -17,13 +17,17 @@ from hypnagogia.analysis.criticality import analyse_population, CRITERIA
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--subset", action="store_true"); ap.add_argument("--seeds", default=None); ap.add_argument("--sigmas", default=None)
     ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--gain", type=float, default=1.0,
+                    help="multiplier on every synaptic weight; 1.0 is the published model. Values below 1 are a "
+                         "labelled deviation (see configs/stage3d_gain.yaml) and are written to a separate directory.")
     a = ap.parse_args()
     cfg = load_config("stage2_criticality"); s2 = cfg["stage2"]
     sigmas = [float(x) for x in a.sigmas.split(",")] if a.sigmas else s2["sigma_values_mV"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s2["seeds"]
-    tag = "subset" if a.subset else "full"
+    tag = ("subset" if a.subset else "full") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
     OUT = RESULTS / "stage2_criticality" / tag; OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
-    cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"],
+    cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain",
+             "weight_scale": cfg["dataset"]["weight_scale"] * a.gain,
              "subset": SUBSET_MB_CX if a.subset else None}
     conn = load_connectome("malecns", "v1.0", "brain")
     if a.subset:
@@ -152,7 +156,11 @@ def main():
                                 "bistable network, not a continuous approach to a critical point. This is the expected behaviour of a "
                                 "network with no spike-frequency adaptation and no short-term synaptic depression."),
            "criterion": "sweep completes for all sigma x seeds; classification per CRITERIA; a missing critical band is a finding, not a failure",
-           "network": tag, "n_neurons": conn.N, "n_connections": conn.E, "duration_s": s2["duration_s"], "warmup_s": s2["warmup_s"], "seeds": seeds,
+           "network": tag, "gain": a.gain,
+           "gain_note": ("published parameters" if a.gain == 1.0 else
+                         f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value (an uncited free "
+                         f"parameter introduced by this project; see configs/stage3d_gain.yaml)"),
+           "n_neurons": conn.N, "n_connections": conn.E, "duration_s": s2["duration_s"], "warmup_s": s2["warmup_s"], "seeds": seeds,
            "criteria": CRITERIA, "sigma_values_mV": all_sigmas, "sigma_values_requested_this_run": sigmas, "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],
            "per_sigma": per, "summary_by_sigma": summ,
            "transition_bracket": bracket, "operating_sigma_mV": (op["sigma_mV"] if op else None), "operating_sigma_reason": reason, "operating_rule": s2["operating_rule"],
