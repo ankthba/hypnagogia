@@ -283,6 +283,11 @@ SLEEP_OBSERVABLES = {
         "source": ("Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, "
                    "Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, "
                    "DOI 10.1016/j.cub.2019.08.070, PMID 31630950. In vivo, with simultaneous patch clamp."),
+        "version_caveat": ("These numbers were read in the bioRxiv PREPRINT full text, not the version of "
+                           "record: the publisher returns HTTP 403 to every fetch route tried. The preprint "
+                           "calls these cells R2 and the published paper renames them R5. The 0.5 to 1.5 Hz "
+                           "band is independently corroborated inside Raccuglia et al. 2025 Nature, which was "
+                           "opened in full."),
     },
     "apl_sk_ahp": {
         "what": ("Slow afterhyperpolarisation in APL, the mushroom body's feedback inhibitory neuron, carried "
@@ -301,5 +306,36 @@ SLEEP_OBSERVABLES = {
                    "'Sleep facilitates pattern separation through SK channel-mediated sparse coding', "
                    "Current Biology 36:1633-1643.e6, DOI 10.1016/j.cub.2026.02.028, PMID 41844155, "
                    "PMC13075853. Adult ex vivo brain, whole-cell current clamp."),
+    },
+}
+
+
+# Where the published model's own constants actually come from.
+#
+# This project quotes tau_m = 20 ms and tau_syn = 5 ms as "the published constants" throughout, and stage 11
+# turns on the claim that nothing in the model is slower than tau_syn. Both numbers were chased back to their
+# sources, and neither is quite what the phrase "the published constants" suggests.
+PUBLISHED_CONSTANT_PROVENANCE = {
+    "tau_m_ms": {
+        "value": 20.0,
+        "how_the_paper_states_it": ("Shiu, Sterne, Spiller et al. 2024 Nature 634:210-219 print the membrane "
+                                    "resistance and capacitance, R_mbr = 10 kOhm cm2 and C_mbr = 2 uF cm-2, "
+                                    "and define the membrane timescale as their product. The number 20 ms is "
+                                    "NOT printed anywhere in the paper: it is 2e-6 F/cm2 x 1e4 Ohm cm2."),
+        "ultimate_source": ("Both R_mbr and C_mbr are cited to Kakaria KS & de Bivort BL (2017), so the 20 ms "
+                            "this project quotes is a product of two numbers taken from an earlier model."),
+        "status": "derived, not printed",
+    },
+    "tau_syn_ms": {
+        "value": 5.0,
+        "how_the_paper_states_it": "Printed as the synaptic (alpha-synapse) decay timescale, applied identically to every neuron.",
+        "ultimate_source": ("Cited to Juergensen et al. 2021, a Drosophila LARVA neuromorphic model whose "
+                            "Table 1 lists an excitatory time constant of 5 ms with no source of its own. So "
+                            "the constant is inherited from another model rather than measured. Kakaria & de "
+                            "Bivort 2017 independently use a 5 ms postsynaptic-current decay half-life and "
+                            "cite Gaudry et al. 2013 Nature, which IS a Drosophila measurement; that is the "
+                            "chain by which a measurement stands behind the number, and it is not the chain "
+                            "the 2024 paper cites."),
+        "status": "model parameter inherited from a model, not a measurement",
     },
 }
