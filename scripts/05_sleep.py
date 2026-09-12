@@ -19,18 +19,27 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", default=None); ap.add_argument("--shuffled", action="store_true")
     ap.add_argument("--rates", default=None, help="comma-separated dFB clamp rates (default: the configured rate)")
     ap.add_argument("--analyse-only", action="store_true"); ap.add_argument("--gain", type=float, default=1.0)
+    ap.add_argument("--sigma", type=float, default=None,
+                    help="offline background noise in mV, overriding the stage-2 operating point. Used to run the "
+                         "offline period in the sparse regime, where activity arrives as discrete avalanches instead "
+                         "of a continuous wash, which is the only regime in which a discrete reactivation could be "
+                         "seen at all. Results go to a separate directory tagged with the value.")
+    ap.add_argument("--tag", default="", help="extra suffix on the results directory")
     a = ap.parse_args()
     cfg = load_config("stage5_sleep"); s5 = cfg["stage5"]; s4 = cfg["stage4"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s5["seeds"]
     rates = [float(x) for x in a.rates.split(",")] if a.rates else [s5["dfb_clamp_rate_hz"]]
-    tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
+    tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}") + (a.tag or "")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
-    s4dir = RESULTS / "stage4_learning" / tag
+    s4dir = RESULTS / "stage4_learning" / (("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}"))
     if not (s4dir / "stage4.json").exists():
         raise SystemExit(f"no stage-4 result at {s4dir}: run scripts/04_encode.py with the same --gain first")
     s4j = json.load(open(s4dir / "stage4.json"))
     # the offline background, not the (quiet) conditioning background
-    sigma = s4j["protocol"].get("sigma_offline_mV", s4j["protocol"]["sigma_mV"])
+    sigma = a.sigma if a.sigma is not None else s4j["protocol"].get("sigma_offline_mV", s4j["protocol"]["sigma_mV"])
+    sigma_src = ("--sigma override: the offline period is run in the sparse regime, where activity arrives as "
+                 "discrete avalanches rather than continuously, which is the only regime in which a discrete "
+                 "reactivation could be observed" if a.sigma is not None else "stage 2 operating point")
     eta = s4j["protocol"]["eta_ltd"]
     conn = load_connectome("malecns", "v1.0", "brain")
     dfb = conn.select(**POPULATIONS[s5["dfb_population"]]["selector"])
@@ -157,7 +166,7 @@ def main():
              "conditions": {"sleep": {"description": f"dFB clamped active at {s5['dfb_clamp_rate_hz']} Hz Poisson drive, background noise on, no odour input, learned weights loaded"},
                             "wake": {"description": "dFB off, background noise on, no odour input, learned weights loaded (identical in every other respect)"},
                             "sleep_naive": {"description": "identical to sleep but with the UNLEARNED weights, to test whether the memory contributes anything to reactivation at all"}},
-             "sigma_mV": sigma, "plastic_during_sleep": s5["plastic_during_sleep"], "duration_s": s5["duration_s"],
+             "sigma_mV": sigma, "sigma_source": sigma_src, "plastic_during_sleep": s5["plastic_during_sleep"], "duration_s": s5["duration_s"],
              "reset_at_offline_onset": bool(s5.get("reset_at_offline_onset", True)),
              "reset_note": ("Membrane potentials and synaptic conductances are reset to rest at the start of the offline "
                             "period; learned synaptic weights are not touched. The model has no adaptation or short-term "
