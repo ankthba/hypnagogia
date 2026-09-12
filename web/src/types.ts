@@ -57,6 +57,7 @@ export type StageKey =
   | 'stage0_reproduction'
   | 'stage1_noise'
   | 'stage2_criticality'
+  | 'stage3b_feasibility'
   | 'stage3_plasticity'
   | 'stage4_learning'
   | 'stage5_sleep'
@@ -483,3 +484,74 @@ export interface RasterSidecar {
  * were deleted with them, so no code path can reach for a second source again.
  */
 
+
+/**
+ * Stage 3b, the feasibility block: everything that has to be true before a memory can be encoded at
+ * all, plus the two modelling corrections that decide whether it is. Written by scripts/export_web.py
+ * from results/stage3a_apl, stage3f_dpm, stage3b_odor, stage3c_control, stage3d_gain and stage3e_discrim.
+ * Every field is optional: a section whose source file has not been written yet is simply not shown.
+ */
+export interface CorrectionSummary {
+  odor: { pop_rate_hz: number; kc_rate_hz: number; frac_kc: number; apl_rate_hz?: number; readout_rate_hz?: number; dpm_rate_hz?: number };
+  post: { pop_rate_hz: number; kc_rate_hz: number; frac_kc: number; apl_rate_hz?: number; readout_rate_hz?: number; dpm_rate_hz?: number };
+  n_seeds: number;
+}
+
+export interface Stage3bFeasibility {
+  status: string;
+  criterion?: string;
+  headline?: string;
+  apl_correction?: {
+    status?: string;
+    question?: string;
+    correction?: string;
+    finding?: string;
+    why_it_matters?: Record<string, number | string | null>;
+    summary?: Record<string, CorrectionSummary>;
+    provenance?: Provenance;
+  } | null;
+  dpm_correction?: {
+    status?: string;
+    question?: string;
+    correction?: string;
+    finding?: string;
+    dpm_is_silent?: boolean;
+    why_it_matters?: Record<string, number | string | null>;
+    summary?: Record<string, CorrectionSummary>;
+    provenance?: Provenance;
+  } | null;
+  odor_calibration?: {
+    status?: string;
+    criterion?: string;
+    reference?: string;
+    finding?: string;
+    n_kc?: number;
+    target_frac_kc?: number[];
+    grid?: Array<Record<string, number | string | boolean | null>>;
+    chosen?: Record<string, number | string | boolean | null> | null;
+    provenance?: Provenance;
+  } | null;
+  ignition_threshold?: {
+    glomerulus?: string;
+    rate_hz?: number;
+    smallest_igniting_drive?: number | null;
+    finding?: string;
+    grid?: Array<Record<string, number | null>>;
+  } | null;
+  dataset_control?: {
+    finding?: string;
+    pathway_control?: string;
+    grid?: Array<Record<string, number | string | boolean | null>>;
+    provenance?: Provenance;
+  } | null;
+  gain_sensitivity?: {
+    WARNING?: string;
+    finding?: string;
+    chosen_gain?: number | null;
+    grid?: Array<Record<string, number | boolean | null>>;
+    provenance?: Provenance;
+  } | null;
+  gain_cost_on_gustatory_benchmark?: { question?: string; protocol?: string; finding?: string; runs?: Array<Record<string, number>> } | null;
+  discriminability?: { finding?: string; criterion?: string; note?: string; grid?: Array<Record<string, number | string | boolean | null>>; provenance?: Provenance } | null;
+  provenance?: Provenance;
+}

@@ -295,10 +295,13 @@ function BrainMapInner({
   showVncControl = true,
   showLegend = true,
   showStatus = true,
+  activityLoading = false,
 }: {
   atlas: AtlasData;
   /** spikes to light up; null renders the populations only (no activity) */
   activity?: ActivityData | null;
+  /** the run's file is still on the wire: the status line says so instead of reading as a failure */
+  activityLoading?: boolean;
   /** required: what this map is showing; carried to a screen reader as the canvas's aria-label */
   source: MapSourceLabel;
   /** the playhead, as a subscription; null means no activity is shown */
@@ -1069,6 +1072,8 @@ function BrainMapInner({
                 </span>
               )}
             </>
+          ) : activityLoading ? (
+            <span>loading the run's spikes; the populations are drawn, nothing is lit yet</span>
           ) : (
             <span>no activity file loaded: populations only, nothing is lit</span>
           )}

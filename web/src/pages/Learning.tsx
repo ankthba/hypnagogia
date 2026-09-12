@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDataFile } from '../lib/data';
-import type { Stage3, Stage4 } from '../types';
+import type { Stage3, Stage4, Stage3bFeasibility } from '../types';
 import StageGate from '../components/StageGate';
 import { MapSlot } from '../components/Layout';
 import StatusBanner from '../components/StatusBanner';
@@ -11,12 +11,14 @@ import ParamTable from '../components/ParamTable';
 import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
 import PairedPlot from '../components/charts/PairedPlot';
+import FeasibilityView from '../components/Feasibility';
 import { SERIES } from '../lib/colors';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct, NOT_MEASURED, fmtUnit } from '../lib/format';
 
 export default function Learning() {
   const s3 = useDataFile<Stage3>('stage3_plasticity.json');
   const s4 = useDataFile<Stage4>('stage4_learning.json');
+  const s3b = useDataFile<Stage3bFeasibility>('stage3b_feasibility.json');
   return (
     <div>
       <h1 className="page-title">Learning</h1>
@@ -24,10 +26,22 @@ export default function Learning() {
         Stage 3 adds a dopamine-gated plasticity rule at the single plastic locus (KC → MBON). Stage 4 pairs odor A with
         DAN activation and checks that the MBON response to A, but not to the unpaired odor B, changes. Only if learning
         is verified here does the replay test in Stage 6 have a memory to look for.
+      </p><p>
+        Before any of that, Stage 3b asks whether there is a sparse Kenyon-cell odour code for a memory to live in. Two
+        modelling corrections decide the answer, and they are reported first because everything below inherits them.
       </p></div>
       <MapSlot />
 
       <section className="mt-8">
+        <h2>Stage 3b · is there a code to encode a memory in?</h2>
+        <ErrorBoundary label="Stage 3b">
+          <StageGate stage="stage3b_feasibility" loaded={s3b}>
+            {(d) => <FeasibilityView d={d} />}
+          </StageGate>
+        </ErrorBoundary>
+      </section>
+
+      <section className="mt-10">
         <h2>Stage 4 · associative conditioning</h2>
         <ErrorBoundary label="Stage 4">
           <StageGate stage="stage4_learning" loaded={s4}>

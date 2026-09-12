@@ -128,11 +128,14 @@ def main():
     for cand in sorted(RESULTS.glob("stage6_structure/structure*.json")):
         s6b = load_json(cand) or s6b
     s3dg = load_json(RESULTS / "stage3d_gain" / "gustatory_cost.json")
-    if s3a or s3b or s3c or s3d or s3e:
+    s3f = load_json(RESULTS / "stage3f_dpm" / "stage3f.json")
+    if s3a or s3b or s3c or s3d or s3e or s3f:
         feas = {"status": (s3b or {}).get("status", "not_run"),
                 "criterion": (s3b or {}).get("criterion", ""),
-                "headline": " ".join(x for x in [(s3a or {}).get("finding", ""), (s3b or {}).get("finding", "")] if x),
+                "headline": " ".join(x for x in [(s3a or {}).get("finding", ""), (s3f or {}).get("finding", ""),
+                                                 (s3b or {}).get("finding", "")] if x),
                 "apl_correction": ({k: v for k, v in s3a.items() if k != "per_run"} if s3a else None),
+                "dpm_correction": ({k: v for k, v in s3f.items() if k != "per_run"} if s3f else None),
                 "odor_calibration": ({k: v for k, v in s3b.items() if k != "per_run"} if s3b else None),
                 "ignition_threshold": s3bi,
                 "dataset_control": ({k: v for k, v in s3c.items() if k != "per_run"} if s3c else None),
@@ -141,7 +144,8 @@ def main():
                 "discriminability": ({k: v for k, v in s3e.items() if k != "per_run"} if s3e else None),
                 "provenance": prov("configs/stage3b_odor.yaml + configs/stage3d_gain.yaml",
                                    "results/stage3b_odor + results/stage3c_control + results/stage3d_gain",
-                                   ["results/stage3b_odor/stage3b.json", "results/stage3b_odor/ignition_threshold.json",
+                                   ["results/stage3a_apl/stage3a.json", "results/stage3f_dpm/stage3f.json",
+                                    "results/stage3b_odor/stage3b.json", "results/stage3b_odor/ignition_threshold.json",
                                     "results/stage3c_control/stage3c.json", "results/stage3d_gain/stage3d.json"], commit, now)}
         json.dump(feas, open(WEB_DATA / "stage3b_feasibility.json", "w"), indent=1, default=str)
         stages["stage3b_feasibility"] = {"status": feas["status"], "file": "stage3b_feasibility.json",

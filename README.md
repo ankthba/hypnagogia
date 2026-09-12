@@ -21,7 +21,7 @@ Pipeline stages (each is a script under `scripts/`, config under `configs/`, out
 | 4 | encode an odour memory, verify learning | `scripts/04_encode.py` |
 | 5 | sleep (dFB clamped) vs wake, noise-driven, no odour | `scripts/05_sleep.py` |
 | 6 | replay test with four null comparisons | `scripts/06_replay.py` |
-| — | reference activity clips for the viewer's neuron map | `scripts/07_reference_clips.py` |
+| - | reference activity clips for the viewer's neuron map | `scripts/07_reference_clips.py` |
 
 Run the whole downstream pipeline at a given synaptic gain with `scripts/run_variant.sh <gain>`; `1.0` is the
 published model and anything below it is a labelled deviation that is reported as such.

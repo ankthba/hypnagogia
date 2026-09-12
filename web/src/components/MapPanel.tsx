@@ -221,13 +221,19 @@ export default function MapPanel() {
   /** Neurons that actually spike in the loaded file, counted from the binary rather than trusted. */
   const activeCounted = useMemo(() => (activity ? countDistinctRows(activity.atlasRow) : null), [activity]);
 
-  const source: MapSourceLabel = useMemo(
-    () =>
-      selection
-        ? { text: `replay activity · ${selection.condition}, seed ${selection.seed}${activity ? '' : ' · not loaded, nothing is lit'}` }
-        : { text: 'atlas only · no run selected' },
-    [selection, activity],
-  );
+  /**
+   * What the header says the map is showing. While the run's several megabytes are still on the
+   * wire the map is already drawn and simply has nothing lit yet, and saying "not loaded" there
+   * reads as a failure rather than as a wait, which is what it looked like on every page that is
+   * not Replay. The three states are now distinct: loading, loaded, and could not be loaded.
+   */
+  const source: MapSourceLabel = useMemo(() => {
+    if (!selection) return { text: 'atlas only · no run selected' };
+    const head = `replay activity · ${selection.condition}, seed ${selection.seed}`;
+    if (activity) return { text: head };
+    if (load?.state === 'failed') return { text: `${head} · could not be loaded, nothing is lit` };
+    return { text: `${head} · loading the run …` };
+  }, [selection, activity, load]);
 
   const prov = useMemo(() => atlasProvenance(atlasData, manifest, path ? [`web/public/data/${path}`] : []), [atlasData, manifest, path]);
 
@@ -263,6 +269,7 @@ export default function MapPanel() {
       <BrainMap
         atlas={atlas.data}
         activity={activity}
+        activityLoading={load?.state === 'loading'}
         source={source}
         time={time}
         decayMs={DECAY_MS}
@@ -526,7 +533,7 @@ const SourceLine = memo(function SourceLine({
           <span className="mono">python {REPLAY_SCRIPT}</span>, then <span className="mono">python scripts/export_web.py</span>.
         </p>
       )}
-      <div className="smaller mono muted">web/public/data/{path}</div>
+      <div className="map-panel__path mono">web/public/data/{path}</div>
       {canPlay && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
     </div>
   );

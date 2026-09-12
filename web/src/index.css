@@ -1424,6 +1424,17 @@ pre.equations {
   font-variant-numeric: tabular-nums;
 }
 
+/* The file the panel is playing. It is one long unbreakable token set in a monospace face, so on a
+   narrow screen it has to be both smaller than the prose around it and allowed to break anywhere,
+   or it sets the panel's width and pushes the page sideways. Same size as the facts list above it. */
+.map-panel__path {
+  margin-top: 0.45rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
 .map-panel .provenance {
   margin-top: 0.6rem;
   overflow-wrap: anywhere;

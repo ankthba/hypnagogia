@@ -122,6 +122,7 @@ export const STAGES: { key: StageKey; file: string; script: string; route: strin
   { key: 'stage0_reproduction', file: 'stage0_reproduction.json', script: 'scripts/00_reproduce_shiu.py', route: '/', label: 'Stage 0 - Reproduction' },
   { key: 'stage1_noise', file: 'stage1_noise.json', script: 'scripts/01_noise.py', route: '/criticality', label: 'Stage 1 - Noise' },
   { key: 'stage2_criticality', file: 'stage2_criticality.json', script: 'scripts/02_criticality.py', route: '/criticality', label: 'Stage 2 - Criticality' },
+  { key: 'stage3b_feasibility', file: 'stage3b_feasibility.json', script: 'scripts/03b_odor_calibration.py', route: '/learning', label: 'Stage 3b - Odour code feasibility' },
   { key: 'stage3_plasticity', file: 'stage3_plasticity.json', script: 'scripts/03_plasticity.py', route: '/learning', label: 'Stage 3 - Plasticity' },
   { key: 'stage4_learning', file: 'stage4_learning.json', script: 'scripts/04_encode.py', route: '/learning', label: 'Stage 4 - Learning' },
   { key: 'stage5_sleep', file: 'stage5_sleep.json', script: 'scripts/05_sleep.py', route: '/replay', label: 'Stage 5 - Sleep' },
