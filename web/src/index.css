@@ -1502,9 +1502,29 @@ pre.equations {
   transition: filter 140ms ease;
 }
 
+/* The body box is a fixed size, set from the component, and both photographs are centred inside it.
+   It used to take its size from whichever image was showing, which meant it collapsed to nothing the
+   moment the standing photograph was hidden, taking the shadow and the wingbeat with it. */
 .fly__body {
   position: relative;
+  width: var(--fly-w, 32px);
+  height: var(--fly-h, 16px);
   transform-origin: 50% 50%;
+}
+
+/* The two photographs sit on top of each other, centred on the same body, and only one is shown. A swap
+   rather than a cross-fade: a fly's wings come up in a few milliseconds and a dissolve would be slower
+   and would show two flies at once. */
+.fly__photo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.fly:not([data-airborne='true']) .fly__photo--fly,
+.fly[data-airborne='true'] .fly__photo--stand {
+  display: none;
 }
 
 /* The shadow directly under her, on the page. Separate from the drop shadow on the photograph so it

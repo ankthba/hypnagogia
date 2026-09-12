@@ -37,6 +37,27 @@ import { useEffect, useRef } from 'react';
  */
 const FLY_W = 32;
 const FLY_H = Math.round((FLY_W * 126) / 256);
+/**
+ * The airborne sprite is a second photograph, of a fly with her wings raised. It has to be wider than
+ * the standing one because the raised wings stick out well past the body, and the thing that must match
+ * between the two is the BODY, not the box.
+ *
+ * The scale comes from the compound eye, which is the one feature both photographs show clearly and
+ * which is the same size on both flies: measured on the cut-outs, the eye is 645 px in the standing
+ * sprite and 254 px in the airborne one at a common 256 px width, so the airborne fly is drawn at about
+ * 0.63 of the standing fly's scale there. 52 px is the width that brings the two bodies to the same
+ * length, allowing for the airborne eye being foreshortened and so reading a little small.
+ */
+const FLIGHT_W = 52;
+const FLIGHT_H = Math.round((FLIGHT_W * 153) / 256);
+/**
+ * Where the eye sits in each cut-out, as a fraction of its box, measured from the files themselves. The
+ * two sprites are aligned on the eye, because a swap that moves the head is a swap you can see.
+ */
+const STAND_EYE = [0.778, 0.33];
+const FLIGHT_EYE = [0.582, 0.34];
+const FLIGHT_DX = (STAND_EYE[0] * FLY_W - FLY_W / 2) - (FLIGHT_EYE[0] * FLIGHT_W - FLIGHT_W / 2);
+const FLIGHT_DY = (STAND_EYE[1] * FLY_H - FLY_H / 2) - (FLIGHT_EYE[1] * FLIGHT_H - FLIGHT_H / 2);
 const STEP = 1 / 60;
 const MARGIN = 18;
 /** Where the wing bases sit in the photograph, as a fraction of its box. */
@@ -269,6 +290,7 @@ export default function FlyOrnament() {
     // Attribute writes invalidate style for the subtree they touch, so each is written only when the
     // value it carries has actually changed.
     let wingOn = false;
+    let flying = false;
     let mirrored = false;
     let lifted = false;
     let flickUntil = 0;
@@ -313,6 +335,13 @@ export default function FlyOrnament() {
           `translateY(${bob.toFixed(2)}px) scale(${sx}, ${s.scale.toFixed(3)}) rotate(${(rock + sway).toFixed(2)}deg)`;
       }
 
+      // Swap to the wings-raised photograph while she is airborne. The swap happens under the wingbeat
+      // blur, at the two moments she is moving fastest, which is where it is least visible.
+      const airborne = s.mode === 'flight' || (s.mode === 'land' && s.speed > 40);
+      if (airborne !== flying) {
+        flying = airborne;
+        el.setAttribute('data-airborne', airborne ? 'true' : 'false');
+      }
       const beating = s.wing > 0.25 || now < flickUntil;
       if (beating !== wingOn) {
         wingOn = beating;
@@ -335,7 +364,14 @@ export default function FlyOrnament() {
   }, []);
 
   return (
-    <div ref={ref} className="fly" aria-hidden="true" data-lifted="false">
+    <div
+      ref={ref}
+      className="fly"
+      aria-hidden="true"
+      data-lifted="false"
+      data-airborne="false"
+      style={{ ['--fly-w' as string]: `${FLY_W}px`, ['--fly-h' as string]: `${FLY_H}px` }}
+    >
       <div ref={bodyRef} className="fly__body">
         {/* the shadow she casts on the page under her: tight while she is standing on it, thrown
             further and softer while she is in the air */}
@@ -347,11 +383,24 @@ export default function FlyOrnament() {
           <span className="fly__wingblur-a" />
           <span className="fly__wingblur-b" />
         </div>
+        {/* Two photographs of two real flies. The standing one has her wings folded over her abdomen,
+            which is where a fly at rest keeps them; the airborne one has them raised. One heading drives
+            both, because the second sprite was rotated at cut-out time so the two share a body axis. */}
         <img
-          className="fly__photo"
+          className="fly__photo fly__photo--stand"
           src={`${import.meta.env.BASE_URL}fly/fly-256.png`}
           width={FLY_W}
           height={FLY_H}
+          alt=""
+          draggable={false}
+          decoding="async"
+        />
+        <img
+          className="fly__photo fly__photo--fly"
+          src={`${import.meta.env.BASE_URL}fly/flight-256.png`}
+          width={FLIGHT_W}
+          height={FLIGHT_H}
+          style={{ transform: `translate(calc(-50% + ${FLIGHT_DX.toFixed(2)}px), calc(-50% + ${FLIGHT_DY.toFixed(2)}px))` }}
           alt=""
           draggable={false}
           decoding="async"
