@@ -1,0 +1,111 @@
+{
+ "status": "failed",
+ "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term the Shiu et al. 2024 model does not have. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model.",
+ "constants_are": "unsourced",
+ "constants_note": "Neither adaptation constant has a measurement behind it, so both are SCANNED and the range is reported instead of a value. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be.",
+ "deviation": {
+  "what": "Give every spiking neuron one extra state variable: a hyperpolarising term that steps up by b_mV each time that cell fires and decays exponentially with tau_ms, subtracted from the membrane drive. This is spike-triggered adaptation, the 'b' of an adaptive exponential integrate-and-fire cell, and it is the only quantity in the model slower than the 5 ms synaptic time constant.",
+  "constants": {
+   "tau_ms": {
+    "what": "decay time constant of the adaptation term",
+    "measurement": null,
+    "status": "unsourced"
+   },
+   "b_mV": {
+    "what": "step added to the adaptation term by one spike of that cell",
+    "measurement": null,
+    "status": "unsourced"
+   }
+  },
+  "measurement": null,
+  "status": "unsourced",
+  "why_it_is_a_deviation_and_not_a_correction": "A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model.",
+  "how_it_must_be_reported": "Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be."
+ },
+ "sigma_mV": 1.55,
+ "duration_s": 6.0,
+ "tau_ms_scanned": [
+  600.0
+ ],
+ "b_mV_scanned": [
+  0.5
+ ],
+ "seeds": [
+  0
+ ],
+ "any_setting_gave_brain_episodes": false,
+ "any_setting_gave_ensemble_episodes": false,
+ "per_run": [
+  {
+   "tau_ms": 600.0,
+   "b_mV": 0.5,
+   "seed": 0,
+   "pop": {
+    "brain": {
+     "frac_on": 0.4666666666666667,
+     "n_episodes": 1,
+     "mean_s": 2.8000000000000003,
+     "max_s": 2.8000000000000003,
+     "one_way": true,
+     "cv": 1.1461373157730272,
+     "rate_hz": 0.34026771329574906
+    },
+    "KC": {
+     "frac_on": 0.05,
+     "n_episodes": 1,
+     "mean_s": 0.30000000000000004,
+     "max_s": 0.30000000000000004,
+     "one_way": false,
+     "cv": 3.150232839354698,
+     "rate_hz": 0.009022309711286088
+    },
+    "ALLN": {
+     "frac_on": 0.4666666666666667,
+     "n_episodes": 1,
+     "mean_s": 2.8000000000000003,
+     "max_s": 2.8000000000000003,
+     "one_way": true,
+     "cv": 1.0973973079541375,
+     "rate_hz": 35.765476190476186
+    },
+    "ALPN": {
+     "frac_on": 0.4666666666666667,
+     "n_episodes": 1,
+     "mean_s": 2.8000000000000003,
+     "max_s": 2.8000000000000003,
+     "one_way": true,
+     "cv": 1.117309351074701,
+     "rate_hz": 18.78182701652089
+    },
+    "MBON": {
+     "frac_on": 0.23333333333333334,
+     "n_episodes": 5,
+     "mean_s": 0.28,
+     "max_s": 0.8,
+     "one_way": false,
+     "cv": 1.4865122894865592,
+     "rate_hz": 0.5687285223367696
+    },
+    "ensemble": {
+     "frac_on": 0.06666666666666667,
+     "n_episodes": 1,
+     "mean_s": 0.4,
+     "max_s": 0.4,
+     "one_way": false,
+     "cv": 3.191965195594943,
+     "rate_hz": 0.18655303030303028,
+     "ratio_to_other_kcs": 189.21343873517785,
+     "corr_with_brain": 0.6295450730244043
+    }
+   }
+  }
+ ],
+ "finding": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term the Shiu et al. 2024 model does not have. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model. Neither adaptation constant has a measurement behind it, so both are SCANNED and the range is reported instead of a value. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be. Adaptation did not produce episodes at any scanned setting. If that holds over the whole range the conclusion is stronger than stage 11's, because the mechanism that terminates an up state was present and the up state still did not terminate, which would point at the drive rather than at the cell model.",
+ "provenance": {
+  "config": "configs/stage5_sleep.yaml",
+  "results_dir": "results/stage12_adaptation",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage12_adaptation/smoke_t600_b0.5_seed0"
+  ]
+ }
+}

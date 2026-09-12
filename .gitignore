@@ -32,3 +32,6 @@ results/**/analysis.json
 scripts/.run_variant_active.sh
 scripts/.run_sparse.sh
 results/_archive_prev/
+
+# the dev-server launch config the Browser pane writes; not part of the pipeline
+.claude/launch.json

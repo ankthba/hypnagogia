@@ -138,3 +138,133 @@ SYNAPSE_DEVIATIONS = {
         "edge_table": "results/stage8_kc_kc/kc_kc_edges_by_region.npz",
     },
 }
+
+
+# LABELLED DEVIATIONS to the neuron model itself, as distinct from the synaptic substrate above.
+#
+# The published model (Shiu, Sterne, Spiller et al. 2024, Nature 634:210-219) is a plain leaky
+# integrate-and-fire cell with one membrane time constant and one synaptic time constant, and stage 11
+# measured what that costs: with no state variable slower than tau_syn = 5 ms, an active state has nothing
+# that can terminate it. Over 18 runs at four noise levels and injected recurrence from 1x to 300x, the
+# network was silent, or permanently on, or it ignited exactly once and never switched off. It cannot
+# represent an episode, which is the shape memory replay has.
+#
+# An entry here adds a mechanism the published model does not have. That is a larger step than any synaptic
+# deviation, so the bar is correspondingly higher: every constant carries its own provenance, a constant with
+# no measurement behind it is marked unsourced and must be SCANNED rather than chosen, and every figure,
+# table and sentence derived from a run with one of these switched on says so.
+MECHANISM_DEVIATIONS = {
+    "short_term_depression_excitatory": {
+        "what": ("Make excitatory synapses depress with use. Each arriving spike delivers the synapse's "
+                 "weight times a resource variable A and then multiplies A by f; between spikes A recovers "
+                 "exponentially toward 1 with time constant tau. Both constants are measured. Which "
+                 "synapses it is applied to is NOT measured, and is reported as an arm."),
+        "constants": {
+            "f": {"what": "fraction of the releasable resource left after one spike", "status": "measured"},
+            "tau_ms": {"what": "recovery time constant of the resource", "status": "measured"},
+            "scope": {"what": "which synapses depress", "status": "NOT MEASURED, reported as an arm"},
+        },
+        # Three independent fits, two laboratories, two postsynaptic cell types, all in the adult antennal
+        # lobe. The per-spike factor agrees to within 8% across all three; the recovery time constant spans
+        # 2.7x, which is a bracket between measured endpoints and not a free parameter.
+        "measurement": [
+            {"synapse": "ORN->PN, glomeruli DM6 and VM2", "f": 0.78, "tau_ms": 893, "n": "19 PNs from 19 flies",
+             "source": ("Nagel KI, Hong EJ, Wilson RI (2015) Nature Neuroscience 18:56-65, "
+                        "DOI 10.1038/nn.3895, PMID 25485755. Fit to mean normalised EPSC amplitudes "
+                        "during a 10 Hz train.")},
+            {"synapse": "ORN->LN (GABAergic antennal-lobe local neurons)", "f": 0.75, "tau_ms": 1566, "n": "9 LNs",
+             "source": ("Nagel KI, Wilson RI (2016) Journal of Neuroscience 36:4325-4338, "
+                        "DOI 10.1523/JNEUROSCI.3887-15.2016. Fit to mean normalised EPSC amplitudes "
+                        "during a 10 Hz train.")},
+            {"synapse": "ORN->PN, glomerulus DM4", "f": 0.72, "tau_ms": 2400, "n": "not stated in the entry",
+             "source": ("Kazama H, Wilson RI (2009) Nature Neuroscience 12:1136-1144, DOI 10.1038/nn.2376, "
+                        "PMID 19684589.")},
+        ],
+        "status": "constants measured, scope declared",
+        "why_it_is_a_deviation_and_not_a_correction": (
+            "The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding "
+            "depression changes what a synapse is, so no run with it switched on is a property of the "
+            "published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. "
+            "Applying the same two constants to any other synapse is an extrapolation the measurements do "
+            "not license, which is why the scope is an arm of the experiment and not a setting."),
+        "how_it_must_be_reported": (
+            "The two constants are cited. The scope is stated in the same sentence as any number derived "
+            "from it, and results are given for every scope arm run, not only the one that worked."),
+        "why_this_mechanism_for_this_failure": (
+            "Depression is rate-selective, and the offline state's problem is a rate. At the measured "
+            "constants the steady-state weight scaling A* = (1 - exp(-1/(r*tau))) / (1 - f*exp(-1/(r*tau))) "
+            "removes 94 to 99 per cent of the excitatory drive from the antennal-lobe populations that run "
+            "away at 122 and 75 Hz, and 2 to 14 per cent from the Kenyon cells at 0.42 Hz whose "
+            "reactivation is the thing being measured. Nothing was chosen to make that happen: it follows "
+            "from the measured constants and the model's own measured rates. Depression also acts on the "
+            "recurrent excitatory loop that carries the runaway, which is where a slow negative feedback "
+            "has to act to turn a bistable switch into a relaxation oscillator."),
+    },
+    "spike_frequency_adaptation": {
+        "what": ("Give every spiking neuron one extra state variable: a hyperpolarising term that steps up "
+                 "by b_mV each time that cell fires and decays exponentially with tau_ms, subtracted from "
+                 "the membrane drive. This is spike-triggered adaptation, the 'b' of an adaptive "
+                 "exponential integrate-and-fire cell, and it is the only quantity in the model slower than "
+                 "the 5 ms synaptic time constant."),
+        "constants": {
+            "tau_ms": {"what": "decay time constant of the adaptation term", "measurement": None,
+                       "status": "unsourced"},
+            "b_mV": {"what": "step added to the adaptation term by one spike of that cell",
+                     "measurement": None, "status": "unsourced"},
+        },
+        # Filled in only from a paper that was opened and whose number was read in its own text. Until then
+        # it stays None and every output says the constants were scanned, not measured.
+        "measurement": None,
+        "status": "unsourced",
+        "why_it_is_a_deviation_and_not_a_correction": (
+            "A correction replaces a predicted value with a measured one and changes nothing else. This adds "
+            "a mechanism, and the published model's authors did not omit adaptation by oversight: a plain "
+            "LIF is the model they validated. Adding adaptation makes the network something other than the "
+            "model in the paper, whatever the constants are, so no result from a run with it switched on may "
+            "be presented as a property of the published model."),
+        "how_it_must_be_reported": (
+            "Wherever a number from an adapted run appears, the deviation is named alongside it, and while "
+            "the constants are unsourced the range scanned is given rather than a single value. A scan that "
+            "is reported as a scan is not an invented parameter; a single chosen value with no citation "
+            "would be."),
+    },
+}
+
+
+# What sleep actually looks like in a fly brain, measured. This is the target any claimed episode has to be
+# compared against, and it is here so that a comparison cannot be made up at the point of writing a figure
+# caption. Nothing in this table is a model parameter; none of it is fitted to.
+SLEEP_OBSERVABLES = {
+    "r5_slow_wave": {
+        "what": ("Network-generated slow-wave activity, up states and down states, in the R5 ellipsoid-body "
+                 "ring neurons that carry the sleep homeostat. About 10 cells per hemisphere."),
+        "frequency_hz": [0.5, 1.5],
+        "period_s": [0.67, 2.0],
+        "period_is_derived": ("The paper prints the frequency band, not a period and not an episode duration. "
+                              "0.67 to 2.0 s is 1/f of the printed band and is arithmetic, not a measurement."),
+        "up_down_amplitude_mV": "about 26 +/- 7",
+        "sleep_dependence": ("Frequency is unchanged by sleep deprivation; up and down state POWER increases "
+                             "significantly with it."),
+        "source": ("Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, "
+                   "Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, "
+                   "DOI 10.1016/j.cub.2019.08.070, PMID 31630950. In vivo, with simultaneous patch clamp."),
+    },
+    "apl_sk_ahp": {
+        "what": ("Slow afterhyperpolarisation in APL, the mushroom body's feedback inhibitory neuron, carried "
+                 "by SK channels. Sleep deprivation enhances it; recovery sleep reduces it."),
+        "decay_tau_ms": 491.1,
+        "decay_tau_sem_ms": 72.17,
+        "amplitude": ("NOT REPORTED. No mV and no nS value for the APL afterhyperpolarisation appears anywhere "
+                      "in the paper's text; the amplitude panels give only n. So this measurement fixes a "
+                      "timescale and cannot fix a magnitude."),
+        "condition": ("The 491.1 ms fit is from the SLEEP-DEPRIVED condition only. The authors state that "
+                      "exponential fitting was unreliable in the normally-slept group, so there is no measured "
+                      "baseline time constant to compare it with."),
+        "also_confirms": ("APL is non-spiking and responds to somatic current injection in a graded way, which "
+                          "is the correction this project already applies to APL from Amin et al. 2020."),
+        "source": ("Chen CC, Huang YC, Ortega A, Suarez-Grimalt R, Tedre E, Baz ES, Wu Y, Lin AC, Liu S (2026) "
+                   "'Sleep facilitates pattern separation through SK channel-mediated sparse coding', "
+                   "Current Biology 36:1633-1643.e6, DOI 10.1016/j.cub.2026.02.028, PMID 41844155, "
+                   "PMC13075853. Adult ex vivo brain, whole-cell current clamp."),
+    },
+}

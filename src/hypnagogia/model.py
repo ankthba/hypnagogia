@@ -112,7 +112,20 @@ class Simulation:
         gauss = noise["mode"] == "gaussian"
         graded_idx = np.unique(np.asarray(cfg.get("graded", {}).get("index", []), dtype=np.int64))
         use_graded = len(graded_idx) > 0
-        eqs = ["dv/dt = (v_rest - v + g" + (" + g_graded" if use_graded else "") + ")/tau_m"
+        # Spike-triggered adaptation, when a caller asks for it. It is NOT part of the published model and
+        # nothing in the connectome implies it: see MECHANISM_DEVIATIONS["spike_frequency_adaptation"] for
+        # what it is, where its two constants come from, and why it is a deviation and not a correction.
+        # It is absent from base.yaml deliberately, so that a run without it hashes exactly as it did before
+        # this existed and no completed simulation is invalidated by the mere possibility of adaptation.
+        adapt = cfg.get("adaptation") or None
+        if adapt is not None:
+            for k in ("tau_ms", "b_mV"):
+                if adapt.get(k) is None:
+                    raise ValueError(f"adaptation.{k} has no default: an unset adaptation constant must be "
+                                     f"supplied explicitly and labelled, never inferred")
+        # Named drive_expr and not drive: `drive` is already the config's Poisson-drive block, three lines up.
+        drive_expr = "v_rest - v + g" + (" + g_graded" if use_graded else "") + (" - adapt" if adapt else "")
+        eqs = ["dv/dt = (" + drive_expr + ")/tau_m"
                + (" + sigma*sqrt(2/tau_m)*xi" if gauss else "") + " : volt (unless refractory)",
                "dg/dt = -g/tau_syn : volt (unless refractory)",
                "rfc : second", "sigma : volt", "v_th_i : volt"]
@@ -125,10 +138,21 @@ class Simulation:
             eqs.append("g_graded : volt")
         if pl:
             eqs.append("dda/dt = -da/tau_da : 1")                 # dopamine trace, driven on MBONs by DAN->MBON synapses
+        if adapt:
+            # One extra state variable per neuron: a hyperpolarising conductance that steps up by b_adapt on
+            # every spike this cell fires and decays with tau_adapt. It is the only thing in the model slower
+            # than tau_syn, and it is what allows an active state to end. The variable is named `adapt` and
+            # not `a` because `da` is already the dopamine trace and Brian2 would read `da/dt` as its
+            # derivative.
+            ns.update(tau_adapt=float(adapt["tau_ms"]) * ms, b_adapt=float(adapt["b_mV"]) * mV)
+            eqs.append("dadapt/dt = -adapt/tau_adapt : volt (unless refractory)")
         N = conn.N
+        reset = "v = v_reset; g = 0*mV" + ("; adapt += b_adapt" if adapt else "")
         neu = NeuronGroup(N, "\n".join(eqs), method="euler" if gauss else "linear",
-                          threshold="v > v_th_i", reset="v = v_reset; g = 0*mV", refractory="rfc", namespace=ns, name="neu")
+                          threshold="v > v_th_i", reset=reset, refractory="rfc", namespace=ns, name="neu")
         neu.v = ns["v_rest"]; neu.g = 0 * mV; neu.rfc = m["t_refr_ms"] * ms
+        if adapt:
+            neu.adapt = 0 * mV
         th = np.full(N, float(m["v_th_mV"]))
         if use_graded:
             th[graded_idx] = 1e6          # never spikes: release is graded, handled by the graded synapses below
@@ -149,10 +173,47 @@ class Simulation:
             plastic_mask = kc[conn.pre] & mbon[conn.post]
         graded_mask = np.isin(conn.pre, graded_idx) if use_graded else np.zeros(conn.E, dtype=bool)
         spiking_mask = (~plastic_mask) & (~graded_mask)
+
+        # Short-term synaptic depression, when a caller asks for it. NOT part of the published model: see
+        # MECHANISM_DEVIATIONS["short_term_depression_excitatory"]. Both constants are measured, at the
+        # antennal-lobe synapses named in that entry; the SCOPE it is applied to is not measured and is
+        # reported as an arm rather than assumed. Absent from base.yaml on purpose, so that a run without
+        # it hashes exactly as it did before this existed.
+        std = cfg.get("depression") or None
+        if std is not None:
+            for k in ("f", "tau_ms", "scope"):
+                if std.get(k) is None:
+                    raise ValueError(f"depression.{k} has no default: an unset depression constant or scope "
+                                     f"must be supplied explicitly and labelled, never inferred")
+        depress_mask = np.zeros(conn.E, dtype=bool)
+        if std is not None:
+            dep_pre = np.zeros(N, bool); dep_pre[np.asarray(std["pre_idx"], dtype=np.int64)] = True
+            dep_post = np.zeros(N, bool); dep_post[np.asarray(std["post_idx"], dtype=np.int64)] = True
+            # Excitatory only: every confirmed measurement is at a cholinergic excitatory synapse, and
+            # nothing measured says an inhibitory synapse in this brain depresses the same way.
+            depress_mask = spiking_mask & dep_pre[conn.pre] & dep_post[conn.post] & (conn.sign > 0)
+        static_mask = spiking_mask & (~depress_mask)
+
         syn = Synapses(neu, neu, "w : volt", on_pre="g += w", delay=m["delay_ms"] * ms, name="syn")
-        syn.connect(i=conn.pre[spiking_mask], j=conn.post[spiking_mask])
-        syn.w = w_all_mV[spiking_mask] * mV
+        syn.connect(i=conn.pre[static_mask], j=conn.post[static_mask])
+        syn.w = w_all_mV[static_mask] * mV
         objs.append(syn)
+        self._n_depressing = int(depress_mask.sum())
+        if self._n_depressing:
+            # A is the fraction of the releasable resource left. Each arriving spike delivers w * A and
+            # then multiplies A by f; between spikes A recovers exponentially toward 1 with tau. That is
+            # the two-parameter model the three antennal-lobe papers fit, in their own parameterisation,
+            # so f and tau enter as measured rather than converted.
+            dsyn = Synapses(neu, neu, model="""w : volt
+                                               dA/dt = (1 - A)/tau_std : 1 (event-driven)""",
+                            on_pre="g_post += w * A; A = A * f_std",
+                            delay=m["delay_ms"] * ms,
+                            namespace={"tau_std": float(std["tau_ms"]) * ms, "f_std": float(std["f"])},
+                            name="dsynstd")
+            dsyn.connect(i=conn.pre[depress_mask], j=conn.post[depress_mask])
+            dsyn.w = w_all_mV[depress_mask] * mV
+            dsyn.A = 1.0
+            objs.append(dsyn)
         gsyn = None
         if use_graded and graded_mask.any():
             # The conversion introduces NO new free parameter. A spiking synapse of weight w driven at the
@@ -305,6 +366,12 @@ class Simulation:
             np.savez_compressed(self.run_dir / "voltage.npz", idx=self.record_v.astype(np.int32),
                                 t_s=np.asarray(vmon.t[:] / second, dtype=np.float32), v_mV=np.asarray(vmon.v[:] / mV, dtype=np.float32))
             out["voltage"] = str(self.run_dir / "voltage.npz")
+        if getattr(self, "_n_depressing", 0):
+            # The count goes in the run's own metadata: how many synapses a deviation actually touched is
+            # part of what the deviation is, and it is not recoverable from the config alone.
+            meta["depression"] = {k: v for k, v in (cfg.get("depression") or {}).items()
+                                  if k not in ("pre_idx", "post_idx")}
+            meta["depression"]["n_depressing_synapses"] = int(self._n_depressing)
         if psyn is not None:
             info = self._plastic_info
             wz = {"pre": info["pre"].astype(np.int32), "post": info["post"].astype(np.int32),

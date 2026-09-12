@@ -25,6 +25,12 @@ def main():
                          "of a continuous wash, which is the only regime in which a discrete reactivation could be "
                          "seen at all. Results go to a separate directory tagged with the value.")
     ap.add_argument("--tag", default="", help="extra suffix on the results directory")
+    ap.add_argument("--depression", default=None, metavar="SCOPE:F:TAU_MS",
+                    help="run the offline period with short-term synaptic depression on excitatory synapses, a "
+                         "LABELLED DEVIATION whose two constants are measured and whose scope is not: see "
+                         "MECHANISM_DEVIATIONS['short_term_depression_excitatory'] and scripts/13_depression.py. "
+                         "SCOPE is one of the arms 13_depression.py defines. Requires --tag, so that a deviated "
+                         "arm can never be written over the published one.")
     a = ap.parse_args()
     cfg = load_config("stage5_sleep"); s5 = cfg["stage5"]; s4 = cfg["stage4"]
     cfg = with_deviations(cfg)
@@ -47,6 +53,23 @@ def main():
     dfb = conn.select(**POPULATIONS[s5["dfb_population"]]["selector"])
     kc, mbon = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON")
     c = json.loads(json.dumps(cfg)); c["noise"] = {"mode": "gaussian" if sigma > 0 else "none", "sigma_mV": sigma, "poisson": cfg["noise"]["poisson"]}
+    dep_note = None
+    if a.depression:
+        # The deviation is applied to the OFFLINE period only. The memory was encoded by stage 4 in the model
+        # as published, which is stated here because it is a real limitation: if depression changes the odour
+        # response it changes which Kenyon cells the ensemble contains, and that would have to be re-encoded.
+        if not a.tag:
+            raise SystemExit("--depression requires --tag: a deviated arm must not overwrite the published one")
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("s13", Path(__file__).with_name("13_depression.py"))
+        s13 = importlib.util.module_from_spec(spec); spec.loader.exec_module(s13)
+        scope_name, f_str, tau_str = a.depression.split(":")
+        sc = s13.scopes(conn)[scope_name]
+        c["depression"] = {"f": float(f_str), "tau_ms": float(tau_str), "scope": scope_name,
+                           "pre_idx": [int(x) for x in sc["pre"]], "post_idx": [int(x) for x in sc["post"]]}
+        dep_note = (s13.BANNER + f" Scope arm: {scope_name} ({sc['what']}). Applied to the offline period only; "
+                    f"the memory was encoded by stage 4 in the model as published.")
+        print(dep_note, flush=True)
     pl = cfg["plasticity"]; p = {k: v for k, v in pl.items() if k not in ("pre", "post", "dan")}
     p["eta_ltd"] = eta; p["pre"], p["post"], p["dan"] = pl["pre"], pl["post"], pl["dan"]
     specs = []
@@ -324,6 +347,11 @@ def main():
              "manipulation_strength": manipulation, "memory_visible_offline": memory_visible, "walltime_s": round(time.time() - t0, 1),
              "provenance": {"config": "configs/stage5_sleep.yaml", "results_dir": f"results/stage5_sleep/{tag}",
                             "files": [s["out_dir"] + "/spikes.npz" for s in specs]}}
+    if dep_note:
+        # The label goes in the result file, not only in the console: anything read out of this directory
+        # has to carry the deviation with it.
+        out_d["IS_A_LABELLED_DEVIATION"] = dep_note
+        out_d["depression"] = {k: v for k, v in c["depression"].items() if k not in ("pre_idx", "post_idx")}
     json.dump(out_d, open(out / "stage5.json", "w"), indent=1, default=str)
     if tag == "real":
         json.dump(out_d, open(OUT / "stage5.json", "w"), indent=1, default=str)
