@@ -65,17 +65,30 @@
   --font-display: 'EB Garamond', Garamond, Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
+  /* Vertical rhythm is fluid: the same page reads at a phone's scale and a 1920 display's
+     without a stack of breakpoints. */
   --space-xs: 0.5rem;
   --space-sm: 1rem;
-  --space-md: 2.5rem;
-  --space-lg: 4.5rem;
-  --space-xl: 7rem;
+  --space-md: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  --space-lg: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --space-xl: clamp(3rem, 1.5rem + 6vw, 7rem);
 
   /* The reading measure applies to running prose only (~70 characters). The page itself is
      wide: this is a data viewer, so charts, rasters and multi-column tables get the room. */
   --measure: 70ch;
   --measure-wide: 1400px;
-  --gutter: var(--space-md);
+  /* The page gutter also clears a notched phone's rounded corners in landscape. */
+  --gutter-base: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+  --gutter: var(--gutter-base);
+  --gutter-left: max(var(--gutter-base), env(safe-area-inset-left));
+  --gutter-right: max(var(--gutter-base), env(safe-area-inset-right));
+
+  /* Fluid type. 1rem at the bottom keeps body copy at the 16px minimum on a phone. */
+  --text-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-small: clamp(0.9375rem, 0.92rem + 0.1vw, 1rem);
+  --text-smaller: clamp(0.875rem, 0.86rem + 0.08vw, 0.9375rem);
+  --text-h2: clamp(1.35rem, 1.15rem + 0.9vw, 1.75rem);
+  --text-h3: clamp(1.15rem, 1.06rem + 0.4vw, 1.3rem);
 
   /* Width of the sticky right-hand rail that carries the neuron map. */
   --rail-w: 380px;
@@ -141,6 +154,15 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Nothing may scroll the page sideways. Wide things (tables, canvases, the forest plot) scroll
+   inside their own container; this is the backstop, and `clip` rather than `hidden` so it does
+   not turn the document into a scroll container and break the sticky rail. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 html,
 body,
 #root {
@@ -149,7 +171,7 @@ body,
 
 body {
   font-family: var(--font-serif);
-  font-size: 1.0625rem;
+  font-size: var(--text-body);
   font-weight: 400;
   line-height: 1.7;
   color: var(--color-fg);
@@ -232,7 +254,7 @@ table {
   width: 100%;
   max-width: var(--measure);
   margin: 0 auto;
-  padding: var(--space-xl) var(--space-md) 0;
+  padding: calc(var(--space-xl) + env(safe-area-inset-top)) var(--gutter-right) 0 var(--gutter-left);
   text-align: center;
 }
 
@@ -240,7 +262,7 @@ table {
   display: inline-block;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-size: clamp(2.1rem, 1.4rem + 3.4vw, 3.5rem);
   white-space: nowrap;
   line-height: 1.1;
   letter-spacing: 0.01em;
@@ -254,25 +276,38 @@ a.masthead__name:hover {
 
 .masthead__tagline {
   margin-top: 0.6rem;
-  font-size: 0.95rem;
+  font-size: var(--text-small);
   font-style: italic;
   color: var(--color-muted);
 }
 
 /* The nav is justified like the body copy: every row meets both edges of the measure. */
+/* Wide: justified like the body copy, every row meeting both edges of the measure.
+   Narrow: a centred wrapping row, because justifying five items across 335px pulls them apart. */
 .masthead__nav {
   max-width: 100%;
   margin: 2rem auto 0;
-  text-wrap: balance;
-  text-align: justify;
-  text-align-last: justify;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: clamp(0.9rem, 3vw, 2rem);
+}
+
+@media (min-width: 620px) {
+  .masthead__nav {
+    display: block;
+    text-wrap: balance;
+    text-align: justify;
+    text-align-last: justify;
+  }
 }
 
 .masthead__nav-link {
   display: inline-block;
   margin: 0 0 0.65rem;
   text-align: center;
-  font-size: 0.95rem;
+  font-size: var(--text-small);
   color: var(--color-fg);
   transition: color var(--transition-fast);
 }
@@ -326,7 +361,7 @@ a.masthead__name:hover {
   width: 100%;
   max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: 0 var(--gutter);
+  padding: 0 var(--gutter-right) 0 var(--gutter-left);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
@@ -357,7 +392,7 @@ a.masthead__name:hover {
   .rail {
     position: sticky;
     top: var(--space-sm);
-    max-height: calc(100svh - 2 * var(--space-sm));
+    max-height: calc(100dvh - 2 * var(--space-sm));
     overflow-y: auto;
     padding: var(--space-lg) 0 var(--space-sm);
   }
@@ -413,7 +448,7 @@ a.masthead__name:hover {
 .page-title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.25rem, 5vw, 2.9rem);
+  font-size: clamp(1.9rem, 1.4rem + 2.4vw, 2.9rem);
   line-height: 1.15;
   margin-bottom: var(--space-sm);
   color: var(--color-fg);
@@ -421,7 +456,7 @@ a.masthead__name:hover {
 
 .page h2,
 .h2 {
-  font-size: 1.65rem;
+  font-size: var(--text-h2);
   margin-top: var(--space-lg);
   margin-bottom: var(--space-sm);
   padding-top: var(--space-sm);
@@ -430,7 +465,7 @@ a.masthead__name:hover {
 
 .page h3,
 .h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-h3);
   margin-top: var(--space-md);
   margin-bottom: 0.6rem;
 }
@@ -444,11 +479,11 @@ a.masthead__name:hover {
 }
 
 .small {
-  font-size: 0.95rem;
+  font-size: var(--text-small);
 }
 
 .smaller {
-  font-size: 0.875rem;
+  font-size: var(--text-smaller);
 }
 
 /* Letterspaced small caps: labels, nav-like controls, badges, table heads. */
@@ -532,8 +567,10 @@ a.masthead__name:hover {
   color: var(--color-fg);
   border: 1px solid var(--color-border);
   border-radius: 2px;
-  padding: 1rem 1rem 0.5rem;
+  padding: clamp(0.6rem, 0.3rem + 1.2vw, 1rem) clamp(0.6rem, 0.3rem + 1.2vw, 1rem) 0.5rem;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
 }
 
 .figure__caption {
@@ -690,11 +727,37 @@ a.masthead__name:hover {
    6. Tables, key-value lists, stats
    --------------------------------------------------------- */
 
+/* A wide table scrolls inside here, never in the page. The two shadows are the affordance: they
+   are painted on the scroll container (`scroll`) over a matching pair painted on the content
+   (`local`), so each edge shadow is visible only while there is more table past that edge. */
 .table-wrap {
   width: 100%;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
+  --edge: var(--color-bg);
+  background-image: linear-gradient(to right, var(--edge), transparent), linear-gradient(to left, var(--edge), transparent),
+    linear-gradient(to right, var(--color-border-hover), transparent), linear-gradient(to left, var(--color-border-hover), transparent);
+  background-position: left center, right center, left center, right center;
+  background-size: 22px 100%, 22px 100%, 9px 100%, 9px 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* Inside a figure mat the paper is white, so the fade must be white too. */
+.mat .table-wrap {
+  --edge: var(--color-mat);
+}
+
+.table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 4px;
 }
 
 .data-table {
@@ -1024,7 +1087,7 @@ pre.equations {
   width: 100%;
   max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: var(--space-md) var(--gutter) var(--space-lg);
+  padding: var(--space-md) var(--gutter-right) calc(var(--space-lg) + env(safe-area-inset-bottom)) var(--gutter-left);
 }
 
 .colophon__meta {
@@ -1343,29 +1406,129 @@ pre.equations {
    --------------------------------------------------------- */
 
 @media (max-width: 640px) {
-  :root {
-    --space-xl: 4.5rem;
-    --space-lg: 3rem;
-    --space-md: 2rem;
-    --gutter: 1.25rem;
-  }
-
-  .masthead {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
-
-  .colophon {
-    padding-left: var(--gutter);
-    padding-right: var(--gutter);
-  }
-
   .masthead__nav-link {
     margin: 0 0 0.45rem;
   }
 
   .page-title {
     text-align: center;
+  }
+
+  /* Two stat tiles per row is already the default; one per row below ~380px keeps the big
+     numbers from being hyphenated in half. */
+  .stats {
+    gap: 0.85rem 1.25rem;
+  }
+}
+
+/* The map panel where it is not the sticky rail: a full-width block in the flow of the page,
+   sitting straight after the page intro rather than squeezed into a column that is not there. */
+.map-slot {
+  margin: var(--space-md) 0 0;
+}
+
+.map-slot:empty {
+  display: none;
+  margin: 0;
+}
+
+.rail--inline {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------
+   13. Touch
+   --------------------------------------------------------- */
+
+/* On a touch screen every control gets a 44px target and nothing depends on hover. The padding
+   is negative-margined back out so the visual rhythm of the text-style controls is unchanged. */
+@media (hover: none), (pointer: coarse) {
+  .segmented {
+    gap: 0.35rem 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .segmented__option,
+  .theme-toggle__option,
+  .masthead__nav-link {
+    padding-top: 0.72rem;
+    padding-bottom: 0.72rem;
+    margin-top: -0.4rem;
+    margin-bottom: -0.4rem;
+    min-height: 44px;
+  }
+
+  .masthead__nav-link {
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+  }
+
+  .control,
+  select.control {
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .map-panel__play {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    font-size: var(--text-smaller);
+  }
+
+  .map-panel__select select {
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+
+  .map-toggle {
+    min-height: 44px;
+    padding: 0.5rem 0;
+  }
+
+  .map-toggle input {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .board__row {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Hover-only affordances become the resting state, since a finger cannot hover. */
+  .segmented__option,
+  .theme-toggle__option {
+    color: var(--color-fg);
+  }
+
+  .board__row:hover {
+    background: none;
+  }
+}
+
+/* The scrubber has to be draggable with a thumb, not a mouse pointer. */
+input[type='range'] {
+  width: 100%;
+  min-width: 0;
+  height: 1.6rem;
+  touch-action: pan-y;
+  background: transparent;
+}
+
+@media (hover: none), (pointer: coarse) {
+  input[type='range'] {
+    height: 44px;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
   }
 }
 

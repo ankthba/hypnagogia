@@ -122,14 +122,18 @@ def main():
     s3bi = load_json(RESULTS / "stage3b_odor" / "ignition_threshold.json")
     s3c = load_json(RESULTS / "stage3c_control" / "stage3c.json")
     s3d = load_json(RESULTS / "stage3d_gain" / "stage3d.json")
-    if s3b or s3c or s3d:
+    s3e = load_json(RESULTS / "stage3e_discrim" / "stage3e.json")
+    s3dg = load_json(RESULTS / "stage3d_gain" / "gustatory_cost.json")
+    if s3b or s3c or s3d or s3e:
         feas = {"status": (s3b or {}).get("status", "not_run"),
                 "criterion": (s3b or {}).get("criterion", ""),
-                "headline": (s3b or {}).get("finding", ""),
+                "headline": " ".join(x for x in [(s3b or {}).get("finding", ""), (s3e or {}).get("finding", "")] if x),
                 "odor_calibration": ({k: v for k, v in s3b.items() if k != "per_run"} if s3b else None),
                 "ignition_threshold": s3bi,
                 "dataset_control": ({k: v for k, v in s3c.items() if k != "per_run"} if s3c else None),
                 "gain_sensitivity": ({k: v for k, v in s3d.items() if k != "per_run"} if s3d else None),
+                "gain_cost_on_gustatory_benchmark": s3dg,
+                "discriminability": ({k: v for k, v in s3e.items() if k != "per_run"} if s3e else None),
                 "provenance": prov("configs/stage3b_odor.yaml + configs/stage3d_gain.yaml",
                                    "results/stage3b_odor + results/stage3c_control + results/stage3d_gain",
                                    ["results/stage3b_odor/stage3b.json", "results/stage3b_odor/ignition_threshold.json",

@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T01:24:02+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T01:32:14+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -12,7 +12,7 @@ Two independent findings block it, and neither came from tuning anything:
 
 1. *There is no critical regime, because the network is bistable.* Sweeping the background noise never produces a sustained intermediate activity level. Seeds at the same noise amplitude either stay silent or ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls inside a gap of more than four orders of magnitude that the model cannot occupy.
 2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a single receptor neuron driven at 50 Hz, ignites the whole network, and the activity never decays: the population rate after the odour is as high as during it, indefinitely. More than half of all Kenyon cells fire, where a real fly uses 5 to 10 per cent with a few spikes each.
-3. *This is the published model, not this dataset.* Olfactory input ignites BOTH the male CNS and the FlyWire networks at identical parameters. The runaway is a property of the published model when it is driven through the olfactory pathway, not of the male CNS dataset. The published sugar-neuron benchmark does not reveal it because that stimulus is small.
+3. *This is the published model, not this dataset.* Olfactory input ignites EVERY network tested, at every rate, including the FlyWire v630 and v783 datasets that Shiu et al. published on. The runaway is a property of the model, not of the male CNS connectome. The gustatory pathway behaves completely differently with the same code and parameters: it never ignites the male CNS at any rate tested, and ignites the FlyWire networks only at the highest rate (150 Hz) when all 122 labellar neurons are driven at once. The 21-neuron stimulus the paper actually used stays well below that (stage 0). So the instability is specific to the olfactory pathway, and the published benchmark was never in a position to reveal it. Without the 0.581 FlyWire-equivalence scaling the male CNS ignites on everything, including the gustatory pathway, which is independent evidence that the scaling belongs there.
 
 A memory needs a sparse, odour-specific ensemble, and a replay test needs a quiet background for that ensemble to reappear against. This model, at this scale and with the published parameters, provides neither. Reporting that is the honest outcome; the alternative would have been to change parameters until the plots looked right, which this project does not do.
 
@@ -170,7 +170,24 @@ The last two columns are the important ones: the population rate after the odour
 
 ## Stage 3e - do two different odours leave two different ensembles?
 
-**Not run.**
+**passed.** Do two different odours leave two different Kenyon-cell ensembles, or the same attractor?
+
+The two odours remain discriminable at gain(s) [0.4, 0.5, 0.6, 0.8] in the self-sustaining state after the stimulus.
+
+Overlap is reported against the chance overlap of two random ensembles of the same sizes. When both ensembles contain most of the Kenyon cells, a high raw overlap is arithmetic, not odour specificity.
+
+| gain | epoch | Kenyon cells in ensemble A | in ensemble B | overlap (Jaccard) | chance overlap | excess | discriminable |
+|---|---|---|---|---|---|---|---|
+| 1.00 (published) | odor | 68.2% | 64.8% | 0.943 | 0.499 | +0.444 | **no** |
+| 1.00 (published) | post | 61.0% | 59.3% | 0.941 | 0.430 | +0.511 | **no** |
+| 0.80 | odor | 34.4% | 21.0% | 0.582 | 0.150 | +0.432 | yes |
+| 0.80 | post | 20.0% | 17.6% | 0.827 | 0.102 | +0.725 | yes |
+| 0.60 | odor | 7.8% | 5.0% | 0.496 | 0.032 | +0.464 | yes |
+| 0.60 | post | 4.9% | 4.6% | 0.879 | 0.023 | +0.856 | yes |
+| 0.50 | odor | 2.8% | 1.6% | 0.343 | 0.010 | +0.333 | yes |
+| 0.50 | post | 1.5% | 1.4% | 0.855 | 0.009 | +0.846 | yes |
+| 0.40 | odor | 0.4% | 0.1% | 0.111 | 0.001 | +0.111 | yes |
+| 0.40 | post | 0.1% | 0.1% | 0.606 | 0.000 | +0.606 | yes |
 
 ## Stage 3d - how far from the published model would you have to go?
 
@@ -196,22 +213,36 @@ No gain in the scan produced sparse, transient Kenyon-cell coding.
 
 ## Stage 3c - is the runaway the model, or this dataset?
 
-Olfactory input ignites BOTH the male CNS and the FlyWire networks at identical parameters. The runaway is a property of the published model when it is driven through the olfactory pathway, not of the male CNS dataset. The published sugar-neuron benchmark does not reveal it because that stimulus is small.
+Olfactory input ignites EVERY network tested, at every rate, including the FlyWire v630 and v783 datasets that Shiu et al. published on. The runaway is a property of the model, not of the male CNS connectome. The gustatory pathway behaves completely differently with the same code and parameters: it never ignites the male CNS at any rate tested, and ignites the FlyWire networks only at the highest rate (150 Hz) when all 122 labellar neurons are driven at once. The 21-neuron stimulus the paper actually used stays well below that (stage 0). So the instability is specific to the olfactory pathway, and the published benchmark was never in a position to reveal it. Without the 0.581 FlyWire-equivalence scaling the male CNS ignites on everything, including the gustatory pathway, which is independent evidence that the scaling belongs there.
+
+**Pathway control.** Ignition probability by pathway: olfactory 100% of conditions, gustatory 42%. Same code, same parameters, same networks, same rates.
 
 | network | pathway | neurons driven | drive | probability of ignition | Kenyon cells responding | neurons active | rate during | rate after |
 |---|---|---|---|---|---|---|---|---|
 | malecns_scaled | olfactory | 74 | 10 Hz | 100% | 57.2% | 7905 | 2.7494 | 2.8835 |
 | malecns_scaled | olfactory | 74 | 50 Hz | 100% | 59.5% | 8038 | 2.8467 | 2.8797 |
 | malecns_scaled | olfactory | 74 | 150 Hz | 100% | 61.5% | 8171 | 2.9998 | 2.8796 |
+| malecns_scaled | gustatory | 78 | 10 Hz | 0% | 0.0% | 90 | 0.0062 | 0.0000 |
+| malecns_scaled | gustatory | 78 | 50 Hz | 0% | 0.0% | 215 | 0.0456 | 0.0000 |
+| malecns_scaled | gustatory | 78 | 150 Hz | 0% | 0.0% | 717 | 0.1925 | 0.0005 |
 | malecns_unscaled | olfactory | 74 | 10 Hz | 100% | 100.0% | 14651 | 7.1775 | 7.3960 |
 | malecns_unscaled | olfactory | 74 | 50 Hz | 100% | 100.0% | 14736 | 7.2923 | 7.3947 |
 | malecns_unscaled | olfactory | 74 | 150 Hz | 100% | 100.0% | 14810 | 7.4469 | 7.3961 |
+| malecns_unscaled | gustatory | 78 | 10 Hz | 100% | 100.0% | 14973 | 5.4568 | 7.3922 |
+| malecns_unscaled | gustatory | 78 | 50 Hz | 100% | 66.9% | 11847 | 4.5660 | 7.1849 |
+| malecns_unscaled | gustatory | 78 | 150 Hz | 100% | 100.0% | 14903 | 6.4915 | 7.3968 |
 | flywire_783 | olfactory | 68 | 10 Hz | 100% | 65.0% | 8431 | 3.3454 | 3.4361 |
 | flywire_783 | olfactory | 68 | 50 Hz | 100% | 65.2% | 8473 | 3.4094 | 3.4332 |
 | flywire_783 | olfactory | 68 | 150 Hz | 100% | 65.3% | 8513 | 3.4947 | 3.4364 |
+| flywire_783 | gustatory | 122 | 10 Hz | 0% | 0.0% | 159 | 0.0109 | 0.0000 |
+| flywire_783 | gustatory | 122 | 50 Hz | 0% | 0.0% | 520 | 0.1047 | 0.0002 |
+| flywire_783 | gustatory | 122 | 150 Hz | 100% | 65.0% | 8878 | 3.4065 | 3.4382 |
 | flywire_630 | olfactory | 63 | 10 Hz | 100% | 64.0% | 8218 | 3.4872 | 3.5761 |
 | flywire_630 | olfactory | 63 | 50 Hz | 100% | 64.2% | 8222 | 3.5515 | 3.5807 |
 | flywire_630 | olfactory | 63 | 150 Hz | 100% | 64.6% | 8258 | 3.6447 | 3.5800 |
+| flywire_630 | gustatory | 112 | 10 Hz | 0% | 0.0% | 151 | 0.0108 | 0.0000 |
+| flywire_630 | gustatory | 112 | 50 Hz | 0% | 0.0% | 493 | 0.1087 | 0.0006 |
+| flywire_630 | gustatory | 112 | 150 Hz | 100% | 63.9% | 8598 | 3.6603 | 3.5786 |
 
 ## Stage 3 - dopamine-gated plasticity
 

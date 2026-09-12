@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-11T23:55:08+00:00",
- "git_commit": "bec98e6",
+ "generated_at": "2026-09-12T01:31:59+00:00",
+ "git_commit": "351d0f3",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -205,10 +205,16 @@
    "summary": "7 runs; isolated Gaussian model: sample s.d. of v within 5% of sigma for sigma <= 2 mV (threshold 7 mV above rest -> spikes negligible); Poisson mode runs with finite rates"
   },
   "stage2_criticality": {
-   "status": "not_run",
+   "status": "passed",
    "file": "stage2_criticality.json",
    "title": "Stage 2 - Criticality",
-   "summary": "not run"
+   "summary": "network=full; critical regime: NO; operating sigma 1.41 mV"
+  },
+  "stage3b_feasibility": {
+   "status": "failed",
+   "file": "stage3b_feasibility.json",
+   "title": "Stage 3b - Is there a sparse odour code to encode a memory in?",
+   "summary": "NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. Th"
   },
   "stage3_plasticity": {
    "status": "not_run",
@@ -234,5 +240,12 @@
    "title": "Stage 6 - Replay",
    "summary": "not run"
   }
+ },
+ "atlas": {
+  "file": "neuron_atlas.json",
+  "n_neurons_in_map": 126109,
+  "n_neurons_simulated": 144209,
+  "subsampled": false,
+  "n_without_soma_position": 18100
  }
 }

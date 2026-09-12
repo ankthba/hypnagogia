@@ -9,13 +9,22 @@ Pipeline stages (each is a script under `scripts/`, config under `configs/`, out
 
 | stage | what | script |
 |---|---|---|
-| 0 | reproduce the paper's sugar-GRN → MN9 result (correctness gate) | `scripts/00_reproduce_shiu.py` |
-| 1 | add noise (Gaussian membrane noise or Poisson background) | `scripts/01_noise.py` |
-| 2 | sweep noise, classify silent / critical / saturated with proper power-law fits | `scripts/02_criticality.py` |
-| 3 | dopamine-gated KC→MBON plasticity | `scripts/03_plasticity.py` |
-| 4 | encode an odor memory, verify learning | `scripts/04_encode.py` |
-| 5 | sleep (dFB clamped) vs wake, noise-driven, no odor | `scripts/05_sleep.py` |
+| 0a | reproduce the published model on its own data (engine check) | `scripts/00_engine_check.py` |
+| 0b | validate the male CNS network: weight scaling and sensory→motor propagation | `scripts/00_validate_malecns.py` |
+| 1 | add background noise (Gaussian membrane noise or Poisson drive) | `scripts/01_noise.py` |
+| 2 | sweep the noise, classify silent / critical / saturated / bistable | `scripts/02_criticality.py` |
+| 3 | dopamine-gated Kenyon-cell → MBON plasticity, calibrated against Hige et al. 2015 | `scripts/03_plasticity.py` |
+| 3b | is there a sparse odour code to encode a memory in? | `scripts/03b_odor_calibration.py` |
+| 3c | is the runaway the model or this dataset? (cross-dataset, cross-pathway control) | `scripts/03c_dataset_control.py` |
+| 3d | how far from the published parameters would sparse coding require? (labelled deviation) | `scripts/03d_gain_sensitivity.py` |
+| 3e | do two different odours leave two different ensembles? | `scripts/03e_discriminability.py` |
+| 4 | encode an odour memory, verify learning | `scripts/04_encode.py` |
+| 5 | sleep (dFB clamped) vs wake, noise-driven, no odour | `scripts/05_sleep.py` |
 | 6 | replay test with four null comparisons | `scripts/06_replay.py` |
+| — | reference activity clips for the viewer's neuron map | `scripts/07_reference_clips.py` |
+
+Run the whole downstream pipeline at a given synaptic gain with `scripts/run_variant.sh <gain>`; `1.0` is the
+published model and anything below it is a labelled deviation that is reported as such.
 
 Results are exported to `web/public/data/` and rendered by the static viewer in `web/`
 (**viewer shows real outputs only; missing results render as "not yet run"**).
