@@ -31,3 +31,4 @@ results/**/meta.json
 results/**/analysis.json
 scripts/.run_variant_active.sh
 scripts/.run_sparse.sh
+results/_archive_prev/
