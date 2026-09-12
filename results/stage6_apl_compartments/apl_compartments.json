@@ -1,0 +1,652 @@
+{
+ "status": "passed",
+ "question": "Does the published data contain an anatomical partition of APL, so that modelling it as compartments introduces no free parameter?",
+ "source": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/syn-partners-male-cns-v1.0-minconf-0.5-traced-only.feather",
+ "n_synapses_scanned": 124025046,
+ "partition_exists": true,
+ "per_cell_type": {
+  "APL": {
+   "n_cells": 2,
+   "n_input_synapses": 229181,
+   "n_output_synapses": 209913,
+   "n_neuropils": 36,
+   "largest_compartment": "gL(R)",
+   "largest_compartment_share_of_input": 0.15210685004428814,
+   "input_reduction_in_largest_compartment": 6.5743258749282845,
+   "by_neuropil": [
+    {
+     "neuropil": "gL(R)",
+     "input_synapses": 34860,
+     "output_synapses": 31790,
+     "input_share": 0.15210685004428814,
+     "output_share": 0.15144369333962165
+    },
+    {
+     "neuropil": "gL(L)",
+     "input_synapses": 29164,
+     "output_synapses": 29979,
+     "input_share": 0.1272531318041199,
+     "output_share": 0.14281630961398292
+    },
+    {
+     "neuropil": "CA(R)",
+     "input_synapses": 17664,
+     "output_synapses": 17761,
+     "input_share": 0.07707445207063413,
+     "output_share": 0.0846112437057257
+    },
+    {
+     "neuropil": "CentralBrain-unspecified",
+     "input_synapses": 18205,
+     "output_synapses": 16416,
+     "input_share": 0.0794350316998355,
+     "output_share": 0.07820382729988137
+    },
+    {
+     "neuropil": "CA(L)",
+     "input_synapses": 15442,
+     "output_synapses": 17043,
+     "input_share": 0.06737905847343366,
+     "output_share": 0.08119077903702962
+    },
+    {
+     "neuropil": "b'L(L)",
+     "input_synapses": 12245,
+     "output_synapses": 12188,
+     "input_share": 0.05342938550752462,
+     "output_share": 0.058062149557197504
+    },
+    {
+     "neuropil": "aL(R)",
+     "input_synapses": 13760,
+     "output_synapses": 10514,
+     "input_share": 0.06003988114197948,
+     "output_share": 0.05008741716806486
+    },
+    {
+     "neuropil": "bL(L)",
+     "input_synapses": 13218,
+     "output_synapses": 10227,
+     "input_share": 0.05767493814932302,
+     "output_share": 0.048720184076260165
+    },
+    {
+     "neuropil": "aL(L)",
+     "input_synapses": 11891,
+     "output_synapses": 10330,
+     "input_share": 0.05188475484442428,
+     "output_share": 0.049210863548231884
+    },
+    {
+     "neuropil": "b'L(R)",
+     "input_synapses": 9351,
+     "output_synapses": 9762,
+     "input_share": 0.04080181166850655,
+     "output_share": 0.04650498063483443
+    },
+    {
+     "neuropil": "PED(L)",
+     "input_synapses": 10183,
+     "output_synapses": 8706,
+     "input_share": 0.04443213006313787,
+     "output_share": 0.04147432507753212
+    },
+    {
+     "neuropil": "PED(R)",
+     "input_synapses": 11058,
+     "output_synapses": 7562,
+     "input_share": 0.04825007308633787,
+     "output_share": 0.03602444822378795
+    },
+    {
+     "neuropil": "bL(R)",
+     "input_synapses": 10452,
+     "output_synapses": 7213,
+     "input_share": 0.045605874832555925,
+     "output_share": 0.03436185467312648
+    },
+    {
+     "neuropil": "a'L(L)",
+     "input_synapses": 6567,
+     "output_synapses": 7246,
+     "input_share": 0.028654207809547912,
+     "output_share": 0.03451906265929218
+    },
+    {
+     "neuropil": "a'L(R)",
+     "input_synapses": 6739,
+     "output_synapses": 6863,
+     "input_share": 0.029404706323822655,
+     "output_share": 0.032694497244096364
+    },
+    {
+     "neuropil": "CRE(R)",
+     "input_synapses": 3840,
+     "output_synapses": 2865,
+     "input_share": 0.016755315667529157,
+     "output_share": 0.013648511526203713
+    },
+    {
+     "neuropil": "CRE(L)",
+     "input_synapses": 1011,
+     "output_synapses": 588,
+     "input_share": 0.004411360453091661,
+     "output_share": 0.0028011604807706048
+    },
+    {
+     "neuropil": "SCL(R)",
+     "input_synapses": 898,
+     "output_synapses": 694,
+     "input_share": 0.003918300382666975,
+     "output_share": 0.003306131587848299
+    },
+    {
+     "neuropil": "PLP(R)",
+     "input_synapses": 533,
+     "output_synapses": 486,
+     "input_share": 0.002325672721560688,
+     "output_share": 0.002315244887167541
+    },
+    {
+     "neuropil": "PLP(L)",
+     "input_synapses": 496,
+     "output_synapses": 519,
+     "input_share": 0.0021642282737225163,
+     "output_share": 0.002472452873333238
+    },
+    {
+     "neuropil": "SLP(R)",
+     "input_synapses": 382,
+     "output_synapses": 331,
+     "input_share": 0.0016668048398427444,
+     "output_share": 0.0015768437400256296
+    },
+    {
+     "neuropil": "SCL(L)",
+     "input_synapses": 291,
+     "output_synapses": 348,
+     "input_share": 0.0012697387654299441,
+     "output_share": 0.001657829672292807
+    },
+    {
+     "neuropil": "SLP(L)",
+     "input_synapses": 170,
+     "output_synapses": 153,
+     "input_share": 0.0007417717873645721,
+     "output_share": 0.0007288733904045962
+    },
+    {
+     "neuropil": "SIP(L)",
+     "input_synapses": 201,
+     "output_synapses": 63,
+     "input_share": 0.0008770360544722293,
+     "output_share": 0.000300124337225422
+    },
+    {
+     "neuropil": "AVLP(R)",
+     "input_synapses": 91,
+     "output_synapses": 83,
+     "input_share": 0.00039706607441280037,
+     "output_share": 0.0003954019045985718
+    },
+    {
+     "neuropil": "SIP(R)",
+     "input_synapses": 125,
+     "output_synapses": 40,
+     "input_share": 0.0005454204318857148,
+     "output_share": 0.00019055513474629967
+    },
+    {
+     "neuropil": "ICL(L)",
+     "input_synapses": 50,
+     "output_synapses": 57,
+     "input_share": 0.00021816817275428592,
+     "output_share": 0.000271541067013477
+    },
+    {
+     "neuropil": "SMP(L)",
+     "input_synapses": 72,
+     "output_synapses": 19,
+     "input_share": 0.0003141621687661717,
+     "output_share": 9.051368900449234e-05
+    },
+    {
+     "neuropil": "LH(R)",
+     "input_synapses": 85,
+     "output_synapses": 0,
+     "input_share": 0.00037088589368228605,
+     "output_share": 0.0
+    },
+    {
+     "neuropil": "LH(L)",
+     "input_synapses": 77,
+     "output_synapses": 5,
+     "input_share": 0.00033597898604160033,
+     "output_share": 2.381939184328746e-05
+    },
+    {
+     "neuropil": "Optic-unspecified(R)",
+     "input_synapses": 7,
+     "output_synapses": 42,
+     "input_share": 3.054354418560003e-05,
+     "output_share": 0.00020008289148361463
+    },
+    {
+     "neuropil": "ICL(R)",
+     "input_synapses": 15,
+     "output_synapses": 18,
+     "input_share": 6.545045182628577e-05,
+     "output_share": 8.574981063583485e-05
+    },
+    {
+     "neuropil": "SMP(R)",
+     "input_synapses": 31,
+     "output_synapses": 2,
+     "input_share": 0.00013526426710765727,
+     "output_share": 9.527756737314982e-06
+    },
+    {
+     "neuropil": "AVLP(L)",
+     "input_synapses": 3,
+     "output_synapses": 0,
+     "input_share": 1.3090090365257154e-05,
+     "output_share": 0.0
+    },
+    {
+     "neuropil": "PVLP(R)",
+     "input_synapses": 2,
+     "output_synapses": 0,
+     "input_share": 8.726726910171437e-06,
+     "output_share": 0.0
+    },
+    {
+     "neuropil": "LAL(L)",
+     "input_synapses": 2,
+     "output_synapses": 0,
+     "input_share": 8.726726910171437e-06,
+     "output_share": 0.0
+    }
+   ]
+  },
+  "DPM": {
+   "n_cells": 2,
+   "n_input_synapses": 100155,
+   "n_output_synapses": 47699,
+   "n_neuropils": 26,
+   "largest_compartment": "gL(L)",
+   "largest_compartment_share_of_input": 0.20850681443762167,
+   "input_reduction_in_largest_compartment": 4.796006320930901,
+   "by_neuropil": [
+    {
+     "neuropil": "gL(L)",
+     "input_synapses": 20883,
+     "output_synapses": 11736,
+     "input_share": 0.20850681443762167,
+     "output_share": 0.2460428939810059
+    },
+    {
+     "neuropil": "gL(R)",
+     "input_synapses": 18045,
+     "output_synapses": 9550,
+     "input_share": 0.1801707353601917,
+     "output_share": 0.20021384096102643
+    },
+    {
+     "neuropil": "aL(L)",
+     "input_synapses": 8677,
+     "output_synapses": 4095,
+     "input_share": 0.08663571464230443,
+     "output_share": 0.0858508564120841
+    },
+    {
+     "neuropil": "b'L(L)",
+     "input_synapses": 8688,
+     "output_synapses": 3572,
+     "input_share": 0.08674554440617044,
+     "output_share": 0.07488626595945408
+    },
+    {
+     "neuropil": "aL(R)",
+     "input_synapses": 8302,
+     "output_synapses": 3621,
+     "input_share": 0.08289151814687234,
+     "output_share": 0.07591354116438499
+    },
+    {
+     "neuropil": "bL(L)",
+     "input_synapses": 5710,
+     "output_synapses": 2844,
+     "input_share": 0.05701163197044581,
+     "output_share": 0.05962389148619468
+    },
+    {
+     "neuropil": "a'L(L)",
+     "input_synapses": 5279,
+     "output_synapses": 1847,
+     "input_share": 0.05270830213169587,
+     "output_share": 0.03872198578586553
+    },
+    {
+     "neuropil": "bL(R)",
+     "input_synapses": 4436,
+     "output_synapses": 2039,
+     "input_share": 0.04429134840996456,
+     "output_share": 0.04274722740518669
+    },
+    {
+     "neuropil": "a'L(R)",
+     "input_synapses": 4363,
+     "output_synapses": 1803,
+     "input_share": 0.04356247815885378,
+     "output_share": 0.03779953458143777
+    },
+    {
+     "neuropil": "b'L(R)",
+     "input_synapses": 4272,
+     "output_synapses": 1299,
+     "input_share": 0.04265388647596226,
+     "output_share": 0.02723327533071972
+    },
+    {
+     "neuropil": "PED(R)",
+     "input_synapses": 3407,
+     "output_synapses": 1539,
+     "input_share": 0.034017273226498924,
+     "output_share": 0.03226482735487117
+    },
+    {
+     "neuropil": "PED(L)",
+     "input_synapses": 3305,
+     "output_synapses": 1225,
+     "input_share": 0.0329988517797414,
+     "output_share": 0.025681880123273024
+    },
+    {
+     "neuropil": "CentralBrain-unspecified",
+     "input_synapses": 2076,
+     "output_synapses": 1081,
+     "input_share": 0.020727871798711998,
+     "output_share": 0.022662948908782156
+    },
+    {
+     "neuropil": "CRE(R)",
+     "input_synapses": 1876,
+     "output_synapses": 1077,
+     "input_share": 0.01873096700114822,
+     "output_share": 0.02257908970837963
+    },
+    {
+     "neuropil": "CRE(L)",
+     "input_synapses": 454,
+     "output_synapses": 204,
+     "input_share": 0.004532973890469772,
+     "output_share": 0.004276819220528732
+    },
+    {
+     "neuropil": "SCL(R)",
+     "input_synapses": 150,
+     "output_synapses": 53,
+     "input_share": 0.0014976785981728321,
+     "output_share": 0.0011111344053334451
+    },
+    {
+     "neuropil": "SIP(L)",
+     "input_synapses": 105,
+     "output_synapses": 37,
+     "input_share": 0.0010483750187209825,
+     "output_share": 0.0007756976037233485
+    },
+    {
+     "neuropil": "AVLP(R)",
+     "input_synapses": 28,
+     "output_synapses": 30,
+     "input_share": 0.00027956667165892864,
+     "output_share": 0.0006289440030189312
+    },
+    {
+     "neuropil": "PLP(R)",
+     "input_synapses": 31,
+     "output_synapses": 16,
+     "input_share": 0.0003095202436223853,
+     "output_share": 0.00033543680161009665
+    },
+    {
+     "neuropil": "SIP(R)",
+     "input_synapses": 29,
+     "output_synapses": 10,
+     "input_share": 0.00028955119564674753,
+     "output_share": 0.0002096480010063104
+    },
+    {
+     "neuropil": "PLP(L)",
+     "input_synapses": 17,
+     "output_synapses": 5,
+     "input_share": 0.00016973690779292097,
+     "output_share": 0.0001048240005031552
+    },
+    {
+     "neuropil": "ICL(L)",
+     "input_synapses": 7,
+     "output_synapses": 9,
+     "input_share": 6.989166791473216e-05,
+     "output_share": 0.00018868320090567936
+    },
+    {
+     "neuropil": "SCL(L)",
+     "input_synapses": 11,
+     "output_synapses": 4,
+     "input_share": 0.00010982976386600769,
+     "output_share": 8.385920040252416e-05
+    },
+    {
+     "neuropil": "SMP(L)",
+     "input_synapses": 3,
+     "output_synapses": 1,
+     "input_share": 2.995357196345664e-05,
+     "output_share": 2.096480010063104e-05
+    },
+    {
+     "neuropil": "SMP(R)",
+     "input_synapses": 1,
+     "output_synapses": 1,
+     "input_share": 9.984523987818882e-06,
+     "output_share": 2.096480010063104e-05
+    },
+    {
+     "neuropil": "EB",
+     "input_synapses": 0,
+     "output_synapses": 1,
+     "input_share": 0.0,
+     "output_share": 2.096480010063104e-05
+    }
+   ]
+  },
+  "MBON11": {
+   "n_cells": 2,
+   "n_input_synapses": 45949,
+   "n_output_synapses": 10605,
+   "n_neuropils": 24,
+   "largest_compartment": "gL(R)",
+   "largest_compartment_share_of_input": 0.34980086617771877,
+   "input_reduction_in_largest_compartment": 2.858769364773222,
+   "by_neuropil": [
+    {
+     "neuropil": "gL(R)",
+     "input_synapses": 16073,
+     "output_synapses": 866,
+     "input_share": 0.34980086617771877,
+     "output_share": 0.08165959453088166
+    },
+    {
+     "neuropil": "gL(L)",
+     "input_synapses": 11944,
+     "output_synapses": 510,
+     "input_share": 0.25994036866961195,
+     "output_share": 0.04809052333804809
+    },
+    {
+     "neuropil": "PED(R)",
+     "input_synapses": 5383,
+     "output_synapses": 234,
+     "input_share": 0.11715162462730419,
+     "output_share": 0.022065063649222064
+    },
+    {
+     "neuropil": "PED(L)",
+     "input_synapses": 4374,
+     "output_synapses": 219,
+     "input_share": 0.09519249602820519,
+     "output_share": 0.02065063649222065
+    },
+    {
+     "neuropil": "CentralBrain-unspecified",
+     "input_synapses": 3289,
+     "output_synapses": 562,
+     "input_share": 0.0715793597249124,
+     "output_share": 0.052993870815652995
+    },
+    {
+     "neuropil": "aL(R)",
+     "input_synapses": 2314,
+     "output_synapses": 912,
+     "input_share": 0.05036018194084746,
+     "output_share": 0.085997171145686
+    },
+    {
+     "neuropil": "CRE(L)",
+     "input_synapses": 55,
+     "output_synapses": 1624,
+     "input_share": 0.0011969792596139197,
+     "output_share": 0.15313531353135312
+    },
+    {
+     "neuropil": "aL(L)",
+     "input_synapses": 872,
+     "output_synapses": 734,
+     "input_share": 0.018977562079697054,
+     "output_share": 0.06921263554926921
+    },
+    {
+     "neuropil": "CRE(R)",
+     "input_synapses": 87,
+     "output_synapses": 1085,
+     "input_share": 0.001893403556116564,
+     "output_share": 0.10231023102310231
+    },
+    {
+     "neuropil": "bL(R)",
+     "input_synapses": 441,
+     "output_synapses": 715,
+     "input_share": 0.009597597336177066,
+     "output_share": 0.06742102781706742
+    },
+    {
+     "neuropil": "bL(L)",
+     "input_synapses": 538,
+     "output_synapses": 464,
+     "input_share": 0.011708633484950706,
+     "output_share": 0.04375294672324375
+    },
+    {
+     "neuropil": "SIP(L)",
+     "input_synapses": 87,
+     "output_synapses": 568,
+     "input_share": 0.001893403556116564,
+     "output_share": 0.05355964167845356
+    },
+    {
+     "neuropil": "b'L(R)",
+     "input_synapses": 113,
+     "output_synapses": 509,
+     "input_share": 0.0024592482970249626,
+     "output_share": 0.047996228194247995
+    },
+    {
+     "neuropil": "b'L(L)",
+     "input_synapses": 71,
+     "output_synapses": 344,
+     "input_share": 0.0015451914078652418,
+     "output_share": 0.03243752946723244
+    },
+    {
+     "neuropil": "SMP(R)",
+     "input_synapses": 9,
+     "output_synapses": 398,
+     "input_share": 0.0001958693333913687,
+     "output_share": 0.03752946723243753
+    },
+    {
+     "neuropil": "SIP(R)",
+     "input_synapses": 35,
+     "output_synapses": 284,
+     "input_share": 0.0007617140742997671,
+     "output_share": 0.02677982083922678
+    },
+    {
+     "neuropil": "a'L(R)",
+     "input_synapses": 63,
+     "output_synapses": 231,
+     "input_share": 0.0013710853337395809,
+     "output_share": 0.02178217821782178
+    },
+    {
+     "neuropil": "SMP(L)",
+     "input_synapses": 35,
+     "output_synapses": 187,
+     "input_share": 0.0007617140742997671,
+     "output_share": 0.017633191890617635
+    },
+    {
+     "neuropil": "a'L(L)",
+     "input_synapses": 34,
+     "output_synapses": 100,
+     "input_share": 0.0007399508150340595,
+     "output_share": 0.00942951438000943
+    },
+    {
+     "neuropil": "SCL(R)",
+     "input_synapses": 102,
+     "output_synapses": 3,
+     "input_share": 0.0022198524451021787,
+     "output_share": 0.0002828854314002829
+    },
+    {
+     "neuropil": "SLP(R)",
+     "input_synapses": 11,
+     "output_synapses": 46,
+     "input_share": 0.00023939585192278397,
+     "output_share": 0.004337576614804338
+    },
+    {
+     "neuropil": "SLP(L)",
+     "input_synapses": 3,
+     "output_synapses": 10,
+     "input_share": 6.52897777971229e-05,
+     "output_share": 0.000942951438000943
+    },
+    {
+     "neuropil": "ICL(L)",
+     "input_synapses": 11,
+     "output_synapses": 0,
+     "input_share": 0.00023939585192278397,
+     "output_share": 0.0
+    },
+    {
+     "neuropil": "SCL(L)",
+     "input_synapses": 5,
+     "output_synapses": 0,
+     "input_share": 0.00010881629632853816,
+     "output_share": 0.0
+    }
+   ]
+  }
+ },
+ "finding": "The partition is in the data. APL's 229,181 input and 209,913 output synapses divide across 36 named neuropils, and the largest single one, gL(R), holds only 15.2% of the input. Splitting APL along those boundaries therefore cuts the drive reaching any one compartment by at least 6.6 times, and far more in the smaller ones, with no number chosen by anyone: the compartments are the neuropils the reconstruction already labels each synapse with. That is the parameter-free form of the correction Amin et al. 2020 imply, and whether it is enough to let the readout fire while keeping the Kenyon-cell code sparse is the experiment it makes possible rather than something to assume.",
+ "provenance": {
+  "config": "configs/base.yaml",
+  "results_dir": "results/stage6_apl_compartments",
+  "files": [
+   "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/syn-partners-male-cns-v1.0-minconf-0.5-traced-only.feather"
+  ]
+ }
+}
