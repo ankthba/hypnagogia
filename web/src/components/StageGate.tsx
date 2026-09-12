@@ -111,7 +111,7 @@ export default function StageGate<T>({
       {mismatch && (
         <div className="notice notice--warn measure">
           <em>Status mismatch:</em> <span className="mono">manifest.json</span> says "{entry.status}" for
-          this stage but <span className="mono">{loaded.path}</span> says "{String(fileStatus)}". The export is inconsistent; the
+          this stage but <span className="mono">{loaded.path}</span> says "{fileStatus == null ? 'no status at all' : String(fileStatus)}". The export is inconsistent; the
           file's own status is shown below.
         </div>
       )}

@@ -12,7 +12,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
 import PairedPlot from '../components/charts/PairedPlot';
 import { SERIES } from '../lib/colors';
-import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
+import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct, NOT_MEASURED, fmtUnit } from '../lib/format';
 
 export default function Learning() {
   const s3 = useDataFile<Stage3>('stage3_plasticity.json');
@@ -61,8 +61,9 @@ function Stage4View({ d }: { d: Stage4 }) {
 
       {typeof d.learning_verified !== 'boolean' ? (
         <Callout tone="negative" title="Field missing from stage file">
-          <span className="mono">learning_verified</span> is absent (or not a boolean) in <span className="mono">stage4_learning.json</span>;
-          got <span className="mono">{JSON.stringify(d.learning_verified) ?? 'undefined'}</span>. No verdict can be shown.
+          <span className="mono">learning_verified</span> is absent (or not a boolean) in <span className="mono">stage4_learning.json</span>
+          {d.learning_verified === undefined ? ' (the field is not present at all)' : <>; it holds <span className="mono">{JSON.stringify(d.learning_verified)}</span></>}. No
+          verdict can be shown.
         </Callout>
       ) : d.learning_verified ? (
         <Callout tone="positive" title="Learning verified">
@@ -121,17 +122,17 @@ function Stage4View({ d }: { d: Stage4 }) {
             ]}
             rows={[
               ['odor A ORN types', (d.protocol?.odor_A?.orn_types ?? []).join(', ') || 'not stated'],
-              ['odor A n ORNs / rate', `${fmtInt(d.protocol?.odor_A?.n_orns)} / ${fmtNum(d.protocol?.odor_A?.rate_hz)} Hz`],
+              ['odor A n ORNs / rate', `${fmtInt(d.protocol?.odor_A?.n_orns)} / ${fmtUnit(d.protocol?.odor_A?.rate_hz, 'Hz')}`],
               ['odor B ORN types', (d.protocol?.odor_B?.orn_types ?? []).join(', ') || 'not stated'],
-              ['odor B n ORNs / rate', `${fmtInt(d.protocol?.odor_B?.n_orns)} / ${fmtNum(d.protocol?.odor_B?.rate_hz)} Hz`],
+              ['odor B n ORNs / rate', `${fmtInt(d.protocol?.odor_B?.n_orns)} / ${fmtUnit(d.protocol?.odor_B?.rate_hz, 'Hz')}`],
               ['DAN types', (d.protocol?.dans?.types ?? []).join(', ') || 'not stated'],
-              ['DAN n / rate', `${fmtInt(d.protocol?.dans?.n)} / ${fmtNum(d.protocol?.dans?.rate_hz)} Hz`],
+              ['DAN n / rate', `${fmtInt(d.protocol?.dans?.n)} / ${fmtUnit(d.protocol?.dans?.rate_hz, 'Hz')}`],
               ['n pairings', fmtInt(d.protocol?.n_pairings)],
-              ['odor duration', `${fmtNum(d.protocol?.odor_s)} s`],
-              ['inter-trial interval', `${fmtNum(d.protocol?.iti_s)} s`],
-              ['test window', `${fmtNum(d.protocol?.test_s)} s`],
-              ['background noise sigma', `${fmtNum(d.protocol?.sigma_mV)} mV`],
-              ['seeds', (d.seeds ?? []).join(', ')],
+              ['odor duration', fmtUnit(d.protocol?.odor_s, 's')],
+              ['inter-trial interval', fmtUnit(d.protocol?.iti_s, 's')],
+              ['test window', fmtUnit(d.protocol?.test_s, 's')],
+              ['background noise sigma', fmtUnit(d.protocol?.sigma_mV, 'mV')],
+              ['seeds', (d.seeds ?? []).join(', ') || 'not stated'],
               ['readout MBONs', (d.readout_mbons ?? []).map((m) => `${m.type} (${m.root_id})`).join(', ') || 'not stated'],
             ]}
             rowKey={(r) => r[0]}
@@ -233,12 +234,18 @@ function Stage3View({ d }: { d: Stage3 }) {
         <DataTable
           columns={[
             { key: 'm', header: 'MBON type', render: (r) => r.mbon_type },
-            { key: 'd', header: 'gating DAN types', render: (r) => <span className="whitespace-normal">{r.dan_types.join(', ')}</span> },
+            { key: 'side', header: 'side', render: (r) => r.side ?? NOT_MEASURED },
+            { key: 'd', header: 'gating DAN types', render: (r) => <span className="whitespace-normal">{danTypes(r.dan_types)}</span> },
             { key: 'n', header: 'n plastic synapses', render: (r) => fmtInt(r.n_syn) },
           ]}
           rows={d.dan_to_mbon_map ?? []}
-          rowKey={(r) => r.mbon_type}
+          rowKey={(r, i) => `${r.mbon ?? r.mbon_type}-${r.side ?? ''}-${i}`}
+          pageSize={20}
         />
+        <div className="smaller muted mt-2">
+          Where the file gives each gating DAN type a synapse count, the count is printed with the name; where it gives a bare list of
+          names, the names are printed alone.
+        </div>
         <ProvenanceFooter provenance={d.provenance} />
       </div>
     </div>
@@ -252,4 +259,22 @@ function Stat({ label, value, emphasis }: { label: string; value: string; emphas
       <div className="stat__value">{value}</div>
     </div>
   );
+}
+
+/**
+ * The gating DAN types of one MBON compartment, in whichever shape the stage file wrote them: a
+ * list of names, or an object mapping each name to the number of synapses it contributes (which is
+ * what the file actually holds, and is more than the contract's list, so the counts are shown).
+ */
+function danTypes(v: string[] | Record<string, number> | null | undefined): string {
+  if (Array.isArray(v)) return v.length > 0 ? v.join(', ') : NOT_MEASURED;
+  if (v && typeof v === 'object') {
+    const es = Object.entries(v).filter(([, n]) => typeof n === 'number');
+    if (es.length === 0) return NOT_MEASURED;
+    return es
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, n]) => `${k} (${fmtInt(n)})`)
+      .join(', ');
+  }
+  return NOT_MEASURED;
 }

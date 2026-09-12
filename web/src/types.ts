@@ -191,7 +191,20 @@ export interface Stage3 extends StageBase {
   n_kc: number;
   n_mbon: number;
   n_dan: number;
-  dan_to_mbon_map: { mbon_type: string; dan_types: string[]; n_syn: number }[];
+  /**
+   * DATA_CONTRACT.md gives `dan_types` as a list of names; the stage file writes an object mapping
+   * each DAN type to the number of synapses it contributes. Both shapes are accepted and the
+   * viewer says which one it read, rather than crashing on `.join` (which it did) or silently
+   * dropping the counts.
+   */
+  dan_to_mbon_map: {
+    mbon_type: string;
+    dan_types: string[] | Record<string, number>;
+    n_syn: number;
+    mbon?: number | string;
+    side?: string;
+    n_kc_inputs?: number;
+  }[];
   unit_test: {
     description: string;
     w_before: number;

@@ -118,6 +118,7 @@ def main():
         stages["stage2_criticality"] = {"status": "not_run", "file": "stage2_criticality.json", "title": "Stage 2 - Criticality", "summary": "not run"}
 
     # ---- stages 3b / 3c / 3d: the feasibility findings that gate everything downstream ----
+    s3a = load_json(RESULTS / "stage3a_apl" / "stage3a.json")
     s3b = load_json(RESULTS / "stage3b_odor" / "stage3b.json")
     s3bi = load_json(RESULTS / "stage3b_odor" / "ignition_threshold.json")
     s3c = load_json(RESULTS / "stage3c_control" / "stage3c.json")
@@ -127,10 +128,11 @@ def main():
     for cand in sorted(RESULTS.glob("stage6_structure/structure*.json")):
         s6b = load_json(cand) or s6b
     s3dg = load_json(RESULTS / "stage3d_gain" / "gustatory_cost.json")
-    if s3b or s3c or s3d or s3e:
+    if s3a or s3b or s3c or s3d or s3e:
         feas = {"status": (s3b or {}).get("status", "not_run"),
                 "criterion": (s3b or {}).get("criterion", ""),
-                "headline": " ".join(x for x in [(s3b or {}).get("finding", ""), (s3e or {}).get("finding", "")] if x),
+                "headline": " ".join(x for x in [(s3a or {}).get("finding", ""), (s3b or {}).get("finding", "")] if x),
+                "apl_correction": ({k: v for k, v in s3a.items() if k != "per_run"} if s3a else None),
                 "odor_calibration": ({k: v for k, v in s3b.items() if k != "per_run"} if s3b else None),
                 "ignition_threshold": s3bi,
                 "dataset_control": ({k: v for k, v in s3c.items() if k != "per_run"} if s3c else None),

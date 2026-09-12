@@ -264,8 +264,9 @@ function RegimeCallout({ d }: { d: Stage2 }) {
   if (typeof d.has_critical_regime !== 'boolean') {
     return (
       <Callout tone="negative" title="Field missing from stage file">
-        <span className="mono">has_critical_regime</span> is absent (or not a boolean) in <span className="mono">stage2_criticality.json</span>;
-        got <span className="mono">{JSON.stringify(d.has_critical_regime) ?? 'undefined'}</span>. No regime verdict can be shown.
+        <span className="mono">has_critical_regime</span> is absent (or not a boolean) in <span className="mono">stage2_criticality.json</span>
+        {d.has_critical_regime === undefined ? ' (the field is not present at all)' : <>; it holds <span className="mono">{JSON.stringify(d.has_critical_regime)}</span></>}. No
+        regime verdict can be shown.
       </Callout>
     );
   }
@@ -312,23 +313,28 @@ function fitCells(prefix: string, f: PowerLawFit | undefined) {
 }
 
 function FitTable({ rows }: { rows: PerSigma[] }) {
-  return (
-    <DataTable
-      columns={[
-        { key: 'sigma', header: 'sigma (mV)', render: (r) => fmtNum(r.sigma_mV) },
-        { key: 'seed', header: 'seed', render: (r) => r.seed },
-        { key: 'cls', header: 'class', render: (r) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span> },
-        { key: 'm', header: 'm [CI95]', render: (r) => fmtValueCI(r.branching_ratio_mr?.m, r.branching_ratio_mr?.ci95) },
-        { key: 'kmax', header: 'k_max', render: (r) => fmtInt(r.branching_ratio_mr?.k_max) },
-        { key: 'mrbin', header: 'MR bin (ms)', render: (r) => fmtNum(r.branching_ratio_mr?.bin_ms) },
-        { key: 'mn', header: 'm naive', render: (r) => fmtNum(r.branching_ratio_naive) },
-        { key: 'nav', header: 'n avalanches', render: (r) => fmtInt(r.avalanches?.n) },
-        { key: 'fta', header: 'frac time active', render: (r) => fmtPct(r.avalanches?.frac_time_active) },
-        ...fitCells('size', undefined).map((c, i) => ({ ...c, render: (r: PerSigma) => fitCells('size', r.size_fit)[i].render() })),
-        ...fitCells('dur', undefined).map((c, i) => ({ ...c, render: (r: PerSigma) => fitCells('dur', r.duration_fit)[i].render() })),
-      ]}
-      rows={rows}
-      rowKey={(r) => `${r.sigma_mV}-${r.seed}`}
-    />
-  );
+  // The fit columns are built once. They used to be rebuilt inside every cell's render, twice per
+  // cell: 113 rows times 18 fit columns times two nine-element arrays is 4,000 arrays per paint of
+  // one table.
+  const columns = useMemo(() => {
+    const fitCol = (prefix: 'size' | 'dur', pick: (r: PerSigma) => PowerLawFit | undefined) =>
+      fitCells(prefix, undefined).map((c, i) => ({
+        ...c,
+        render: (r: PerSigma) => fitCells(prefix, pick(r))[i].render(),
+      }));
+    return [
+      { key: 'sigma', header: 'sigma (mV)', render: (r: PerSigma) => fmtNum(r.sigma_mV) },
+      { key: 'seed', header: 'seed', render: (r: PerSigma) => r.seed },
+      { key: 'cls', header: 'class', render: (r: PerSigma) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span> },
+      { key: 'm', header: 'm [CI95]', render: (r: PerSigma) => fmtValueCI(r.branching_ratio_mr?.m, r.branching_ratio_mr?.ci95) },
+      { key: 'kmax', header: 'k_max', render: (r: PerSigma) => fmtInt(r.branching_ratio_mr?.k_max) },
+      { key: 'mrbin', header: 'MR bin (ms)', render: (r: PerSigma) => fmtNum(r.branching_ratio_mr?.bin_ms) },
+      { key: 'mn', header: 'm naive', render: (r: PerSigma) => fmtNum(r.branching_ratio_naive) },
+      { key: 'nav', header: 'n avalanches', render: (r: PerSigma) => fmtInt(r.avalanches?.n) },
+      { key: 'fta', header: 'frac time active', render: (r: PerSigma) => fmtPct(r.avalanches?.frac_time_active) },
+      ...fitCol('size', (r) => r.size_fit),
+      ...fitCol('dur', (r) => r.duration_fit),
+    ];
+  }, []);
+  return <DataTable columns={columns} rows={rows} rowKey={(r) => `${r.sigma_mV}-${r.seed}`} pageSize={20} />;
 }

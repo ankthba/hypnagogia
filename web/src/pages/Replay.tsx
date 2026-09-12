@@ -312,7 +312,7 @@ function statusSentence(status: Stage6['status'] | string): string {
     case 'running':
       return 'Stage 6 is still running; the file is provisional.';
     default:
-      return `status: ${String(status)}`;
+      return status == null ? 'stage6_replay.json states no status.' : `status: ${String(status)}`;
   }
 }
 

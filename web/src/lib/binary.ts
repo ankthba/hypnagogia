@@ -101,6 +101,19 @@ export const TRACE_COLUMNS = ['t_s', 'corr_A', 'corr_B'] as const;
 export const ATLAS_COLUMNS = ['x_q', 'y_q', 'z_q', 'group'] as const;
 export const ACTIVITY_COLUMNS = ['t_ms', 'atlas_row'] as const;
 
+
+/**
+ * A sidecar field as it should appear in an error message.
+ *
+ * `JSON.stringify(undefined)` is the JavaScript value `undefined`, which lands in a template
+ * literal as the word "undefined": a reader cannot tell that from a file that literally contains
+ * that string. An absent field says it is absent.
+ */
+function describe(v: unknown): string {
+  if (v === undefined) return 'no value (the field is absent)';
+  return JSON.stringify(v) ?? 'no value';
+}
+
 function dirOf(p: string) {
   const i = p.lastIndexOf('/');
   return i >= 0 ? p.slice(0, i + 1) : '';
@@ -123,7 +136,7 @@ function checkLayout(
 ): { off: number; nRows: number; nCols: number; columns: string[] } | Fail {
   const shape = sc.shape;
   if (!Array.isArray(shape) || shape.length !== 2 || !shape.every((v) => Number.isInteger(v) && v >= 0)) {
-    return fail(binPath, `shape missing or malformed in sidecar (contract: [n, ${required.length}]), got ${JSON.stringify(shape)}`);
+    return fail(binPath, `shape missing or malformed in sidecar (contract: [n, ${required.length}]), got ${describe(shape)}`);
   }
   const columns = sc.columns;
   if (!Array.isArray(columns) || !columns.every((c) => typeof c === 'string')) {
@@ -131,7 +144,7 @@ function checkLayout(
   }
   const missingCols = required.filter((c) => !columns.includes(c));
   if (missingCols.length > 0) {
-    return fail(binPath, `sidecar columns ${JSON.stringify(columns)} lack ${missingCols.join(', ')} (contract: ${JSON.stringify(required)})`);
+    return fail(binPath, `sidecar columns ${describe(columns)} lack ${missingCols.join(', ')} (contract: ${JSON.stringify(required)})`);
   }
   const [nRows, nCols] = shape as [number, number];
   if (nCols !== columns.length) {
@@ -139,13 +152,13 @@ function checkLayout(
   }
   const off = sc.byte_offset === undefined ? 0 : sc.byte_offset;
   if (!Number.isInteger(off) || (off as number) < 0) {
-    return fail(binPath, `byte_offset malformed in sidecar: ${JSON.stringify(sc.byte_offset)}`);
+    return fail(binPath, `byte_offset malformed in sidecar: ${describe(sc.byte_offset)}`);
   }
   const n = nRows * nCols;
   if ((off as number) + n * bytes > buf.byteLength) {
     return fail(
       binPath,
-      `binary is truncated: need ${(off as number) + n * bytes} bytes for shape ${JSON.stringify(shape)} at byte_offset ${off}, file has ${buf.byteLength}`,
+      `binary is truncated: need ${(off as number) + n * bytes} bytes for shape ${describe(shape)} at byte_offset ${off}, file has ${buf.byteLength}`,
     );
   }
   return { off: off as number, nRows, nCols, columns: columns as string[] };
@@ -183,7 +196,7 @@ export async function loadRaster(sidecarPath: string): Promise<BinLoad<RasterDat
     if (!sc.ok) return fail(sidecarPath, sc.message, sc.missing);
     if (typeof sc.data.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
     binPath = dirOf(sidecarPath) + sc.data.bin;
-    if (sc.data.dtype !== 'uint32') return fail(binPath, `unexpected dtype ${JSON.stringify(sc.data.dtype)} (contract: uint32)`);
+    if (sc.data.dtype !== 'uint32') return fail(binPath, `unexpected dtype ${describe(sc.data.dtype)} (contract: uint32)`);
     const buf = await fetchBinary(binPath);
     if (!buf) return fail(binPath, `${binPath} not found`, true);
     const layout = checkLayout(sc.data, buf, RASTER_COLUMNS, binPath);
@@ -202,11 +215,11 @@ export async function loadTrace(sidecarPath: string): Promise<BinLoad<TraceData>
     if (!sc.ok) return fail(sidecarPath, sc.message, sc.missing);
     if (typeof sc.data.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
     binPath = dirOf(sidecarPath) + sc.data.bin;
-    if (sc.data.dtype !== 'float32') return fail(binPath, `unexpected dtype ${JSON.stringify(sc.data.dtype)} (contract: float32)`);
+    if (sc.data.dtype !== 'float32') return fail(binPath, `unexpected dtype ${describe(sc.data.dtype)} (contract: float32)`);
     // dt_s is the trace's bin width; without it the time axis has no length, so it is reported rather
     // than silently treated as 0 (which would collapse every bin onto t = 0).
     if (typeof sc.data.dt_s !== 'number' || !Number.isFinite(sc.data.dt_s) || sc.data.dt_s <= 0) {
-      return fail(sidecarPath, `dt_s missing or not a positive number in the sidecar: ${JSON.stringify(sc.data.dt_s)} (contract: the bin width in seconds)`);
+      return fail(sidecarPath, `dt_s missing or not a positive number in the sidecar: ${describe(sc.data.dt_s)} (contract: the bin width in seconds)`);
     }
     const buf = await fetchBinary(binPath);
     if (!buf) return fail(binPath, `${binPath} not found`, true);
@@ -233,7 +246,7 @@ export async function loadAtlas(sidecarPath = 'neuron_atlas.json'): Promise<BinL
     const s = sc.data;
     if (typeof s.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
     binPath = dirOf(sidecarPath) + s.bin;
-    if (s.dtype !== 'uint16') return fail(binPath, `unexpected dtype ${JSON.stringify(s.dtype)} (contract: uint16)`);
+    if (s.dtype !== 'uint16') return fail(binPath, `unexpected dtype ${describe(s.dtype)} (contract: uint16)`);
     const q = s.quantisation;
     const okTriple = (v: unknown): v is [number, number, number] => Array.isArray(v) && v.length === 3 && v.every((x) => typeof x === 'number' && Number.isFinite(x));
     if (!q || !okTriple(q.lo_um) || !okTriple(q.hi_um) || typeof q.scale !== 'number' || !(q.scale > 0)) {
@@ -291,7 +304,7 @@ export async function loadActivity(sidecarPath: string): Promise<BinLoad<Activit
     const s = sc.data;
     if (typeof s.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
     binPath = dirOf(sidecarPath) + s.bin;
-    if (s.dtype !== 'uint32') return fail(binPath, `unexpected dtype ${JSON.stringify(s.dtype)} (contract: uint32)`);
+    if (s.dtype !== 'uint32') return fail(binPath, `unexpected dtype ${describe(s.dtype)} (contract: uint32)`);
     const buf = await fetchBinary(binPath);
     if (!buf) return fail(binPath, `${binPath} not found`, true);
     const layout = checkLayout(s, buf, ACTIVITY_COLUMNS, binPath, 4);

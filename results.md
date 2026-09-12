@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T05:42:49+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T06:18:42+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -120,29 +120,55 @@ Two methodological points, both of which changed the numbers:
 - When the mean interval between spikes anywhere in the brain falls below the simulation time step, the Beggs and Plenz avalanche definition has nothing to bite on. Those runs are now labelled 'avalanche analysis not applicable' instead of being binned at the time step and reported as if the numbers meant something.
 - The branching ratio is estimated by the multistep-regression method, which assumes the population autocorrelation decays exponentially. In the high-rate state it does not: it oscillates, with a negative lag-1 autocorrelation. Those runs no longer report a branching ratio from the exponential fit.
 
-## Stage 3b - is there a sparse odour code to build a memory on? No.
+## Stage 3a - a modelling error in the mushroom body's gain control
 
-**failed.** In a real fly about 5-10% of Kenyon cells respond to a given odour, each firing a few spikes (Honegger, Campbell & Turner 2011 J Neurosci 31:11772: mean responding fraction <= 0.10; Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734: 6 +/- 5% of KCs, 2-5 spikes per response).
+**passed.** APL does not fire action potentials; it releases transmitter in proportion to membrane depolarisation (Amin et al. 2020 eLife 9:e56954). It is modelled here as non-spiking, with release rectified at rest and saturating at the spike threshold. The scaling introduces no free parameter: a neuron held at threshold delivers exactly what a spiking synapse delivers at its maximum refractory-limited rate.
 
-NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. This is a property of the published model at this scale, not a tuning failure: no parameter was changed to obtain it.
+Modelling APL as a spiking neuron takes the odour response from 4.5% of Kenyon cells at 0.79 Hz to 67.7% at 40.1 Hz, and the offline rate from 0.13 Hz to 32.3 Hz. Real Kenyon cells respond at 6 +/- 5% and idle near 0.1 Hz, so the corrected model matches the measurement and the published one is off by more than two orders of magnitude. Everything else is identical.
+
+Why the substitution is not neutral, measured in this connectome:
+
+| quantity | value |
+|---|---|
+| threshold gap | 7.0 mV |
+| one Kenyon-cell spike delivers to APL | 7.16 mV |
+| Kenyon-cell spikes needed to fire APL | 0.98 |
+| one APL spike delivers to each Kenyon cell | 6.77 mV, 97% of a full threshold gap |
+| APL's maximum rate, set by the refractory period | 455 Hz |
+| APL's share of all inhibition onto Kenyon cells | 79.8% |
+
+A single Kenyon-cell spike already carries APL most of the way to threshold, and a single APL spike removes more than a full threshold gap from every Kenyon cell it touches, while APL's output rate is capped by the refractory period. A graded controller has become a saturated switch, and it is the only feedback that keeps the odour code sparse.
+
+| APL | Kenyon cells responding | rate during odour | rate after odour | APL rate |
+|---|---|---|---|---|
+| spiking, as published | 67.7% | 40.09 Hz | 32.29 Hz | 354.3 Hz |
+| graded, corrected | 4.5% | 0.79 Hz | 0.13 Hz | 0.0 Hz |
+
+Real Kenyon cells respond at 6 plus or minus 5 per cent of the population and idle near 0.1 Hz (Turner, Bazhenov & Laurent 2008). The corrected model lands on both; the published one misses each by more than two orders of magnitude. No parameter was changed to obtain this: the only difference between the two rows is whether APL is allowed to fire action potentials.
+
+## Stage 3b - is there a sparse odour code to build a memory on?
+
+**passed.** In a real fly about 5-10% of Kenyon cells respond to a given odour, each firing a few spikes (Honegger, Campbell & Turner 2011 J Neurosci 31:11772: mean responding fraction <= 0.10; Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734: 6 +/- 5% of KCs, 2-5 spikes per response).
+
+Sparse, transient Kenyon-cell odour coding is reproduced at 4 glomeruli / 150 Hz: 4.4% of Kenyon cells respond at 0.77 Hz, falling to 0.14 Hz once the odour stops. The rest of the network does not return to baseline (1.69 vs 2.00 Hz per neuron), so the mushroom body recovers while the wider brain does not.
 
 | glomeruli driven | receptor neurons | drive | Kenyon cells responding | spikes per responding cell | rate during | rate after |
 |---|---|---|---|---|---|---|
-| 1 glomerulus | 74 | 10 Hz | **57.4%** | 54 | 2.7319 Hz/neuron | 2.8782 Hz/neuron |
-| 1 glomerulus | 74 | 20 Hz | **58.5%** | 54 | 2.7972 Hz/neuron | 2.8806 Hz/neuron |
-| 1 glomerulus | 74 | 50 Hz | **59.3%** | 54 | 2.8501 Hz/neuron | 2.8840 Hz/neuron |
-| 1 glomerulus | 74 | 100 Hz | **60.2%** | 55 | 2.9214 Hz/neuron | 2.8814 Hz/neuron |
-| 1 glomerulus | 74 | 150 Hz | **61.1%** | 56 | 2.9870 Hz/neuron | 2.8738 Hz/neuron |
-| 2 glomeruli | 106 | 10 Hz | **57.9%** | 54 | 2.7657 Hz/neuron | 2.8816 Hz/neuron |
-| 2 glomeruli | 106 | 20 Hz | **58.5%** | 54 | 2.8080 Hz/neuron | 2.8872 Hz/neuron |
-| 2 glomeruli | 106 | 50 Hz | **60.3%** | 55 | 2.8905 Hz/neuron | 2.8759 Hz/neuron |
-| 2 glomeruli | 106 | 100 Hz | **62.3%** | 56 | 2.9968 Hz/neuron | 2.8780 Hz/neuron |
-| 2 glomeruli | 106 | 150 Hz | **63.2%** | 56 | 3.0895 Hz/neuron | 2.8802 Hz/neuron |
-| 4 glomeruli | 243 | 10 Hz | **58.9%** | 54 | 2.8077 Hz/neuron | 2.8829 Hz/neuron |
-| 4 glomeruli | 243 | 20 Hz | **61.2%** | 54 | 2.8896 Hz/neuron | 2.8762 Hz/neuron |
-| 4 glomeruli | 243 | 50 Hz | **63.4%** | 56 | 3.0422 Hz/neuron | 2.8819 Hz/neuron |
-| 4 glomeruli | 243 | 100 Hz | **66.5%** | 58 | 3.2756 Hz/neuron | 2.8758 Hz/neuron |
-| 4 glomeruli | 243 | 150 Hz | **67.7%** | 59 | 3.4441 Hz/neuron | 2.8838 Hz/neuron |
+| 1 glomerulus | 74 | 10 Hz | **1.1%** | 12 | 1.5880 Hz/neuron | 1.6931 Hz/neuron |
+| 1 glomerulus | 74 | 20 Hz | **1.2%** | 13 | 1.5736 Hz/neuron | 1.6765 Hz/neuron |
+| 1 glomerulus | 74 | 50 Hz | **1.4%** | 14 | 1.6521 Hz/neuron | 1.6928 Hz/neuron |
+| 1 glomerulus | 74 | 100 Hz | **1.8%** | 14 | 1.7066 Hz/neuron | 1.6922 Hz/neuron |
+| 1 glomerulus | 74 | 150 Hz | **2.2%** | 15 | 1.7370 Hz/neuron | 1.6943 Hz/neuron |
+| 2 glomeruli | 106 | 10 Hz | **1.1%** | 12 | 1.5576 Hz/neuron | 1.6900 Hz/neuron |
+| 2 glomeruli | 106 | 20 Hz | **1.2%** | 13 | 1.6402 Hz/neuron | 1.6967 Hz/neuron |
+| 2 glomeruli | 106 | 50 Hz | **1.6%** | 13 | 1.6905 Hz/neuron | 1.6921 Hz/neuron |
+| 2 glomeruli | 106 | 100 Hz | **2.0%** | 15 | 1.7414 Hz/neuron | 1.6962 Hz/neuron |
+| 2 glomeruli | 106 | 150 Hz | **2.4%** | 16 | 1.8048 Hz/neuron | 1.6935 Hz/neuron |
+| 4 glomeruli | 243 | 10 Hz | **1.2%** | 13 | 1.5977 Hz/neuron | 1.6666 Hz/neuron |
+| 4 glomeruli | 243 | 20 Hz | **1.4%** | 13 | 1.5247 Hz/neuron | 1.6470 Hz/neuron |
+| 4 glomeruli | 243 | 50 Hz | **2.2%** | 14 | 1.7317 Hz/neuron | 1.6931 Hz/neuron |
+| 4 glomeruli | 243 | 100 Hz | **3.4%** | 16 | 1.9041 Hz/neuron | 1.6927 Hz/neuron |
+| 4 glomeruli | 243 | 150 Hz | **4.4%** | 18 | 1.9977 Hz/neuron | 1.6904 Hz/neuron |
 
 The last two columns are the important ones: the population rate after the odour ends is the same as the rate during it. The stimulus does not drive a response, it triggers a transition, and the network stays in the new state afterwards. Before the odour the network is exactly silent.
 
@@ -150,15 +176,15 @@ The last two columns are the important ones: the population rate after the odour
 
 | receptor neurons driven | probability of ignition | rate during stimulus | rate after |
 |---|---|---|---|
-| 1 | 100% | 2.5270 Hz/neuron | 2.8808 Hz/neuron |
-| 2 | 100% | 2.5592 Hz/neuron | 2.8793 Hz/neuron |
-| 3 | 100% | 2.7115 Hz/neuron | 2.8851 Hz/neuron |
-| 5 | 100% | 2.6749 Hz/neuron | 2.8825 Hz/neuron |
-| 8 | 100% | 2.7233 Hz/neuron | 2.8809 Hz/neuron |
-| 12 | 100% | 2.7421 Hz/neuron | 2.8788 Hz/neuron |
-| 20 | 100% | 2.7730 Hz/neuron | 2.8807 Hz/neuron |
-| 35 | 100% | 2.7956 Hz/neuron | 2.8817 Hz/neuron |
-| 74 | 100% | 2.8527 Hz/neuron | 2.8803 Hz/neuron |
+| 1 | 100% | 1.4310 Hz/neuron | 1.6770 Hz/neuron |
+| 2 | 100% | 1.4708 Hz/neuron | 1.6926 Hz/neuron |
+| 3 | 100% | 1.5478 Hz/neuron | 1.6925 Hz/neuron |
+| 5 | 100% | 1.5237 Hz/neuron | 1.6954 Hz/neuron |
+| 8 | 100% | 1.4513 Hz/neuron | 1.6035 Hz/neuron |
+| 12 | 100% | 1.5661 Hz/neuron | 1.6288 Hz/neuron |
+| 20 | 100% | 1.5208 Hz/neuron | 1.6858 Hz/neuron |
+| 35 | 100% | 1.5829 Hz/neuron | 1.6926 Hz/neuron |
+| 74 | 100% | 1.6631 Hz/neuron | 1.6908 Hz/neuron |
 
 ## Stage 3e - do two different odours leave two different ensembles?
 

@@ -31,6 +31,7 @@ def main():
     s0x = load(RESULTS / "stage0_engine_check" / "crossmatch_report.json")
     s1 = load(RESULTS / "stage1_noise" / "stage1.json")
     s2 = load(RESULTS / "stage2_criticality" / "full" / "stage2.json")
+    s3a = load(RESULTS / "stage3a_apl" / "stage3a.json")
     s3b = load(RESULTS / "stage3b_odor" / "stage3b.json")
     s3bi = load(RESULTS / "stage3b_odor" / "ignition_threshold.json")
     s3c = load(RESULTS / "stage3c_control" / "stage3c.json")
@@ -286,7 +287,47 @@ def main():
         w("**Not run.**")
         w()
 
-    w("## Stage 3b - is there a sparse odour code to build a memory on? No.")
+    w("## Stage 3a - a modelling error in the mushroom body's gain control")
+    w()
+    if s3a:
+        w(f"**{s3a['status']}.** {s3a['correction']}")
+        w()
+        w(f"{s3a['finding']}")
+        w()
+        y = s3a["why_it_matters"]
+        w("Why the substitution is not neutral, measured in this connectome:")
+        w()
+        w("| quantity | value |")
+        w("|---|---|")
+        w(f"| threshold gap | {y['threshold_gap_mV']:.1f} mV |")
+        w(f"| one Kenyon-cell spike delivers to APL | {y['one_KC_spike_delivers_to_APL_mV']:.2f} mV |")
+        w(f"| Kenyon-cell spikes needed to fire APL | {y['KC_spikes_needed_to_fire_APL']:.2f} |")
+        w(f"| one APL spike delivers to each Kenyon cell | {y['one_APL_spike_delivers_to_each_KC_mV']:.2f} mV, "
+          f"{y['APL_spike_as_fraction_of_KC_threshold_gap']:.0%} of a full threshold gap |")
+        w(f"| APL's maximum rate, set by the refractory period | {y['APL_max_rate_hz_from_refractory']:.0f} Hz |")
+        w(f"| APL's share of all inhibition onto Kenyon cells | {y['APL_share_of_all_inhibition_onto_KCs']:.1%} |")
+        w()
+        w(f"{y['note']}")
+        w()
+        sm = s3a.get("summary", {})
+        if sm:
+            w("| APL | Kenyon cells responding | rate during odour | rate after odour | APL rate |")
+            w("|---|---|---|---|---|")
+            for cond, lab in (("apl_spiking", "spiking, as published"), ("apl_graded", "graded, corrected")):
+                if cond in sm:
+                    v = sm[cond]
+                    w(f"| {lab} | {v['odor']['frac_kc']:.1%} | {v['odor']['kc_rate_hz']:.2f} Hz | "
+                      f"{v['post']['kc_rate_hz']:.2f} Hz | {v['odor']['apl_rate_hz']:.1f} Hz |")
+            w()
+            w("Real Kenyon cells respond at 6 plus or minus 5 per cent of the population and idle near 0.1 Hz "
+              "(Turner, Bazhenov & Laurent 2008). The corrected model lands on both; the published one misses "
+              "each by more than two orders of magnitude. No parameter was changed to obtain this: the only "
+              "difference between the two rows is whether APL is allowed to fire action potentials.")
+            w()
+    else:
+        w("**Not run.**")
+        w()
+    w("## Stage 3b - is there a sparse odour code to build a memory on?")
     w()
     if s3b:
         w(f"**{s3b['status']}.** {s3b['reference']}")
