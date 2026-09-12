@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { RasterData, TraceData } from '../../lib/binary';
 import { SERIES, CHART_FONT, resolveColors, useThemeVersion } from '../../lib/colors';
+import { useCanvasPixelRatio } from '../../lib/media';
 import { fmtNum, fmtInt } from '../../lib/format';
 
 const LEFT = 56;
@@ -146,7 +147,10 @@ function RasterViewerInner({
   const traceRef = useRef<HTMLCanvasElement>(null);
   // state rather than a ref, so the colour resolution below can depend on the wrapper existing
   const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
-  const [width, setWidth] = useState(800);
+  // Starts at the narrowest box the mat can give it rather than at a desktop width: 800 inside a
+  // ~301px phone mat flashed a horizontal scrollbar and re-rasterised both canvases on the next
+  // frame. The observer below grows it immediately.
+  const [width, setWidth] = useState(280);
 
   useEffect(() => {
     if (!wrap) return;
@@ -172,6 +176,7 @@ function RasterViewerInner({
   const rasterH = 300;
   const traceH = 150;
   const themeVersion = useThemeVersion();
+  const dpr = useCanvasPixelRatio();
 
   /**
    * The palette as literal canvas colours. Each entry costs a DOM insertion and a forced style
@@ -194,7 +199,6 @@ function RasterViewerInner({
     const cv = rasterRef.current;
     if (!cv || !C) return;
     const groupColor: Record<string, string> = { ensemble_A: C.A, ensemble_B: C.B, other_kc: C.other };
-    const dpr = window.devicePixelRatio || 1;
     sizeCanvas(cv, width, rasterH, dpr);
     const ctx = cv.getContext('2d')!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -266,12 +270,14 @@ function RasterViewerInner({
       const tt = t0 + (windowS * k) / 4;
       ctx.fillText(`${fmtNum(tt, 2)} s`, LEFT + (plotW * k) / 4, rasterH - 6);
     }
-  }, [raster, rc, spikeIndex, rowOrder, start, windowS, width, C]);
+    // dpr is a dependency, not a value read at draw time: moving the window to a display of a
+    // different density (or zooming) changes no CSS size, so without it the backing store would
+    // stay at the old ratio and both canvases would render blurry until something else redrew them.
+  }, [raster, rc, spikeIndex, rowOrder, start, windowS, width, C, dpr]);
 
   useEffect(() => {
     const cv = traceRef.current;
     if (!cv || !C) return;
-    const dpr = window.devicePixelRatio || 1;
     sizeCanvas(cv, width, traceH, dpr);
     const ctx = cv.getContext('2d')!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -374,7 +380,7 @@ function RasterViewerInner({
     ctx.fillText(fmtNum(hi, 2), LEFT - 4, top + 9);
     ctx.fillText(fmtNum(lo, 2), LEFT - 4, bottom);
     drawTimeTicks();
-  }, [trace, tc, traceRange, start, windowS, width, C]);
+  }, [trace, tc, traceRange, start, windowS, width, C, dpr]);
 
   const rasterCols = raster?.sidecar.columns ?? [];
 

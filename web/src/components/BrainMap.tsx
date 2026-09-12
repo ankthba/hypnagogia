@@ -296,7 +296,11 @@ function BrainMapInner({
   onShowVncChange?: (v: boolean) => void;
   /** 'panel' is the compact instrument in the right-hand rail: smaller type */
   variant?: 'figure' | 'panel';
-  /** 'mat' paints the white figure mat behind the points, 'page' paints the page background */
+  /**
+   * MAP_SPEC.md:33 fixes this: the canvas background is the page background token, so the map
+   * reads as part of the page and the spec's dark / light colour column follows the theme. 'mat'
+   * remains only for a caller that deliberately mounts the map on the white figure mat.
+   */
   background?: 'mat' | 'page';
   showProjectionControl?: boolean;
   showVncControl?: boolean;
@@ -317,7 +321,19 @@ function BrainMapInner({
   const bgRef = useRef<HTMLCanvasElement | null>(null);
   const [width, setWidth] = useState(400);
   const themeVersion = useThemeVersion();
-  const dpr = useDevicePixelRatio();
+  const dpr = useCanvasPixelRatio();
+
+  /**
+   * The wrapper's width, measured synchronously before the first paint. The ResizeObserver below
+   * coalesces to one update per frame, which is right for a drag but wrong for the mount: for that
+   * one frame the canvas would be sized 400 wide and its CSS `max-width: 100%` would cap the width
+   * without touching the height, so the projection would be drawn at the wrong aspect ratio.
+   */
+  useLayoutEffect(() => {
+    if (!wrap) return;
+    const w = Math.max(200, Math.floor(wrap.getBoundingClientRect().width));
+    setWidth((prev) => (prev === w ? prev : w));
+  }, [wrap]);
 
   // Width changes are coalesced to one per frame: dragging a window edge otherwise rebuilds the
   // whole background layer once per pixel.
@@ -373,7 +389,7 @@ function BrainMapInner({
     for (let i = 0; i < atlas.n; i++) if (inBox[i]) counts.set(atlas.group[i], (counts.get(atlas.group[i]) ?? 0) + 1);
 
     const sc = atlas.sidecar;
-    // Which of the sidecar's own count blocks corroborates the legend depends on the frame in view.
+    // Which of the sidecar's own count blocks the legend states depends on the frame in view.
     const stated = showVnc ? sc.group_counts : sc.group_counts_in_brain_view ?? (hasBoxes ? undefined : sc.group_counts);
     const list = (sc.groups ?? []).map((g) => ({
       code: g.code,
@@ -381,7 +397,12 @@ function BrainMapInner({
       spec: specFor(g.label),
       /** neurons of this group inside the current frame, counted from the binary itself */
       inView: counts.get(g.code) ?? 0,
-      /** what the sidecar states for this group in this frame; null when it states nothing */
+      /**
+       * What the sidecar states for this group in this frame; null when it states nothing.
+       * MAP_SPEC.md:44-45 makes this the number the legend shows, with `inView` as the check on it:
+       * the stated figure is the export's own, while counting the binary depends on reproducing the
+       * exporter's box test through a quantisation the file only carries to half a step.
+       */
       sidecarCount: stated && Object.prototype.hasOwnProperty.call(stated, g.label) ? stated[g.label] : null,
     }));
     const known = new Set(list.map((g) => g.code));
@@ -555,17 +576,13 @@ function BrainMapInner({
    */
   const C = useMemo(() => {
     if (!wrap) return null;
-    const resolved = resolveColors(wrap, { bg: background === 'page' ? 'var(--color-bg)' : SERIES.mat, axis: SERIES.axis });
+    const resolved = resolveColors(wrap, { bg: background === 'page' ? 'var(--color-bg)' : 'var(--color-mat)', axis: 'var(--color-muted)' });
     const dark = isDarkColor(resolved.bg);
     return {
       bg: resolved.bg,
       axis: resolved.axis,
       dark,
       accent: dark ? ACCENT.dark : ACCENT.light,
-      // the stamp is picked by the canvas's own background, like every other colour here: the white
-      // figure mat is light in both themes, so a token would be invisible on it in the dark theme
-      ink: dark ? STAMP_INK.dark : STAMP_INK.light,
-      failed: dark ? STAMP_FAILED.dark : STAMP_FAILED.light,
     };
     // themeVersion is the signal that the same var() now resolves to a different colour
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -648,12 +665,42 @@ function BrainMapInner({
     // the foreground blits the background this pass has just written.
   }, [groups, view, canvasW, canvasH, C, variant, dpr]);
 
-  // Foreground: blit the background, draw the lit neurons on top, then stamp the source identity so
-  // it is part of the image and survives a crop of it.
+  /**
+   * Everything about a lit point that depends only on its group, resolved once per theme / scale
+   * rather than once per point per frame.
+   *
+   * The hot loop below runs over every neuron lit in the window - one to three thousand of them,
+   * sixty times a second. Its per-point constant used to include two `parseRgb` calls, a map
+   * lookup and a fresh `rgb(...)` template string; all of that is one of nine group constants, so
+   * it is hoisted here. The blend to the accent is then quantised into 33 alpha buckets so the
+   * fillStyle strings are reused instead of allocated per point (a bucket is 3% of the tail, well
+   * under a perceptible step).
+   */
+  const litStyle = useMemo(() => {
+    if (!C) return null;
+    const [ar, ag, ab] = parseRgb(C.accent);
+    const BUCKETS = 32;
+    const byCode = new Map<number, { baseR: number; alpha: number; fill: string[] }>();
+    const forLabel = (label: string) => {
+      const spec = specFor(label);
+      const [gr, gg, gb] = parseRgb(specColor(spec, C.dark));
+      const fill: string[] = [];
+      for (let b = 0; b <= BUCKETS; b++) {
+        const a = b / BUCKETS;
+        fill.push(`rgb(${Math.round(gr + (ar - gr) * a)}, ${Math.round(gg + (ag - gg) * a)}, ${Math.round(gb + (ab - gb) * a)})`);
+      }
+      return { baseR: specRadius(spec, C.dark) * view.rScale, alpha: spec.alpha, fill };
+    };
+    (atlas.groupLabels ?? []).forEach((label, code) => byCode.set(code, forLabel(label ?? '')));
+    return { byCode, fallback: forLabel(''), buckets: BUCKETS };
+  }, [C, atlas.groupLabels, view.rScale]);
+
+  // Foreground: blit the cached background and draw the lit neurons on top of it. Nothing else is
+  // painted here - the source line is HTML above and below the canvas (MAP_SPEC.md:54-57).
   useEffect(() => {
     const cv = canvasRef.current;
     const bg = bgRef.current;
-    if (!cv || !C) return;
+    if (!cv || !C || !litStyle) return;
     const w = Math.round(canvasW * dpr);
     const h = Math.round(canvasH * dpr);
     if (cv.width !== w) cv.width = w;
@@ -666,25 +713,22 @@ function BrainMapInner({
     ctx.clearRect(0, 0, canvasW, canvasH);
     if (bg) ctx.drawImage(bg, 0, 0, canvasW, canvasH);
     if (lit && lit.rows.length > 0) {
-      const [ar, ag, ab] = parseRgb(C.accent);
       // a is 1 at the instant of the spike and 0 at the end of the tail, so nothing stays lit
       for (let k = 0; k < lit.rows.length; k++) {
         const i = lit.rows[k];
         const a = lit.alphas[k];
-        const spec = specFor(atlas.groupLabels[atlas.group[i]] ?? '');
-        const [gr, gg, gb] = parseRgb(specColor(spec, C.dark));
-        const base = Math.max(specRadius(spec, C.dark) * view.rScale, LIT_MIN_R);
-        const r = base * (1 + (LIT_GAIN - 1) * a);
-        ctx.fillStyle = `rgb(${Math.round(gr + (ar - gr) * a)}, ${Math.round(gg + (ag - gg) * a)}, ${Math.round(gb + (ab - gb) * a)})`;
-        ctx.globalAlpha = spec.alpha + (1 - spec.alpha) * a;
+        const g = litStyle.byCode.get(atlas.group[i]) ?? litStyle.fallback;
+        // exactly 2.2x the group radius at the instant of the spike, decaying to 1x: no floor
+        const r = g.baseR * (1 + (LIT_GAIN - 1) * a);
+        ctx.fillStyle = g.fill[Math.round(a * litStyle.buckets)];
+        ctx.globalAlpha = g.alpha + (1 - g.alpha) * a;
         ctx.beginPath();
         ctx.arc(view.px(i), view.py(i), r, 0, TAU);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
     }
-    drawSourceStamp(ctx, source, C, canvasW);
-  }, [lit, view, canvasW, canvasH, atlas, C, dpr, source]);
+  }, [lit, view, canvasW, canvasH, atlas, C, dpr, litStyle]);
 
   const sc = atlas.sidecar;
   /** the fraction of its spikes the activity file actually carries, when it carries a sample */
@@ -723,26 +767,34 @@ function BrainMapInner({
           {showVncControl && hasBoxes && <VncToggle atlas={atlas} on={showVnc} set={setShowVnc} />}
         </div>
       )}
-      {/* The identity is drawn into the top-left of the canvas itself by the foreground effect, not
-          printed under it: this map animates beside a verdict, and the text saying what it is must
-          not be separated from the picture by a legend, a status line and a row of controls - nor
-          lost when someone crops a screenshot to the picture. `aria-label` carries the same words to
-          a screen reader, which cannot read pixels. */}
+      {/* Nothing is burned into the bitmap but the scale bar and the axis note. What the map is
+          showing is HTML: the panel prints it on the head rule above the canvas and in the source
+          line below it, where it is selectable and translatable, and `aria-label` carries the same
+          words to a screen reader.
+
+          `aspect-ratio` with `height: auto` is what keeps the projection honest: a bare
+          `max-width: 100%` caps the width without touching the height, so any frame in which the
+          canvas is wider than its wrapper would squash the brain. */}
       <canvas
         ref={canvasRef}
         role="img"
         aria-label={source.text}
-        style={{ width: canvasW, height: canvasH }}
-        className="block mx-auto max-w-full"
+        style={{ width: canvasW, height: 'auto', aspectRatio: `${canvasW} / ${canvasH}`, maxWidth: '100%' }}
+        className="block mx-auto"
       />
       {showLegend && (
         <div className={legendClass}>
           {groups.list.map((g) => (
             <span key={g.code}>
-              <i className="swatch swatch--map" style={{ ['--sw-l' as string]: g.spec.light, ['--sw-d' as string]: g.spec.dark }} /> {g.label} ({fmtInt(g.inView)})
-              {/* the count is the binary's own, inside the framed box; a differing sidecar figure is shown too */}
-              {g.sidecarCount !== null && g.sidecarCount !== g.inView && (
-                <span className="tone-failed"> · neuron_atlas.json says {fmtInt(g.sidecarCount)}</span>
+              <i className="swatch swatch--map" style={{ ['--sw-l' as string]: g.spec.light, ['--sw-d' as string]: g.spec.dark }} /> {g.label} (
+              {fmtInt(g.sidecarCount ?? g.inView)})
+              {/* The count is the sidecar's own, per MAP_SPEC.md:45. What was drawn is counted from
+                  the binary and printed only when the two disagree; when the sidecar states no
+                  count for this group the figure IS the binary's, and says so. */}
+              {g.sidecarCount === null ? (
+                <span className="tone-failed"> · counted in neuron_atlas.bin; the sidecar states no count for this group</span>
+              ) : (
+                g.sidecarCount !== g.inView && <span className="tone-failed"> · {fmtInt(g.inView)} drawn from neuron_atlas.bin</span>
               )}
             </span>
           ))}

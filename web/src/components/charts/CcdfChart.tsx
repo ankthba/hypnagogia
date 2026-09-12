@@ -1,7 +1,7 @@
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { SERIES, TOOLTIP_STYLE, seedColor } from '../../lib/colors';
 import { fmtNum, fmtInt } from '../../lib/format';
-import { useNarrowViewport } from '../../lib/media';
+import { useNarrowBox } from '../../lib/media';
 
 export { seedColor };
 
@@ -20,8 +20,11 @@ export interface CcdfSeries {
   y: number[];
 }
 
+/** Axis tick type. The narrow size is 12px, not 10px: no text on this site goes below 12. */
 const TICK = { fontSize: 12, fill: SERIES.axis };
-const TICK_SM = { fontSize: 10, fill: SERIES.axis };
+const TICK_SM = { fontSize: 12, fill: SERIES.axis };
+/** Axis names and legend entries, narrow / wide. */
+const LABEL_FS = { sm: 12.5, lg: 13 };
 
 /** Keep at most `max` of the decade ticks, always both ends, so labels cannot collide when narrow. */
 function thinTicks(ticks: number[], max: number): number[] {
@@ -34,7 +37,8 @@ function thinTicks(ticks: number[], max: number): number[] {
 
 /** Log-log CCDF. Points with x<=0 or y<=0 are not drawable on log axes and are dropped (count reported). */
 export default function CcdfChart({ series, xLabel, height = 280 }: { series: CcdfSeries[]; xLabel: string; height?: number }) {
-  const narrow = useNarrowViewport();
+  // narrow follows the width of the box the chart is drawn into, not the window's (see useNarrowBox)
+  const { ref: boxRef, narrow } = useNarrowBox();
   const prepared = series.map((s) => {
     const pts: { x: number; y: number }[] = [];
     let dropped = 0;
@@ -62,7 +66,7 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
   const xTicks = narrow ? thinTicks(xd.ticks, 4) : xd.ticks;
   const yTicks = narrow ? thinTicks(yd.ticks, 4) : yd.ticks;
   return (
-    <div>
+    <div ref={boxRef}>
       <ResponsiveContainer width="100%" height={h} minHeight={200}>
         <ScatterChart margin={narrow ? { top: 8, right: 8, bottom: 24, left: 0 } : { top: 10, right: 16, bottom: 28, left: 8 }}>
           <CartesianGrid stroke={SERIES.grid} />
@@ -75,7 +79,7 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             stroke={SERIES.axis}
             tick={tick}
             tickFormatter={(v) => decadeLabel(Number(v))}
-            label={{ value: xLabel, position: 'insideBottom', offset: narrow ? -14 : -16, fill: SERIES.axis, fontSize: narrow ? 11 : 13 }}
+            label={{ value: xLabel, position: 'insideBottom', offset: narrow ? -14 : -16, fill: SERIES.axis, fontSize: narrow ? LABEL_FS.sm : LABEL_FS.lg }}
           />
           <YAxis
             type="number"
@@ -83,14 +87,14 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             scale="log"
             domain={yd.domain}
             ticks={yTicks}
-            width={narrow ? 40 : 60}
+            width={narrow ? 46 : 60}
             stroke={SERIES.axis}
             tick={tick}
             tickFormatter={(v) => decadeLabel(Number(v))}
-            label={narrow ? undefined : { value: 'P(X ≥ x)', angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
+            label={narrow ? undefined : { value: 'P(X ≥ x)', angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: LABEL_FS.lg }}
           />
           <Tooltip cursor={{ stroke: SERIES.axis }} contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 4)} />
-          <Legend verticalAlign="top" height={narrow ? 34 : 24} wrapperStyle={{ fontSize: narrow ? 11 : 13, color: SERIES.axis, lineHeight: 1.4 }} />
+          <Legend verticalAlign="top" height={narrow ? 34 : 24} wrapperStyle={{ fontSize: narrow ? LABEL_FS.sm : LABEL_FS.lg, color: SERIES.axis, lineHeight: 1.4 }} />
           {prepared.map((s) => (
             <Scatter key={s.name} name={s.name} data={s.pts} fill={s.color} line={{ stroke: s.color, strokeWidth: 1 }} shape={<circle r={2} />} isAnimationActive={false} />
           ))}

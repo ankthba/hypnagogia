@@ -276,6 +276,9 @@ function ManifestView({ m }: { m: Manifest }) {
   );
 }
 
+/** What this map is showing; a stable object, so the memoised map is not re-rendered for it. */
+const ATLAS_ONLY_SOURCE = { text: 'atlas only · no spikes loaded' };
+
 /**
  * The populations, at their soma positions. Static: the Replay page is where the map is animated.
  *
@@ -319,8 +322,13 @@ function AtlasFigure({ m }: { m: Manifest }) {
             page.
           </>
         }
+        /* Drawn on the page background rather than on the white figure mat: MAP_SPEC.md:33 asks
+           for the page token, and the mat would force the light colour column in both themes. */
+        flat
       >
-        <BrainMap atlas={atlas.data} source={{ text: 'atlas only · no spikes loaded' }} height={560} />
+        {/* the source statement MAP_SPEC.md:44-45 requires, as HTML beside the picture */}
+        <div className="map-figure__source smaller muted">{ATLAS_ONLY_SOURCE.text}</div>
+        <BrainMap atlas={atlas.data} source={ATLAS_ONLY_SOURCE} height={560} />
       </Figure>
     </div>
   );

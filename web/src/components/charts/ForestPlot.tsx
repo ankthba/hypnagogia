@@ -2,7 +2,7 @@ import { memo } from 'react';
 import type { Comparison } from '../../types';
 import { fmtNum, fmtCI, fmtP, fmtInt } from '../../lib/format';
 import { SERIES } from '../../lib/colors';
-import { useNarrowViewport } from '../../lib/media';
+import { useNarrowBox } from '../../lib/media';
 
 const INK = SERIES.ink;
 const MUTED = SERIES.axis;
@@ -24,10 +24,10 @@ type Row = { kind: 'present'; c: Comparison } | { kind: 'missing'; name: string 
  * are labelled unexpected.
  */
 function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
-  // Below ~700px there is no room for a label column beside the whiskers, so the row is stacked:
-  // name and verdict on the first line, the metric line under it, the CI bar under that. The
-  // viewBox then matches the container's own width instead of being scaled down to illegibility.
-  const narrow = useNarrowViewport();
+  // Below ~700px of *container* (not window: the mat this is drawn into is ~400px wide beside the
+  // map rail) there is no room for a label column beside the whiskers, so the row is stacked: name
+  // and verdict on the first line, the metric line under it, the CI bar under that.
+  const { ref: boxRef, narrow, width: boxW } = useNarrowBox();
   const present = comparisons ?? [];
   const rows: Row[] = [
     ...REQUIRED_COMPARISONS.map<Row>((n) => {
@@ -48,7 +48,10 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
   lo -= pad;
   hi += pad;
 
-  const W = narrow ? 340 : 720;
+  // One SVG unit is one CSS pixel: the viewBox is the box the plot is actually drawn into, so a
+  // `w-full` scale factor cannot shrink the type below the size it is set at. Before the first
+  // measurement, and when the wide layout scrolls inside its own mat, the old fixed widths stand.
+  const W = narrow ? Math.max(260, boxW || 340) : Math.max(720, boxW || 720);
   const labelW = narrow ? 8 : 250;
   const plotW = narrow ? W - 16 : W - labelW - 130;
   const rowH = narrow ? 82 : 44;
@@ -58,10 +61,12 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
   /** vertical offset of the whisker line inside a row: centred when wide, third line when stacked */
   const barDy = narrow ? 56 : rowH / 2;
   const ticks = niceTicks(lo, hi, narrow ? 4 : 6);
-  const badgeW = narrow ? 68 : 74;
+  // wide enough for "SURVIVES" at 12px letterspaced serif
+  const badgeW = narrow ? 78 : 82;
   const badgeX = W - badgeW - 4;
 
   return (
+    <div ref={boxRef} className="w-full">
     <svg
       viewBox={`0 0 ${W} ${H}`}
       className={narrow ? 'w-full' : 'w-full min-w-[640px]'}
@@ -72,12 +77,12 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
       {ticks.map((t) => (
         <g key={t}>
           <line x1={x(t)} x2={x(t)} y1={H - 26} y2={H - 21} stroke={MUTED} />
-          <text x={x(t)} y={H - 8} textAnchor="middle" fontSize={narrow ? 10.5 : 12} fill={MUTED}>
+          <text x={x(t)} y={H - 8} textAnchor="middle" fontSize={12} fill={MUTED}>
             {fmtNum(t, 2)}
           </text>
         </g>
       ))}
-      <text x={labelW + plotW / 2} y={12} textAnchor="middle" fontSize={narrow ? 10.5 : 12} fill={MUTED}>
+      <text x={labelW + plotW / 2} y={12} textAnchor="middle" fontSize={12} fill={MUTED}>
         Hedges g (95% CI) · dashed line = no effect
       </text>
       {rows.map((r, i) => {
@@ -90,11 +95,11 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
               <text x={8} y={y0 + 16} fontSize={narrow ? 12 : 13} fill={BAD} fontWeight={500}>
                 {r.name}
               </text>
-              <text x={8} y={y0 + 32} fontSize={11.5} fill={BAD}>
+              <text x={8} y={y0 + 32} fontSize={12} fill={BAD}>
                 comparison missing from stage6_replay.json
               </text>
               <rect x={badgeX} y={narrow ? y0 + 42 : y0 + rowH / 2 - 9} width={badgeW} height={18} rx={2} fill="none" stroke={BAD} />
-              <text x={badgeX + badgeW / 2} y={(narrow ? y0 + 42 : y0 + rowH / 2 - 9) + 13} fontSize={10} letterSpacing="0.12em" textAnchor="middle" fill={BAD}>
+              <text x={badgeX + badgeW / 2} y={(narrow ? y0 + 42 : y0 + rowH / 2 - 9) + 13} fontSize={12} letterSpacing="0.1em" textAnchor="middle" fill={BAD}>
                 MISSING
               </text>
             </g>
@@ -112,7 +117,7 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
             <text x={8} y={y0 + 16} fontSize={narrow ? 12.5 : 13} fill={INK}>
               {c.label}
             </text>
-            <text x={8} y={y0 + 32} fontSize={11.5} fill={MUTED}>
+            <text x={8} y={y0 + 32} fontSize={12} fill={MUTED}>
               {c.metric} · n = {fmtInt(c.n)} · p = {fmtP(c.p)}
               {unexpected && (
                 <tspan fill={BAD} fontWeight={500}>
@@ -136,7 +141,7 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
               </text>
             )}
             {narrow ? (
-              <text x={8} y={y0 + 74} fontSize={11.5} fill={INK}>
+              <text x={8} y={y0 + 74} fontSize={12} fill={INK}>
                 g = {fmtNum(g, 3)} <tspan fill={MUTED}>{fmtCI(c.g_ci95, 2)}</tspan>
               </text>
             ) : (
@@ -144,7 +149,7 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
                 <text x={labelW + plotW + 10} y={cy - 2} fontSize={12} fill={INK}>
                   g = {fmtNum(g, 3)}
                 </text>
-                <text x={labelW + plotW + 10} y={cy + 11} fontSize={11.5} fill={MUTED}>
+                <text x={labelW + plotW + 10} y={cy + 11} fontSize={12} fill={MUTED}>
                   {fmtCI(c.g_ci95, 2)}
                 </text>
               </>
@@ -161,8 +166,8 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
             <text
               x={badgeX + badgeW / 2}
               y={(narrow ? y0 + 62 : y0 + rowH / 2 - 9) + 13}
-              fontSize={10}
-              letterSpacing="0.12em"
+              fontSize={12}
+              letterSpacing="0.1em"
               textAnchor="middle"
               fill={color}
             >
@@ -172,6 +177,7 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
         );
       })}
     </svg>
+    </div>
   );
 }
 

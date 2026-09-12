@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import BrainMap, {
+  AtlasCaption,
   PROJECTIONS,
   PROJECTION_SHORT,
   VncToggle,
@@ -36,8 +37,8 @@ import type { Manifest, Provenance, ReferenceClip, ReferenceClipEpoch, Reference
  * There is no demo mode: every spike drawn here was read out of a binary the pipeline wrote.
  */
 
-/** A spike stays lit for this long on the panel map, fading out. */
-const DECAY_MS = 160;
+/** A spike stays lit for this long on the panel map, fading out (MAP_SPEC.md:38: a 150 ms tail). */
+const DECAY_MS = 150;
 /** Fixed simulation step for the loop, so the playback rate does not depend on the frame rate. */
 const STEP_MS = 1000 / 60;
 
@@ -115,12 +116,27 @@ function useClockTime(clock: Clock): number {
 export default function MapPanel() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(380);
+  // Coalesced to one update per frame, like the map's own observer and the raster's: dragging a
+  // window edge otherwise re-renders the whole panel once per observed pixel, and each of those
+  // renders rebuilds the props of the canvas below.
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const ro = new ResizeObserver((e) => setWidth(Math.max(240, Math.floor(e[0].contentRect.width))));
+    let raf = 0;
+    let pending = 0;
+    const ro = new ResizeObserver((e) => {
+      pending = Math.max(240, Math.floor(e[0].contentRect.width));
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setWidth((w) => (w === pending ? w : pending));
+      });
+    });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
   }, []);
   const narrow = useMediaQuery('(max-width: 699px)');
   const railed = useMediaQuery('(min-width: 1100px)');
@@ -181,13 +197,19 @@ export default function MapPanel() {
   /** Neurons that actually spike in the loaded file, counted from the binary rather than trusted. */
   const activeCounted = useMemo(() => (activity ? countDistinctRows(activity.atlasRow) : null), [activity]);
 
-  const source: MapSourceLabel = replay
-    ? {
-        text: `replay result · ${replay.condition}, seed ${replay.seed}${replayData ? '' : ' · not loaded, nothing is lit'}`,
-      }
-    : clip
-      ? { text: `REFERENCE SIMULATION · ${clip.title} · not the replay result`, reference: true }
-      : { text: 'atlas only · no spikes loaded' };
+  // Memoised so a re-render that changes nothing about the source (a resize, the clock's own
+  // subscribers) hands MapCanvas the same object and its memo() actually holds.
+  const source: MapSourceLabel = useMemo(
+    () =>
+      replay
+        ? {
+            text: `replay result · ${replay.condition}, seed ${replay.seed}${replayData ? '' : ' · not loaded, nothing is lit'}`,
+          }
+        : clip
+          ? { text: `REFERENCE SIMULATION · ${clip.title} · not the replay result`, reference: true }
+          : { text: 'atlas only · no spikes loaded' },
+    [replay, replayData, clip],
+  );
 
   const prov = useMemo(
     () => panelProvenance({ clip, clipData, replay, atlas: atlasData, manifest }),
@@ -281,6 +303,17 @@ export default function MapPanel() {
         {canPlay && <ClockReadout clock={clock} durationMs={durationMs} epochs={clip?.epochs} />}
         {atlas.data.sidecar.view_boxes?.brain && <VncToggle atlas={atlas.data} on={showVnc} set={setShowVnc} compact />}
       </div>
+
+      {/* MAP_SPEC.md:46-47 attaches this caption to the map, and this is the map that is on every
+          page: soma positions and not morphology, and the receptor neurons that are simulated but
+          have no soma in the volume. It is folded because the rail has a height budget, never
+          omitted, and every number in it is the sidecar's own. */}
+      <details className="map-panel__more map-panel__caption">
+        <summary className="smaller">what these dots are</summary>
+        <p className="smaller">
+          <AtlasCaption atlas={atlas.data} activity={activity} />
+        </p>
+      </details>
 
       {!replay && clips.length > 1 && (
         <label className="map-panel__select small muted">

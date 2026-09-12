@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useDataFile } from '../lib/data';
 import { checkAtlasIdentity, loadRaster, loadTrace, rasterMaxTimeMs, type ActivityData, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
 import type { Comparison, Manifest, Stage5, Stage6 } from '../types';
@@ -23,7 +23,8 @@ type Cond = 'sleep' | 'wake';
 const DECAY_MS = 150;
 
 interface Timeline {
-  start: number;
+  /** the window start, as a subscription: only the leaves that render a time re-render on a frame */
+  clock: Clock;
   setStart: (v: number) => void;
   windowS: number;
   setWindowS: (v: number) => void;
@@ -36,6 +37,25 @@ interface Timeline {
 }
 
 /**
+ * The window start, held in a mutable store rather than in state.
+ *
+ * The play loop advances it on every animation frame. As `useState` on this component that
+ * reconciled the whole scrubbed subtree sixty times a second - including the map figure's title,
+ * its atlas caption (a fifty-node prose block quoting every sidecar count) and its provenance
+ * footer, none of which reads the clock. The rail panel already solved this with a store
+ * (MapPanel's useMapClock); this is the same shape, so only the scrubber's readout and the map's
+ * own canvas subscribe.
+ */
+interface Clock {
+  subscribe: (cb: () => void) => () => void;
+  get: () => number;
+}
+
+function useClockValue(clock: Clock): number {
+  return useSyncExternalStore(clock.subscribe, clock.get, clock.get);
+}
+
+/**
  * The single clock of the Replay page. It was previously private to the raster; it is lifted here
  * so the raster, the correlation trace and the brain map are scrubbed and played together.
  */
@@ -43,17 +63,36 @@ function useTimeline(duration: number | null): Timeline {
   const durationKnown = duration !== null && Number.isFinite(duration) && duration > 0;
   const durationS = durationKnown ? (duration as number) : 0;
   const [windowS, setWindowS] = useState(2);
-  const [start, setStart] = useState(0);
   const [playing, setPlaying] = useState(false);
   const maxStart = Math.max(0, durationS - windowS);
-  const startRef = useRef(start);
-  useEffect(() => {
-    startRef.current = start;
-  }, [start]);
 
+  const store = useRef<{ t: number; subs: Set<() => void> }>({ t: 0, subs: new Set() }).current;
+  const clock = useMemo<Clock>(
+    () => ({
+      subscribe: (cb) => {
+        store.subs.add(cb);
+        return () => {
+          store.subs.delete(cb);
+        };
+      },
+      get: () => store.t,
+    }),
+    [store],
+  );
+  const setStart = useCallback(
+    (v: number) => {
+      if (store.t === v) return;
+      store.t = v;
+      store.subs.forEach((cb) => cb());
+    },
+    [store],
+  );
+
+  // A shorter file, or a longer window, cannot leave the playhead past the end of the data.
   useEffect(() => {
-    setStart((v) => Math.min(v, Math.max(0, durationS - windowS)));
-  }, [durationS, windowS]);
+    const cap = Math.max(0, durationS - windowS);
+    if (store.t > cap) setStart(cap);
+  }, [durationS, windowS, store, setStart]);
 
   useEffect(() => {
     if (!playing) return;
@@ -62,7 +101,7 @@ function useTimeline(duration: number | null): Timeline {
     const step = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
-      const next = startRef.current + dt; // 1x real time
+      const next = store.t + dt; // 1x real time
       if (next >= maxStart) {
         setStart(maxStart);
         setPlaying(false);
@@ -73,14 +112,15 @@ function useTimeline(duration: number | null): Timeline {
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [playing, maxStart]);
+  }, [playing, maxStart, store, setStart]);
 
-  return { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS, durationKnown };
+  return { clock, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS, durationKnown };
 }
 
 /** Play / pause, scrubber and window length: one set of controls for every panel below it. */
 function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled: boolean }) {
-  const { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS, durationKnown } = timeline;
+  const { clock, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS, durationKnown } = timeline;
+  const start = useClockValue(clock);
   return (
     <div className="card">
       <div className="flex flex-wrap items-center gap-3 small">
@@ -147,12 +187,14 @@ function BrainMapBlockInner({
   activity,
   activityPath,
   sourceText,
-  timeMs,
+  clock,
+  windowS = 0,
+  durationS = 0,
   decayMs,
   height,
 }: {
   activity: Loadable<ActivityData> | null;
-  /** what this map is drawing, stamped onto the canvas so a crop of it still says so */
+  /** what this map is drawing; the canvas's aria-label and the figure's own identity line */
   sourceText: string;
   /**
    * The concrete activity sidecar this map would animate from, named in the panel when it is absent.
@@ -160,7 +202,14 @@ function BrainMapBlockInner({
    * shows the naming convention labelled as one rather than a path with a placeholder in it.
    */
   activityPath: string | null;
-  timeMs: number | null;
+  /**
+   * The page's clock, or null when nothing is scrubbed (no file reports a duration, or the map is
+   * drawn on its own). Only the leaf that renders the canvas subscribes to it, so the figure's
+   * title, caption and provenance footer are built once instead of on every frame.
+   */
+  clock: Clock | null;
+  windowS?: number;
+  durationS?: number;
   decayMs: number;
   height?: number;
 }) {
@@ -198,6 +247,10 @@ function BrainMapBlockInner({
       provenanceCommitNote={prov.commitNote}
       provenanceNote={prov.note}
       caption={<AtlasCaption atlas={atlasData} activity={act} />}
+      /* The map is drawn on the page background, not on the white figure mat: MAP_SPEC.md:33 asks
+         for the page token so the panel reads as part of the page, and the mat would also force
+         the light colour column on the points in both themes. */
+      flat
     >
       {activity === null && (
         <div className="mb-3">
@@ -239,17 +292,74 @@ function BrainMapBlockInner({
           />
         </div>
       )}
+      {/* The source statement MAP_SPEC.md:44-45 requires, as selectable HTML beside the picture
+          rather than burned into the bitmap. */}
+      <div className="map-figure__source smaller muted">{sourceText}</div>
       {/* no loopMs: this timeline runs once and stops, so 0 really is the start of the file */}
-      <BrainMap
+      <MapClockCanvas
         atlas={atlasData}
         activity={act}
-        source={{ text: sourceText }}
-        timeMs={act ? timeMs : null}
+        sourceText={sourceText}
+        clock={act ? clock : null}
+        windowS={windowS}
+        durationS={durationS}
         decayMs={decayMs}
         height={height}
       />
     </Figure>
   );
+}
+
+/**
+ * The canvas, and nothing else. This is the only part of the map figure that subscribes to the
+ * clock, so a play loop re-renders one leaf per frame instead of the figure's title, its atlas
+ * caption and its provenance footer - none of which reads the time.
+ */
+function MapClockCanvas({
+  atlas,
+  activity,
+  sourceText,
+  clock,
+  windowS,
+  durationS,
+  decayMs,
+  height,
+}: {
+  atlas: AtlasData;
+  activity: ActivityData | null;
+  sourceText: string;
+  clock: Clock | null;
+  windowS: number;
+  durationS: number;
+  decayMs: number;
+  height?: number;
+}) {
+  // The map lights the leading edge of the visible window: spikes in the last decayMs of it.
+  // Clamped to the data, so a window longer than the file cannot push the map past the last spike
+  // while the raster and the trace still show them.
+  const start = useClockValue(clock ?? STILL_CLOCK);
+  const timeMs = clock ? Math.min(start + windowS, durationS) * 1000 : null;
+  const source = useMemo(() => ({ text: sourceText }), [sourceText]);
+  return <BrainMap atlas={atlas} activity={activity} source={source} timeMs={timeMs} decayMs={decayMs} height={height} />;
+}
+
+/** A clock that never ticks, for a map with no timeline: hooks may not be called conditionally. */
+const STILL_CLOCK: Clock = { subscribe: () => () => {}, get: () => 0 };
+
+/** The raster and its trace, subscribed to the same clock as the map beside them. */
+function RasterWindow({
+  clock,
+  raster,
+  trace,
+  windowS,
+}: {
+  clock: Clock;
+  raster: RasterData | null;
+  trace: TraceData | null;
+  windowS: number;
+}) {
+  const start = useClockValue(clock);
+  return <RasterViewer raster={raster} trace={trace} startS={start} windowS={windowS} />;
 }
 
 /** Memoised so the play loop's clock, which lives below, cannot re-render the whole figure. */
@@ -320,14 +430,7 @@ export default function Replay() {
             </p>
           </div>
           {/* no seed is identified yet, so no concrete file is named: the panel shows the convention as one */}
-          <BrainMapBlock
-            activity={null}
-            activityPath={null}
-            sourceText="atlas only · no spikes loaded"
-            timeMs={null}
-            decayMs={DECAY_MS}
-            height={520}
-          />
+          <BrainMapBlock activity={null} activityPath={null} sourceText="atlas only · no spikes loaded" clock={null} decayMs={DECAY_MS} height={520} />
         </section>
       )}
 
@@ -639,10 +742,6 @@ function ReplayWindow({
   }, [rasterData, traceData, act]);
 
   const timeline = useTimeline(durationS);
-  // The map lights the leading edge of the visible window: spikes in the last DECAY_MS of it. Clamped
-  // to the data, so a window longer than the file cannot push the map past the last spike while the
-  // raster and the trace still show them.
-  const mapTimeMs = Math.min(timeline.start + timeline.windowS, timeline.durationS) * 1000;
 
   return (
     <>
@@ -656,7 +755,9 @@ function ReplayWindow({
               ? `replay result · ${cond}, seed ${seed ?? '?'}`
               : `replay result · ${cond}, seed ${seed ?? '?'} · not loaded, nothing is lit`
           }
-          timeMs={timeline.durationKnown ? mapTimeMs : null}
+          clock={timeline.durationKnown ? timeline.clock : null}
+          windowS={timeline.windowS}
+          durationS={timeline.durationS}
           decayMs={DECAY_MS}
           height={520}
         />
@@ -676,7 +777,9 @@ function ReplayWindow({
             </div>
           )}
           {(raster === 'loading' || trace === 'loading') && <div className="small muted mb-2">loading binary data …</div>}
-          <RasterViewer raster={rasterData} trace={traceData} startS={timeline.start} windowS={timeline.windowS} />
+          {/* the one child of this figure that reads the clock; it subscribes rather than being
+              handed a time from above, so the figure around it is not rebuilt on every frame */}
+          <RasterWindow clock={timeline.clock} raster={rasterData} trace={traceData} windowS={timeline.windowS} />
         </Figure>
       </div>
     </>

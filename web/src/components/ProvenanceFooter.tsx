@@ -4,6 +4,15 @@ import { REPO_URL } from '../lib/data';
 
 const HEX = /^[0-9a-f]{7,40}$/i;
 
+/**
+ * How many data paths are printed inline before the rest are folded into a disclosure.
+ *
+ * A stage's provenance can list every sweep output it wrote: the criticality figures list 115
+ * files, which set inline is 4,939px tall under a 257px chart on a 375px phone. Folding is a
+ * layout decision only - the disclosure is in the DOM, open on demand, and nothing is elided.
+ */
+const INLINE_FILES = 4;
+
 function RepoLink({ path, commit }: { path: string; commit: string }) {
   if (!HEX.test(commit)) return <span className="mono">{path}</span>;
   return (
@@ -37,17 +46,37 @@ export default function ProvenanceFooter({
   }
   const commit = provenance.git_commit ?? '';
   const files = provenance.files ?? [];
+  const shown = files.slice(0, INLINE_FILES);
+  const rest = files.slice(INLINE_FILES);
   return (
     <div className="provenance">
       config: <RepoLink path={provenance.config} commit={commit} /> · data:{' '}
       {files.length === 0
         ? '(none listed)'
-        : files.map((f, i) => (
+        : shown.map((f, i) => (
             <span key={`${f}-${i}`}>
               {i > 0 && ', '}
               <RepoLink path={f} commit={commit} />
             </span>
-          ))}{' '}
+          ))}
+      {/* Every file stays in the page - none is dropped and none is summarised away - but a stage
+          that lists 115 of them must not bury the figure it belongs to under 4,900px of paths on a
+          phone. The overflow is one click away and is still selectable, linked and printable. */}
+      {rest.length > 0 && (
+        <details className="provenance__more">
+          <summary>
+            {rest.length} more file{rest.length === 1 ? '' : 's'}
+          </summary>
+          <div className="provenance__files">
+            {rest.map((f, i) => (
+              <span key={`${f}-${i}`}>
+                {i > 0 && ', '}
+                <RepoLink path={f} commit={commit} />
+              </span>
+            ))}
+          </div>
+        </details>
+      )}{' '}
       ·{' '}
       {HEX.test(commit) ? (
         <>

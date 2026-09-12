@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import { CLASS_LABELS, classColor, classBand, SERIES, type ClassLabel } from '../../lib/colors';
 import { fmtNum } from '../../lib/format';
-import { useNarrowViewport } from '../../lib/media';
+import { useNarrowBox } from '../../lib/media';
 
 export interface SigmaPoint {
   sigma: number;
@@ -32,8 +32,15 @@ export interface SigmaBand {
   cls: ClassLabel | string;
 }
 
+/**
+ * Axis tick type. The narrow size is 12px, not the 10px it was: 10px was the smallest text on the
+ * site, on the screen least able to carry it. There is room for the larger glyphs - the narrow
+ * layout already thins the axis to three or four ticks.
+ */
 const TICK = { fontSize: 12, fill: SERIES.axis };
-const TICK_SM = { fontSize: 10, fill: SERIES.axis };
+const TICK_SM = { fontSize: 12, fill: SERIES.axis };
+/** Axis names and legend entries, narrow / wide. */
+const LABEL_FS = { sm: 12.5, lg: 13 };
 
 /** Keep at most `max` ticks, both ends included, so sigma labels cannot collide on a phone. */
 function thinTicks(ticks: number[], max: number): number[] {
@@ -71,7 +78,10 @@ export default function SigmaChart({
   height?: number;
   yDomain?: [number | 'auto', number | 'auto'];
 }) {
-  const narrow = useNarrowViewport();
+  // narrow is decided by the width of the box this chart is drawn into, not by the window: with
+  // the map rail taking 400px and .cols-2 splitting what is left, a figure mat is ~400px wide at a
+  // 1440px window, and the wide tick density does not fit in it.
+  const { ref: boxRef, narrow } = useNarrowBox();
   const edges = bandEdges(bands.map((b) => b.sigma));
   const bandCls = new Map(bands.map((b) => [b.sigma, b.cls]));
   const xs = edges.map((e) => e.s);
@@ -94,7 +104,7 @@ export default function SigmaChart({
   const h = narrow ? Math.max(200, Math.round(height * 0.82)) : height;
   const xTicks = narrow ? thinTicks(xs, 4) : xs;
   return (
-    <div>
+    <div ref={boxRef}>
       <ResponsiveContainer width="100%" height={h} minHeight={190}>
         <ScatterChart margin={narrow ? { top: 8, right: 10, bottom: 24, left: 0 } : { top: 10, right: 16, bottom: 28, left: 8 }}>
           <CartesianGrid stroke={SERIES.grid} />
@@ -112,7 +122,7 @@ export default function SigmaChart({
             stroke={SERIES.axis}
             tick={tick}
             minTickGap={narrow ? 12 : 5}
-            label={{ value: 'noise sigma (mV)', position: 'insideBottom', offset: narrow ? -14 : -16, fill: SERIES.axis, fontSize: narrow ? 11 : 13 }}
+            label={{ value: 'noise sigma (mV)', position: 'insideBottom', offset: narrow ? -14 : -16, fill: SERIES.axis, fontSize: narrow ? LABEL_FS.sm : LABEL_FS.lg }}
           />
           <YAxis
             type="number"
@@ -120,10 +130,10 @@ export default function SigmaChart({
             domain={yDomain ?? ['auto', 'auto']}
             stroke={SERIES.axis}
             tick={tick}
-            width={narrow ? 42 : 66}
+            width={narrow ? 46 : 66}
             tickCount={narrow ? 4 : undefined}
             tickFormatter={(v) => fmtNum(v, 3)}
-            label={narrow ? undefined : { value: yLabel, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
+            label={narrow ? undefined : { value: yLabel, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: LABEL_FS.lg }}
           />
           {refY?.map((r) => (
             /* narrow: the label goes inside the plot, on the left, where the low-sigma band is
@@ -133,7 +143,7 @@ export default function SigmaChart({
               y={r.y}
               stroke={SERIES.ink}
               strokeDasharray="4 4"
-              label={{ value: r.label, fill: SERIES.ink, fontSize: narrow ? 11 : 12, position: narrow ? 'insideBottomLeft' : 'right' }}
+              label={{ value: r.label, fill: SERIES.ink, fontSize: 12, position: narrow ? 'insideBottomLeft' : 'right' }}
             />
           ))}
           <Tooltip
@@ -159,7 +169,7 @@ export default function SigmaChart({
             verticalAlign="top"
             height={narrow ? 40 : 24}
             payload={present.map((c) => ({ value: c, type: 'circle', color: classColor(c), id: c }))}
-            wrapperStyle={{ fontSize: narrow ? 11 : 13, color: SERIES.axis, lineHeight: 1.4 }}
+            wrapperStyle={{ fontSize: narrow ? LABEL_FS.sm : LABEL_FS.lg, color: SERIES.axis, lineHeight: 1.4 }}
           />
           <Scatter data={drawable} isAnimationActive={false}>
             {drawable.some((p) => p.err) && <ErrorBar dataKey="err" width={4} strokeWidth={1.2} stroke={SERIES.ink} direction="y" />}

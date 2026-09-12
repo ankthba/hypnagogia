@@ -76,7 +76,10 @@
   /* The reading measure applies to running prose only (~70 characters). The page itself is
      wide: this is a data viewer, so charts, rasters and multi-column tables get the room. */
   --measure: 70ch;
-  --measure-wide: 1400px;
+  /* Correction 3 in MAP_SPEC.md: at a 1440px window the text column should be roughly 780-820px
+     with the rail at 380-400px. 1300px of shell, less two 40px gutters, less a 388px rail and a
+     40px column gap, leaves ~791px of content. */
+  --measure-wide: 1300px;
   /* The page gutter also clears a notched phone's rounded corners in landscape. */
   --gutter-base: clamp(1rem, 0.5rem + 2vw, 2.5rem);
   --gutter: var(--gutter-base);
@@ -93,7 +96,7 @@
   /* Width of the sticky right-hand rail that carries the neuron map. It grows with the window
      rather than stepping at a breakpoint: a step would widen the rail without widening
      --measure-wide, so one pixel of extra window would cost the text column 40px of measure. */
-  --rail-w: clamp(340px, 26vw, 420px);
+  --rail-w: clamp(360px, 27vw, 400px);
 
   --transition-fast: 0.15s ease;
 
@@ -924,6 +927,42 @@ a.masthead__name:hover {
   font-style: normal;
 }
 
+/* The folded tail of a long file list. Inline, so "config: … · data: a, b, c, d [12 more files] ·
+   commit …" still reads as one sentence. */
+.provenance__more {
+  display: inline;
+}
+
+.provenance__more > summary {
+  display: inline;
+  cursor: pointer;
+  list-style: none;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.provenance__more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.provenance__more > summary::before {
+  content: ', ';
+}
+
+.provenance__more > summary:hover {
+  color: var(--color-fg);
+}
+
+.provenance__files {
+  margin-top: 0.25rem;
+}
+
+/* The one-line source statement over the map (MAP_SPEC.md:44-45): what is playing, in HTML, where
+   it is selectable - never burned into the canvas. */
+.map-figure__source {
+  margin-bottom: 0.4rem;
+}
+
 .provenance a {
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -1402,6 +1441,10 @@ pre.equations {
 /* Fixed to the viewport, never interactive, and painted *behind* the page content: z-index -1
    puts it above the page background and below everything in normal flow, so it cannot cover a
    control or a number. */
+/* The body fills are near-black (#2b2724), which in the light theme is the ink colour: text sitting
+   over the fly dropped to almost no contrast for the second or two it was there. It is decoration,
+   so it gives way - at 0.4 it blends toward whichever background is behind it and the type always
+   wins, in both themes. */
 .fly {
   position: fixed;
   top: 0;
@@ -1409,6 +1452,7 @@ pre.equations {
   z-index: -1;
   pointer-events: none;
   will-change: transform;
+  opacity: 0.4;
 }
 
 .fly svg {
@@ -1533,6 +1577,49 @@ pre.equations {
   .stats {
     gap: 0.85rem 1.25rem;
   }
+
+  /* The label / badge / table / provenance layer is fixed in rem and so, unlike --text-body, it
+     does not grow back on a small screen: 11.5px badges and 12px table heads on a phone. This is a
+     data viewer, and the numeric layer is the content, so it reaches 16px here; the small-caps
+     layer, which is letterspaced and therefore reads smaller than its size, reaches 13px. */
+  .label,
+  .data-table th,
+  .badge {
+    font-size: 0.8125rem;
+  }
+
+  .data-table,
+  .kv,
+  .figure__caption {
+    font-size: 1rem;
+  }
+
+  .provenance,
+  .provenance--missing {
+    font-size: 0.9375rem;
+  }
+
+  .legend {
+    font-size: 0.9375rem;
+  }
+
+  /* A key/value pair cannot hold two columns on a 375px screen: the value collapses to ~127px and
+     mono paths break mid-token. The term goes above its value and the path gets the full width. */
+  .kv {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .kv dt {
+    margin-top: 0.6rem;
+  }
+
+  /* the first pair sits tight to whatever is above it; pairs are sometimes wrapped in a
+     display: contents div, so both shapes are covered */
+  .kv > dt:first-child,
+  .kv > div:first-child > dt {
+    margin-top: 0;
+  }
 }
 
 /* The map panel where it is not the sticky rail: a full-width block in the flow of the page,
@@ -1600,6 +1687,31 @@ pre.equations {
   .map-toggle {
     min-height: 44px;
     padding: 0.5rem 0;
+  }
+
+  /* A <summary> is a control like any other: the map panel's folded prose and the provenance
+     line's folded file list both get a 44px target, negative-margined back out so the visual
+     rhythm of these text-style controls is unchanged. */
+  .map-panel__more > summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    margin-top: -0.4rem;
+    margin-bottom: -0.4rem;
+  }
+
+  .provenance__more > summary {
+    display: inline-block;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  /* Inline path links are 13px-tall hit targets inside a sentence. WCAG 2.5.8 exempts inline
+     links, but a finger still has to land on one, so the line box is opened up. */
+  .provenance {
+    line-height: 1.9;
   }
 
   .map-toggle input {
