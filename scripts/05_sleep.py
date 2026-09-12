@@ -102,6 +102,9 @@ def main():
               "dfb_silent_in_wake": bool(wk and wk["dfb_rate_hz_mean"] < 0.5),
               "kc_activity_present": bool((sl and sl["kc_rate_hz_mean"] > 0) or (wk and wk["kc_rate_hz_mean"] > 0))}
     out_d = {"status": "passed" if all(checks.values()) else "failed", "criterion": s5["criterion"], "checks": checks, "network": tag,
+             "gain": a.gain,
+             "gain_note": ("published parameters" if a.gain == 1.0 else
+                           f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value (stage 3b/3d)."),
              "dfb": {"population": s5["dfb_population"], "cell_types": sorted(set(conn.ann.cell_type.iloc[dfb].dropna().tolist())),
                      "n_neurons": int(len(dfb)), "selection_source": POPULATIONS[s5["dfb_population"]]["source"],
                      "clamp_rate_hz": s5["dfb_clamp_rate_hz"],

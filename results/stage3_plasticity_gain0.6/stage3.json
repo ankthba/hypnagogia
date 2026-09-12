@@ -1,5 +1,7 @@
 {
  "status": "passed",
+ "gain": 0.6,
+ "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has no sparse odour code to store a memory in (stage 3b). This is an uncited free parameter introduced by this project; see configs/stage3d_gain.yaml.",
  "criterion": "unit test passes (depression only with KC-then-DAN); MBON11 responds to the calibration odor pre-pairing (> 5 spikes/s mean); some eta in the grid brings the single-pairing post/pre ratio within 0.15 of Hige's 0.20",
  "rule": {
   "equations": [
@@ -1700,7 +1702,7 @@
   "n_readout_dans": 2,
   "n_odor_orns": 243
  },
- "walltime_s": 25.7,
+ "walltime_s": 33.2,
  "provenance": {
   "config": "configs/stage3_plasticity.yaml",
   "results_dir": "results/stage3_plasticity",

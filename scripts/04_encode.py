@@ -186,6 +186,11 @@ def main():
     if not responds: note.append(f"the readout MBON ({s4['readout_mbon_type']}) does not respond to odour A before conditioning (mean {np.mean([r['A_pre'] for r in ok]) if ok else 0:.2f} Hz): no learning can be measured")
     if ok and not learned: note.append("conditioning did not shift the odour-A response relative to odour B (the 95% CI of the difference of deltas includes or exceeds 0)")
     out_d = {"status": status, "criterion": s4["criterion"], "learning_verified": learned, "network": tag,
+             "gain": a.gain,
+             "gain_note": ("published parameters" if a.gain == 1.0 else
+                           f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
+                           f"published value there is no sparse odour code to store a memory in (stage 3b) and two odours "
+                           f"leave indistinguishable ensembles (stage 3e)."),
              "reset_between_presentations": bool(s4.get("reset_between_presentations", True)),
              "reset_note": ("Membrane potentials and synaptic conductances are reset to rest before every odour "
                             "presentation; learned weights are not. The model never returns to baseline on its own "

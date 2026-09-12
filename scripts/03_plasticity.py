@@ -146,7 +146,12 @@ def main():
         chosen, chosen_rule = None, "no learning rate in the grid produced a measurable depression"
     pre_ok = bool(df["mbon11_pre"].mean() > 5) if len(df) else False    # the readout MBON must respond to the odor before pairing
     status = "passed" if (ut["passed"] and chosen is not None and pre_ok) else "failed"
-    out = {"status": status, "criterion": "unit test passes (depression only with KC-then-DAN); MBON11 responds to the calibration odor pre-pairing (> 5 spikes/s mean); some eta in the grid brings the single-pairing post/pre ratio within 0.15 of Hige's 0.20",
+    out = {"status": status, "gain": a.gain,
+           "gain_note": ("published parameters" if a.gain == 1.0 else
+                         f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
+                         f"published value the network has no sparse odour code to store a memory in (stage 3b). This is "
+                         f"an uncited free parameter introduced by this project; see configs/stage3d_gain.yaml."),
+           "criterion": "unit test passes (depression only with KC-then-DAN); MBON11 responds to the calibration odor pre-pairing (> 5 spikes/s mean); some eta in the grid brings the single-pairing post/pre ratio within 0.15 of Hige's 0.20",
            "rule": {"equations": ["de/dt = -e/tau_e (per KC->MBON synapse); on KC spike: e += 1",
                                   "on DAN spike (DAN presynaptic to the MBON, >= dan_mbon_min_synapses): w -= eta_ltd * e * w0",
                                   "dda/dt = -da/tau_da (per MBON); on DAN spike: da += 1; on KC spike: w += eta_ltp * da * w0 (eta_ltp = 0 here)",
