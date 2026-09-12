@@ -161,30 +161,60 @@ def main():
                  "pop_rate_hz_quiescent_mean": s.get("pop_rate_hz_quiescent_mean"), "pop_rate_hz_ignited_mean": s.get("pop_rate_hz_ignited_mean"),
                  "kc_rate_hz_quiescent_mean": s.get("kc_rate_hz_quiescent_mean"), "kc_rate_hz_ignited_mean": s.get("kc_rate_hz_ignited_mean")} for s in summ]
     crit = [s for s in summ if s["classification"] == "critical" and s["m_mean"] is not None]
+    old_rule_pick = None
     if crit:
         op = min(crit, key=lambda s: abs(s["m_mean"] - 1.0)); has_crit = True
         reason = f"critical regime found at sigma = {op['sigma_mV']} mV (mean m = {op['m_mean']:.3f}); operating point = critical sigma with m closest to 1"
     else:
+        # Two exclusions, and one that used to be here and is not any more.
+        #
         # A bistable sigma is excluded. At one of those the outcome depends on the seed: some runs stay silent and
         # some ignite, so the population rate reported for it is the average of two different states rather than the
         # rate of any state the network is ever in, and every downstream stage would inherit that mixture. Only
         # sigmas whose outcome is the same in every seed are eligible.
-        elig = [s for s in summ if s["classification"] not in ("saturated", "bistable") and (s.get("kc_rate_hz_mean") or 0) > 0]
-        cand = elig or [s for s in summ if s["classification"] != "saturated" and (s.get("kc_rate_hz_mean") or 0) > 0]
+        #
+        # A sigma with no Kenyon-cell activity at all is excluded, because the criterion is about the Kenyon-cell
+        # rate and a rate of exactly zero has no log distance to anything.
+        #
+        # 'saturated' is NOT excluded any more, and the change is deliberate and worth stating. In this pipeline
+        # that label means the WHOLE-BRAIN activity never pauses, which makes the avalanche analysis inapplicable;
+        # it says nothing about the Kenyon cells, and the criterion here is the Kenyon-cell rate. Before APL was
+        # corrected the two went together, because a brain that never paused had Kenyon cells firing at tens of Hz,
+        # and excluding it was right. With APL modelled as it is measured the Kenyon cells stay sparse inside a
+        # continuously active brain, so the exclusion now throws away every state with any Kenyon-cell activity in
+        # it and leaves an operating point where the whole brain fires roughly once per neuron per hour. That is
+        # further from any measurement than the state it was rejecting. What the old rule would have chosen is
+        # recorded below so the change can be audited.
+        active = [s for s in summ if (s.get("kc_rate_hz_mean") or 0) > 0]
+        elig = [s for s in active if s["classification"] != "bistable"]
+        cand = elig or active
         mixed = not elig and bool(cand)
+        old_rule_cand = [s for s in elig if s["classification"] != "saturated"]
+        old_rule_pick = (min(old_rule_cand, key=lambda s: abs(np.log10(max(s["kc_rate_hz_mean"], 1e-9)) - np.log10(KC_SPONTANEOUS_HZ)))
+                         if old_rule_cand else None)
         has_crit = False
         if cand:
             op = min(cand, key=lambda s: abs(np.log10(max(s["kc_rate_hz_mean"], 1e-9)) - np.log10(KC_SPONTANEOUS_HZ)))
             reason = (f"NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the "
                       f"transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical "
-                      f"point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of "
+                      f"point: it is the sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of "
                       f"{KC_SPONTANEOUS_HZ} Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = {op['sigma_mV']} mV "
                       f"(KC rate {op['kc_rate_hz_mean']:.4f} Hz, whole-brain rate {op['pop_rate_hz_mean']:.4f} Hz/neuron, m = {op['m_mean']}). "
                       f"Sigmas whose outcome depends on the seed are excluded, because the rate reported for one of those is an average of two "
                       f"different states rather than the rate of a state.")
             if mixed:
-                reason += (" WARNING: every active non-saturated sigma in this sweep is seed-dependent, so the operating point IS one of those "
+                reason += (" WARNING: every active sigma in this sweep is seed-dependent, so the operating point IS one of those "
                            "and the downstream stages inherit a mixture of an ignited and a silent network. This is reported, not worked around.")
+            if op.get("classification") == "saturated":
+                reason += (f" The chosen sigma is classified 'saturated', which in this pipeline means the whole brain's activity never "
+                           f"pauses ({op.get('pop_rate_hz_mean', 0):.3f} Hz per neuron) and the avalanche analysis is therefore not "
+                           f"applicable there. That is a property of the model and is reported as one. It is not a statement about the "
+                           f"Kenyon cells, which idle at {op['kc_rate_hz_mean']:.3f} Hz inside that state against the 0.1 Hz measured.")
+            if old_rule_pick is not None and old_rule_pick["sigma_mV"] != op["sigma_mV"]:
+                reason += (f" Excluding the continuously active states, as an earlier version of this rule did, would have chosen "
+                           f"sigma = {old_rule_pick['sigma_mV']} mV instead, where the Kenyon cells fire at "
+                           f"{old_rule_pick['kc_rate_hz_mean']:.5f} Hz and the whole brain at "
+                           f"{old_rule_pick['pop_rate_hz_mean']:.5f} Hz per neuron, which is further from the measurement, not closer.")
         else:
             op = None; reason = "NO critical regime and no active non-saturated sigma: every sigma is silent or saturated."
     out = {"status": "passed" if per and not any("error" in p for p in per) else "failed", "has_critical_regime": has_crit,
@@ -207,7 +237,11 @@ def main():
                                  "invocation's is dropped rather than merged into the sweep."), "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],
            "per_sigma": per, "summary_by_sigma": summ,
            "transition_bracket": bracket, "operating_sigma_mV": (op["sigma_mV"] if op else None), "operating_sigma_reason": reason,
-           "operating_sigma_is_seed_dependent": bool(op is not None and op.get("classification") == "bistable"), "operating_rule": s2["operating_rule"],
+           "operating_sigma_is_seed_dependent": bool(op is not None and op.get("classification") == "bistable"),
+           "operating_sigma_classification": (op.get("classification") if op else None),
+           "operating_sigma_kc_rate_hz": (op.get("kc_rate_hz_mean") if op else None),
+           "operating_sigma_pop_rate_hz": (op.get("pop_rate_hz_mean") if op else None),
+           "operating_sigma_under_the_previous_rule_mV": (old_rule_pick["sigma_mV"] if old_rule_pick else None), "operating_rule": s2["operating_rule"],
            "walltime_s": round(time.time() - t0, 1),
            "provenance": {"config": "configs/stage2_criticality.yaml", "results_dir": f"results/stage2_criticality/{tag}",
                           "files": [p.get("file") for p in per if p.get("file")]}}

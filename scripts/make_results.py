@@ -32,6 +32,7 @@ def main():
     s1 = load(RESULTS / "stage1_noise" / "stage1.json")
     s2 = load(RESULTS / "stage2_criticality" / "full" / "stage2.json")
     s3a = load(RESULTS / "stage3a_apl" / "stage3a.json")
+    s3f = load(RESULTS / "stage3f_dpm" / "stage3f.json")
     s3b = load(RESULTS / "stage3b_odor" / "stage3b.json")
     s3bi = load(RESULTS / "stage3b_odor" / "ignition_threshold.json")
     s3c = load(RESULTS / "stage3c_control" / "stage3c.json")
@@ -327,6 +328,52 @@ def main():
     else:
         w("**Not run.**")
         w()
+
+    w("## Stage 3a2 - the DPM transmitter correction")
+    w()
+    if s3f:
+        w(f"**{s3f.get('finding', '')}**")
+        w()
+        w(s3f.get("correction", ""))
+        w()
+        y = s3f.get("why_it_matters", {})
+        if y:
+            w("| quantity | value |")
+            w("|---|---|")
+            w(f"| DPM synapses onto Kenyon cells | {y.get('DPM_synapses_onto_KCs', 0):,} onto "
+              f"{y.get('n_KCs_contacted_by_DPM', 0):,} of {y.get('n_KCs_total', 0):,} |")
+            w(f"| Kenyon-cell synapses onto DPM | {y.get('KC_synapses_onto_DPM', 0):,} from "
+              f"{y.get('n_KCs_presynaptic_to_DPM', 0):,} cells |")
+            w(f"| DPM's share of all input onto Kenyon cells | {y.get('DPM_share_of_all_input_onto_KCs', 0):.2%} |")
+            w(f"| one DPM spike delivers to each Kenyon cell | {y.get('one_DPM_spike_delivers_to_each_KC_mV', 0):.2f} mV, "
+              f"{y.get('DPM_spike_as_fraction_of_KC_threshold_gap', 0):.0%} of a full threshold gap |")
+            if y.get("APL_graded_drive_onto_DPM_mV") is not None:
+                w(f"| what the corrected APL delivers to DPM | {y['APL_graded_drive_onto_DPM_mV']:.0f} mV through "
+                  f"{y.get('APL_synapses_onto_DPM', 0):,} synapses, "
+                  f"{abs(y.get('APL_graded_drive_onto_DPM_as_threshold_gaps', 0)):.0f} times its threshold gap |")
+            w(f"| transmitter the connectome predicts | {y.get('annotated_nt', '')} |")
+            w(f"| transmitter that was measured | {y.get('measured_nt', '')} |")
+            w()
+            w(y.get("note", ""))
+            w()
+            if y.get("source"):
+                w(f"Source: {y['source']}")
+                w()
+        sm = s3f.get("summary", {})
+        if sm:
+            w("| DPM | Kenyon cells responding | rate during odour | rate after odour | readout MBON | DPM rate |")
+            w("|---|---|---|---|---|---|")
+            for cond, lab in (("dpm_annotated", "as predicted (dopamine, excitatory)"), ("dpm_corrected", "as measured (GABA, inhibitory)")):
+                if cond in sm:
+                    v = sm[cond]
+                    w(f"| {lab} | {v['odor']['frac_kc']:.2%} | {v['odor']['kc_rate_hz']:.3f} Hz | "
+                      f"{v['post']['kc_rate_hz']:.3f} Hz | {v['odor'].get('readout_rate_hz', 0):.2f} Hz | "
+                      f"{v['odor'].get('dpm_rate_hz', 0):.2f} Hz |")
+            w()
+    else:
+        w("**Not run.**")
+        w()
+
     w("## Stage 3b - is there a sparse odour code to build a memory on?")
     w()
     if s3b:

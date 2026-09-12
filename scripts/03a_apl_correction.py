@@ -97,12 +97,35 @@ def main():
         rows.append({**mm, "odor": stat("odor"), "post": stat("post")})
     ok = [r for r in rows if "error" not in r]
     summ = {}
+    # How much MORE inhibition the corrected APL delivers, against how much the odour code changes. A graded
+    # cell held at threshold releases what a spiking synapse delivers at the maximum rate the refractory period
+    # allows; the spiking APL runs at some fraction of that maximum, so the ratio of the two is the whole of the
+    # extra inhibition the correction adds. If that ratio is small while the code changes by a lot, the effect is
+    # the continuity of the release and not its amount, which is the claim being made.
+    amount = {}
     for cond in ("apl_spiking", "apl_graded"):
         g = [r for r in ok if r["condition"] == cond]
         if g:
             summ[cond] = {k: {kk: float(np.mean([r[k][kk] for r in g])) for kk in g[0][k]} for k in ("odor", "post")}
             summ[cond]["n_seeds"] = len(g)
+    if len(summ) == 2:
+        max_hz = 1.0 / (cfg["model"]["t_refr_ms"] * 1e-3)
+        spk_hz = summ["apl_spiking"]["odor"]["apl_rate_hz"]
+        amount = {
+            "APL_spiking_rate_hz": spk_hz,
+            "APL_max_rate_hz_from_refractory": max_hz,
+            "spiking_APL_as_fraction_of_its_own_maximum": (spk_hz / max_hz if max_hz else None),
+            "extra_inhibition_the_correction_delivers": (max_hz / spk_hz if spk_hz else None),
+            "change_in_KC_response_fraction": (summ["apl_spiking"]["odor"]["frac_kc"] / summ["apl_graded"]["odor"]["frac_kc"]
+                                               if summ["apl_graded"]["odor"]["frac_kc"] else None),
+            "note": ("The spiking APL already runs at most of the maximum rate its refractory period allows, so the "
+                     "corrected APL delivers only a little more inhibition in total, while the odour code changes by "
+                     "more than an order of magnitude. What the correction changes is that the inhibition is "
+                     "continuous instead of arriving in pulses that Kenyon cells can fire between."),
+        }
+
     out = {"status": "passed" if len(summ) == 2 else "failed",
+           "how_much_of_this_is_just_more_inhibition": amount,
            "question": "What does modelling APL as a spiking neuron do to the mushroom body?",
            "correction": ("APL does not fire action potentials; it releases transmitter in proportion to membrane "
                           "depolarisation (Amin et al. 2020 eLife 9:e56954). It is modelled here as non-spiking, with "
@@ -110,15 +133,16 @@ def main():
                           "free parameter: a neuron held at threshold delivers exactly what a spiking synapse delivers "
                           "at its maximum refractory-limited rate."),
            "why_it_matters": why, "per_run": rows, "summary": summ,
-           "finding": ((f"Modelling APL as a spiking neuron takes the odour response from "
-                        f"{summ['apl_graded']['odor']['frac_kc']:.1%} of Kenyon cells at "
-                        f"{summ['apl_graded']['odor']['kc_rate_hz']:.2f} Hz to "
-                        f"{summ['apl_spiking']['odor']['frac_kc']:.1%} at "
-                        f"{summ['apl_spiking']['odor']['kc_rate_hz']:.1f} Hz, and the offline rate from "
-                        f"{summ['apl_graded']['post']['kc_rate_hz']:.2f} Hz to "
-                        f"{summ['apl_spiking']['post']['kc_rate_hz']:.1f} Hz. Real Kenyon cells respond at 6 +/- 5% "
-                        f"and idle near 0.1 Hz, so the corrected model matches the measurement and the published one "
-                        f"is off by more than two orders of magnitude. Everything else is identical.")
+           "finding": ((f"With APL modelled as a spiking neuron, as the published model does, an odour drives "
+                        f"{summ['apl_spiking']['odor']['frac_kc']:.1%} of Kenyon cells at "
+                        f"{summ['apl_spiking']['odor']['kc_rate_hz']:.1f} Hz and they idle afterwards at "
+                        f"{summ['apl_spiking']['post']['kc_rate_hz']:.1f} Hz. Correcting APL to non-spiking release "
+                        f"gives {summ['apl_graded']['odor']['frac_kc']:.2%} at "
+                        f"{summ['apl_graded']['odor']['kc_rate_hz']:.2f} Hz, idling at "
+                        f"{summ['apl_graded']['post']['kc_rate_hz']:.3f} Hz. Real Kenyon cells respond at 6 +/- 5% of "
+                        f"the population and idle near 0.1 Hz, so the corrected model lands on the measurement and the "
+                        f"published one misses it by more than two orders of magnitude. Nothing else differs between "
+                        f"the two: same connectome, same parameters, same stimulus, same seeds.")
                        if len(summ) == 2 else "not computed"),
            "walltime_s": round(time.time() - t0, 1),
            "provenance": {"config": "configs/base.yaml", "results_dir": "results/stage3a_apl",

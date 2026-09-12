@@ -9,4 +9,11 @@ stage2:
   mr_kmax_ms: 500.0
   avalanche_bin_mult: 1.0   # avalanche bin = <IEI> x this (Priesemann 2014); 0.5 and 2.0 run as robustness checks
   max_avalanches_for_fit: 200000
-  operating_rule: "if any sigma is classified critical: the critical sigma with mean branching ratio closest to 1. Otherwise NO critical regime is reported as the finding, and the operating point for downstream stages is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734) - chosen to match biology, not to manufacture criticality."
+  operating_rule: "if any sigma is classified critical: the critical sigma with mean branching ratio closest to 1.
+    Otherwise NO critical regime is reported as the finding, and the operating point for the downstream stages is the
+    sigma whose Kenyon-cell population rate is closest, in log distance, to the measured KC spontaneous rate of 0.1 Hz
+    (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), among sigmas that have any Kenyon-cell activity and whose
+    outcome does not depend on the seed. Chosen to match biology, not to manufacture criticality. Sigmas classified
+    'saturated' are NOT excluded: that label means the whole brain's activity never pauses, which makes the avalanche
+    analysis inapplicable there, and says nothing about the Kenyon cells, which is what this criterion is about. What
+    the earlier rule, which did exclude them, would have chosen is reported alongside the choice."

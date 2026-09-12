@@ -150,6 +150,69 @@ def main():
                                    "output neurons fire more slowly in the trained network than in the identical run with "
                                    "unlearned weights. This confirms the engram is loaded and active during the offline "
                                    "period, independently of whether it changes which Kenyon cells reactivate.")}
+    # THE DECISIVE DIAGNOSTIC. The memory in this model is a depression of Kenyon-cell to MBON synapses, which
+    # is downstream of the Kenyon cells. For it to change which Kenyon cells reactivate offline there has to be a
+    # path back: MBON-gamma1pedc is GABAergic and contacts Kenyon cells directly and through APL. That path only
+    # carries anything if the MBON fires. 'sleep' and 'sleep_naive' are the same run with the same seed and
+    # differ in exactly one thing, the learned weights, so comparing their Kenyon-cell spikes spike for spike
+    # answers it outright: if they are identical, the engram is causally disconnected from the offline state and
+    # no reactivation difference measured downstream can be real.
+    reaches_kc = None
+    if not a.shuffled:
+        dt_s = float(cfg["model"]["dt_ms"]) * 1e-3
+        pairs = []
+        for sd in seeds:
+            tr = next((r for r in ok if r["condition"] == "sleep" and r["seed"] == sd
+                       and r["dfb_rate_clamp_hz"] == s5["dfb_clamp_rate_hz"]), None)
+            nvr = next((r for r in ok if r["condition"] == "sleep_naive" and r["seed"] == sd), None)
+            if not tr or not nvr:
+                continue
+            try:
+                a1 = np.load(tr["file"]); a2 = np.load(nvr["file"])
+            except Exception as e:
+                pairs.append({"seed": sd, "error": str(e)}); continue
+            k1 = np.isin(a1["i"], kc); k2 = np.isin(a2["i"], kc)
+            i1, t1 = a1["i"][k1], a1["t_step"][k1]
+            i2, t2 = a2["i"][k2], a2["t_step"][k2]
+            same = bool(len(i1) == len(i2) and np.array_equal(i1, i2) and np.array_equal(t1, t2))
+            first_div = None
+            if not same:
+                n = min(len(i1), len(i2))
+                d = np.flatnonzero((i1[:n] != i2[:n]) | (t1[:n] != t2[:n]))
+                first_step = int(d[0] if len(d) else n)
+                idx = first_step if first_step < n else n - 1
+                first_div = float((t1[idx] if len(t1) else 0) * dt_s) if n else 0.0
+            s1, s2 = set(np.unique(i1).tolist()), set(np.unique(i2).tolist())
+            union = len(s1 | s2)
+            pairs.append({"seed": sd, "n_kc_spikes_trained": int(len(i1)), "n_kc_spikes_naive": int(len(i2)),
+                          "spike_trains_identical": same,
+                          "first_divergence_s": first_div,
+                          "n_kc_active_trained": len(s1), "n_kc_active_naive": len(s2),
+                          "jaccard_active_kcs": (len(s1 & s2) / union if union else None)})
+        good = [x for x in pairs if "error" not in x]
+        if good:
+            n_same = sum(1 for x in good if x["spike_trains_identical"])
+            disconnected = n_same == len(good)
+            reaches_kc = {
+                "n_seeds": len(good), "n_seeds_identical": n_same,
+                "engram_reaches_the_kenyon_cells": bool(not disconnected),
+                "per_seed": good,
+                "mean_jaccard_active_kcs": float(np.mean([x["jaccard_active_kcs"] for x in good
+                                                          if x["jaccard_active_kcs"] is not None]))
+                if any(x["jaccard_active_kcs"] is not None for x in good) else None,
+                "note": (
+                    (f"In all {len(good)} seeds the offline Kenyon-cell spike train is identical, spike for spike, "
+                     f"with the learned weights and without them. The memory therefore has no causal effect on the "
+                     f"offline state at all. The engram sits on Kenyon-cell to MBON synapses, its only route back to "
+                     f"the Kenyon cells is through the MBON, and the MBON does not fire in this network. Any "
+                     f"difference the replay test finds between the trained ensemble and a control is chance, and a "
+                     f"positive result would have to be read as an artifact.")
+                    if disconnected else
+                    (f"The learned weights change the offline Kenyon-cell activity in {len(good) - n_same} of "
+                     f"{len(good)} seeds, so the engram does reach the Kenyon cells and a reactivation difference "
+                     f"measured downstream can in principle be real.")),
+            }
+
     checks = {"all_runs_completed": len(ok) == len(specs),
               "dfb_active_in_sleep": bool(sl and sl["dfb_rate_hz_mean"] > 1.0),
               "dfb_silent_in_wake": bool(wk and wk["dfb_rate_hz_mean"] < 0.5),
@@ -174,6 +237,7 @@ def main():
                             "to baseline (stage 3b). Without the reset the offline period would inherit the conditioning "
                             "activity and any apparent reactivation would be persistence, not replay. The 'carryover' epoch "
                             "measures the state that was discarded, so the size of that confound is on the record."),
+             "engram_reaches_the_kenyon_cells": reaches_kc,
              "seeds": seeds, "per_seed": rows, "summary": summary,
              "manipulation_strength": manipulation, "memory_visible_offline": memory_visible, "walltime_s": round(time.time() - t0, 1),
              "provenance": {"config": "configs/stage5_sleep.yaml", "results_dir": f"results/stage5_sleep/{tag}",
