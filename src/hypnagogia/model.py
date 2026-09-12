@@ -123,8 +123,19 @@ class Simulation:
                 if adapt.get(k) is None:
                     raise ValueError(f"adaptation.{k} has no default: an unset adaptation constant must be "
                                      f"supplied explicitly and labelled, never inferred")
+        # A slow afterhyperpolarisation on named cells. Unlike the adaptation term above, its time constant
+        # is measured: 491.1 +/- 72.17 ms in APL, the mushroom body's feedback inhibitory neuron
+        # (Chen et al. 2026 Curr Biol 36:1633, PMC13075853). Its MAGNITUDE is not measured anywhere in that
+        # paper, so the gain is scanned and never chosen. See MECHANISM_DEVIATIONS["apl_slow_ahp"].
+        ahp = cfg.get("slow_ahp") or None
+        if ahp is not None:
+            for k in ("tau_ms", "gain", "index"):
+                if ahp.get(k) is None:
+                    raise ValueError(f"slow_ahp.{k} has no default: an unset constant must be supplied "
+                                     f"explicitly and labelled, never inferred")
         # Named drive_expr and not drive: `drive` is already the config's Poisson-drive block, three lines up.
-        drive_expr = "v_rest - v + g" + (" + g_graded" if use_graded else "") + (" - adapt" if adapt else "")
+        drive_expr = ("v_rest - v + g" + (" + g_graded" if use_graded else "")
+                      + (" - adapt" if adapt else "") + (" - ahp" if ahp else ""))
         eqs = ["dv/dt = (" + drive_expr + ")/tau_m"
                + (" + sigma*sqrt(2/tau_m)*xi" if gauss else "") + " : volt (unless refractory)",
                "dg/dt = -g/tau_syn : volt (unless refractory)",
@@ -138,6 +149,15 @@ class Simulation:
             eqs.append("g_graded : volt")
         if pl:
             eqs.append("dda/dt = -da/tau_da : 1")                 # dopamine trace, driven on MBONs by DAN->MBON synapses
+        if ahp:
+            # A low-pass of this cell's own depolarisation, subtracted from its drive. The paper's AHP
+            # follows depolarising current injection and is carried by calcium-activated potassium current,
+            # so depolarisation is the driving variable rather than the spike count; APL, the cell it was
+            # measured in, does not spike at all, which is the same fact this project already models from
+            # Amin et al. 2020 and which that paper independently confirms.
+            ns.update(tau_ahp=float(ahp["tau_ms"]) * ms, gain_ahp=float(ahp["gain"]))
+            eqs.append("dahp/dt = (gain_ahp * ahp_on * clip(v - v_rest, 0*volt, 0.5*volt) - ahp)/tau_ahp : volt")
+            eqs.append("ahp_on : 1")
         if adapt:
             # One extra state variable per neuron: a hyperpolarising conductance that steps up by b_adapt on
             # every spike this cell fires and decays with tau_adapt. It is the only thing in the model slower
@@ -153,6 +173,12 @@ class Simulation:
         neu.v = ns["v_rest"]; neu.g = 0 * mV; neu.rfc = m["t_refr_ms"] * ms
         if adapt:
             neu.adapt = 0 * mV
+        if ahp:
+            neu.ahp = 0 * mV
+            on = np.zeros(N, dtype=np.float64)
+            on[np.asarray(ahp["index"], dtype=np.int64)] = 1.0
+            neu.ahp_on = on
+            self._n_ahp_cells = int(on.sum())
         th = np.full(N, float(m["v_th_mV"]))
         if use_graded:
             th[graded_idx] = 1e6          # never spikes: release is graded, handled by the graded synapses below
@@ -366,6 +392,9 @@ class Simulation:
             np.savez_compressed(self.run_dir / "voltage.npz", idx=self.record_v.astype(np.int32),
                                 t_s=np.asarray(vmon.t[:] / second, dtype=np.float32), v_mV=np.asarray(vmon.v[:] / mV, dtype=np.float32))
             out["voltage"] = str(self.run_dir / "voltage.npz")
+        if getattr(self, "_n_ahp_cells", 0):
+            meta["slow_ahp"] = {k: v for k, v in (cfg.get("slow_ahp") or {}).items() if k != "index"}
+            meta["slow_ahp"]["n_cells"] = int(self._n_ahp_cells)
         if getattr(self, "_n_depressing", 0):
             # The count goes in the run's own metadata: how many synapses a deviation actually touched is
             # part of what the deviation is, and it is not recoverable from the config alone.

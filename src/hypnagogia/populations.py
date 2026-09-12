@@ -200,6 +200,41 @@ MECHANISM_DEVIATIONS = {
             "recurrent excitatory loop that carries the runaway, which is where a slow negative feedback "
             "has to act to turn a bistable switch into a relaxation oscillator."),
     },
+    "apl_slow_ahp": {
+        "what": ("Give APL, the mushroom body's feedback inhibitory neuron, a slow afterhyperpolarisation: a "
+                 "low-pass of its own depolarisation, with the measured time constant, subtracted from its "
+                 "membrane drive. APL does not spike, so the driving variable is depolarisation and not spike "
+                 "count, which is what the measurement itself describes."),
+        "constants": {
+            "tau_ms": {"what": "decay time constant of the afterhyperpolarisation", "value": 491.1,
+                       "sem": 72.17, "status": "measured"},
+            "gain": {"what": "how much hyperpolarisation a given depolarisation eventually produces",
+                     "status": "NOT MEASURED, scanned"},
+        },
+        "measurement": (
+            "Chen CC, Huang YC, Ortega A, Suarez-Grimalt R, Tedre E, Baz ES, Wu Y, Lin AC, Liu S (2026) "
+            "'Sleep facilitates pattern separation through SK channel-mediated sparse coding', Current Biology "
+            "36(7):1633-1643.e6, DOI 10.1016/j.cub.2026.02.028, PMID 41844155, PMC13075853. Adult Drosophila, "
+            "ex vivo brain, whole-cell current clamp, AHP elicited by 1 nA depolarising injection: 'The decay "
+            "time constant of the enhanced AHP is 491.1 +/- 72.17 ms (mean +/- SEM)'. Sleep deprivation "
+            "enhances the AHP and recovery sleep reduces it, and the SK dependence is established with "
+            "NS8593 and with APL-specific SK RNAi."),
+        "what_the_measurement_does_not_establish": (
+            "Three things, all of which matter. The 491.1 ms fit is from the SLEEP-DEPRIVED condition only: "
+            "the authors state that exponential fitting was unreliable in the normally-slept group, so there "
+            "is no measured baseline time constant. No amplitude is printed anywhere in the paper, in mV or "
+            "in nS, so the gain is unsourced and is scanned rather than chosen. And the driving function, "
+            "depolarisation rather than calcium, is a modelling choice the paper does not dictate."),
+        "status": "time constant measured, gain scanned",
+        "why_it_is_a_deviation_and_not_a_correction": (
+            "It adds a mechanism the published model does not have, so no run with it switched on is a "
+            "property of that model. The same paper does independently confirm the correction this project "
+            "already applies to APL from Amin et al. 2020, in its own words: 'APL neurons are non-spiking and "
+            "exhibit graded responses to somatic current injection'."),
+        "how_it_must_be_reported": (
+            "The time constant is cited. The gain is reported as the range scanned, never as a value, for as "
+            "long as no measurement exists for it."),
+    },
     "spike_frequency_adaptation": {
         "what": ("Give every spiking neuron one extra state variable: a hyperpolarising term that steps up "
                  "by b_mV each time that cell fires and decays exponentially with tau_ms, subtracted from "
