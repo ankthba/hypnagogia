@@ -1,0 +1,21 @@
+{
+ "question": "What does the reduced gain cost on the benchmark the published model was calibrated against?",
+ "protocol": "the male counterparts of the right labellar sugar neurons at 200 Hz for 1 s, the stage 0 benchmark",
+ "runs": [
+  {
+   "gain": 1.0,
+   "n_seeds": 3,
+   "MN9_L_hz_mean": 102.66666666666667,
+   "MN9_R_hz_mean": 0.0,
+   "n_active_mean": 493.6666666666667
+  },
+  {
+   "gain": 0.6,
+   "n_seeds": 3,
+   "MN9_L_hz_mean": 8.666666666666666,
+   "MN9_R_hz_mean": 0.0,
+   "n_active_mean": 146.33333333333334
+  }
+ ],
+ "finding": "At the published gain MN9 fires at 102.7 Hz with 494 neurons active; at gain 0.60 it fires at 8.7 Hz with 146 neurons active. Lowering the gain to obtain sparse odour coding therefore breaks the gustatory calibration that fixed W_syn in the first place, which is the price of this deviation."
+}

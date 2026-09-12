@@ -40,23 +40,32 @@ def eta_from_stage3(cfg):
 
 
 def build_epochs(s4, plastic_conditioning=True):
+    """Conditioning protocol.
+
+    Every odour presentation is preceded by a reset of membrane potentials and synaptic conductances (learned
+    weights are untouched). This is necessary, not cosmetic: the model has no adaptation or short-term
+    depression, so the first odour drives it into a self-sustaining state it never leaves (stage 3b). Without a
+    reset, the second odour would be delivered into the first odour's ongoing activity and every measurement
+    after the first presentation would be contaminated. Each reset is recorded in the epoch table.
+    """
     g, od, w = s4["gap_s"], s4["odor_duration_s"], s4["warmup_s"]
     dl, dd = s4["dan_delay_s"], s4["dan_duration_s"]
+    R = bool(s4.get("reset_between_presentations", True))
     ep = [{"name": "warmup", "duration_s": w},
-          {"name": "pre_test_A", "duration_s": od, "drives": {"odor_A": s4["odor_rate_hz"]}},
+          {"name": "pre_test_A", "duration_s": od, "drives": {"odor_A": s4["odor_rate_hz"]}, "reset": R},
           {"name": "gap", "duration_s": g},
-          {"name": "pre_test_B", "duration_s": od, "drives": {"odor_B": s4["odor_rate_hz"]}},
+          {"name": "pre_test_B", "duration_s": od, "drives": {"odor_B": s4["odor_rate_hz"]}, "reset": R},
           {"name": "gap", "duration_s": g}]
     for k in range(s4["n_pairings"]):
-        ep += [{"name": "pair_A_only", "duration_s": dl, "drives": {"odor_A": s4["odor_rate_hz"]}, "plastic": plastic_conditioning},
+        ep += [{"name": "pair_A_only", "duration_s": dl, "drives": {"odor_A": s4["odor_rate_hz"]}, "plastic": plastic_conditioning, "reset": R},
                {"name": "pair_A_dan", "duration_s": od - dl, "drives": {"odor_A": s4["odor_rate_hz"], "dan": s4["dan_rate_hz"]}, "plastic": plastic_conditioning},
                {"name": "pair_dan_only", "duration_s": max(dd - (od - dl), 0.0), "drives": {"dan": s4["dan_rate_hz"]}, "plastic": plastic_conditioning},
                {"name": "iti", "duration_s": s4["iti_s"], "plastic": plastic_conditioning},
-               {"name": "unpaired_B", "duration_s": od, "drives": {"odor_B": s4["odor_rate_hz"]}, "plastic": plastic_conditioning},
+               {"name": "unpaired_B", "duration_s": od, "drives": {"odor_B": s4["odor_rate_hz"]}, "plastic": plastic_conditioning, "reset": R},
                {"name": "iti", "duration_s": s4["iti_s"], "plastic": plastic_conditioning}]
-    ep += [{"name": "post_test_A", "duration_s": od, "drives": {"odor_A": s4["odor_rate_hz"]}},
+    ep += [{"name": "post_test_A", "duration_s": od, "drives": {"odor_A": s4["odor_rate_hz"]}, "reset": R},
            {"name": "gap", "duration_s": g},
-           {"name": "post_test_B", "duration_s": od, "drives": {"odor_B": s4["odor_rate_hz"]}}]
+           {"name": "post_test_B", "duration_s": od, "drives": {"odor_B": s4["odor_rate_hz"]}, "reset": R}]
     return ep
 
 
@@ -151,6 +160,11 @@ def main():
     if not responds: note.append(f"the readout MBON ({s4['readout_mbon_type']}) does not respond to odour A before conditioning (mean {np.mean([r['A_pre'] for r in ok]) if ok else 0:.2f} Hz): no learning can be measured")
     if ok and not learned: note.append("conditioning did not shift the odour-A response relative to odour B (the 95% CI of the difference of deltas includes or exceeds 0)")
     out_d = {"status": status, "criterion": s4["criterion"], "learning_verified": learned, "network": tag,
+             "reset_between_presentations": bool(s4.get("reset_between_presentations", True)),
+             "reset_note": ("Membrane potentials and synaptic conductances are reset to rest before every odour "
+                            "presentation; learned weights are not. The model never returns to baseline on its own "
+                            "(stage 3b), so without this the second odour would be delivered into the first odour's "
+                            "ongoing activity and every later measurement would be contaminated."),
              "protocol": {"odor_A": {"orn_types": s4["odor_A_orn_types"], "n_orns": int(len(conn.select(cell_type=s4["odor_A_orn_types"]))), "rate_hz": s4["odor_rate_hz"]},
                           "odor_B": {"orn_types": s4["odor_B_orn_types"], "n_orns": int(len(conn.select(cell_type=s4["odor_B_orn_types"]))), "rate_hz": s4["odor_rate_hz"]},
                           "dans": {"types": [s4["dan_type"]], "n": int(len(conn.select(cell_type=s4["dan_type"]))), "rate_hz": s4["dan_rate_hz"]},
