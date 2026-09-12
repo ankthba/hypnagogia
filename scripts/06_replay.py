@@ -245,13 +245,22 @@ def main():
     # learned weights and without them, the memory had no causal effect on the state being measured, and no
     # comparison computed on that state can be evidence of replay however it comes out. That is checked before
     # the comparisons are read, not after, because it does not depend on them.
-    causal = None
+    causal, manip = None, None
     try:
         s5f = RESULTS / "stage5_sleep" / ("real" + ("" if a.gain == 1.0 else f"_gain{a.gain}")) / "stage5.json"
         if s5f.exists():
-            causal = (json.load(open(s5f)) or {}).get("engram_reaches_the_kenyon_cells")
+            s5d = json.load(open(s5f)) or {}
+            causal = s5d.get("engram_reaches_the_kenyon_cells")
+            manip = s5d.get("manipulation_strength")
     except Exception:
-        causal = None
+        causal, manip = None, None
+    # One of the four required comparisons is sleep against wake. If stage 5 measured the two states as
+    # indistinguishable outside the clamped cells themselves, that comparison is being asked to find a
+    # difference the model does not have, and its failing says nothing about replay. Recorded next to the
+    # verdict rather than left for the reader to work out from stage 5.
+    wake_arm_is_empty = bool(manip and manip.get("state_is_distinguishable") is False)
+    wake_note = (" One of the four, sleep against wake, is testing a difference this model does not have: "
+                 + str(manip.get("note", "")).strip() if wake_arm_is_empty else "")
     disconnected = bool(causal and causal.get("engram_reaches_the_kenyon_cells") is False)
     causal_note = (" " + causal["note"] if disconnected and causal.get("note") else "")
 
@@ -262,19 +271,19 @@ def main():
                      "Some comparisons showed the predicted effect, but none of them can be read as replay. "
                      if others_pos else
                      "No evidence of memory replay, and none was possible. ")
-                    + causal_note.strip() + memory_note)
+                    + causal_note.strip() + memory_note + wake_note)
     elif all_survive and not continuity["events_are_discrete"]:
         status = "artifact"
         headline = ("All four null comparisons showed the predicted effect, but the result cannot be read as replay: "
-                    + continuity["note"] + memory_note)
+                    + continuity["note"] + memory_note + wake_note)
     elif all_survive:
         status, headline = "passed", ("The odour-A Kenyon-cell ensemble reactivated above chance during simulated sleep, and the "
                                       "effect survived all four null comparisons including the degree-preserving shuffled "
-                                      "connectome." + memory_note)
+                                      "connectome." + memory_note + wake_note)
     elif others_pos and shuffled_c and shuffled_c.get("available") and not shuffled_c["survives"]:
         status, headline = "artifact", ("A positive reactivation signal was measured, but it did NOT survive the "
                                         "degree-preserving shuffled-connectome null: it is an artifact of network structure, "
-                                        "not evidence of replay." + memory_note)
+                                        "not evidence of replay." + memory_note + wake_note)
     elif not avail:
         status, headline = "not_run", "The replay comparisons could not be computed: the required sleep and wake runs are not available."
     else:
@@ -282,9 +291,13 @@ def main():
         status, headline = "failed", (("" if continuity["events_are_discrete"] else continuity["note"] + " ") +
                                       "No evidence of memory replay: the odour-A ensemble did not reactivate above chance during "
                                       "simulated sleep. Comparisons that did not show the predicted effect: "
-                                      f"{', '.join(failed) if failed else 'none'}." + memory_note)
+                                      f"{', '.join(failed) if failed else 'none'}." + memory_note + wake_note)
     out_d = {"status": status, "criterion": s6["criterion"], "headline": headline,
              "engram_reaches_the_kenyon_cells": causal,
+             "sleep_state_is_distinguishable": (None if manip is None else manip.get("state_is_distinguishable")),
+             "sleep_vs_wake_arm_note": (wake_note.strip() or
+                                        "Stage 5 measured the sleep and wake states as distinguishable, so the "
+                                        "sleep-versus-wake comparison is testing a difference the model has."),
              "engram_guard": {"applied": disconnected,
                               "rule": ("If stage 5 finds the offline Kenyon-cell spike train identical with and without the "
                                        "learned weights, the memory had no causal effect on the state being measured and no "
