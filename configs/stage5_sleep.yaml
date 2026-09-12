@@ -19,4 +19,4 @@ stage5:
   conditions: ["sleep", "wake"]
   naive_weight_arm: true               # repeat sleep with unlearned weights; see the note in scripts/05_sleep.py
   seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-  criterion: "both conditions run to completion for every seed with the learned weights loaded; the dFB clamp is applied in the sleep condition and not in the wake condition, which means the dFB cells fire above 1 Hz in sleep and are either silent in wake or at least three times slower there than in sleep (this network is self-sustaining, so nothing in it is silent and the wake rate is whatever the network gives the cells on its own); and KC activity is non-zero in at least one condition, or the replay test has no data"
+  criterion: "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)"

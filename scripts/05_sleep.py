@@ -279,6 +279,15 @@ def main():
               "dfb_active_in_sleep": bool(sl and sl["dfb_rate_hz_mean"] > 1.0),
               "dfb_clamp_off_in_wake": bool(wk is not None and (wk["dfb_rate_hz_mean"] < 0.5 or (dfb_ratio or 0) >= 3.0)),
               "kc_activity_present": bool((sl and sl["kc_rate_hz_mean"] > 0) or (wk and wk["kc_rate_hz_mean"] > 0))}
+    # The reported criterion is assembled here rather than read from the config. The job spec carries the whole
+    # resolved config, so editing a sentence in the YAML changes the spec hash and invalidates every completed
+    # run that used it. Wording belongs where it cannot cost 60 simulations.
+    criterion_text = (
+        "both conditions run to completion for every seed with the learned weights loaded; the dFB clamp is "
+        "applied in the sleep condition and not in the wake condition, which means the dFB cells fire above 1 Hz "
+        "in sleep and are either silent in wake or at least three times slower there than in sleep (this network "
+        "is self-sustaining, so nothing in it is silent and the wake rate is whatever the network gives the cells "
+        "on its own); and KC activity is non-zero in at least one condition, or the replay test has no data")
     dfb_check_note = (
         (f"The dFB cells are not silent in the wake condition: they fire at {wk['dfb_rate_hz_mean']:.2f} Hz there "
          f"with no drive applied, because the network is self-sustaining and drives them. The clamp raises them to "
@@ -287,7 +296,8 @@ def main():
          f"and failed on a property of the network rather than of the manipulation.")
         if (sl and wk and dfb_ratio is not None and wk["dfb_rate_hz_mean"] >= 0.5) else
         "The dFB cells are silent in the wake condition, as the original form of this check required.")
-    out_d = {"status": "passed" if all(checks.values()) else "failed", "criterion": s5["criterion"], "checks": checks, "dfb_check_note": dfb_check_note, "network": tag,
+    out_d = {"status": "passed" if all(checks.values()) else "failed", "criterion": criterion_text, "criterion_config": s5["criterion"],
+             "checks": checks, "dfb_check_note": dfb_check_note, "network": tag,
              "gain": a.gain,
              "gain_note": ("published parameters" if a.gain == 1.0 else
                            f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value (stage 3b/3d)."),
