@@ -123,6 +123,9 @@ def main():
     s3c = load_json(RESULTS / "stage3c_control" / "stage3c.json")
     s3d = load_json(RESULTS / "stage3d_gain" / "stage3d.json")
     s3e = load_json(RESULTS / "stage3e_discrim" / "stage3e.json")
+    s6b = None
+    for cand in sorted(RESULTS.glob("stage6_structure/structure*.json")):
+        s6b = load_json(cand) or s6b
     s3dg = load_json(RESULTS / "stage3d_gain" / "gustatory_cost.json")
     if s3b or s3c or s3d or s3e:
         feas = {"status": (s3b or {}).get("status", "not_run"),
@@ -189,6 +192,8 @@ def main():
         if d is not None:
             d["source_file"] = src
             d = conform(key, d)
+            if key == "stage6_replay" and s6b:
+                d["structure_confound"] = s6b
             sub_dir = str(Path(src).parent.relative_to("results")) if src else sub_dir
         if d:
             d.setdefault("provenance", {}); d["provenance"].update({"git_commit": commit, "generated_at": now})

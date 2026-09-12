@@ -467,6 +467,22 @@ def main():
                 for net, conds in obj["ensemble_sizes"].items():
                     w(f"- {net}: " + ", ".join(f"{c} {v:.0f}" for c, v in conds.items()))
                 w()
+            sc = obj.get("structure_confound")
+            if sc:
+                w("**Is this wiring rather than memory?** " + sc["finding"])
+                w()
+                sp = sc.get("structure_predicts_reactivation")
+                if sp:
+                    w(f"{sp['interpretation']}")
+                    w()
+                w("| ensemble | within-ensemble synapses | expected by chance | z | synapses per cell |")
+                w("|---|---|---|---|---|")
+                sm = sc["summary"]
+                w(f"| trained (A) | {sm['A_within_synapses_mean']:.0f} | "
+                  f"{np.mean([r['A_expected_by_chance'] for r in sc['per_seed']]):.0f} | {sm['A_z_mean']:+.0f} | {sm['A_density_per_cell_mean']:.1f} |")
+                w(f"| untrained (B) | {sm['B_within_synapses_mean']:.0f} | "
+                  f"{np.mean([r['B_expected_by_chance'] for r in sc['per_seed']]):.0f} | {sm['B_z_mean']:+.0f} | {sm['B_density_per_cell_mean']:.1f} |")
+                w()
             seq = obj.get("sequence")
             if seq:
                 w(f"**Sequence order.** {seq['note']} Scored on {seq['n_seeds_scored']} seeds over "

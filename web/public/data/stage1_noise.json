@@ -115,7 +115,7 @@
    "results/stage1_noise/poisson100/spikes.npz",
    "results/stage1_noise/poisson200/spikes.npz"
   ],
-  "git_commit": "7471545",
-  "generated_at": "2026-09-12T05:22:49+00:00"
+  "git_commit": "47a7e54",
+  "generated_at": "2026-09-12T05:42:48+00:00"
  }
 }
