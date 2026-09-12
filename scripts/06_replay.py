@@ -259,8 +259,15 @@ def main():
     # difference the model does not have, and its failing says nothing about replay. Recorded next to the
     # verdict rather than left for the reader to work out from stage 5.
     wake_arm_is_empty = bool(manip and manip.get("state_is_distinguishable") is False)
-    wake_note = (" One of the four, sleep against wake, is testing a difference this model does not have: "
-                 + str(manip.get("note", "")).strip() if wake_arm_is_empty else "")
+    wake_note = ""
+    if wake_arm_is_empty:
+        pr = manip.get("pop_rate_relative_change")
+        kr = manip.get("kc_rate_relative_change")
+        nd = manip.get("n_dfb_clamped")
+        wake_note = (f" One of the four, sleep against wake, is being asked to find a difference this model does not "
+                     f"have: stage 5 measured clamping the {nd} dorsal fan-shaped body neurons as changing the rest of "
+                     f"the brain by {100 * pr:.1f} per cent in population rate and {100 * kr:.1f} per cent in "
+                     f"Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.")
     disconnected = bool(causal and causal.get("engram_reaches_the_kenyon_cells") is False)
     causal_note = (" " + causal["note"] if disconnected and causal.get("note") else "")
 
