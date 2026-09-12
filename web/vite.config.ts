@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// GitHub Pages serves the site from https://ankthba.github.io/hypnagogia/
+// GitHub Pages serves the site from https://ankthba.github.io/hypnagogia/.
+// The app uses a HashRouter, so a relative base works from any path (root, /hypnagogia/, file preview)
+// and data fetches become ./data/... regardless of whether GITHUB_PAGES is set at build time.
 export default defineConfig({
-  base: process.env.GITHUB_PAGES ? '/hypnagogia/' : '/',
+  base: './',
   plugins: [react()],
   build: {
     sourcemap: false,

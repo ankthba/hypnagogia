@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDataFile } from '../lib/data';
 import { loadRaster, loadTrace, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
-import type { Stage5, Stage6 } from '../types';
+import type { Comparison, Stage5, Stage6 } from '../types';
 import StageGate from '../components/StageGate';
 import StatusBanner from '../components/StatusBanner';
 import Figure from '../components/Figure';
 import DataTable from '../components/DataTable';
 import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
-import ForestPlot from '../components/charts/ForestPlot';
+import ForestPlot, { REQUIRED_COMPARISONS } from '../components/charts/ForestPlot';
 import RasterViewer from '../components/charts/RasterViewer';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
 
@@ -21,27 +21,22 @@ export default function Replay() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-4">
-        <h1 className="h1">Replay</h1>
-        <div className="ml-auto inline-flex rounded-md border border-slate-700 overflow-hidden" role="tablist" aria-label="condition">
+      <h1 className="page-title">Replay</h1>
+      <div className="measure mb-4 flex flex-wrap items-center gap-4">
+        <span className="label">condition</span>
+        <div className="segmented" role="tablist" aria-label="condition">
           {(['sleep', 'wake'] as Cond[]).map((c) => (
-            <button
-              key={c}
-              role="tab"
-              aria-selected={cond === c}
-              onClick={() => setCond(c)}
-              className={`px-4 py-1.5 text-sm font-medium ${cond === c ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-300 hover:bg-slate-800'}`}
-            >
+            <button key={c} type="button" role="tab" aria-selected={cond === c} onClick={() => setCond(c)} className="segmented__option" data-text={c}>
               {c}
             </button>
           ))}
         </div>
       </div>
-      <p className="mt-2 text-slate-400 max-w-3xl">
+      <div className="prose"><p>
         Does the odor-A Kenyon-cell ensemble learned in Stage 4 reactivate spontaneously during the simulated sleep state
         from Stage 5, more than the unpaired ensemble, more than in wake, more than in a shuffled connectome, and more than
-        random ensembles of the same size? Selected condition: <span className="font-semibold text-slate-200">{cond}</span>.
-      </p>
+        random ensembles of the same size? Selected condition: <em>{cond}</em>.
+      </p></div>
 
       <section className="mt-6">
         <ErrorBoundary label="Stage 6">
@@ -52,7 +47,7 @@ export default function Replay() {
       </section>
 
       <section className="mt-10">
-        <h2 className="h2">Stage 5 - sleep state</h2>
+        <h2>Stage 5 · sleep state</h2>
         <ErrorBoundary label="Stage 5">
           <StageGate stage="stage5_sleep" loaded={s5}>
             {(d) => <Stage5View d={d} />}
@@ -61,19 +56,6 @@ export default function Replay() {
       </section>
     </div>
   );
-}
-
-function statusSentence(status: string): string {
-  switch (status) {
-    case 'passed':
-      return 'Result: the pre-registered replay criterion was met and the effect survived every null comparison.';
-    case 'failed':
-      return 'Result: the pre-registered replay criterion was NOT met. There is no evidence of replay in this run.';
-    case 'artifact':
-      return 'Result: ARTIFACT. A positive signal was observed, but it did NOT survive the shuffled-connectome null - the same signal appears in a network whose wiring has been randomised, so it cannot be attributed to the learned memory.';
-    default:
-      return `Result status "${status}".`;
-  }
 }
 
 function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
@@ -96,11 +78,15 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
     let cancel = false;
     if (rasterEntry) {
       setRaster('loading');
-      loadRaster(rasterEntry.file).then((r) => !cancel && setRaster(r));
+      loadRaster(rasterEntry.file)
+        .then((r) => !cancel && setRaster(r))
+        .catch((e) => !cancel && setRaster({ ok: false, missing: false, message: e instanceof Error ? e.message : String(e), path: rasterEntry.file }));
     } else setRaster(null);
     if (traceEntry) {
       setTrace('loading');
-      loadTrace(traceEntry.file).then((r) => !cancel && setTrace(r));
+      loadTrace(traceEntry.file)
+        .then((r) => !cancel && setTrace(r))
+        .catch((e) => !cancel && setTrace({ ok: false, missing: false, message: e instanceof Error ? e.message : String(e), path: traceEntry.file }));
     } else setTrace(null);
     return () => {
       cancel = true;
@@ -109,48 +95,104 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
 
   const perSeedRows = (d.per_seed ?? []).filter((r) => r.condition === cond);
 
+  // Verdict summary computed from the file, never from the status enum.
+  const comparisons: Comparison[] = d.comparisons ?? [];
+  const nSurvive = comparisons.filter((c) => c.survives === true).length;
+  const presentNames = new Set(comparisons.map((c) => c.name));
+  const missingRequired = REQUIRED_COMPARISONS.filter((n) => !presentNames.has(n));
+  const unexpected = comparisons.filter((c) => !(REQUIRED_COMPARISONS as readonly string[]).includes(c.name));
+  type CompRow = { kind: 'present'; c: Comparison } | { kind: 'missing'; name: string };
+  const compRows: CompRow[] = [
+    ...REQUIRED_COMPARISONS.map<CompRow>((n) => {
+      const c = comparisons.find((x) => x.name === n);
+      return c ? { kind: 'present', c } : { kind: 'missing', name: n };
+    }),
+    ...unexpected.map<CompRow>((c) => ({ kind: 'present', c })),
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-slate-700 bg-slate-900 p-5">
-        <div className="text-xl sm:text-2xl font-semibold leading-snug text-slate-50">{d.headline}</div>
-        <div className="mt-2 text-xs text-slate-500">
+      <div className="measure" style={{ borderTop: '1px solid var(--color-fg)', paddingTop: '1rem' }}>
+        <div className="banner__title" style={{ fontSize: '1.6rem' }}>{d.headline}</div>
+        <div className="mt-2 smaller muted">
           headline sentence from <span className="mono">stage6_replay.json</span> · window {fmtNum(d.window_ms)} ms · {fmtInt(d.n_seeds)} seeds
         </div>
       </div>
 
-      <StatusBanner status={d.status} title={statusSentence(d.status)} criterion={d.criterion} reasons={d.reasons} />
+      <StatusBanner status={d.status} title="Replay verdict" criterion={d.criterion} reasons={d.reasons}>
+        <div>
+          {fmtInt(nSurvive)} of {fmtInt(comparisons.length)} comparisons listed in the file survive
+          {missingRequired.length > 0 && (
+            <span className="tone-failed"> · {missingRequired.length} of the 4 pre-registered comparisons missing from the file</span>
+          )}
+          .
+        </div>
+      </StatusBanner>
 
       <Figure
-        title="Four comparisons - effect sizes"
+        title="Four pre-registered comparisons - effect sizes"
         provenance={d.provenance}
-        caption="Each row is one pre-registered null comparison. 'Survives' / 'does not' is the pipeline's own verdict for that comparison. A positive g means the first-named condition scored higher on the metric."
+        caption={
+          <>
+            Each row is one pre-registered null comparison ({REQUIRED_COMPARISONS.join(', ')}). 'Survives' / 'does not' is the
+            pipeline's own verdict for that comparison. A positive g means the first-named condition scored higher on the metric.
+            {missingRequired.length > 0 && (
+              <span className="tone-failed"> {missingRequired.length} required comparison(s) are missing from the file and are shown as missing rows.</span>
+            )}
+            {unexpected.length > 0 && (
+              <span className="tone-failed"> {unexpected.length} comparison(s) in the file are not among the four pre-registered names and are labelled unexpected.</span>
+            )}
+          </>
+        }
       >
-        <ForestPlot comparisons={d.comparisons} />
+        <ForestPlot comparisons={comparisons} />
       </Figure>
 
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-2">Comparison values</div>
-        <DataTable
+        <div className="label label--ink mb-2">Comparison values</div>
+        <DataTable<CompRow>
           columns={[
-            { key: 'l', header: 'comparison', render: (c) => <span className="whitespace-normal">{c.label}</span> },
-            { key: 'n', header: 'name', render: (c) => <span className="mono">{c.name}</span> },
-            { key: 'm', header: 'metric', render: (c) => c.metric },
-            { key: 'x', header: 'x mean', render: (c) => fmtNum(c.x_mean, 4) },
-            { key: 'y', header: 'y mean', render: (c) => fmtNum(c.y_mean, 4) },
-            { key: 'd', header: 'diff', render: (c) => fmtNum(c.diff, 4) },
-            { key: 'ci', header: 'diff CI95', render: (c) => fmtCI(c.ci95, 4) },
-            { key: 'g', header: 'Hedges g', render: (c) => fmtNum(c.hedges_g, 3) },
-            { key: 'gci', header: 'g CI95', render: (c) => fmtCI(c.g_ci95, 3) },
-            { key: 'p', header: 'p', render: (c) => fmtP(c.p) },
-            { key: 'nn', header: 'n', render: (c) => fmtInt(c.n) },
+            {
+              key: 'l',
+              header: 'comparison',
+              render: (r) =>
+                r.kind === 'missing' ? (
+                  <span className="whitespace-normal tone-failed">
+                    comparison <span className="mono">{r.name}</span> missing from stage6_replay.json
+                  </span>
+                ) : (
+                  <span className="whitespace-normal">
+                    {r.c.label}
+                    {!(REQUIRED_COMPARISONS as readonly string[]).includes(r.c.name) && (
+                      <span className="badge badge--failed ml-2">unexpected</span>
+                    )}
+                  </span>
+                ),
+            },
+            { key: 'n', header: 'name', render: (r) => <span className="mono">{r.kind === 'missing' ? r.name : r.c.name}</span> },
+            { key: 'm', header: 'metric', render: (r) => (r.kind === 'missing' ? '—' : r.c.metric) },
+            { key: 'x', header: 'x mean', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.x_mean, 4)) },
+            { key: 'y', header: 'y mean', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.y_mean, 4)) },
+            { key: 'd', header: 'diff', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.diff, 4)) },
+            { key: 'ci', header: 'diff CI95', render: (r) => (r.kind === 'missing' ? '—' : fmtCI(r.c.ci95, 4)) },
+            { key: 'g', header: 'Hedges g', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.hedges_g, 3)) },
+            { key: 'gci', header: 'g CI95', render: (r) => (r.kind === 'missing' ? '—' : fmtCI(r.c.g_ci95, 3)) },
+            { key: 'p', header: 'p', render: (r) => (r.kind === 'missing' ? '—' : fmtP(r.c.p)) },
+            { key: 'nn', header: 'n', render: (r) => (r.kind === 'missing' ? '—' : fmtInt(r.c.n)) },
             {
               key: 's',
               header: 'survives',
-              render: (c) => <span className={c.survives ? 'text-emerald-300' : 'text-red-300 font-semibold'}>{c.survives ? 'yes' : 'NO'}</span>,
+              render: (r) =>
+                r.kind === 'missing' ? (
+                  <span className="tone-failed">MISSING</span>
+                ) : (
+                  <span className={r.c.survives ? 'tone-passed' : 'tone-failed'}>{r.c.survives ? 'yes' : 'NO'}</span>
+                ),
             },
           ]}
-          rows={d.comparisons ?? []}
-          rowKey={(c) => c.name}
+          rows={compRows}
+          rowKey={(r) => (r.kind === 'missing' ? `missing-${r.name}` : r.c.name)}
+          rowClass={(r) => (r.kind === 'missing' ? 'row--flag' : '')}
         />
         <ProvenanceFooter provenance={d.provenance} />
       </div>
@@ -159,9 +201,9 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
         title={`KC ensemble raster - ${cond}${seed !== null ? `, seed ${seed}` : ''}`}
         provenance={d.provenance}
         right={
-          <label className="text-sm text-slate-400 flex items-center gap-2">
+          <label className="small muted flex items-center gap-2">
             seed
-            <select className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-slate-100" value={seed ?? ''} onChange={(e) => setSeedSel(Number(e.target.value))} disabled={seedsForCond.length === 0}>
+            <select className="control" value={seed ?? ''} onChange={(e) => setSeedSel(Number(e.target.value))} disabled={seedsForCond.length === 0}>
               {seedsForCond.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -173,31 +215,31 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
         caption="Top: spikes of the ensemble neurons (rows grouped A / B / other KC). Bottom: Pearson correlation between the population vector in each bin and the A and B templates, with the reactivation threshold. Both panels share the time axis; drag the slider or press Play."
       >
         {seedsForCond.length === 0 ? (
-          <div className="rounded border-2 border-dashed border-slate-600 p-4 text-sm text-slate-300">
+          <div className="notrun small" style={{ maxWidth: 'none' }}>
             No raster or trace sidecar is listed in <span className="mono">stage6_replay.json</span> for condition "{cond}". Expected entries under{' '}
             <span className="mono">rasters[]</span> / <span className="mono">traces[]</span> pointing at <span className="mono">data/replay/raster_{cond}_seed&lt;k&gt;.json</span>; produced by{' '}
-            <span className="mono">scripts/stage6_replay.py</span> + <span className="mono">scripts/export_web.py</span>.
+            <span className="mono">scripts/06_replay.py</span> + <span className="mono">scripts/export_web.py</span>.
           </div>
         ) : (
           <>
             {raster !== null && raster !== 'loading' && !raster.ok && (
-              <div className="mb-2 rounded border-2 border-dashed border-slate-600 p-3 text-sm text-slate-300">
+              <div className="mb-2 notrun small" style={{ maxWidth: 'none' }}>
                 raster not available: <span className="mono">{raster.path}</span> - {raster.message}
               </div>
             )}
             {trace !== null && trace !== 'loading' && !trace.ok && (
-              <div className="mb-2 rounded border-2 border-dashed border-slate-600 p-3 text-sm text-slate-300">
+              <div className="mb-2 notrun small" style={{ maxWidth: 'none' }}>
                 trace not available: <span className="mono">{trace.path}</span> - {trace.message}
               </div>
             )}
-            {(raster === 'loading' || trace === 'loading') && <div className="text-sm text-slate-500 mb-2">loading binary data …</div>}
+            {(raster === 'loading' || trace === 'loading') && <div className="small muted mb-2">loading binary data …</div>}
             <RasterViewer raster={raster && raster !== 'loading' && raster.ok ? raster.data : null} trace={trace && trace !== 'loading' && trace.ok ? trace.data : null} />
           </>
         )}
       </Figure>
 
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-2">Per-seed metrics - {cond}</div>
+        <div className="label label--ink mb-2">Per-seed metrics - {cond}</div>
         <DataTable
           columns={[
             { key: 'seed', header: 'seed', render: (r) => r.seed },
@@ -218,7 +260,7 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
       </div>
 
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-2">Metric definitions (from the stage file)</div>
+        <div className="label label--ink mb-2">Metric definitions (from the stage file)</div>
         <dl className="kv">
           {Object.entries(d.metrics ?? {}).map(([k, v]) => (
             <div key={k} className="contents">
@@ -227,6 +269,7 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
             </div>
           ))}
         </dl>
+        <ProvenanceFooter provenance={d.provenance} />
       </div>
     </div>
   );
@@ -236,9 +279,9 @@ function Stage5View({ d }: { d: Stage5 }) {
   return (
     <div className="space-y-4">
       <StatusBanner status={d.status} title="Sleep-state induction" criterion={d.criterion} reasons={d.reasons} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         <div className="card">
-          <div className="font-semibold text-slate-100 mb-2">Dorsal fan-shaped body clamp</div>
+          <div className="label label--ink mb-2">Dorsal fan-shaped body clamp</div>
           <dl className="kv">
             <dt>dFB cell types</dt>
             <dd className="whitespace-normal">{(d.dfb?.cell_types ?? []).join(', ') || 'null'}</dd>
@@ -251,7 +294,7 @@ function Stage5View({ d }: { d: Stage5 }) {
             <dt>rate source</dt>
             <dd className="whitespace-normal">{d.dfb?.rate_source}</dd>
           </dl>
-          <div className="font-semibold text-slate-100 mt-4 mb-1">Conditions</div>
+          <div className="label label--ink mt-5 mb-1">Conditions</div>
           <dl className="kv">
             {Object.entries(d.conditions ?? {}).map(([k, v]) => (
               <div key={k} className="contents">
@@ -263,7 +306,7 @@ function Stage5View({ d }: { d: Stage5 }) {
           <ProvenanceFooter provenance={d.provenance} />
         </div>
         <div className="card">
-          <div className="font-semibold text-slate-100 mb-2">Population rates by condition</div>
+          <div className="label label--ink mb-2">Population rates by condition</div>
           <DataTable
             columns={[
               { key: 'c', header: 'condition', render: (r) => r.condition },
@@ -274,7 +317,7 @@ function Stage5View({ d }: { d: Stage5 }) {
             rows={d.summary ?? []}
             rowKey={(r) => r.condition}
           />
-          <div className="font-semibold text-slate-100 mt-4 mb-2">Per seed</div>
+          <div className="label label--ink mt-5 mb-2">Per seed</div>
           <DataTable
             columns={[
               { key: 's', header: 'seed', render: (r) => r.seed },

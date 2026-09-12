@@ -1,14 +1,43 @@
 import type { Provenance } from '../types';
+import { REPO_URL } from '../lib/data';
 
-/** Required under every figure: "config: … · data: … · commit …", built from the stage's provenance object. */
+const HEX = /^[0-9a-f]{7,40}$/i;
+
+function RepoLink({ path, commit }: { path: string; commit: string }) {
+  if (!HEX.test(commit)) return <>{path}</>;
+  return (
+    <a href={`${REPO_URL}/blob/${commit}/${path.replace(/^\//, '')}`} target="_blank" rel="noreferrer">
+      {path}
+    </a>
+  );
+}
+
+/** Required under every figure: "config: … · data: … · commit …", built from the stage's provenance object; each path links to the repository at that commit. */
 export default function ProvenanceFooter({ provenance }: { provenance: Provenance | undefined }) {
   if (!provenance) {
-    return <div className="mt-2 text-xs text-red-300">provenance object missing from stage file</div>;
+    return <div className="provenance provenance--missing">provenance object missing from stage file</div>;
   }
-  const files = provenance.files && provenance.files.length > 0 ? provenance.files.join(', ') : '(none listed)';
+  const commit = provenance.git_commit ?? '';
+  const files = provenance.files ?? [];
   return (
-    <div className="mt-2 text-[11px] leading-relaxed text-slate-500 mono break-words">
-      config: {provenance.config} · data: {files} · commit {provenance.git_commit}
+    <div className="provenance">
+      config: <RepoLink path={provenance.config} commit={commit} /> · data:{' '}
+      {files.length === 0
+        ? '(none listed)'
+        : files.map((f, i) => (
+            <span key={`${f}-${i}`}>
+              {i > 0 && ', '}
+              <RepoLink path={f} commit={commit} />
+            </span>
+          ))}{' '}
+      · commit{' '}
+      {HEX.test(commit) ? (
+        <a href={`${REPO_URL}/commit/${commit}`} target="_blank" rel="noreferrer">
+          {commit}
+        </a>
+      ) : (
+        commit || 'null'
+      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@ export default function ParamTable({ params }: { params: ModelParam[] }) {
   return (
     <div>
       {nUncited > 0 && (
-        <div className="mb-2 text-sm text-orange-300">
+        <div className="mb-2 small tone-failed">
           {nUncited} of {params.length} parameters have no citation and are flagged below.
         </div>
       )}
@@ -20,21 +20,12 @@ export default function ParamTable({ params }: { params: ModelParam[] }) {
           {
             key: 'cited',
             header: 'cited',
-            render: (p) =>
-              p.cited ? (
-                <span className="inline-block rounded border border-emerald-500/40 bg-emerald-500/10 px-1.5 text-xs text-emerald-300">
-                  cited
-                </span>
-              ) : (
-                <span className="inline-block rounded border border-orange-500/60 bg-orange-500/15 px-1.5 text-xs font-semibold text-orange-300">
-                  UNCITED
-                </span>
-              ),
+            render: (p) => (p.cited ? <span className="badge badge--passed">cited</span> : <span className="badge badge--failed">uncited</span>),
           },
         ]}
         rows={params}
         rowKey={(p, i) => `${p.name}-${i}`}
-        rowClass={(p) => (p.cited ? '' : 'bg-orange-500/5')}
+        rowClass={(p) => (p.cited ? '' : 'row--flag')}
       />
     </div>
   );

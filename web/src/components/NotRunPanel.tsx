@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 /**
  * Explicit "not yet run" state. Names the missing file and the script that produces it.
  * This is the ONLY thing rendered when data is absent; no substitute data ever appears.
@@ -7,11 +9,14 @@ export default function NotRunPanel({
   script,
   reason,
   title,
+  note,
 }: {
   file: string;
   script: string;
   reason: 'missing' | 'not_run' | 'error' | 'running';
   title?: string;
+  /** optional extra line (e.g. where the status came from) */
+  note?: ReactNode;
 }) {
   const heading =
     reason === 'running'
@@ -20,11 +25,10 @@ export default function NotRunPanel({
         ? 'Data file could not be read'
         : 'Not yet run';
   return (
-    <div className="rounded-lg border-2 border-dashed border-slate-600 bg-slate-900/50 p-5">
-      <div className="flex items-center gap-2 text-slate-200 font-semibold">
-        <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-500" aria-hidden />
+    <div className="notrun measure">
+      <div className="notrun__title">
         {heading}
-        {title && <span className="text-slate-400 font-normal">- {title}</span>}
+        {title && <em> · {title}</em>}
       </div>
       <dl className="kv mt-3">
         <dt>expected file</dt>
@@ -34,14 +38,15 @@ export default function NotRunPanel({
         <dt>state</dt>
         <dd>
           {reason === 'missing' && 'file is absent (HTTP 404)'}
-          {reason === 'not_run' && 'manifest reports status "not_run"'}
-          {reason === 'running' && 'manifest reports status "running"'}
+          {reason === 'not_run' && 'status "not_run"'}
+          {reason === 'running' && 'status "running" (partial outputs exist)'}
           {reason === 'error' && 'fetch or parse error'}
         </dd>
       </dl>
-      <p className="mt-3 text-sm text-slate-400">
-        Run <span className="mono">python {script}</span> and then <span className="mono">python scripts/export_web.py</span> to
-        populate this panel. Nothing is shown in its place.
+      {note && <div className="mt-2 small">{note}</div>}
+      <p className="mt-3 small muted">
+        Run <span className="mono">python {script}</span> (the stage script documented in the repository README) and then{' '}
+        <span className="mono">python scripts/export_web.py</span> to populate this panel. Nothing is shown in its place.
       </p>
     </div>
   );

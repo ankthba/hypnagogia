@@ -1,0 +1,1224 @@
+{
+ "status": "passed",
+ "gate_checks": [
+  "mn9_active_in_90pct_trials",
+  "mn9_rate_within_2x_of_flywire",
+  "n_active_within_2x_of_flywire"
+ ],
+ "checks": {
+  "mn9_active_in_90pct_trials": true,
+  "mn9_rate_within_2x_of_flywire": true,
+  "n_active_within_2x_of_flywire": true,
+  "scale_factor_prereg_statistic": false,
+  "scale_factor_total_input_statistic": true
+ },
+ "gate_note": "gate = propagation benchmark (the response-magnitude test); the two scale-factor statistics are reported alongside (one fails, one passes) and did not lead to any retuning",
+ "criterion": "(written before running):\n    scale: count-weighted median FlyWire/male ratio within [0.45, 0.75] (i.e. 0.581 +/- ~25%);\n    propagation: at 200 Hz the matched-set MN9 (side matched to Shiu's MN9) fires in >= 90% of trials,\n    its mean rate is within a factor of 2 of the FlyWire v630 value at 200 Hz, and the number of activated\n    neurons is within a factor of 2 of the FlyWire v630 count. If either fails: STOP and report; W_syn is\n    NOT retuned.",
+ "network": {
+  "name": "brain",
+  "dataset": "malecns",
+  "version": "v1.0",
+  "n_neurons": 144209,
+  "n_connections": 21868062,
+  "n_synapses": 101079336,
+  "weight_scale": 0.581,
+  "n_excitatory_connections": 13502767,
+  "n_inhibitory_connections": 8365295,
+  "nt_counts": {
+   "acetylcholine": 92610,
+   "glutamate": 27132,
+   "gaba": 16783,
+   "histamine": 5902,
+   "unknown": 952,
+   "dopamine": 395,
+   "serotonin": 352,
+   "octopamine": 83
+  },
+  "filtering_steps": [
+   {
+    "step": "bodies in body-annotations table",
+    "n_neurons_before": 211577,
+    "n_neurons_after": 211577,
+    "n_connections_before": 25563197,
+    "n_connections_after": 25563197,
+    "n_synapses_before": null,
+    "n_synapses_after": null
+   },
+   {
+    "step": "status == 'Traced' (proofread neurons)",
+    "n_neurons_before": 211577,
+    "n_neurons_after": 165122,
+    "n_connections_before": 25563197,
+    "n_connections_after": 25563197,
+    "n_synapses_before": null,
+    "n_synapses_after": 124025046
+   },
+   {
+    "step": "scope == 'brain': drop superclass vnc_* (VNC), ENS, and Traced bodies with no superclass",
+    "n_neurons_before": 165122,
+    "n_neurons_after": 144209,
+    "n_connections_before": 25563197,
+    "n_connections_after": 21868062,
+    "n_synapses_before": 124025046,
+    "n_synapses_after": 101079336
+   }
+  ]
+ },
+ "weight_scale_check": {
+  "n_type_pairs": 39307,
+  "min_pairs_per_type_pair": 20,
+  "ratio_weighted_median": 0.7948,
+  "ratio_quartiles": [
+   0.6864,
+   0.8338,
+   0.96
+  ],
+  "ratio_of_totals": 0.5473,
+  "expected": 0.581,
+  "examples": [
+   {
+    "pre": "KCg-m",
+    "post": "KCg-m",
+    "mean_syn_male": 1.57,
+    "mean_syn_flywire": 1.17,
+    "n_pairs_male": 265164,
+    "n_pairs_flywire": 103282,
+    "ratio": 0.743
+   },
+   {
+    "pre": "KCab",
+    "post": "KCab",
+    "mean_syn_male": 1.66,
+    "mean_syn_flywire": 1.35,
+    "n_pairs_male": 229532,
+    "n_pairs_flywire": 112331,
+    "ratio": 0.813
+   },
+   {
+    "pre": "LC12",
+    "post": "LC12",
+    "mean_syn_male": 1.78,
+    "mean_syn_flywire": 1.25,
+    "n_pairs_male": 42526,
+    "n_pairs_flywire": 12997,
+    "ratio": 0.703
+   },
+   {
+    "pre": "LC17",
+    "post": "LC17",
+    "mean_syn_male": 2.44,
+    "mean_syn_flywire": 1.51,
+    "n_pairs_male": 41079,
+    "n_pairs_flywire": 15941,
+    "ratio": 0.619
+   },
+   {
+    "pre": "KCapbp-ap2",
+    "post": "KCapbp-ap2",
+    "mean_syn_male": 2.72,
+    "mean_syn_flywire": 1.39,
+    "n_pairs_male": 25654,
+    "n_pairs_flywire": 10760,
+    "ratio": 0.509
+   },
+   {
+    "pre": "KCg-m",
+    "post": "PAM08",
+    "mean_syn_male": 1.54,
+    "mean_syn_flywire": 1.18,
+    "n_pairs_male": 19406,
+    "n_pairs_flywire": 7838,
+    "ratio": 0.762
+   },
+   {
+    "pre": "PAM08",
+    "post": "KCg-m",
+    "mean_syn_male": 1.46,
+    "mean_syn_flywire": 1.1,
+    "n_pairs_male": 18478,
+    "n_pairs_flywire": 4834,
+    "ratio": 0.755
+   },
+   {
+    "pre": "Tm3",
+    "post": "Tm3",
+    "mean_syn_male": 3.07,
+    "mean_syn_flywire": 2.29,
+    "n_pairs_male": 18477,
+    "n_pairs_flywire": 11031,
+    "ratio": 0.745
+   },
+   {
+    "pre": "KCg-m",
+    "post": "PAM01",
+    "mean_syn_male": 1.5,
+    "mean_syn_flywire": 1.13,
+    "n_pairs_male": 17920,
+    "n_pairs_flywire": 5279,
+    "ratio": 0.75
+   },
+   {
+    "pre": "KCg-d",
+    "post": "KCg-d",
+    "mean_syn_male": 2.98,
+    "mean_syn_flywire": 1.31,
+    "n_pairs_male": 17240,
+    "n_pairs_flywire": 7516,
+    "ratio": 0.439
+   },
+   {
+    "pre": "KCapbp-m",
+    "post": "KCapbp-m",
+    "mean_syn_male": 2.85,
+    "mean_syn_flywire": 1.4,
+    "n_pairs_male": 15913,
+    "n_pairs_flywire": 16978,
+    "ratio": 0.49
+   },
+   {
+    "pre": "KCapbp-ap1",
+    "post": "KCapbp-ap1",
+    "mean_syn_male": 3.19,
+    "mean_syn_flywire": 1.3,
+    "n_pairs_male": 15708,
+    "n_pairs_flywire": 10185,
+    "ratio": 0.407
+   },
+   {
+    "pre": "T2",
+    "post": "T2",
+    "mean_syn_male": 2.77,
+    "mean_syn_flywire": 1.89,
+    "n_pairs_male": 15475,
+    "n_pairs_flywire": 9245,
+    "ratio": 0.683
+   },
+   {
+    "pre": "PAM01",
+    "post": "KCg-m",
+    "mean_syn_male": 1.34,
+    "mean_syn_flywire": 1.07,
+    "n_pairs_male": 15280,
+    "n_pairs_flywire": 3025,
+    "ratio": 0.796
+   },
+   {
+    "pre": "PFNp",
+    "post": "PFNp",
+    "mean_syn_male": 1.77,
+    "mean_syn_flywire": 1.36,
+    "n_pairs_male": 14978,
+    "n_pairs_flywire": 4270,
+    "ratio": 0.769
+   },
+   {
+    "pre": "T5b",
+    "post": "T5b",
+    "mean_syn_male": 2.41,
+    "mean_syn_flywire": 1.86,
+    "n_pairs_male": 14779,
+    "n_pairs_flywire": 7352,
+    "ratio": 0.772
+   },
+   {
+    "pre": "T4b",
+    "post": "T4b",
+    "mean_syn_male": 2.77,
+    "mean_syn_flywire": 2.08,
+    "n_pairs_male": 14478,
+    "n_pairs_flywire": 7460,
+    "ratio": 0.753
+   },
+   {
+    "pre": "KCab",
+    "post": "PAM04",
+    "mean_syn_male": 1.46,
+    "mean_syn_flywire": 1.37,
+    "n_pairs_male": 14459,
+    "n_pairs_flywire": 9339,
+    "ratio": 0.938
+   },
+   {
+    "pre": "L3",
+    "post": "Dm20",
+    "mean_syn_male": 3.58,
+    "mean_syn_flywire": 2.55,
+    "n_pairs_male": 13940,
+    "n_pairs_flywire": 7451,
+    "ratio": 0.711
+   },
+   {
+    "pre": "T2a",
+    "post": "LMt2",
+    "mean_syn_male": 8.3,
+    "mean_syn_flywire": 4.59,
+    "n_pairs_male": 13593,
+    "n_pairs_flywire": 8255,
+    "ratio": 0.553
+   },
+   {
+    "pre": "Mi1",
+    "post": "Tm3",
+    "mean_syn_male": 9.34,
+    "mean_syn_flywire": 7.19,
+    "n_pairs_male": 13487,
+    "n_pairs_flywire": 9722,
+    "ratio": 0.77
+   },
+   {
+    "pre": "LPLC2",
+    "post": "LPLC2",
+    "mean_syn_male": 3.44,
+    "mean_syn_flywire": 1.6,
+    "n_pairs_male": 13434,
+    "n_pairs_flywire": 8647,
+    "ratio": 0.464
+   },
+   {
+    "pre": "Dm3q",
+    "post": "Dm3p",
+    "mean_syn_male": 1.68,
+    "mean_syn_flywire": 1.6,
+    "n_pairs_male": 13065,
+    "n_pairs_flywire": 8609,
+    "ratio": 0.949
+   },
+   {
+    "pre": "L5",
+    "post": "Tm3",
+    "mean_syn_male": 7.85,
+    "mean_syn_flywire": 6.65,
+    "n_pairs_male": 13029,
+    "n_pairs_flywire": 9328,
+    "ratio": 0.847
+   },
+   {
+    "pre": "Tm3",
+    "post": "TmY3",
+    "mean_syn_male": 4.46,
+    "mean_syn_flywire": 3.3,
+    "n_pairs_male": 13025,
+    "n_pairs_flywire": 9711,
+    "ratio": 0.74
+   },
+   {
+    "pre": "Tm21",
+    "post": "Tm21",
+    "mean_syn_male": 3.14,
+    "mean_syn_flywire": 2.17,
+    "n_pairs_male": 12939,
+    "n_pairs_flywire": 6981,
+    "ratio": 0.693
+   },
+   {
+    "pre": "L1",
+    "post": "Tm3",
+    "mean_syn_male": 11.84,
+    "mean_syn_flywire": 9.13,
+    "n_pairs_male": 12802,
+    "n_pairs_flywire": 8958,
+    "ratio": 0.771
+   },
+   {
+    "pre": "KCab",
+    "post": "PAM10",
+    "mean_syn_male": 1.7,
+    "mean_syn_flywire": 1.41,
+    "n_pairs_male": 12574,
+    "n_pairs_flywire": 6838,
+    "ratio": 0.83
+   },
+   {
+    "pre": "Tm9",
+    "post": "T5c",
+    "mean_syn_male": 5.94,
+    "mean_syn_flywire": 4.64,
+    "n_pairs_male": 12462,
+    "n_pairs_flywire": 9003,
+    "ratio": 0.781
+   },
+   {
+    "pre": "T2a",
+    "post": "LC17",
+    "mean_syn_male": 8.68,
+    "mean_syn_flywire": 6.51,
+    "n_pairs_male": 12285,
+    "n_pairs_flywire": 10377,
+    "ratio": 0.749
+   }
+  ],
+  "prereg_statistic": "count-weighted median of (FlyWire mean synapses per connected pair) / (male mean synapses per connected pair) over shared type pairs",
+  "prereg_passed": false,
+  "total_input_statistic": "sum of FlyWire synapses / sum of male synapses over the same shared type pairs",
+  "total_input_consistent_with_0.581": true,
+  "passed": false,
+  "note": "pre-registered per-pair statistic FAILED (0.795, outside [0.45, 0.75]); the total-input statistic is 0.547, consistent with 0.581. Both are reported; W_syn and the scale were NOT retuned. The gate decision rests on the propagation benchmark."
+ },
+ "sugar_grn_mapping": {
+  "flywire_ids": [
+   720575940624963786,
+   720575940630233916,
+   720575940637568838,
+   720575940638202345,
+   720575940617000768,
+   720575940630797113,
+   720575940632889389,
+   720575940621754367,
+   720575940621502051,
+   720575940640649691,
+   720575940639332736,
+   720575940616885538,
+   720575940639198653,
+   720575940620900446,
+   720575940617937543,
+   720575940632425919,
+   720575940633143833,
+   720575940612670570,
+   720575940628853239,
+   720575940629176663,
+   720575940611875570
+  ],
+  "n_flywire": 21,
+  "one_to_one_matched": [
+   {
+    "flywire_id": "720575940632425919",
+    "male_body": "516218",
+    "score": "0.5584362745285034",
+    "rank": "1"
+   },
+   {
+    "flywire_id": "720575940632889389",
+    "male_body": "163597",
+    "score": "0.5413985252380371",
+    "rank": "1"
+   },
+   {
+    "flywire_id": "720575940629176663",
+    "male_body": "120303",
+    "score": "0.5271558165550232",
+    "rank": "2"
+   },
+   {
+    "flywire_id": "720575940616885538",
+    "male_body": "261048",
+    "score": "0.504497230052948",
+    "rank": "3"
+   },
+   {
+    "flywire_id": "720575940630797113",
+    "male_body": "210344",
+    "score": "0.5014862418174744",
+    "rank": "2"
+   },
+   {
+    "flywire_id": "720575940611875570",
+    "male_body": "209155",
+    "score": "0.49137961864471436",
+    "rank": "2"
+   },
+   {
+    "flywire_id": "720575940638202345",
+    "male_body": "140015",
+    "score": "0.4912005066871643",
+    "rank": "1"
+   },
+   {
+    "flywire_id": "720575940621754367",
+    "male_body": "140619",
+    "score": "0.4901706874370575",
+    "rank": "1"
+   },
+   {
+    "flywire_id": "720575940621502051",
+    "male_body": "158537",
+    "score": "0.4600009024143219",
+    "rank": "5"
+   },
+   {
+    "flywire_id": "720575940640649691",
+    "male_body": "72059",
+    "score": "0.4519180357456207",
+    "rank": "3"
+   },
+   {
+    "flywire_id": "720575940612670570",
+    "male_body": "101087",
+    "score": "0.4470539391040802",
+    "rank": "1"
+   },
+   {
+    "flywire_id": "720575940637568838",
+    "male_body": "141663",
+    "score": "0.44376808404922485",
+    "rank": "4"
+   },
+   {
+    "flywire_id": "720575940639332736",
+    "male_body": "92440",
+    "score": "0.4322892427444458",
+    "rank": "4"
+   },
+   {
+    "flywire_id": "720575940639198653",
+    "male_body": "142827",
+    "score": "0.4235857427120209",
+    "rank": "4"
+   },
+   {
+    "flywire_id": "720575940617937543",
+    "male_body": "213650853",
+    "score": "0.41170236468315125",
+    "rank": "1"
+   },
+   {
+    "flywire_id": "720575940630233916",
+    "male_body": "516217",
+    "score": "0.4013303816318512",
+    "rank": "5"
+   },
+   {
+    "flywire_id": "720575940628853239",
+    "male_body": "215556",
+    "score": "0.31111940741539",
+    "rank": "4"
+   }
+  ],
+  "unmatched_flywire_ids": [
+   "720575940624963786",
+   "720575940617000768",
+   "720575940620900446",
+   "720575940633143833"
+  ],
+  "allR_n": 40,
+  "male_types_matched": {
+   "LB3c": 8,
+   "LB3d": 4,
+   "LB3b": 3,
+   "LB3a": 2
+  }
+ },
+ "mn9_male": {
+  "MN9_L": 10331,
+  "MN9_R": 16949
+ },
+ "mn9_flywire_match": {
+  "flywire": "720575940660219265",
+  "male_body": 10331,
+  "instance": "MN9_L"
+ },
+ "runs": [
+  {
+   "drive_set": "matched17",
+   "n_driven": 17,
+   "sugar_rate_hz": 100,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 25.7,
+     "rate_hz_sd": 4.720826929315639,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      26,
+      25,
+      20,
+      27,
+      26,
+      28,
+      24,
+      24,
+      26,
+      20,
+      22,
+      26,
+      32,
+      24,
+      30,
+      21,
+      35,
+      29,
+      21,
+      32,
+      34,
+      20,
+      23,
+      23,
+      27,
+      22,
+      23,
+      25,
+      37,
+      19
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "rate_hz_sd": 0.0,
+     "frac_trials_active": 0.0,
+     "per_trial": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 220.4,
+   "n_spikes_per_trial_mean": 4796.433333333333,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667
+   }
+  },
+  {
+   "drive_set": "matched17",
+   "n_driven": 17,
+   "sugar_rate_hz": 100,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 105.6,
+     "rate_hz_sd": 17.889700369495984,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      126,
+      116,
+      70,
+      118,
+      84,
+      99,
+      109,
+      108,
+      113,
+      74,
+      108,
+      84,
+      87,
+      114,
+      89,
+      99,
+      94,
+      99,
+      115,
+      121,
+      69,
+      126,
+      112,
+      133,
+      139,
+      114,
+      112,
+      104,
+      121,
+      111
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 10.766666666666667,
+     "rate_hz_sd": 5.98667101860938,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      22,
+      14,
+      3,
+      15,
+      4,
+      8,
+      10,
+      10,
+      13,
+      4,
+      12,
+      2,
+      4,
+      14,
+      5,
+      6,
+      4,
+      6,
+      15,
+      18,
+      2,
+      16,
+      16,
+      20,
+      5,
+      21,
+      13,
+      12,
+      14,
+      15
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 9566.466666666667,
+   "n_spikes_per_trial_mean": 439568.86666666664,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667
+   }
+  },
+  {
+   "drive_set": "matched17",
+   "n_driven": 17,
+   "sugar_rate_hz": 200,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 80.4,
+     "rate_hz_sd": 3.944441746262097,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      76,
+      83,
+      82,
+      83,
+      78,
+      87,
+      81,
+      75,
+      87,
+      76,
+      76,
+      74,
+      83,
+      85,
+      86,
+      80,
+      82,
+      79,
+      77,
+      76,
+      78,
+      83,
+      79,
+      83,
+      78,
+      80,
+      77,
+      89,
+      81,
+      78
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "rate_hz_sd": 0.0,
+     "frac_trials_active": 0.0,
+     "per_trial": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 431.1666666666667,
+   "n_spikes_per_trial_mean": 11179.966666666667,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7
+   }
+  },
+  {
+   "drive_set": "matched17",
+   "n_driven": 17,
+   "sugar_rate_hz": 200,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 135.76666666666668,
+     "rate_hz_sd": 8.830524385309188,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      140,
+      166,
+      119,
+      143,
+      118,
+      130,
+      134,
+      134,
+      137,
+      141,
+      144,
+      135,
+      141,
+      128,
+      136,
+      134,
+      133,
+      141,
+      128,
+      135,
+      134,
+      130,
+      133,
+      130,
+      149,
+      137,
+      142,
+      139,
+      129,
+      133
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 12.333333333333334,
+     "rate_hz_sd": 5.247878608071787,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      19,
+      15,
+      6,
+      17,
+      8,
+      6,
+      11,
+      15,
+      8,
+      19,
+      19,
+      8,
+      21,
+      6,
+      19,
+      10,
+      16,
+      7,
+      7,
+      6,
+      8,
+      7,
+      8,
+      9,
+      19,
+      18,
+      17,
+      9,
+      17,
+      15
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 11064.3,
+   "n_spikes_per_trial_mean": 585968.5,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7
+   }
+  },
+  {
+   "drive_set": "allR",
+   "n_driven": 40,
+   "sugar_rate_hz": 100,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 68.33333333333333,
+     "rate_hz_sd": 4.922386114220547,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      63,
+      67,
+      74,
+      71,
+      66,
+      62,
+      70,
+      78,
+      67,
+      71,
+      69,
+      72,
+      65,
+      61,
+      67,
+      75,
+      66,
+      66,
+      72,
+      76,
+      76,
+      66,
+      59,
+      71,
+      60,
+      72,
+      67,
+      64,
+      66,
+      71
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "rate_hz_sd": 0.0,
+     "frac_trials_active": 0.0,
+     "per_trial": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 356.73333333333335,
+   "n_spikes_per_trial_mean": 9529.1,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667
+   }
+  },
+  {
+   "drive_set": "allR",
+   "n_driven": 40,
+   "sugar_rate_hz": 100,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 121.6,
+     "rate_hz_sd": 16.30231631521666,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      126,
+      132,
+      116,
+      143,
+      136,
+      138,
+      113,
+      87,
+      140,
+      112,
+      145,
+      132,
+      126,
+      108,
+      97,
+      124,
+      92,
+      111,
+      110,
+      112,
+      142,
+      94,
+      133,
+      128,
+      131,
+      135,
+      142,
+      119,
+      113,
+      111
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 15.433333333333334,
+     "rate_hz_sd": 7.933705197505106,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      20,
+      22,
+      9,
+      25,
+      25,
+      24,
+      5,
+      5,
+      21,
+      10,
+      26,
+      20,
+      23,
+      9,
+      6,
+      22,
+      6,
+      6,
+      7,
+      9,
+      26,
+      6,
+      19,
+      23,
+      20,
+      18,
+      25,
+      7,
+      10,
+      9
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 10152.233333333334,
+   "n_spikes_per_trial_mean": 502182.26666666666,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 67.46666666666667,
+    "n_active_per_trial_mean": 357.3666666666667
+   }
+  },
+  {
+   "drive_set": "allR",
+   "n_driven": 40,
+   "sugar_rate_hz": 200,
+   "weight_scale": 0.581,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 101.46666666666667,
+     "rate_hz_sd": 3.411272725713293,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      99,
+      104,
+      98,
+      102,
+      104,
+      104,
+      103,
+      106,
+      103,
+      100,
+      103,
+      105,
+      104,
+      100,
+      105,
+      103,
+      101,
+      101,
+      99,
+      99,
+      103,
+      107,
+      94,
+      100,
+      91,
+      103,
+      99,
+      101,
+      104,
+      99
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 0.0,
+     "rate_hz_sd": 0.0,
+     "frac_trials_active": 0.0,
+     "per_trial": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 521.0,
+   "n_spikes_per_trial_mean": 19369.8,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7
+   }
+  },
+  {
+   "drive_set": "allR",
+   "n_driven": 40,
+   "sugar_rate_hz": 200,
+   "weight_scale": 1.0,
+   "n_trials": 30,
+   "mn9": {
+    "MN9_L": {
+     "rate_hz_mean": 144.5,
+     "rate_hz_sd": 6.755585173357136,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      154,
+      136,
+      150,
+      144,
+      147,
+      132,
+      149,
+      142,
+      134,
+      139,
+      151,
+      147,
+      161,
+      148,
+      144,
+      144,
+      139,
+      144,
+      137,
+      153,
+      145,
+      147,
+      137,
+      147,
+      141,
+      148,
+      134,
+      141,
+      146,
+      154
+     ]
+    },
+    "MN9_R": {
+     "rate_hz_mean": 16.533333333333335,
+     "rate_hz_sd": 5.600082101204399,
+     "frac_trials_active": 1.0,
+     "per_trial": [
+      16,
+      11,
+      18,
+      25,
+      16,
+      9,
+      16,
+      9,
+      9,
+      10,
+      26,
+      20,
+      26,
+      22,
+      23,
+      16,
+      10,
+      14,
+      11,
+      17,
+      23,
+      13,
+      10,
+      15,
+      15,
+      22,
+      13,
+      15,
+      20,
+      26
+     ]
+    }
+   },
+   "n_active_per_trial_mean": 12017.766666666666,
+   "n_spikes_per_trial_mean": 679329.2666666667,
+   "flywire_v630_reference": {
+    "mn9_rate_hz_mean": 92.8,
+    "n_active_per_trial_mean": 401.7
+   }
+  }
+ ],
+ "walltime_s": 8.6
+}

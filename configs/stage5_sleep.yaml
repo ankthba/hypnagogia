@@ -1,0 +1,19 @@
+extends: stage4_encode.yaml
+stage5:
+  # dFB sleep-promoting neurons: the R23E10 population matched to EM cell types by Hulse et al. 2021 eLife
+  # 10:e66039 Fig. 48 (FB6A, FB6C_a/b, FB6E, FB6G, FB6I, FB6Z high-quality; FB7A, FB7K layer 7).
+  dfb_population: dFB                  # key in hypnagogia.populations.POPULATIONS
+  # No absolute firing rate for dFB neurons exists in the literature: Donlea et al. 2014 Neuron 81:860 and
+  # Pimentel et al. 2016 Nature 536:333 report only a binary ON (spiking) / OFF (silent) switch, with ON-state
+  # excitability measured as the fraction of cells reaching a 1-50 Hz spike-frequency threshold under current
+  # injection. The nearest well-defined number in this circuit is the UP state of the connected helicon cells
+  # (ExR1): 16.9 +/- 3.6 Hz (Donlea et al. 2018 Neuron 97:378). We clamp the dFB at 17 Hz and run 8.5 and 34 Hz
+  # as a sensitivity check. This rate is an approximation, not a measurement of dFB firing.
+  dfb_clamp_rate_hz: 17.0
+  dfb_rate_sensitivity_hz: [8.5, 34.0]
+  duration_s: 60.0                     # offline period analysed for reactivation
+  warmup_s: 2.0
+  plastic_during_sleep: false          # the engram is held fixed while it is read out, so the measurement cannot change it
+  conditions: ["sleep", "wake"]
+  seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  criterion: "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)"

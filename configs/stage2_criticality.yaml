@@ -1,7 +1,7 @@
 extends: base.yaml
 noise: {mode: gaussian, sigma_mV: 2.0}
 stage2:
-  sigma_values_mV: [0.5, 0.71, 1.0, 1.41, 2.0, 2.83, 4.0, 5.66, 8.0]   # log-spaced (factor sqrt(2))
+  sigma_values_mV: [0.5, 0.71, 1.0, 1.41, 1.5, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.83, 4.0, 5.66, 8.0]
   seeds: [0, 1, 2]
   warmup_s: 1.0
   duration_s: 4.0
@@ -9,4 +9,4 @@ stage2:
   mr_kmax_ms: 500.0
   avalanche_bin_mult: 1.0   # avalanche bin = <IEI> x this (Priesemann 2014); 0.5 and 2.0 run as robustness checks
   max_avalanches_for_fit: 200000
-  operating_rule: "if any sigma is 'critical': the critical sigma with mean m closest to 1; else the non-saturated sigma with mean m closest to 1 from below, and 'no critical regime' is reported as the finding"
+  operating_rule: "if any sigma is classified critical: the critical sigma with mean branching ratio closest to 1. Otherwise NO critical regime is reported as the finding, and the operating point for downstream stages is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734) - chosen to match biology, not to manufacture criticality."

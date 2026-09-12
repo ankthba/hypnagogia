@@ -2,27 +2,34 @@ import type { ReactNode } from 'react';
 import type { Provenance } from '../types';
 import ProvenanceFooter from './ProvenanceFooter';
 
+/**
+ * A figure: small-caps title, the plot on a white mat (which forces the light palette on
+ * everything drawn inside it, in both themes), caption, and the required provenance line.
+ */
 export default function Figure({
   title,
   caption,
   provenance,
   children,
   right,
+  flat = false,
 }: {
   title: string;
   caption?: ReactNode;
   provenance: Provenance | undefined;
   children: ReactNode;
   right?: ReactNode;
+  /** draw the content on the page rather than on a mat (for content that is not a plot) */
+  flat?: boolean;
 }) {
   return (
-    <figure className="card">
-      <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-        <figcaption className="font-semibold text-slate-100">{title}</figcaption>
+    <figure className="figure">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+        <figcaption className="label label--ink">{title}</figcaption>
         {right}
       </div>
-      <div className="w-full overflow-x-auto">{children}</div>
-      {caption && <div className="mt-2 text-sm text-slate-400">{caption}</div>}
+      <div className={flat ? 'w-full overflow-x-auto' : 'mat'}>{children}</div>
+      {caption && <div className="figure__caption">{caption}</div>}
       <ProvenanceFooter provenance={provenance} />
     </figure>
   );

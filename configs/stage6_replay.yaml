@@ -1,0 +1,11 @@
+extends: stage5_sleep.yaml
+stage6:
+  bin_ms: 100.0                 # Kudrimoti et al. 1999 J Neurosci 19:4090 (primary); 50 and 200 ms as robustness
+  bin_ms_robustness: [50.0, 200.0]
+  n_random_ensembles: 200       # size-matched random KC ensembles drawn from the same population
+  n_sequence_shuffles: 200      # cell-identity shuffles for the rank-order test (Foster & Wilson 2006)
+  seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  export_seeds: [0, 1, 2]       # seeds whose raster + correlation trace are exported for the viewer
+  export_window_s: 60.0
+  export_max_spikes: 200000
+  criterion: "a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such."

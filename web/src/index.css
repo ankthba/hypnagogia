@@ -2,60 +2,1021 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   hypnagogia results viewer - styled after aniketh.net
+   One centered column, serif throughout. Letterspaced caps
+   for labels and status, hairline rules for structure, a
+   white mat behind every figure. Tokens and the masthead /
+   nav / colophon treatment mirror docs/aniketh_net_style_reference.css.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. Tokens & theme
+   --------------------------------------------------------- */
+
+/* The light palette, and the whole palette for a browser without light-dark(). */
 :root {
-  color-scheme: dark;
+  --color-bg: #faf9f5;
+  --color-bg-alt: #f0eee8;
+  --color-fg: #262624;
+  --color-muted: #6f695e;
+  --color-border: rgba(38, 38, 36, 0.14);
+  --color-border-hover: rgba(38, 38, 36, 0.3);
+
+  /* The mat behind a figure. White in both themes, like a print mounted on
+     white board: on the dark page the mat is what reads as paper. */
+  --color-mat: #ffffff;
+
+  --color-link: #2f5575;
+  --color-link-hover: #4a749b;
+  --color-link-underline: rgba(47, 85, 117, 0.35);
+  --color-underline-quiet: rgba(38, 38, 36, 0.32);
+
+  /* Status colours for this viewer only; muted, the same warmth as the ink. */
+  --color-passed: #4f7a4a;
+  --color-failed: #9a3f35;
+  --color-artifact: #9a3f35;
+  --color-running: var(--color-link);
+  --color-not-run: var(--color-muted);
+  --color-passed-wash: rgba(79, 122, 74, 0.08);
+  --color-failed-wash: rgba(154, 63, 53, 0.08);
+  --color-running-wash: rgba(47, 85, 117, 0.08);
+
+  /* Criticality regimes: marker colour and the band drawn behind each sigma. */
+  --color-class-silent: #9c968a;
+  --color-class-subcritical: #8a7f6a;
+  --color-class-critical: var(--color-link);
+  --color-class-saturated: var(--color-failed);
+  --color-class-indeterminate: #b5afa4;
+  --color-class-not-run: var(--color-muted);
+  --band-silent: var(--color-bg-alt);
+  --band-subcritical: rgba(111, 105, 94, 0.1);
+  --band-critical: rgba(47, 85, 117, 0.12);
+  --band-saturated: rgba(154, 63, 53, 0.1);
+  --band-indeterminate: transparent;
+  --band-not-run: transparent;
+
+  --font-serif: 'EB Garamond', Garamond, Georgia, serif;
+  --font-display: 'EB Garamond', Garamond, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2.5rem;
+  --space-lg: 4.5rem;
+  --space-xl: 7rem;
+
+  --measure: 36rem;
+  --measure-wide: 64rem;
+  --gutter: var(--space-md);
+
+  --transition-fast: 0.15s ease;
+
+  color-scheme: light;
 }
 
-html, body, #root {
+/* Both palettes in one place; light-dark() reads whichever the used color-scheme
+   calls for. Guarded so a browser without light-dark() keeps the ivory above. */
+@supports (color: light-dark(#000, #fff)) {
+  :root {
+    --color-bg: light-dark(#faf9f5, #1a1917);
+    --color-bg-alt: light-dark(#f0eee8, #22211e);
+    --color-fg: light-dark(#262624, #e8e6df);
+    --color-muted: light-dark(#6f695e, #a49d90);
+    --color-border: light-dark(rgba(38, 38, 36, 0.14), rgba(232, 230, 223, 0.16));
+    --color-border-hover: light-dark(rgba(38, 38, 36, 0.3), rgba(232, 230, 223, 0.32));
+
+    --color-link: light-dark(#2f5575, #8fb3d4);
+    --color-link-hover: light-dark(#4a749b, #b3cde5);
+    --color-link-underline: light-dark(rgba(47, 85, 117, 0.35), rgba(143, 179, 212, 0.38));
+    --color-underline-quiet: light-dark(rgba(38, 38, 36, 0.32), rgba(232, 230, 223, 0.3));
+
+    --color-passed: light-dark(#4f7a4a, #8fbf88);
+    --color-failed: light-dark(#9a3f35, #d98b82);
+    --color-artifact: light-dark(#9a3f35, #d98b82);
+    --color-passed-wash: light-dark(rgba(79, 122, 74, 0.08), rgba(143, 191, 136, 0.1));
+    --color-failed-wash: light-dark(rgba(154, 63, 53, 0.08), rgba(217, 139, 130, 0.1));
+    --color-running-wash: light-dark(rgba(47, 85, 117, 0.08), rgba(143, 179, 212, 0.1));
+
+    --color-class-silent: light-dark(#9c968a, #7d766a);
+    --color-class-subcritical: light-dark(#8a7f6a, #b3a78f);
+    --color-class-indeterminate: light-dark(#b5afa4, #6a645a);
+    --band-subcritical: light-dark(rgba(111, 105, 94, 0.1), rgba(164, 157, 144, 0.12));
+    --band-critical: light-dark(rgba(47, 85, 117, 0.12), rgba(143, 179, 212, 0.14));
+    --band-saturated: light-dark(rgba(154, 63, 53, 0.1), rgba(217, 139, 130, 0.12));
+
+    /* No data-theme defers to the system; the colophon toggle writes the attribute. */
+    color-scheme: light dark;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+}
+
+/* ---------------------------------------------------------
+   2. Base
+   --------------------------------------------------------- */
+
+::selection {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+html {
+  font-family: var(--font-serif);
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body,
+#root {
   min-height: 100%;
 }
 
 body {
-  @apply bg-slate-950 text-slate-200 antialiased;
-  overflow-x: hidden;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--color-fg);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
 }
 
-@layer components {
-  .card {
-    @apply rounded-lg border border-slate-800 bg-slate-900/60 p-4 sm:p-5;
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+select,
+input,
+option {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+i,
+em {
+  font-style: italic;
+}
+
+code,
+pre,
+kbd,
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+pre {
+  line-height: 1.5;
+}
+
+strong,
+b {
+  font-weight: 500;
+}
+
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------
+   3. Masthead
+   --------------------------------------------------------- */
+
+.masthead {
+  width: 100%;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md) 0;
+  text-align: center;
+}
+
+.masthead__name {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  white-space: nowrap;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: var(--color-fg);
+  transition: opacity var(--transition-fast);
+}
+
+a.masthead__name:hover {
+  opacity: 0.6;
+}
+
+.masthead__tagline {
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+/* The nav is justified like the body copy: every row meets both edges of the measure. */
+.masthead__nav {
+  max-width: 100%;
+  margin: 2rem auto 0;
+  text-wrap: balance;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+.masthead__nav-link {
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--color-fg);
+  transition: color var(--transition-fast);
+}
+
+/* Invisible ghosts reserve both the upright and the italic width, so the italic
+   current-page link sits at the same width as the rest of the row. */
+.masthead__nav-link::before,
+.masthead__nav-link::after,
+.theme-toggle__option::before,
+.theme-toggle__option::after {
+  content: attr(data-text);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.masthead__nav-link::before,
+.theme-toggle__option::before {
+  font-style: normal;
+}
+
+.masthead__nav-link::after,
+.theme-toggle__option::after {
+  font-style: italic;
+}
+
+.masthead__nav-link:hover {
+  color: var(--color-muted);
+}
+
+.masthead__nav-link.active {
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+/* ---------------------------------------------------------
+   4. Page column
+   --------------------------------------------------------- */
+
+/* The column is one wide measure so figures and tables can reach 64rem; prose,
+   headings and status blocks constrain themselves to the 36rem reading measure
+   with .measure / .prose, and everything stays centred on the same axis. */
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: calc(var(--measure-wide) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: var(--space-lg) var(--gutter) var(--space-xl);
+}
+
+.measure,
+.page h1,
+.page h2,
+.page h3 {
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.prose {
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.prose p,
+.page .justify p {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.prose p + p {
+  margin-top: 1.2rem;
+}
+
+.prose a,
+.link {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-link-underline);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.prose a:hover,
+.link:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 2.9rem);
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+  color: var(--color-fg);
+}
+
+.page h2,
+.h2 {
+  font-size: 1.65rem;
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.page h3,
+.h3 {
+  font-size: 1.25rem;
+  margin-top: var(--space-md);
+  margin-bottom: 0.6rem;
+}
+
+.lede {
+  color: var(--color-fg);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.small {
+  font-size: 0.95rem;
+}
+
+.smaller {
+  font-size: 0.875rem;
+}
+
+/* Letterspaced small caps: labels, nav-like controls, badges, table heads. */
+.label,
+.data-table th {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.label--ink {
+  color: var(--color-fg);
+}
+
+.tone-passed {
+  color: var(--color-passed);
+}
+.tone-failed,
+.tone-artifact {
+  color: var(--color-failed);
+}
+.tone-running {
+  color: var(--color-running);
+}
+.tone-muted {
+  color: var(--color-muted);
+}
+
+.wide {
+  max-width: var(--measure-wide);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Body copy paragraphs in the page column justify like the reference. */
+.page .prose p,
+.page .callout p,
+.page .banner p {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* ---------------------------------------------------------
+   5. Blocks: card, figure, mat, banner, callout, not-run
+   --------------------------------------------------------- */
+
+/* A "card" is a plate opened by a hairline rule; no background, no shadow. */
+.card {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-sm);
+}
+
+.card__title,
+.fig-title {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* A figure: the plot sits on a white mat. The mat forces the light colour scheme
+   on itself, so every var() inside it (chart strokes, bands, canvas probes)
+   resolves to the light palette and ink stays ink on the white board. */
+.figure {
+  margin: 0;
+}
+
+.mat {
+  color-scheme: light;
+  background: var(--color-mat);
+  color: var(--color-fg);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 1rem 1rem 0.5rem;
+  overflow-x: auto;
+}
+
+.figure__caption {
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+/* Status banner. failed / artifact carry exactly the weight passed does. */
+.banner {
+  border: 1px solid var(--tone, var(--color-muted));
+  border-left-width: 4px;
+  border-radius: 2px;
+  padding: 1rem 1.25rem;
+  background: var(--wash, transparent);
+}
+
+.banner--passed {
+  --tone: var(--color-passed);
+  --wash: var(--color-passed-wash);
+}
+.banner--failed,
+.banner--artifact {
+  --tone: var(--color-failed);
+  --wash: var(--color-failed-wash);
+}
+.banner--running {
+  --tone: var(--color-running);
+  --wash: var(--color-running-wash);
+}
+.banner--not_run,
+.banner--unknown {
+  --tone: var(--color-border-hover);
+  --wash: transparent;
+}
+
+.banner__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.banner__body {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.banner__body ul,
+.callout ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+/* Status badge: small caps in the status colour, hairline border. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 0.35em 0.6em;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  color: var(--tone, var(--color-muted));
+  white-space: nowrap;
+}
+
+.badge--lg {
+  font-size: 0.8rem;
+  padding: 0.45em 0.75em;
+}
+
+.badge--passed {
+  --tone: var(--color-passed);
+}
+.badge--failed,
+.badge--artifact {
+  --tone: var(--color-failed);
+}
+.badge--running {
+  --tone: var(--color-running);
+}
+.badge--not_run,
+.badge--unknown {
+  --tone: var(--color-muted);
+}
+
+/* Callout: a hairline plate with a coloured left rule. */
+.callout {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--tone, var(--color-border-hover));
+  border-radius: 2px;
+  padding: 0.9rem 1.25rem;
+}
+
+.callout--positive {
+  --tone: var(--color-passed);
+}
+.callout--negative,
+.callout--warning {
+  --tone: var(--color-failed);
+}
+.callout--info {
+  --tone: var(--color-link);
+}
+.callout--neutral {
+  --tone: var(--color-border-hover);
+}
+
+.callout__title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.callout__body {
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+}
+
+/* The explicit "Not yet run" state: dashed hairline, nothing drawn in its place. */
+.notrun {
+  border: 1px dashed var(--color-border-hover);
+  border-radius: 2px;
+  padding: 1.1rem 1.25rem;
+}
+
+.notrun__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.notrun__title em {
+  color: var(--color-muted);
+}
+
+/* Error / mismatch notice */
+.notice {
+  border: 1px solid var(--color-failed);
+  border-left-width: 3px;
+  border-radius: 2px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.notice--warn {
+  border-color: var(--color-failed);
+}
+
+/* ---------------------------------------------------------
+   6. Tables, key-value lists, stats
+   --------------------------------------------------------- */
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table {
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th {
+  padding: 0.55rem 0.75rem 0.45rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-hover);
+  vertical-align: bottom;
+}
+
+.data-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.data-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tr.row--emph td {
+  background: var(--color-bg-alt);
+}
+
+.data-table tr.row--flag td {
+  background: var(--color-failed-wash);
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.25rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+.kv dt {
+  color: var(--color-muted);
+}
+
+.kv dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stat tiles: a rule, a small-caps label, the number in the display face. */
+.stats {
+  display: grid;
+  gap: 1rem 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .table-wrap {
-    @apply w-full overflow-x-auto rounded-md border border-slate-800;
+  .stats--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .data-table {
-    @apply min-w-full text-sm whitespace-nowrap;
+}
+
+.stat {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.5rem;
+}
+
+.stat--emph {
+  border-top-color: var(--color-fg);
+}
+
+.stat__value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin-top: 0.2rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.stat--emph .stat__value {
+  font-size: 1.85rem;
+}
+
+/* Stage status board: one row per stage, separated by hairlines. */
+.board {
+  border-top: 1px solid var(--color-border);
+}
+
+.board__row {
+  display: block;
+  padding: 0.85rem 0.25rem;
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+}
+
+.board__row:hover {
+  background: var(--color-bg-alt);
+}
+
+.board__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.board__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.board__summary {
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+/* Provenance line under every figure. */
+.provenance {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.provenance a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-underline-quiet);
+  text-underline-offset: 2px;
+}
+
+.provenance a:hover {
+  color: var(--color-fg);
+}
+
+.provenance--missing {
+  color: var(--color-failed);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+}
+
+/* ---------------------------------------------------------
+   7. Controls
+   --------------------------------------------------------- */
+
+.control,
+select.control {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.3;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-border-hover);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-fg);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.control:hover:not(:disabled) {
+  background: var(--color-bg-alt);
+}
+
+.control:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.control:focus-visible,
+.masthead__nav-link:focus-visible,
+.theme-toggle__option:focus-visible,
+.board__row:focus-visible {
+  outline: 1px solid var(--color-border-hover);
+  outline-offset: 3px;
+}
+
+/* Segmented control (sleep / wake), rendered as nav-like text. */
+.segmented {
+  display: inline-flex;
+  gap: 1.1rem;
+  font-size: 0.95rem;
+}
+
+.segmented__option {
+  padding: 0;
+  color: var(--color-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-underline-quiet);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.segmented__option::before,
+.segmented__option::after {
+  content: attr(data-text);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.segmented__option::before {
+  font-style: normal;
+}
+
+.segmented__option::after {
+  font-style: italic;
+}
+
+.segmented__option:hover {
+  color: var(--color-fg);
+}
+
+.segmented__option[aria-selected='true'] {
+  font-style: italic;
+  color: var(--color-fg);
+  text-decoration-color: var(--color-fg);
+}
+
+input[type='range'] {
+  accent-color: var(--color-fg);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.swatch {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: 0.4em;
+  vertical-align: 0.05em;
+}
+
+.swatch--line {
+  width: 1em;
+  height: 1.5px;
+  vertical-align: 0.3em;
+}
+
+.chip {
+  display: inline-block;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+pre.equations {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-alt);
+}
+
+/* ---------------------------------------------------------
+   8. Colophon
+   --------------------------------------------------------- */
+
+.colophon {
+  width: 100%;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-md) var(--space-lg);
+}
+
+.colophon__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1.5rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.colophon__note {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.colophon a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-underline-quiet);
+  text-underline-offset: 3px;
+}
+
+.colophon a:hover {
+  color: var(--color-fg);
+}
+
+/* Hidden until the inline head script has proved scripting is on. */
+.theme-toggle {
+  display: none;
+}
+
+:root.js .theme-toggle {
+  display: inline-flex;
+  gap: 0.8rem;
+}
+
+.theme-toggle__option {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: normal;
+  line-height: inherit;
+  padding: 0;
+  color: var(--color-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-underline-quiet);
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.theme-toggle__option:last-child {
+  text-align: right;
+}
+
+.theme-toggle__option:hover {
+  color: var(--color-fg);
+}
+
+.theme-toggle__option[aria-pressed='true'] {
+  font-style: italic;
+  color: var(--color-fg);
+  text-decoration-color: var(--color-fg);
+}
+
+/* ---------------------------------------------------------
+   9. Responsive & motion
+   --------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  :root {
+    --space-xl: 4.5rem;
+    --space-lg: 3rem;
+    --space-md: 2rem;
+    --gutter: 1.25rem;
   }
-  .data-table th {
-    @apply bg-slate-900 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 border-b border-slate-800;
+
+  .masthead,
+  .colophon {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
   }
-  .data-table td {
-    @apply px-3 py-1.5 border-b border-slate-800/70 text-slate-200 tabular-nums;
+
+  .masthead__nav-link {
+    margin: 0 0 0.45rem;
   }
-  .data-table tr:last-child td {
-    @apply border-b-0;
+
+  .page-title {
+    text-align: center;
   }
-  .h1 {
-    @apply text-2xl sm:text-3xl font-semibold tracking-tight text-slate-100;
-  }
-  .h2 {
-    @apply text-lg sm:text-xl font-semibold text-slate-100 mt-8 mb-3;
-  }
-  .h3 {
-    @apply text-base font-semibold text-slate-200 mt-5 mb-2;
-  }
-  .muted {
-    @apply text-slate-400;
-  }
-  .mono {
-    @apply font-mono text-[0.85em];
-  }
-  .kv {
-    @apply grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm;
-  }
-  .kv dt {
-    @apply text-slate-400;
-  }
-  .kv dd {
-    @apply text-slate-100 tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

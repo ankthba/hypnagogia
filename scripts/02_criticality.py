@@ -28,6 +28,8 @@ def main():
     conn = load_connectome("malecns", "v1.0", "brain")
     if a.subset:
         conn = subset_from_config(conn, SUBSET_MB_CX)
+    subpops = {"KC": conn.select(cell_class="Kenyon_Cell"), "MBON": conn.select(cell_class="MBON"),
+               "DAN": conn.select(cell_class="DAN"), "ORN": conn.select(cell_type={"regex": r"^ORN_"})}
     T = s2["warmup_s"] + s2["duration_s"]
     specs = []
     for sg in sigmas:
@@ -42,59 +44,96 @@ def main():
         errs = [(s["name"], r.get("error")) for s, r in zip(specs, res) if r is None or "error" in r]
         if errs:
             print("ERRORS:", errs[:3])
+    # Analyse EVERY run present in the output directory, not only the ones requested on this invocation, so that
+    # successive calls with extra --sigmas accumulate into one combined sweep. Per-run analyses are cached.
+    import re as _re
+    run_dirs = sorted(p for p in OUT.glob("sigma*_seed*") if (p / "spikes.npz").exists())
     per = []
-    for sp in specs:
+    for rd in run_dirs:
+        mm = _re.match(r"sigma([0-9.]+)_seed(\d+)$", rd.name)
+        if not mm:
+            continue
+        sg, sd = float(mm.group(1)), int(mm.group(2))
+        cache = rd / "analysis.json"
+        if cache.exists():
+            per.append(json.load(open(cache)))
+            print(f"sigma={sg} seed={sd}: cached -> {per[-1]['classification']}", flush=True)
+            continue
         try:
-            i, ts, meta = load_spikes(sp["out_dir"])
+            i, ts, meta = load_spikes(str(rd))
         except Exception as e:
-            per.append({"sigma_mV": sp["config"]["noise"]["sigma_mV"], "seed": sp["seed"], "error": str(e)}); continue
-        sg, sd = sp["config"]["noise"]["sigma_mV"], sp["seed"]
-        r = analyse_population(ts, conn.N, meta["dt_ms"] * 1e-3, s2["warmup_s"], T, mr_bin_s=s2["mr_bin_ms"] * 1e-3,
-                               mr_kmax_s=s2["mr_kmax_ms"] * 1e-3, aval_bin_mult=s2["avalanche_bin_mult"], seed=sd, i=i)
+            per.append({"sigma_mV": sg, "seed": sd, "error": str(e)}); continue
+        dur = meta["duration_s"]
+        r = analyse_population(ts, conn.N, meta["dt_ms"] * 1e-3, s2["warmup_s"], dur, mr_bin_s=s2["mr_bin_ms"] * 1e-3,
+                               mr_kmax_s=s2["mr_kmax_ms"] * 1e-3, aval_bin_mult=s2["avalanche_bin_mult"], seed=sd, i=i,
+                               subpopulations=subpops)
         # robustness: avalanche bin x0.5 and x2 (classification only reported, not used for the operating point)
         rob = {}
         for mult in (0.5, 2.0):
-            rr = analyse_population(ts, conn.N, meta["dt_ms"] * 1e-3, s2["warmup_s"], T, mr_bin_s=s2["mr_bin_ms"] * 1e-3,
+            rr = analyse_population(ts, conn.N, meta["dt_ms"] * 1e-3, s2["warmup_s"], dur, mr_bin_s=s2["mr_bin_ms"] * 1e-3,
                                     mr_kmax_s=s2["mr_kmax_ms"] * 1e-3, aval_bin_mult=mult, seed=sd, i=i)
             rob[str(mult)] = {"classification": rr["classification"], "n_avalanches": rr["avalanches"]["n"], "alpha": rr["size_fit"]["alpha"],
                               "R_vs_exponential": rr["size_fit"]["R_vs_exponential"], "R_vs_lognormal": rr["size_fit"]["R_vs_lognormal"]}
-        per.append({"sigma_mV": sg, "seed": sd, "file": f"results/stage2_criticality/{tag}/sigma{sg}_seed{sd}/spikes.npz", **r, "robustness_bin_mult": rob,
-                    "walltime_s": meta.get("walltime_total_s")})
+        rec = {"sigma_mV": sg, "seed": sd, "file": f"results/stage2_criticality/{tag}/{rd.name}/spikes.npz", **r, "robustness_bin_mult": rob,
+               "walltime_s": meta.get("walltime_total_s")}
+        json.dump(rec, open(cache, "w"), indent=1, default=str)
+        per.append(rec)
         print(f"sigma={sg} seed={sd}: rate={r['pop_rate_hz']:.3f} Hz/neuron active={r['frac_active']:.3f} m={r['branching_ratio_mr']['m']} "
               f"n_aval={r['avalanches']['n']} alpha={r['size_fit']['alpha']} -> {r['classification']}", flush=True)
-    # summary by sigma
+    # summary by sigma (over every sigma present in the directory)
     summ = []
-    for sg in sigmas:
+    all_sigmas = sorted({p["sigma_mV"] for p in per})
+    for sg in all_sigmas:
         rows = [p for p in per if p["sigma_mV"] == sg and "error" not in p]
         if not rows:
             summ.append({"sigma_mV": sg, "n_seeds": 0, "classification": "not_run"}); continue
         ms = [p["branching_ratio_mr"]["m"] for p in rows if p["branching_ratio_mr"]["m"] is not None]
         labels = [p["classification"] for p in rows]
         maj = max(set(labels), key=labels.count)
-        summ.append({"sigma_mV": sg, "n_seeds": len(rows), "pop_rate_hz_mean": float(np.mean([p["pop_rate_hz"] for p in rows])),
+        kcr = [p.get("subpopulation_rates", {}).get("KC", {}).get("rate_hz") for p in rows]
+        kcr = [x for x in kcr if x is not None]
+        summ.append({"sigma_mV": sg, "n_seeds": len(rows),
+                     "kc_rate_hz_mean": (float(np.mean(kcr)) if kcr else None),
+                     "avalanche_analysis_applicable": bool(all(p["avalanches"].get("applicable", True) for p in rows)),
+                     "pop_rate_hz_mean": float(np.mean([p["pop_rate_hz"] for p in rows])),
                      "pop_rate_hz_sd": float(np.std([p["pop_rate_hz"] for p in rows], ddof=1)) if len(rows) > 1 else 0.0,
                      "frac_active_mean": float(np.mean([p["frac_active"] for p in rows])),
                      "m_mean": float(np.mean(ms)) if ms else None, "m_sd": float(np.std(ms, ddof=1)) if len(ms) > 1 else 0.0,
                      "classification": maj, "labels": labels})
+    # transition sharpness: the narrowest bracket between the highest silent sigma and the lowest saturated sigma
+    sil = [s["sigma_mV"] for s in summ if s["classification"] == "silent"]
+    sat = [s["sigma_mV"] for s in summ if s["classification"] == "saturated"]
+    bracket = {"highest_silent_sigma_mV": (max(sil) if sil else None), "lowest_saturated_sigma_mV": (min(sat) if sat else None)}
+    if bracket["highest_silent_sigma_mV"] and bracket["lowest_saturated_sigma_mV"]:
+        lo, hi = bracket["highest_silent_sigma_mV"], bracket["lowest_saturated_sigma_mV"]
+        bracket["width_mV"] = round(hi - lo, 4); bracket["width_relative"] = round((hi - lo) / lo, 4)
+        inter = [s for s in summ if lo < s["sigma_mV"] < hi]
+        bracket["n_sigmas_inside_bracket"] = len(inter)
+        bracket["classifications_inside_bracket"] = [{"sigma_mV": s["sigma_mV"], "classification": s["classification"],
+                                                      "pop_rate_hz_mean": s.get("pop_rate_hz_mean")} for s in inter]
+    KC_SPONTANEOUS_HZ = 0.1   # Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734: KC spontaneous rate 0.1 +/- 0.4 spikes/s
     crit = [s for s in summ if s["classification"] == "critical" and s["m_mean"] is not None]
     if crit:
         op = min(crit, key=lambda s: abs(s["m_mean"] - 1.0)); has_crit = True
         reason = f"critical regime found at sigma = {op['sigma_mV']} mV (mean m = {op['m_mean']:.3f}); operating point = critical sigma with m closest to 1"
     else:
-        cand = [s for s in summ if s["classification"] in ("subcritical",) and s["m_mean"] is not None and s["m_mean"] < 1.0]
+        cand = [s for s in summ if s["classification"] not in ("saturated",) and (s.get("kc_rate_hz_mean") or 0) > 0]
         has_crit = False
         if cand:
-            op = min(cand, key=lambda s: 1.0 - s["m_mean"])
-            reason = (f"NO critical regime found in the sweep (no sigma satisfied all criteria). Operating point = the non-saturated sigma with m closest to 1 "
-                      f"from below: sigma = {op['sigma_mV']} mV (mean m = {op['m_mean']:.3f}). Downstream stages use it as a background state, not as a critical state.")
+            op = min(cand, key=lambda s: abs(np.log10(max(s["kc_rate_hz_mean"], 1e-9)) - np.log10(KC_SPONTANEOUS_HZ)))
+            reason = (f"NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the "
+                      f"transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical "
+                      f"point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of "
+                      f"{KC_SPONTANEOUS_HZ} Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = {op['sigma_mV']} mV "
+                      f"(KC rate {op['kc_rate_hz_mean']:.4f} Hz, whole-brain rate {op['pop_rate_hz_mean']:.4f} Hz/neuron, m = {op['m_mean']}).")
         else:
             op = None; reason = "NO critical regime and no active non-saturated sigma: every sigma is silent or saturated."
     out = {"status": "passed" if per and not any("error" in p for p in per) else "failed", "has_critical_regime": has_crit,
            "criterion": "sweep completes for all sigma x seeds; classification per CRITERIA; a missing critical band is a finding, not a failure",
            "network": tag, "n_neurons": conn.N, "n_connections": conn.E, "duration_s": s2["duration_s"], "warmup_s": s2["warmup_s"], "seeds": seeds,
-           "criteria": CRITERIA, "sigma_values_mV": sigmas, "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],
+           "criteria": CRITERIA, "sigma_values_mV": all_sigmas, "sigma_values_requested_this_run": sigmas, "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],
            "per_sigma": per, "summary_by_sigma": summ,
-           "operating_sigma_mV": (op["sigma_mV"] if op else None), "operating_sigma_reason": reason, "operating_rule": s2["operating_rule"],
+           "transition_bracket": bracket, "operating_sigma_mV": (op["sigma_mV"] if op else None), "operating_sigma_reason": reason, "operating_rule": s2["operating_rule"],
            "walltime_s": round(time.time() - t0, 1),
            "provenance": {"config": "configs/stage2_criticality.yaml", "results_dir": f"results/stage2_criticality/{tag}",
                           "files": [p.get("file") for p in per if p.get("file")]}}

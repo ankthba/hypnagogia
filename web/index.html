@@ -1,12 +1,35 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
-    <title>Hypnagogia - whole-brain Drosophila replay simulation</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>hypnagogia - whole-brain Drosophila replay simulation</title>
+    <!--
+      Theme, before first paint. Mirrors aniketh.net's theme.js: the colophon toggle stores
+      "light" / "dark" under localStorage "theme" and the attribute is applied here so the
+      page never flashes the system palette first. No stored value (or "system") means no
+      attribute, and the stylesheet's color-scheme: light dark follows the OS. The "js" class
+      is what reveals the toggle: without scripting the buttons could do nothing.
+    -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="bg-slate-950 text-slate-200">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

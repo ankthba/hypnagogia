@@ -1,0 +1,34 @@
+extends: base.yaml
+noise: {mode: gaussian, sigma_mV: null}     # null -> operating sigma from results/stage2_criticality/full/stage2.json
+plasticity:
+  # Dopamine-gated, anti-Hebbian two-factor rule at KC->MBON synapses (spiking discretisation of Jiang & Litwin-Kumar
+  # 2021 PLoS Comput Biol 17:e1009205 Eq. 4; direction from Hige et al. 2015 Neuron 88:985: coincident KC + DAN -> LTD;
+  # MBON spiking NOT required (Hige 2015 'Plasticity is independent of postsynaptic spiking'), so no postsynaptic factor).
+  #   de/dt = -e/tau_e ; on KC spike: e += 1                       (presynaptic eligibility trace, per synapse)
+  #   on DAN spike (DAN presynaptic to the MBON in the connectome): w -= eta_ltd * e * w0   (LTD)
+  #   dda/dt = -da/tau_da ; on DAN spike: da_MBON += 1 ; on KC spike: w += eta_ltp * da_MBON * w0   (backward-pairing LTP arm)
+  #   w clipped to [w_min_frac*w0, w_max_frac*w0], w initialised at w0 = connectome weight (Jiang: weights start at w_max)
+  tau_e_s: 5.0            # Jiang & Litwin-Kumar 2021 code (definemodel.py tau = 5); Handler 2019 window suggests 1-2 s (sensitivity)
+  tau_da_s: 5.0           # Jiang & Litwin-Kumar 2021 code
+  eta_ltd: null           # FREE: calibrated below so one Hige-like pairing depresses the MBON-gamma1pedc odor response to ~0.2 of pre (Hige 2015: 118 -> 24 spikes)
+  eta_ltp: 0.0            # backward-pairing potentiation exists in gamma2/4/5 (Handler 2019) but not in gamma1pedc (Hige 2015): off for the gamma1pedc readout
+  w_min_frac: 0.0         # Jiang/Eschbach: w in [0, w_max]
+  w_max_frac: 1.0
+  dan_mbon_min_synapses: 5   # FREE (uncited): a DAN gates an MBON's KC synapses if it has >= 5 synapses onto that MBON in the connectome
+  record_w_dt_s: 1.0
+  pre: {selector: {cell_class: Kenyon_Cell}}
+  post: {selector: {cell_class: MBON}}
+  dan: {selector: {cell_class: DAN}}
+calibration:
+  readout_mbon_type: MBON11         # MBON-gamma1pedc>alpha/beta (Aso 2014 nomenclature MBON11) - Hige 2015's readout
+  dan_type: PPL101                  # PPL1-gamma1pedc (MB320C in Hige 2015)
+  dan_rate_hz: 20.0                 # FREE (uncited): no Hz measurement of light-evoked PPL1 firing exists; eta_ltd absorbs it
+  dan_duration_s: 2.0               # Hige 2015: four 1-ms pulses at 2 Hz starting 0.2 s after odor onset -> ~2 s window
+  dan_delay_s: 0.2
+  odor_duration_s: 1.0              # Hige 2015: 1-s odor
+  test_gap_s: 5.0
+  eta_grid: [0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1]
+  seeds: [0, 1, 2]
+  target_post_over_pre: 0.20        # Hige 2015: 24/118
+  odor_orn_types: ["ORN_DM1", "ORN_DM4", "ORN_VA2", "ORN_DM2"]     # placeholder 'odor A' glomeruli for calibration (same as stage 4 odor A)
+  odor_rate_hz: 150.0               # Hallem & Carlson 2006: strong responders 100-200 Hz

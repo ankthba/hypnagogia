@@ -1,6 +1,16 @@
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { SERIES } from '../../lib/colors';
-import { fmtNum } from '../../lib/format';
+import { SERIES, TOOLTIP_STYLE, seedColor } from '../../lib/colors';
+import { fmtNum, fmtInt } from '../../lib/format';
+
+export { seedColor };
+
+/** Decade tick label for a log axis: 1, 10, 100 … above 1; 0.1, 0.01 down to 1e-2; exponential below. Never "0". */
+function decadeLabel(v: number): string {
+  if (!(v > 0)) return '';
+  if (v >= 1) return fmtInt(Math.round(v));
+  if (v >= 1e-2) return String(v);
+  return v.toExponential(0);
+}
 
 export interface CcdfSeries {
   name: string;
@@ -9,10 +19,7 @@ export interface CcdfSeries {
   y: number[];
 }
 
-const PALETTE = ['#34d399', '#60a5fa', '#f472b6', '#fbbf24', '#a78bfa', '#22d3ee', '#fb923c', '#e2e8f0'];
-export function seedColor(i: number) {
-  return PALETTE[i % PALETTE.length];
-}
+const TICK = { fontSize: 12, fill: SERIES.axis };
 
 /** Log-log CCDF. Points with x<=0 or y<=0 are not drawable on log axes and are dropped (count reported). */
 export default function CcdfChart({ series, xLabel, height = 280 }: { series: CcdfSeries[]; xLabel: string; height?: number }) {
@@ -34,7 +41,7 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
   const yd = decadeDomain(allY);
   const dropped = prepared.reduce((a, s) => a + s.dropped, 0);
   if (total === 0) {
-    return <div className="text-sm text-slate-500 py-8 text-center">CCDF arrays are empty for this selection (no avalanches to plot).</div>;
+    return <div className="small muted py-8 text-center">CCDF arrays are empty for this selection (no avalanches to plot).</div>;
   }
   return (
     <div>
@@ -48,9 +55,9 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             domain={xd.domain}
             ticks={xd.ticks}
             stroke={SERIES.axis}
-            tick={{ fontSize: 11 }}
-            tickFormatter={(v) => fmtNum(v, 2)}
-            label={{ value: xLabel, position: 'insideBottom', offset: -16, fill: SERIES.axis, fontSize: 12 }}
+            tick={TICK}
+            tickFormatter={(v) => decadeLabel(Number(v))}
+            label={{ value: xLabel, position: 'insideBottom', offset: -16, fill: SERIES.axis, fontSize: 13 }}
           />
           <YAxis
             type="number"
@@ -59,21 +66,18 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             domain={yd.domain}
             ticks={yd.ticks}
             stroke={SERIES.axis}
-            tick={{ fontSize: 11 }}
-            tickFormatter={(v) => fmtNum(v, 2)}
-            label={{ value: 'P(X ≥ x)', angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 12 }}
+            tick={TICK}
+            tickFormatter={(v) => decadeLabel(Number(v))}
+            label={{ value: 'P(X ≥ x)', angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
           />
-          <Tooltip
-            contentStyle={{ background: '#0f172a', border: '1px solid #334155', fontSize: 12 }}
-            formatter={(v: number) => fmtNum(v, 4)}
-          />
-          <Legend verticalAlign="top" height={24} wrapperStyle={{ fontSize: 12 }} />
+          <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 4)} />
+          <Legend verticalAlign="top" height={24} wrapperStyle={{ fontSize: 13, color: SERIES.axis }} />
           {prepared.map((s) => (
             <Scatter key={s.name} name={s.name} data={s.pts} fill={s.color} line={{ stroke: s.color, strokeWidth: 1 }} shape={<circle r={2} />} isAnimationActive={false} />
           ))}
         </ScatterChart>
       </ResponsiveContainer>
-      {dropped > 0 && <div className="text-xs text-slate-500">{dropped} point(s) with x ≤ 0 or y ≤ 0 not drawable on log axes.</div>}
+      {dropped > 0 && <div className="smaller muted">{dropped} point(s) with x ≤ 0 or y ≤ 0 not drawable on log axes.</div>}
     </div>
   );
 }
@@ -82,7 +86,8 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
 function decadeDomain(vals: number[]): { domain: [number, number]; ticks: number[] } {
   if (vals.length === 0) return { domain: [1, 10], ticks: [1, 10] };
   const lo = Math.floor(Math.log10(Math.min(...vals)));
-  const hi = Math.ceil(Math.log10(Math.max(...vals)));
+  let hi = Math.ceil(Math.log10(Math.max(...vals)));
+  if (hi === lo) hi = lo + 1; // always span at least one decade (single-point series)
   const ticks: number[] = [];
   for (let e = lo; e <= hi; e++) ticks.push(Math.pow(10, e));
   return { domain: [Math.pow(10, lo), Math.pow(10, hi)], ticks };

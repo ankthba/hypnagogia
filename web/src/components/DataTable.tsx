@@ -36,7 +36,7 @@ export default function DataTable<T>({
         <tbody>
           {rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="text-slate-500">
+              <td colSpan={columns.length} className="muted">
                 {empty}
               </td>
             </tr>

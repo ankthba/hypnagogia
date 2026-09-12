@@ -18,15 +18,15 @@ export default function Learning() {
   const s4 = useDataFile<Stage4>('stage4_learning.json');
   return (
     <div>
-      <h1 className="h1">Learning</h1>
-      <p className="mt-2 text-slate-400 max-w-3xl">
+      <h1 className="page-title">Learning</h1>
+      <div className="prose"><p>
         Stage 3 adds a dopamine-gated plasticity rule at the single plastic locus (KC → MBON). Stage 4 pairs odor A with
         DAN activation and checks that the MBON response to A, but not to the unpaired odor B, changes. Only if learning
         is verified here does the replay test in Stage 6 have a memory to look for.
-      </p>
+      </p></div>
 
       <section className="mt-8">
-        <h2 className="h2">Stage 4 - associative conditioning</h2>
+        <h2>Stage 4 · associative conditioning</h2>
         <ErrorBoundary label="Stage 4">
           <StageGate stage="stage4_learning" loaded={s4}>
             {(d) => <Stage4View d={d} />}
@@ -35,7 +35,7 @@ export default function Learning() {
       </section>
 
       <section className="mt-10">
-        <h2 className="h2">Stage 3 - plasticity rule</h2>
+        <h2>Stage 3 · plasticity rule</h2>
         <ErrorBoundary label="Stage 3">
           <StageGate stage="stage3_plasticity" loaded={s3}>
             {(d) => <Stage3View d={d} />}
@@ -57,20 +57,36 @@ function Stage4View({ d }: { d: Stage4 }) {
     <div className="space-y-6">
       <StatusBanner status={d.status} title="Conditioning outcome" criterion={d.criterion} reasons={d.reasons} />
 
-      {d.learning_verified ? (
+      {typeof d.learning_verified !== 'boolean' ? (
+        <Callout tone="negative" title="Field missing from stage file">
+          <span className="mono">learning_verified</span> is absent (or not a boolean) in <span className="mono">stage4_learning.json</span>;
+          got <span className="mono">{JSON.stringify(d.learning_verified) ?? 'undefined'}</span>. No verdict can be shown.
+        </Callout>
+      ) : d.learning_verified ? (
         <Callout tone="positive" title="Learning verified">
           The paired odor (A) changed the MBON readout relative to the unpaired odor (B) under the pre-registered criterion.
           Δ(A) − Δ(B) = {fmtNum(e?.diff_of_deltas, 4)}, 95% CI {fmtCI(e?.ci95, 4)}, n = {fmtInt(e?.n_seeds)} seeds.
         </Callout>
       ) : (
         <Callout tone="negative" title="Learning NOT verified">
-          The MBON response to the paired odor did not differ from the unpaired odor under the pre-registered criterion. Δ(A)
-          − Δ(B) = {fmtNum(e?.diff_of_deltas, 4)}, 95% CI {fmtCI(e?.ci95, 4)}, p = {fmtP(e?.p_paired)}, n = {fmtInt(e?.n_seeds)}{' '}
-          seeds. Downstream replay results should be read with this in mind.
+          <p>
+            The change in MBON response to the paired odor did not meet the pre-registered criterion relative to the unpaired odor.
+            Δ(A) − Δ(B) = {fmtNum(e?.diff_of_deltas, 4)}, 95% CI {fmtCI(e?.ci95, 4)}, p = {fmtP(e?.p_paired)}, n = {fmtInt(e?.n_seeds)}{' '}
+            seeds. Downstream replay results should be read with this in mind.
+          </p>
+          {d.reasons && d.reasons.length > 0 ? (
+            <ul className="mt-1.5 list-disc pl-5 space-y-0.5">
+              {d.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-1.5 muted">(no reasons recorded in the stage file)</p>
+          )}
         </Callout>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         <Figure title="MBON response to odor A (paired) - before vs after" provenance={d.provenance} caption="Thin lines: individual seeds; thick line: mean across seeds. Response = mean readout-MBON rate during the test window.">
           <PairedPlot seeds={seeds.map((s) => ({ seed: s.seed, pre: s.A_pre, post: s.A_post }))} color={SERIES.A} label="MBON rate (Hz)" />
         </Figure>
@@ -80,8 +96,8 @@ function Stage4View({ d }: { d: Stage4 }) {
       </div>
 
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-3">Effect</div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="label label--ink mb-3">Effect</div>
+        <div className="stats">
           <Stat label="Δ A mean (post − pre)" value={fmtNum(e?.delta_A_mean, 4)} />
           <Stat label="Δ B mean (post − pre)" value={fmtNum(e?.delta_B_mean, 4)} />
           <Stat label="diff of deltas" value={fmtNum(e?.diff_of_deltas, 4)} emphasis />
@@ -93,9 +109,9 @@ function Stage4View({ d }: { d: Stage4 }) {
         <ProvenanceFooter provenance={d.provenance} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         <div className="card">
-          <div className="font-semibold text-slate-100 mb-2">Protocol</div>
+          <div className="label label--ink mb-2">Protocol</div>
           <DataTable
             columns={[
               { key: 'k', header: 'field', render: (r) => r[0] },
@@ -121,14 +137,14 @@ function Stage4View({ d }: { d: Stage4 }) {
           <ProvenanceFooter provenance={d.provenance} />
         </div>
         <div className="card">
-          <div className="font-semibold text-slate-100 mb-2">KC ensembles</div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="label label--ink mb-2">KC ensembles</div>
+          <div className="stats stats--2">
             <Stat label="ensemble A size (mean)" value={fmtNum(d.kc_ensemble_summary?.A_size_mean, 1)} />
             <Stat label="ensemble B size (mean)" value={fmtNum(d.kc_ensemble_summary?.B_size_mean, 1)} />
             <Stat label="A ∩ B overlap (mean)" value={fmtNum(d.kc_ensemble_summary?.overlap_mean, 1)} />
             <Stat label="fraction of KCs active for A" value={fmtPct(d.kc_ensemble_summary?.frac_kc_active_A)} />
           </div>
-          <div className="font-semibold text-slate-100 mt-4 mb-2">Per seed</div>
+          <div className="label label--ink mt-5 mb-2">Per seed</div>
           <DataTable
             columns={[
               { key: 'seed', header: 'seed', render: (r) => r.seed },
@@ -151,10 +167,10 @@ function Stage4View({ d }: { d: Stage4 }) {
 
       <div className="card">
         <div className="flex flex-wrap items-center gap-3 mb-2">
-          <div className="font-semibold text-slate-100">Per-MBON responses</div>
-          <label className="ml-auto text-sm text-slate-400 flex items-center gap-2">
+          <div className="label label--ink">Per-MBON responses</div>
+          <label className="ml-auto small muted flex items-center gap-2">
             seed
-            <select className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-slate-100" value={seedForMbon ?? ''} onChange={(ev) => setMbonSeed(Number(ev.target.value))}>
+            <select className="control" value={seedForMbon ?? ''} onChange={(ev) => setMbonSeed(Number(ev.target.value))}>
               {seeds.map((s) => (
                 <option key={s.seed} value={s.seed}>
                   {s.seed}
@@ -196,9 +212,9 @@ function Stage3View({ d }: { d: Stage3 }) {
         </Callout>
       )}
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-2">Rule</div>
-        <p className="text-sm text-slate-300 mb-3">{d.rule?.description}</p>
-        <pre className="overflow-x-auto rounded bg-slate-950 border border-slate-800 p-3 text-sm text-slate-100">{(d.rule?.equations ?? []).join('\n')}</pre>
+        <div className="label label--ink mb-2">Rule</div>
+        <p className="small mb-3">{d.rule?.description}</p>
+        <pre className="equations">{(d.rule?.equations ?? []).join('\n')}</pre>
         <dl className="kv mt-4">
           <dt>plastic synapses</dt>
           <dd>{fmtInt(d.n_plastic_synapses)}</dd>
@@ -209,9 +225,9 @@ function Stage3View({ d }: { d: Stage3 }) {
           <dt>DANs</dt>
           <dd>{fmtInt(d.n_dan)}</dd>
         </dl>
-        <div className="font-semibold text-slate-100 mt-4 mb-2">Rule parameters</div>
+        <div className="label label--ink mt-5 mb-2">Rule parameters</div>
         <ParamTable params={d.rule?.parameters ?? []} />
-        <div className="font-semibold text-slate-100 mt-4 mb-2">DAN → MBON compartment map</div>
+        <div className="label label--ink mt-5 mb-2">DAN → MBON compartment map</div>
         <DataTable
           columns={[
             { key: 'm', header: 'MBON type', render: (r) => r.mbon_type },
@@ -229,9 +245,9 @@ function Stage3View({ d }: { d: Stage3 }) {
 
 function Stat({ label, value, emphasis }: { label: string; value: string; emphasis?: boolean }) {
   return (
-    <div className={`rounded-md border p-3 ${emphasis ? 'border-slate-600 bg-slate-800/60' : 'border-slate-800 bg-slate-900/60'}`}>
-      <div className="text-[11px] uppercase tracking-wide text-slate-500">{label}</div>
-      <div className={`mt-1 tabular-nums ${emphasis ? 'text-xl text-slate-50' : 'text-lg text-slate-100'}`}>{value}</div>
+    <div className={`stat ${emphasis ? 'stat--emph' : ''}`}>
+      <div className="label">{label}</div>
+      <div className="stat__value">{value}</div>
     </div>
   );
 }

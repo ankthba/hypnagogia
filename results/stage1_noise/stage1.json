@@ -1,0 +1,118 @@
+{
+ "status": "passed",
+ "criterion": "isolated Gaussian model: sample s.d. of v within 5% of sigma for sigma <= 2 mV (threshold 7 mV above rest -> spikes negligible); Poisson mode runs with finite rates",
+ "isolated": true,
+ "n_neurons": 144209,
+ "noise_models": [
+  {
+   "name": "gaussian",
+   "equation": "dv/dt = (v_rest - v + g)/tau_m + sigma*sqrt(2/tau_m)*xi",
+   "param": "sigma_mV"
+  },
+  {
+   "name": "poisson",
+   "equation": "dv/dt = (v_rest - v + g)/tau_m; g += w_bg on each event of an independent Poisson stream at rate_hz",
+   "param": "rate_hz"
+  }
+ ],
+ "runs": [
+  {
+   "noise_model": "gaussian",
+   "sigma_mV": 1.0,
+   "rate_hz": null,
+   "seed": 10,
+   "pop_rate_hz": 0.0,
+   "frac_active": 0.0,
+   "mean_v_mV": -52.00897979736328,
+   "mean_v_std_mV": 0.9951725006103516,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 57.0
+  },
+  {
+   "noise_model": "gaussian",
+   "sigma_mV": 2.0,
+   "rate_hz": null,
+   "seed": 10,
+   "pop_rate_hz": 0.11543200031435855,
+   "frac_active": 0.29335200993003213,
+   "mean_v_mV": -52.043827056884766,
+   "mean_v_std_mV": 1.9673576354980469,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 57.0
+  },
+  {
+   "noise_model": "gaussian",
+   "sigma_mV": 3.0,
+   "rate_hz": null,
+   "seed": 10,
+   "pop_rate_hz": 2.3167162474833978,
+   "frac_active": 0.9991262681247356,
+   "mean_v_mV": -52.36603927612305,
+   "mean_v_std_mV": 2.7336316108703613,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 59.2
+  },
+  {
+   "noise_model": "gaussian",
+   "sigma_mV": 4.0,
+   "rate_hz": null,
+   "seed": 10,
+   "pop_rate_hz": 6.574961803123707,
+   "frac_active": 1.0,
+   "mean_v_mV": -52.95478439331055,
+   "mean_v_std_mV": 3.3379900455474854,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 61.9
+  },
+  {
+   "noise_model": "poisson",
+   "sigma_mV": null,
+   "rate_hz": 50.0,
+   "seed": 10,
+   "pop_rate_hz": 0.0,
+   "frac_active": 0.0,
+   "mean_v_mV": -51.932762145996094,
+   "mean_v_std_mV": 0.04198088124394417,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 29.6
+  },
+  {
+   "noise_model": "poisson",
+   "sigma_mV": null,
+   "rate_hz": 100.0,
+   "seed": 10,
+   "pop_rate_hz": 0.0,
+   "frac_active": 0.0,
+   "mean_v_mV": -51.863704681396484,
+   "mean_v_std_mV": 0.05981113389134407,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 29.8
+  },
+  {
+   "noise_model": "poisson",
+   "sigma_mV": null,
+   "rate_hz": 200.0,
+   "seed": 10,
+   "pop_rate_hz": 0.0,
+   "frac_active": 0.0,
+   "mean_v_mV": -51.72776412963867,
+   "mean_v_std_mV": 0.08532378822565079,
+   "n_neurons_recorded_v": 50,
+   "walltime_s": 30.8
+  }
+ ],
+ "walltime_s": 62.0,
+ "provenance": {
+  "config": "configs/stage1_noise.yaml",
+  "results_dir": "results/stage1_noise",
+  "files": [
+   "results/stage1_noise/gauss1.0/spikes.npz",
+   "results/stage1_noise/gauss2.0/spikes.npz",
+   "results/stage1_noise/gauss3.0/spikes.npz",
+   "results/stage1_noise/gauss4.0/spikes.npz",
+   "results/stage1_noise/poisson50/spikes.npz",
+   "results/stage1_noise/poisson100/spikes.npz",
+   "results/stage1_noise/poisson200/spikes.npz"
+  ]
+ }
+}

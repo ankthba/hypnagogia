@@ -10,7 +10,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
 import SigmaChart, { type SigmaPoint } from '../components/charts/SigmaChart';
 import CcdfChart, { seedColor } from '../components/charts/CcdfChart';
-import { CLASS_COLORS } from '../lib/colors';
+import { classColor, CLASS_LABELS } from '../lib/colors';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
 
 export default function Criticality() {
@@ -18,15 +18,15 @@ export default function Criticality() {
   const s2 = useDataFile<Stage2>('stage2_criticality.json');
   return (
     <div>
-      <h1 className="h1">Criticality</h1>
-      <p className="mt-2 text-slate-400 max-w-3xl">
+      <h1 className="page-title">Criticality</h1>
+      <div className="prose"><p>
         Stage 1 adds a noise term to the otherwise silent Shiu et al. model. Stage 2 sweeps the noise amplitude sigma and asks
         whether any value puts the network in a critical regime (branching ratio near 1, power-law avalanches). The regime
         chosen here is the background state for every later stage.
-      </p>
+      </p></div>
 
       <section className="mt-8">
-        <h2 className="h2">Stage 1 - noise models</h2>
+        <h2>Stage 1 · noise models</h2>
         <ErrorBoundary label="Stage 1">
           <StageGate stage="stage1_noise" loaded={s1}>
             {(d) => <Stage1View d={d} />}
@@ -35,7 +35,7 @@ export default function Criticality() {
       </section>
 
       <section className="mt-10">
-        <h2 className="h2">Stage 2 - sigma sweep</h2>
+        <h2>Stage 2 · sigma sweep</h2>
         <ErrorBoundary label="Stage 2">
           <StageGate stage="stage2_criticality" loaded={s2}>
             {(d) => <Stage2View d={d} />}
@@ -51,7 +51,7 @@ function Stage1View({ d }: { d: Stage1 }) {
     <div className="space-y-4">
       <StatusBanner status={d.status} title="Noise model characterisation" criterion={d.criterion} reasons={d.reasons} />
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-2">Noise models</div>
+        <div className="label label--ink mb-2">Noise models</div>
         <DataTable
           columns={[
             { key: 'name', header: 'model', render: (r) => r.name },
@@ -61,7 +61,7 @@ function Stage1View({ d }: { d: Stage1 }) {
           rows={d.noise_models ?? []}
           rowKey={(r) => r.name}
         />
-        <div className="font-semibold text-slate-100 mt-4 mb-2">Runs</div>
+        <div className="label label--ink mt-5 mb-2">Runs</div>
         <DataTable
           columns={[
             { key: 'model', header: 'model', render: (r) => r.noise_model },
@@ -126,18 +126,23 @@ function Stage2View({ d }: { d: Stage2 }) {
           <dt>sigma values (mV)</dt>
           <dd>{d.sigma_values_mV.map((v) => fmtNum(v)).join(', ')}</dd>
         </dl>
-        <div className="mt-4 font-semibold text-slate-100">Classification criteria (pre-registered)</div>
+        <div className="mt-5 label label--ink">Classification criteria (pre-registered)</div>
         <dl className="kv mt-2">
-          {(['silent', 'critical', 'saturated'] as const).map((c) => (
-            <div key={c} className="contents">
-              <dt style={{ color: CLASS_COLORS[c] }}>{c}</dt>
-              <dd className="whitespace-normal">{d.criteria?.[c] ?? 'null'}</dd>
-            </div>
-          ))}
+          {CLASS_LABELS.map((c) => {
+            const crit = (d.criteria as Partial<Record<string, string>> | undefined)?.[c];
+            const used = d.per_sigma.some((p) => p.classification === c) || d.summary_by_sigma.some((p) => p.classification === c);
+            if (crit === undefined && !used && !['silent', 'critical', 'saturated'].includes(c)) return null;
+            return (
+              <div key={c} className="contents">
+                <dt style={{ color: classColor(c) }}>{c}</dt>
+                <dd className="whitespace-normal">{crit ?? (used ? '(no criterion text in file)' : 'null')}</dd>
+              </div>
+            );
+          })}
         </dl>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         <Figure
           title="Branching ratio m (MR estimator) vs sigma"
           provenance={d.provenance}
@@ -145,7 +150,7 @@ function Stage2View({ d }: { d: Stage2 }) {
             <>
               Whiskers: 95% CI of the multistep-regression estimator; dashed line m = 1. Background band colour is the
               per-sigma classification from <span className="mono">summary_by_sigma</span>.
-              {nMissingM > 0 && <span className="text-orange-300"> {nMissingM} run(s) have m = null and are not plotted.</span>}
+              {nMissingM > 0 && <span className="tone-failed"> {nMissingM} run(s) have m = null and are not plotted.</span>}
             </>
           }
         >
@@ -158,14 +163,14 @@ function Stage2View({ d }: { d: Stage2 }) {
           <SigmaChart points={fracPoints} bands={bands} yLabel="fraction active" yDomain={[0, 'auto']} />
         </Figure>
         <div className="card">
-          <div className="font-semibold text-slate-100 mb-2">Summary by sigma</div>
+          <div className="label label--ink mb-2">Summary by sigma</div>
           <DataTable
             columns={[
               { key: 's', header: 'sigma (mV)', render: (r) => fmtNum(r.sigma_mV) },
               {
                 key: 'c',
                 header: 'class',
-                render: (r) => <span style={{ color: CLASS_COLORS[r.classification] ?? '#a3a3a3' }}>{r.classification}</span>,
+                render: (r) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span>,
               },
               { key: 'm', header: 'm mean ± sd', render: (r) => `${fmtNum(r.m_mean)} ± ${fmtNum(r.m_sd)}` },
               { key: 'r', header: 'rate mean ± sd (Hz)', render: (r) => `${fmtNum(r.pop_rate_hz_mean, 4)} ± ${fmtNum(r.pop_rate_hz_sd, 4)}` },
@@ -179,8 +184,8 @@ function Stage2View({ d }: { d: Stage2 }) {
       </div>
 
       <div className="card">
-        <div className="font-semibold text-slate-100 mb-2">Per-run avalanche fits (powerlaw: Clauset-style MLE, likelihood ratio R and p vs alternatives)</div>
-        <p className="text-sm text-slate-400 mb-3">
+        <div className="label label--ink mb-2">Per-run avalanche fits (powerlaw: Clauset-style MLE, likelihood ratio R and p vs alternatives)</div>
+        <p className="small muted mb-3">
           R &gt; 0 favours the power law over the named alternative; p is the significance of that ratio. n_tail is the number
           of observations at or above xmin.
         </p>
@@ -190,11 +195,11 @@ function Stage2View({ d }: { d: Stage2 }) {
 
       <div className="card">
         <div className="flex flex-wrap items-center gap-3 mb-3">
-          <div className="font-semibold text-slate-100">Avalanche CCDFs</div>
-          <label className="ml-auto text-sm text-slate-400 flex items-center gap-2">
+          <div className="label label--ink">Avalanche CCDFs</div>
+          <label className="ml-auto small muted flex items-center gap-2">
             sigma
             <select
-              className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-slate-100"
+              className="control"
               value={sigmaSel ?? ''}
               onChange={(e) => setSelSigma(Number(e.target.value))}
             >
@@ -207,18 +212,19 @@ function Stage2View({ d }: { d: Stage2 }) {
           </label>
         </div>
         {selRows.length === 0 ? (
-          <div className="text-sm text-slate-500">no runs at this sigma</div>
+          <div className="small muted">no runs at this sigma</div>
         ) : (
           <>
-            <div className="flex flex-wrap gap-3 text-sm mb-3">
+            <div className="flex flex-wrap gap-2 mb-3">
               {selRows.map((r) => (
-                <span key={r.seed} className="rounded border border-slate-700 px-2 py-0.5">
-                  seed {r.seed}: <span style={{ color: CLASS_COLORS[r.classification] }}>{r.classification}</span> · n avalanches{' '}
-                  {fmtInt(r.avalanches?.n)} · max size {fmtInt(r.avalanches?.max_size)} · bin {fmtNum(r.avalanches?.bin_ms)} ms
+                <span key={r.seed} className="chip">
+                  seed {r.seed}: <span style={{ color: classColor(r.classification) }}>{r.classification}</span> · n avalanches{' '}
+                  {fmtInt(r.avalanches?.n)} · max size {fmtInt(r.avalanches?.max_size)} · bin {fmtNum(r.avalanches?.bin_ms)} ms · time active{' '}
+                  {fmtPct(r.avalanches?.frac_time_active)}
                 </span>
               ))}
             </div>
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-8 lg:grid-cols-2">
               <Figure title={`Avalanche size CCDF, sigma = ${fmtNum(sigmaSel)} mV`} provenance={d.provenance}>
                 <CcdfChart
                   xLabel="avalanche size (spikes)"
@@ -233,8 +239,8 @@ function Stage2View({ d }: { d: Stage2 }) {
               </Figure>
             </div>
             <div className="mt-3">
-              <div className="text-sm font-semibold text-slate-200 mb-1">Classification reasons at this sigma</div>
-              <ul className="text-sm text-slate-300 list-disc pl-5">
+              <div className="label label--ink mb-1">Classification reasons at this sigma</div>
+              <ul className="small list-disc pl-5">
                 {selRows.map((r) => (
                   <li key={r.seed}>
                     seed {r.seed}: {r.reasons?.length ? r.reasons.join('; ') : '(no reasons recorded)'}
@@ -250,6 +256,14 @@ function Stage2View({ d }: { d: Stage2 }) {
 }
 
 function RegimeCallout({ d }: { d: Stage2 }) {
+  if (typeof d.has_critical_regime !== 'boolean') {
+    return (
+      <Callout tone="negative" title="Field missing from stage file">
+        <span className="mono">has_critical_regime</span> is absent (or not a boolean) in <span className="mono">stage2_criticality.json</span>;
+        got <span className="mono">{JSON.stringify(d.has_critical_regime) ?? 'undefined'}</span>. No regime verdict can be shown.
+      </Callout>
+    );
+  }
   if (d.has_critical_regime) {
     return (
       <Callout tone="positive" title={`Critical regime found · operating sigma = ${fmtNum(d.operating_sigma_mV)} mV`}>
@@ -271,7 +285,7 @@ function RegimeCallout({ d }: { d: Stage2 }) {
         .
       </p>
       <p className="mt-1">
-        <span className="font-semibold">Reason recorded by the pipeline:</span> {d.operating_sigma_reason}
+        <em>Reason recorded by the pipeline:</em> {d.operating_sigma_reason}
       </p>
     </Callout>
   );
@@ -298,10 +312,13 @@ function FitTable({ rows }: { rows: PerSigma[] }) {
       columns={[
         { key: 'sigma', header: 'sigma (mV)', render: (r) => fmtNum(r.sigma_mV) },
         { key: 'seed', header: 'seed', render: (r) => r.seed },
-        { key: 'cls', header: 'class', render: (r) => <span style={{ color: CLASS_COLORS[r.classification] ?? '#a3a3a3' }}>{r.classification}</span> },
+        { key: 'cls', header: 'class', render: (r) => <span style={{ color: classColor(r.classification) }}>{r.classification}</span> },
         { key: 'm', header: 'm [CI95]', render: (r) => `${fmtNum(r.branching_ratio_mr?.m)} ${fmtCI(r.branching_ratio_mr?.ci95)}` },
+        { key: 'kmax', header: 'k_max', render: (r) => fmtInt(r.branching_ratio_mr?.k_max) },
+        { key: 'mrbin', header: 'MR bin (ms)', render: (r) => fmtNum(r.branching_ratio_mr?.bin_ms) },
         { key: 'mn', header: 'm naive', render: (r) => fmtNum(r.branching_ratio_naive) },
         { key: 'nav', header: 'n avalanches', render: (r) => fmtInt(r.avalanches?.n) },
+        { key: 'fta', header: 'frac time active', render: (r) => fmtPct(r.avalanches?.frac_time_active) },
         ...fitCells('size', undefined).map((c, i) => ({ ...c, render: (r: PerSigma) => fitCells('size', r.size_fit)[i].render() })),
         ...fitCells('dur', undefined).map((c, i) => ({ ...c, render: (r: PerSigma) => fitCells('dur', r.duration_fit)[i].render() })),
       ]}

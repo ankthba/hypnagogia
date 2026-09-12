@@ -5,7 +5,7 @@ import StatusBadge from './StatusBadge';
 
 /**
  * Full-width status banner. Failures and artifacts are rendered with the same weight
- * as successes (red / orange), never collapsed.
+ * as successes (the same rule, the same wash, a different hue), never collapsed.
  */
 export default function StatusBanner({
   status,
@@ -20,26 +20,27 @@ export default function StatusBanner({
   reasons?: string[] | null;
   children?: ReactNode;
 }) {
-  const s = STATUS_STYLE[status as StageStatus] ?? STATUS_STYLE.not_run;
+  const s = STATUS_STYLE[status as StageStatus];
+  const tone = s ? s.tone : 'unknown';
   return (
-    <div className={`rounded-lg border-2 p-4 sm:p-5 ${s.banner}`} role="status">
+    <div className={`banner banner--${tone} measure`} role="status">
       <div className="flex flex-wrap items-center gap-3">
         <StatusBadge status={status} size="lg" />
-        <div className="text-lg font-semibold">{title}</div>
+        <div className="banner__title">{title}</div>
       </div>
       {criterion && (
-        <p className="mt-2 text-sm opacity-90">
-          <span className="font-semibold">Pre-registered criterion:</span> {criterion}
+        <p className="banner__body">
+          <em>Pre-registered criterion:</em> {criterion}
         </p>
       )}
       {reasons && reasons.length > 0 && (
-        <ul className="mt-2 list-disc pl-5 text-sm space-y-0.5">
+        <ul className="banner__body">
           {reasons.map((r, i) => (
             <li key={i}>{r}</li>
           ))}
         </ul>
       )}
-      {children && <div className="mt-2 text-sm">{children}</div>}
+      {children && <div className="banner__body">{children}</div>}
     </div>
   );
 }

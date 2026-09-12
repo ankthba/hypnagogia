@@ -14,9 +14,17 @@ run, the page renders an explicit "Not yet run" panel naming the file and the
 script that produces it. Failures (`failed`, `artifact`) are rendered as
 prominently as successes.
 
-`public/data/` is git-ignored except for `.gitkeep`; the pipeline populates it.
-The Methods page's prose is documentation of the model, not a result; its
+The Methods page's prose is documentation of the method, not a result; its
 parameter table is read from `manifest.json`.
+
+## Data on the deployed site
+
+`web/public/data/` is **committed to git** (curated exports only: the stage JSON
+files, sidecars, and capped `.bin` rasters/traces written by
+`scripts/export_web.py`). The Pages workflow only checks out the repository and
+builds, so whatever is committed under `web/public/data/` is exactly what the
+deployed site can show. Re-run the export and commit the result to update the
+site; until a stage has been exported and committed it renders as "Not yet run".
 
 ## Develop
 
@@ -32,13 +40,14 @@ from the repo root) and reload.
 ## Build
 
 ```sh
-npm run build                 # tsc --noEmit && vite build  ->  web/dist  (base '/')
-GITHUB_PAGES=1 npm run build  # base '/hypnagogia/' for GitHub Pages
+npm run build                 # tsc --noEmit && vite build  ->  web/dist  (relative base './')
 npm run preview
 ```
 
-Deployment is automated by `.github/workflows/deploy-pages.yml` on push to
-`main`.
+The build uses a relative base (`./`) because the app is hash-routed, so the
+same `dist/` works at `/`, at `/hypnagogia/`, and from a local preview.
+Deployment is automated by `.github/workflows/deploy-pages.yml` on pushes to
+`main` that touch `web/**`.
 
 ## Layout
 
