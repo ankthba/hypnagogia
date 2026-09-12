@@ -68,6 +68,12 @@ def main():
             if t is None:
                 continue
             ens = {nm: np.array([id2idx[x] for x in t[f"{nm}_pre"] if x in id2idx], dtype=np.int64) for nm in ("A", "B")}
+            # rank of each ensemble member in the odour response, for the sequence test
+            ordr = {}
+            for nm in ("A", "B"):
+                ids_all = t[f"{nm}_pre"]; rk = (t.get("_order") or {}).get(f"{nm}_pre")
+                if rk and len(rk) == len(ids_all):
+                    ordr[nm] = np.array([r for x, r in zip(ids_all, rk) if x in id2idx], dtype=np.int64)
             for cond in ("sleep", "wake"):
                 d = run_dir(tag, cond, sd)
                 if not (d / "spikes.npz").exists():
@@ -77,7 +83,8 @@ def main():
                 if w is None:
                     continue
                 res = analyse_sleep_epoch(i, ts, meta["dt_ms"] * 1e-3, kc, w[0], w[1], ens,
-                                          bin_s=bin_s, n_random=s6["n_random_ensembles"], seed=sd)
+                                          bin_s=bin_s, n_random=s6["n_random_ensembles"], seed=sd,
+                                          order_rank=(ordr or None))
                 for nm, e in res["ensembles"].items():
                     rows.append({"network": tag, "condition": cond, "seed": sd, "ensemble": nm, "bin_ms": bin_s * 1e3,
                                  "kc_rate_hz": res["kc_rate_hz"], "n_active_bins": res["n_active_bins"], "n_bins": res["n_bins"],
@@ -154,6 +161,23 @@ def main():
     comparisons.append(paired(A_sleep, A_wake, "sleep_vs_wake_A", "sleep vs wake, odour-A ensemble", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_sleep_sh, "real_vs_shuffled", "real vs degree-preserving shuffled connectome, odour-A ensemble in sleep", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_rand, "A_vs_random_ensembles", "odour-A ensemble vs size-matched random KC ensembles, during sleep", "greater", "template_corr_mean"))
+    # sequence-order preservation, reported when the reactivation events contain enough ordered members to score
+    seq = [r for r in rows if r["network"] == REAL and r["condition"] == "sleep" and r["ensemble"] == "A"
+           and isinstance(r.get("sequence"), dict) and r["sequence"].get("rho_mean") is not None]
+    sequence_summary = None
+    if seq:
+        rho = np.array([r["sequence"]["rho_abs_mean"] for r in seq])
+        nul = np.array([r["sequence"]["null_mean"] for r in seq if r["sequence"].get("null_mean") is not None])
+        sequence_summary = {"n_seeds_scored": len(seq),
+                            "n_events_scored_total": int(sum(r["sequence"]["n_events_scored"] for r in seq)),
+                            "rho_abs_mean": float(rho.mean()),
+                            "null_abs_mean": (float(nul.mean()) if len(nul) else None),
+                            "per_seed_p": [r["sequence"].get("p") for r in seq],
+                            "note": ("Spearman rank correlation between within-event first-spike order and the order of the "
+                                     "odour response, against a cell-identity shuffle (Foster & Wilson 2006). Reported only "
+                                     "where events contained at least four ensemble members with distinct template ranks.")}
+        if len(nul) == len(rho) and len(rho) >= 3:
+            sequence_summary["effect_vs_shuffle"] = paired_effect(rho, nul, name="sequence_vs_shuffle")
     avail = [c for c in comparisons if c.get("available")]
     all_survive = bool(avail) and len(avail) == 4 and all(c["survives"] for c in avail)
     shuffled_c = next((c for c in comparisons if c["name"] == "real_vs_shuffled"), None)
@@ -178,7 +202,7 @@ def main():
                            f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
                            f"published value the network has neither a sparse odour code nor a quiet background (stages 2 "
                            f"and 3b). This is an uncited free parameter introduced by this project."),
-             "comparisons": comparisons, "per_seed": rows, "traces": exports["traces"], "rasters": exports["rasters"],
+             "comparisons": comparisons, "sequence": sequence_summary, "per_seed": rows, "traces": exports["traces"], "rasters": exports["rasters"],
              "activity": exports.get("activity", []),
              "networks_analysed": sorted(set(r["network"] for r in rows)),
              "walltime_s": round(time.time() - t0, 1),

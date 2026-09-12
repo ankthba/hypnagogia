@@ -10,6 +10,8 @@ export default function Figure({
   title,
   caption,
   provenance,
+  provenanceCommitNote,
+  provenanceNote,
   children,
   right,
   flat = false,
@@ -17,6 +19,10 @@ export default function Figure({
   title: string;
   caption?: ReactNode;
   provenance: Provenance | undefined;
+  /** shown in place of the commit when the source file states none (see ProvenanceFooter) */
+  provenanceCommitNote?: ReactNode;
+  /** a further clause about where the provenance fields came from */
+  provenanceNote?: ReactNode;
   children: ReactNode;
   right?: ReactNode;
   /** draw the content on the page rather than on a mat (for content that is not a plot) */
@@ -30,7 +36,7 @@ export default function Figure({
       </div>
       <div className={flat ? 'w-full overflow-x-auto' : 'mat'}>{children}</div>
       {caption && <div className="figure__caption">{caption}</div>}
-      <ProvenanceFooter provenance={provenance} />
+      <ProvenanceFooter provenance={provenance} commitNote={provenanceCommitNote} note={provenanceNote} />
     </figure>
   );
 }

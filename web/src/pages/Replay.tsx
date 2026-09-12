@@ -146,11 +146,14 @@ const ACTIVITY_PATTERN = 'replay/activity_<condition>_seed<k>.json';
 function BrainMapBlockInner({
   activity,
   activityPath,
+  sourceText,
   timeMs,
   decayMs,
   height,
 }: {
   activity: Loadable<ActivityData> | null;
+  /** what this map is drawing, stamped onto the canvas so a crop of it still says so */
+  sourceText: string;
   /**
    * The concrete activity sidecar this map would animate from, named in the panel when it is absent.
    * `null` means no concrete file is identified yet (stage 6 has listed no seed), and the panel then

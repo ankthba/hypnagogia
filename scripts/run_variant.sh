@@ -11,11 +11,15 @@ SEEDS="${2:-0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19}"
 SIGMAS="${3:-0.5,1.0,1.41,1.6,1.8,2.0,2.4,2.8,3.2,4.0}"
 log() { echo; echo "=== $* ==="; date; }
 
+if [ "${SKIP_STAGE2:-0}" != "1" ]; then
 log "cost of gain $G on the gustatory benchmark the published model was calibrated on"
 python -u scripts/03d_gain_sensitivity.py --gustatory-cost "$G" 2>&1 | tail -6
+fi
 
+if [ "${SKIP_STAGE2:-0}" != "1" ]; then
 log "stage 2 background sweep at gain $G"
 python -u scripts/02_criticality.py --gain "$G" --sigmas "$SIGMAS" --seeds 0,1,2 2>&1 | tail -30
+fi
 
 log "stage 3 plasticity calibration at gain $G"
 python -u scripts/03_plasticity.py --gain "$G" 2>&1 | tail -20

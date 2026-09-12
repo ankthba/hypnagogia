@@ -104,6 +104,55 @@ function parseRgb(css: string): [number, number, number] {
   return [Number(m[0]), Number(m[1]), Number(m[2])];
 }
 
+/** Type size of the stamp burned into the canvas, in CSS pixels. */
+const STAMP_SIZE = 10;
+
+/**
+ * Burns the source identity into the canvas bitmap, top-left, over a wash of the background so it
+ * stays legible against whatever is lit underneath it.
+ *
+ * The point is the crop: the badge in the DOM tells a reader looking at the page what the picture
+ * is, but a screenshot taken of the picture alone would carry nothing, and an animating brain next
+ * to a verdict is exactly the image a reader would crop. This is the same text, in the image.
+ */
+function drawSourceStamp(
+  ctx: CanvasRenderingContext2D,
+  source: MapSourceLabel,
+  C: { bg: string; ink: string; failed: string },
+  canvasW: number,
+): void {
+  const text = source.text.trim();
+  if (!text) return;
+  ctx.save();
+  ctx.font = `${STAMP_SIZE}px ${CHART_FONT}`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  const padX = 4;
+  const padY = 3;
+  const inset = 2;
+  const maxW = Math.max(60, canvasW - 2 * inset - 2 * padX);
+  const lines: string[] = [];
+  let line = '';
+  for (const word of text.split(/\s+/)) {
+    const next = line ? `${line} ${word}` : word;
+    if (line && ctx.measureText(next).width > maxW) {
+      lines.push(line);
+      line = word;
+    } else line = next;
+  }
+  if (line) lines.push(line);
+  const lh = STAMP_SIZE + 3;
+  const boxW = Math.min(maxW, Math.max(...lines.map((l) => ctx.measureText(l).width))) + 2 * padX;
+  const boxH = lines.length * lh + 2 * padY;
+  ctx.globalAlpha = 0.88;
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(inset, inset, boxW, boxH);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = source.reference ? C.failed : C.ink;
+  lines.forEach((l, i) => ctx.fillText(l, inset + padX, inset + padY + i * lh + STAMP_SIZE));
+  ctx.restore();
+}
+
 // ---------------------------------------------------------------- loading hooks
 
 export type { Loadable };
@@ -672,42 +721,45 @@ function BrainMapInner({
     bgRef.current = off;
     // No version bump: this effect is declared before the foreground one, so within the same commit
     // the foreground blits the background this pass has just written.
-  }, [groups, view, canvasW, canvasH, C, variant]);
+  }, [groups, view, canvasW, canvasH, C, variant, dpr]);
 
-  // Foreground: blit the background, then draw only the lit neurons, on top of everything.
+  // Foreground: blit the background, draw the lit neurons on top, then stamp the source identity so
+  // it is part of the image and survives a crop of it.
   useEffect(() => {
     const cv = canvasRef.current;
     const bg = bgRef.current;
     if (!cv || !C) return;
-    const dpr = window.devicePixelRatio || 1;
     const w = Math.round(canvasW * dpr);
     const h = Math.round(canvasH * dpr);
     if (cv.width !== w) cv.width = w;
     if (cv.height !== h) cv.height = h;
     const ctx = cv.getContext('2d');
     if (!ctx) return;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    if (bg) ctx.drawImage(bg, 0, 0);
+    // The blit is in CSS pixels, not backing-store pixels: a background cached at a previous device
+    // pixel ratio is then rescaled to fit rather than painting 60,000 points at the wrong scale.
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (!lit || lit.rows.length === 0) return;
-    const [ar, ag, ab] = parseRgb(C.accent);
-    // a is 1 at the instant of the spike and 0 at the end of the tail, so nothing stays lit
-    for (let k = 0; k < lit.rows.length; k++) {
-      const i = lit.rows[k];
-      const a = lit.alphas[k];
-      const spec = specFor(atlas.groupLabels[atlas.group[i]] ?? '');
-      const [gr, gg, gb] = parseRgb(specColor(spec, C.dark));
-      const base = Math.max(specRadius(spec, C.dark) * view.rScale, LIT_MIN_R);
-      const r = base * (1 + (LIT_GAIN - 1) * a);
-      ctx.fillStyle = `rgb(${Math.round(gr + (ar - gr) * a)}, ${Math.round(gg + (ag - gg) * a)}, ${Math.round(gb + (ab - gb) * a)})`;
-      ctx.globalAlpha = spec.alpha + (1 - spec.alpha) * a;
-      ctx.beginPath();
-      ctx.arc(view.px(i), view.py(i), r, 0, TAU);
-      ctx.fill();
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    if (bg) ctx.drawImage(bg, 0, 0, canvasW, canvasH);
+    if (lit && lit.rows.length > 0) {
+      const [ar, ag, ab] = parseRgb(C.accent);
+      // a is 1 at the instant of the spike and 0 at the end of the tail, so nothing stays lit
+      for (let k = 0; k < lit.rows.length; k++) {
+        const i = lit.rows[k];
+        const a = lit.alphas[k];
+        const spec = specFor(atlas.groupLabels[atlas.group[i]] ?? '');
+        const [gr, gg, gb] = parseRgb(specColor(spec, C.dark));
+        const base = Math.max(specRadius(spec, C.dark) * view.rScale, LIT_MIN_R);
+        const r = base * (1 + (LIT_GAIN - 1) * a);
+        ctx.fillStyle = `rgb(${Math.round(gr + (ar - gr) * a)}, ${Math.round(gg + (ag - gg) * a)}, ${Math.round(gb + (ab - gb) * a)})`;
+        ctx.globalAlpha = spec.alpha + (1 - spec.alpha) * a;
+        ctx.beginPath();
+        ctx.arc(view.px(i), view.py(i), r, 0, TAU);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = 1;
-  }, [lit, view, canvasW, canvasH, atlas, C]);
+    drawSourceStamp(ctx, source, C, canvasW);
+  }, [lit, view, canvasW, canvasH, atlas, C, dpr, source]);
 
   const sc = atlas.sidecar;
   /** the fraction of its spikes the activity file actually carries, when it carries a sample */
@@ -746,7 +798,18 @@ function BrainMapInner({
           {showVncControl && hasBoxes && <VncToggle atlas={atlas} on={showVnc} set={setShowVnc} />}
         </div>
       )}
-      <canvas ref={canvasRef} style={{ width: canvasW, height: canvasH }} className="block mx-auto max-w-full" />
+      {/* The identity is drawn into the top-left of the canvas itself by the foreground effect, not
+          printed under it: this map animates beside a verdict, and the text saying what it is must
+          not be separated from the picture by a legend, a status line and a row of controls - nor
+          lost when someone crops a screenshot to the picture. `aria-label` carries the same words to
+          a screen reader, which cannot read pixels. */}
+      <canvas
+        ref={canvasRef}
+        role="img"
+        aria-label={source.text}
+        style={{ width: canvasW, height: canvasH }}
+        className="block mx-auto max-w-full"
+      />
       {showLegend && (
         <div className={legendClass}>
           {groups.list.map((g) => (
@@ -796,6 +859,13 @@ function BrainMapInner({
               {lit.oob > 0 && (
                 <span className="tone-failed">
                   {fmtInt(lit.oob)} spikes reference an atlas_row outside the {fmtInt(atlas.n)} rows of neuron_atlas.bin and are not drawn
+                </span>
+              )}
+              {/* the caption discloses this too, but the rail panel renders no caption and this map
+                  animates there permanently, so the always-visible instrument has to say it */}
+              {activity.sortedOnLoad && (
+                <span className="tone-failed">
+                  this spike file was not in time order and was sorted on load, so what is drawn is the viewer's ordering of it
                 </span>
               )}
             </>

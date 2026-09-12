@@ -63,7 +63,15 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     t0 = time.time()
     ut = unit_test(cfg, pl); print("unit test:", ut["passed"], ut["results"])
-    sigma, sigma_src = operating_sigma(cfg, gain=a.gain)
+    # Calibrate against the SAME background that conditioning will use in stage 4 (a quiet mushroom body), not
+    # against the offline background. The learning rate is fit to a single-pairing endpoint, and that endpoint
+    # depends on how much eligibility trace the background alone puts on every synapse.
+    sigma_offline, sigma_src = operating_sigma(cfg, gain=a.gain)
+    s4cfg = load_config("stage4_encode")
+    cs = s4cfg.get("stage4", {}).get("conditioning_sigma_mV")
+    sigma = float(cs) if cs is not None else sigma_offline
+    sigma_src = (f"conditioning_sigma_mV in configs/stage4_encode.yaml ({sigma} mV), matching stage 4; the offline "
+                 f"background is {sigma_offline} mV from {sigma_src}" if cs is not None else sigma_src)
     conn = load_connectome("malecns", "v1.0", "brain")
     kc, mbon, dan = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON"), conn.select(cell_class="DAN")
     ro = conn.select(cell_type=cal["readout_mbon_type"]); dsel = conn.select(cell_type=cal["dan_type"])

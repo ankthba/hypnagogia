@@ -126,11 +126,25 @@ def main():
         A_pre, iApre = count("pre_test_A", ro); A_post, iApost = count("post_test_A", ro)
         B_pre, iBpre = count("pre_test_B", ro); B_post, iBpost = count("post_test_B", ro)
         allm_pre = float(np.isin(iApre, mbon).sum()); allm_post = float(np.isin(iApost, mbon).sum())
-        ens = {}
-        for nm, spk in (("A_pre", iApre), ("B_pre", iBpre), ("A_post", iApost), ("B_post", iBpost)):
-            k = spk[np.isin(spk, kc)]
+        ens, order = {}, {}
+        for nm, ep in (("A_pre", "pre_test_A"), ("B_pre", "pre_test_B"), ("A_post", "post_test_A"), ("B_post", "post_test_B")):
+            spk, tt, eps = spikes_in_epoch(i, ts, meta, ep)
+            km = np.isin(spk, kc)
+            k, kt = spk[km], tt[km].astype(np.float64) * meta["dt_ms"] * 1e-3
             cnt = pd.Series(k).value_counts()
-            ens[nm] = np.sort(cnt[cnt >= s4["kc_template_threshold_spikes"]].index.to_numpy()).astype(np.int64)
+            members = np.sort(cnt[cnt >= s4["kc_template_threshold_spikes"]].index.to_numpy()).astype(np.int64)
+            ens[nm] = members
+            # template order: each member's FIRST spike time in the odour response, ranked. Stage 6 uses this as
+            # the reference sequence for the rank-order replay test (Foster & Wilson 2006).
+            if len(members):
+                first = {}
+                for nid, t_ in zip(k, kt):
+                    if nid not in first or t_ < first[nid]:
+                        first[nid] = t_
+                lat = np.array([first.get(int(m), np.inf) for m in members])
+                order[nm] = np.argsort(np.argsort(lat)).astype(np.int32)
+            else:
+                order[nm] = np.array([], dtype=np.int32)
         z = np.load(sp["out_dir"] + "/plastic_w.npz")
         ro_mask = np.isin(z["post"], ro)
         inA = np.isin(z["pre"], ens["A_pre"]); inB = np.isin(z["pre"], ens["B_pre"])
@@ -151,8 +165,10 @@ def main():
                      "per_mbon": per_mbon})
         templates[str(sd)] = {k: [int(conn.ids[x]) for x in v] for k, v in ens.items()}
         templates[str(sd)]["_index"] = {k: [int(x) for x in v] for k, v in ens.items()}
+        templates[str(sd)]["_order"] = {k: [int(x) for x in v] for k, v in order.items()}
     np.savez_compressed(out / "kc_templates.npz", **{f"{sd}_{k}": np.asarray(v, dtype=np.int64)
-                                                     for sd, d in templates.items() for k, v in d.items() if k != "_index"})
+                                                     for sd, d in templates.items() for k, v in d.items()
+                                                     if k not in ("_index", "_order")})
     json.dump(templates, open(out / "kc_templates.json", "w"))
     ok = [r for r in rows if "error" not in r]
     eff = {}
