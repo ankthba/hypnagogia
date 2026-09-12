@@ -4,7 +4,7 @@ import Callout from './Callout';
 import DataTable, { type Column } from './DataTable';
 import Figure from './Figure';
 import StatusBanner from './StatusBanner';
-import { fmtInt, fmtNum, fmtPct } from '../lib/format';
+import { fmtInt, fmtNum, fmtPct, NOT_MEASURED } from '../lib/format';
 
 /**
  * Stage 3b: whether there is a sparse Kenyon-cell odour code for a memory to live in, and the two
@@ -15,9 +15,9 @@ import { fmtInt, fmtNum, fmtPct } from '../lib/format';
  * section whose source file has not been written is not rendered at all, rather than rendered empty.
  */
 
-const yn = (v: unknown) => (v === true ? 'yes' : v === false ? 'no' : '-');
-const num = (v: unknown, d = 3) => (typeof v === 'number' && Number.isFinite(v) ? fmtNum(v, d) : '-');
-const pct = (v: unknown, d = 2) => (typeof v === 'number' && Number.isFinite(v) ? fmtPct(v, d) : '-');
+const yn = (v: unknown) => (v === true ? 'yes' : v === false ? 'no' : NOT_MEASURED);
+const num = (v: unknown, d = 3) => (typeof v === 'number' && Number.isFinite(v) ? fmtNum(v, d) : NOT_MEASURED);
+const pct = (v: unknown, d = 2) => (typeof v === 'number' && Number.isFinite(v) ? fmtPct(v, d) : NOT_MEASURED);
 
 /** A row of the small before/after table that both corrections use. */
 function CorrectionTable({ summary, labels }: { summary: Record<string, CorrectionSummary>; labels: Record<string, string> }) {
@@ -105,7 +105,7 @@ export default function FeasibilityView({ d }: { d: Stage3bFeasibility }) {
           {cal.reference && <Measured>{cal.reference}</Measured>}
           <DataTable
             columns={[
-              { key: 'set', header: 'glomeruli', render: (r) => String(r.set ?? '-') },
+              { key: 'set', header: 'glomeruli', render: (r) => (r.set == null ? NOT_MEASURED : String(r.set)) },
               { key: 'rate', header: 'ORN rate', render: (r) => `${num(r.rate_hz, 0)} Hz` },
               { key: 'n_orn', header: 'ORNs', render: (r) => fmtInt(Number(r.n_orn ?? 0)) },
               { key: 'frac', header: 'KCs responding', render: (r) => pct(r.frac_kc_active) },
@@ -145,8 +145,8 @@ export default function FeasibilityView({ d }: { d: Stage3bFeasibility }) {
           {ctl.pathway_control && <Measured>{ctl.pathway_control}</Measured>}
           <DataTable
             columns={[
-              { key: 'cond', header: 'network', render: (r) => String(r.condition ?? '-') },
-              { key: 'path', header: 'pathway', render: (r) => String(r.pathway ?? '-') },
+              { key: 'cond', header: 'network', render: (r) => (r.condition == null ? NOT_MEASURED : String(r.condition)) },
+              { key: 'path', header: 'pathway', render: (r) => (r.pathway == null ? NOT_MEASURED : String(r.pathway)) },
               { key: 'rate', header: 'drive', render: (r) => `${num(r.rate_hz, 0)} Hz` },
               { key: 'n', header: 'neurons', render: (r) => fmtInt(Number(r.n_neurons ?? 0)) },
               { key: 'ign', header: 'fraction ignited', render: (r) => pct(r.frac_ignited, 0) },
@@ -193,7 +193,7 @@ export default function FeasibilityView({ d }: { d: Stage3bFeasibility }) {
           <DataTable
             columns={[
               { key: 'g', header: 'gain', render: (r) => num(r.gain, 2) },
-              { key: 'ep', header: 'epoch', render: (r) => String(r.epoch ?? '-') },
+              { key: 'ep', header: 'epoch', render: (r) => (r.epoch == null ? NOT_MEASURED : String(r.epoch)) },
               { key: 'a', header: 'KCs for odour A', render: (r) => pct(r.frac_kc_A) },
               { key: 'b', header: 'KCs for odour B', render: (r) => pct(r.frac_kc_B) },
               { key: 'j', header: 'overlap', render: (r) => num(r.jaccard_observed) },
@@ -226,7 +226,8 @@ function WhyTable({ why }: { why: Record<string, number | string | null> }) {
           {
             key: 'v',
             header: 'value',
-            render: (r) => (typeof r.v === 'number' ? (Number.isInteger(r.v) ? fmtInt(r.v) : fmtNum(r.v, 4)) : String(r.v)),
+            render: (r) =>
+              typeof r.v === 'number' ? (Number.isInteger(r.v) ? fmtInt(r.v) : fmtNum(r.v, 4)) : r.v == null ? NOT_MEASURED : String(r.v),
           },
         ]}
         rows={rows}
