@@ -527,6 +527,56 @@ function Stage6View({ d }: { d: Stage6 }) {
         </div>
       )}
 
+      {/* This block sits above the comparisons on purpose. A detector that has never been shown to find
+          replay when replay is present cannot certify that replay is absent, so the reader needs to know
+          the control failed before reading a single effect size. Every number in it is injected by hand
+          and the banner saying so is carried from the result file rather than written here. */}
+      {d.detector_control?.scans && d.detector_control.scans.length > 0 && (
+        <div className="card">
+          <div className="label label--ink mb-2">Could this test have found replay if replay were there?</div>
+          <Callout tone={d.detector_control.any_scan_produced_episodes ? 'positive' : 'warning'} title={d.detector_control.answer}>
+            <p>
+              The model was handed the mechanism it lacks: the recurrent connections between members of the
+              trained ensemble were multiplied by a factor, which is the arrangement hippocampal replay has and
+              this connectome does not. Across {fmtInt(d.detector_control.scans.reduce((a, x) => a + (x.n_runs ?? 0), 0))}{' '}
+              runs at {fmtInt(d.detector_control.scans.length)} noise levels and factors up to 300, the ensemble
+              was silent, or on continuously, or it switched on once and never switched off. It never produced a
+              second episode, so there was never any positive data to test the detector against.
+            </p>
+            <p className="mt-2">
+              At a noise level of 1.47 mV the run with no injection at all (factor 1) and the run at thirty times
+              the connectome weights give the same timing: one transition, about 34 s of the 60 s recording. The
+              injection changes how loudly the ensemble fires by a factor of twenty and does not change when it
+              fires. The transition is the network's own bistable ignition, not the injected memory. Nothing in
+              the published model is slower than the 5 ms synaptic time constant, so nothing can end an up state.
+            </p>
+            <p className="mt-2 smaller">{d.detector_control.IS_NOT_A_RESULT}</p>
+          </Callout>
+          <DataTable
+            columns={[
+              { key: 'sigma', header: 'noise sigma (mV)', render: (r) => fmtNum(r.sigma_mV, 2) },
+              { key: 'dur', header: 'recording (s)', render: (r) => fmtNum(r.duration_s, 0) },
+              { key: 'fac', header: 'injected factor', render: (r) => (r.factors ?? []).map((f) => `x${fmtNum(f, 0)}`).join(', ') },
+              { key: 'n', header: 'runs', render: (r) => fmtInt(r.n_runs) },
+              { key: 'v', header: 'what the ensemble did', render: (r) => (r.verdicts ?? []).join(', ') },
+              {
+                key: 'ep',
+                header: 'repeated episodes?',
+                render: (r) => <span className={r.produced_episodes ? 'tone-passed' : 'tone-failed'}>{r.produced_episodes ? 'yes' : 'no'}</span>,
+              },
+            ]}
+            rows={d.detector_control.scans}
+            rowKey={(r) => `${r.sigma_mV}-${r.duration_s}-${(r.factors ?? []).join('_')}`}
+          />
+          <p className="small mt-2 measure">
+            The consequence for everything below: the failures on this page are properties of this model class,
+            which cannot represent an episode even when the mechanism for one is supplied directly. They are not
+            evidence that the fly does not replay.
+          </p>
+          <ProvenanceFooter provenance={d.provenance} />
+        </div>
+      )}
+
       <Figure
         title={`Pre-registered comparisons · effect sizes${additional.length > 0 ? ', plus any additional comparison' : ''}`}
         provenance={d.provenance}

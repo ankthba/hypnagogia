@@ -73,6 +73,9 @@ def main():
             extra = load(RESULTS / path)
             if extra:
                 s6[field] = {k: v for k, v in extra.items() if k not in ("per_seed", "per_run", "by_run")}
+    # Stage 11, the injected positive control. Read here rather than through the web exporter so the document
+    # stands on the result files alone.
+    s11 = [c for c in (load(f) for f in sorted(RESULTS.glob("stage11_injected/injected_*.json"))) if c]
     # the labelled reduced-gain variant, if it has been run
     variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
     s6v = load(variant_dirs[-1] / "stage6.json") if variant_dirs else None
@@ -114,6 +117,26 @@ def main():
         w()
     if s6:
         w(f"**Stage 6 ({s6['status']}).** {s6['headline']}")
+        # The control belongs immediately under the verdict it qualifies, not in a later section a reader
+        # could stop before reaching.
+        if s11 and not any(c.get("any_factor_produced_episodes") for c in s11):
+            n_runs = sum(len([r for r in (c.get("per_run") or []) if "error" not in r]) for c in s11)
+            facs = sorted({f for c in s11 for f in (c.get("factors") or [])})
+            sig = sorted({c.get("sigma_mV") for c in s11 if c.get("sigma_mV") is not None})
+            w()
+            w(f"**Read that verdict with Stage 11 next to it.** No detector in this project has ever been shown "
+              f"to find replay when replay is present, so none of them can certify that replay is absent. Stage 11 "
+              f"tried to establish that by handing the model the mechanism it lacks: the recurrent connections "
+              f"between members of the trained ensemble were multiplied by a factor the experimenter chose, which "
+              f"is the arrangement hippocampal replay has and this connectome does not. Over {n_runs} runs at "
+              f"{len(sig)} noise levels ({', '.join(f'{x:g}' for x in sig)} mV) and factors from {min(facs):g} to "
+              f"{max(facs):g}, not one run produced a repeated episode. The ensemble was silent, or on "
+              f"continuously, or it switched on once and never switched off, and which of those happened was set "
+              f"by the noise rather than by the injection. So the detector could not be calibrated, because the "
+              f"model never produced the positive data to calibrate it on. Nothing in the published model is "
+              f"slower than the 5 ms synaptic time constant, so nothing can terminate an up state. Every failure "
+              f"below is therefore a property of this model class, which cannot represent an episode even when the "
+              f"mechanism for one is supplied directly, and is not evidence that the fly does not replay.")
     elif s6v:
         w("**Two answers, and the difference between them is the result.**")
         w()

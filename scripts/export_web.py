@@ -236,6 +236,40 @@ def main():
                                "source_file": str(cand.relative_to(RESULTS.parent))})
                 if rb:
                     d["bin_robustness"] = sorted(rb, key=lambda x: x.get("bin_ms") or 0)
+            if key == "stage6_replay":
+                # Stage 11, the injected positive control. It is NOT a result and the banner travels with it,
+                # but it belongs next to the replay verdict because it says how much weight that verdict can
+                # carry: a detector never shown to work on positive data cannot certify an absence. Carried as
+                # scans rather than one number because the answer differs by noise level.
+                def _verdict(r):
+                    return ("episodic" if r.get("episodic") else "latched" if r.get("latched")
+                            else "silent" if r.get("silent")
+                            else "one-way ignition" if r.get("one_way_ignition") else "unclassified")
+                scans, banner = [], ""
+                for cand in sorted(RESULTS.glob("stage11_injected/injected_*.json")):
+                    c = load_json(cand)
+                    if not c:
+                        continue
+                    banner = banner or c.get("IS_NOT_A_RESULT", "")
+                    runs = [r for r in (c.get("per_run") or []) if "error" not in r]
+                    scans.append({"sigma_mV": c.get("sigma_mV"), "duration_s": c.get("duration_s"),
+                                  "factors": c.get("factors"), "n_runs": len(runs),
+                                  "verdicts": sorted({_verdict(r) for r in runs}),
+                                  "produced_episodes": c.get("any_factor_produced_episodes"),
+                                  "runs": [{"factor": r.get("factor"), "ensemble_rate_hz": r.get("ensemble_rate_hz"),
+                                            "other_kc_rate_hz": r.get("other_kc_rate_hz"),
+                                            "frac_bins_on": r.get("frac_bins_on"), "n_episodes": r.get("n_episodes"),
+                                            "episode_duration_s_mean": r.get("episode_duration_s_mean"),
+                                            "verdict": _verdict(r)} for r in runs],
+                                  "source_file": str(cand.relative_to(RESULTS.parent))})
+                if scans:
+                    d["detector_control"] = {
+                        "IS_NOT_A_RESULT": banner,
+                        "question": "Could the stage-6 detector find replay if replay were present?",
+                        "answer": "Untested. The control could not be completed, because the model never "
+                                  "produced the positive data the detector was to be tested on.",
+                        "any_scan_produced_episodes": any(x["produced_episodes"] for x in scans),
+                        "scans": sorted(scans, key=lambda x: x.get("sigma_mV") or 0)}
             sub_dir = str(Path(src).parent.relative_to("results")) if src else sub_dir
         if d:
             d.setdefault("provenance", {}); d["provenance"].update({"git_commit": commit, "generated_at": now})

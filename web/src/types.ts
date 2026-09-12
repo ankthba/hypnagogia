@@ -432,6 +432,25 @@ export interface Stage6 extends StageBase {
       paired_t?: number; p_value?: number; per_bin_ratio_cv_mean?: number | null; is_episodic?: boolean;
     };
   } | null;
+  /**
+   * Stage 11, the injected positive control. NOT a result: the recurrence among the trained ensemble was
+   * multiplied by a factor an experimenter chose. It sits with the replay verdict because it says how much
+   * weight that verdict can carry.
+   */
+  detector_control?: {
+    IS_NOT_A_RESULT?: string;
+    question?: string;
+    answer?: string;
+    any_scan_produced_episodes?: boolean;
+    scans?: Array<{
+      sigma_mV?: number; duration_s?: number; factors?: number[]; n_runs?: number;
+      verdicts?: string[]; produced_episodes?: boolean;
+      runs?: Array<{ factor?: number; ensemble_rate_hz?: number; other_kc_rate_hz?: number;
+                     frac_bins_on?: number; n_episodes?: number; episode_duration_s_mean?: number;
+                     verdict?: string }>;
+      source_file?: string;
+    }>;
+  } | null;
   return_path?: { finding?: string } | null;
   readout_gate?: { finding?: string } | null;
   recurrence_census?: { finding?: string } | null;
