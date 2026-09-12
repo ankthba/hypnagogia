@@ -1488,220 +1488,106 @@ pre.equations {
   z-index: 9999;
   pointer-events: none;
   will-change: transform;
-  /* not fully opaque: it flies over running text, and text always has to win */
-  opacity: 0.92;
+  /* not fully opaque: she flies over running text, and text always has to win */
+  opacity: 0.94;
 }
 
-.fly svg {
+/* The photograph. A real fly, cut out of Hannah Davis's microscope photograph (CC BY-SA 4.0); see
+   web/public/fly/CREDITS.md and the colophon. The drop shadow is the one thing added to it: without a
+   shadow a cut-out photograph reads as a sticker rather than as something above the paper. */
+.fly__photo {
   display: block;
-  overflow: visible;
-  /* the cast shadow, offset down-right from a light above and behind the reader */
-  filter: drop-shadow(1.5px 2.5px 2.5px rgba(20, 16, 12, 0.32));
+  filter: drop-shadow(1.5px 2.5px 2.5px rgba(20, 16, 12, 0.34));
+  user-select: none;
 }
 
 .fly__body {
-  transform-box: view-box;
-  transform-origin: 32px 23px;
+  position: relative;
+  transform-origin: 50% 50%;
 }
 
-/* The shadow the body itself throws on the page directly under it. It sits inside the SVG rather
-   than in the filter so it stays put while the body scales into a landing. */
+/* The shadow directly under her, on the page. Separate from the drop shadow on the photograph so it
+   stays put while she scales down into a landing. */
 .fly__shadow {
-  fill: rgba(20, 16, 12, 0.16);
+  position: absolute;
+  left: 12%;
+  top: 62%;
+  width: 74%;
+  height: 46%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(20, 16, 12, 0.22), rgba(20, 16, 12, 0) 70%);
   transform: translate(3px, 5px);
 }
 
-/* Body colours: a wild-type fly is tan-brown, not black. The scutum is the darker plate over the
-   top of the thorax; the abdomen's ground is the same tan with darker tergite bands over it. */
-.fly__abdomen {
-  fill: #8a6636;
+/* The wingbeat. A Drosophila wing beats at around 200 Hz, so on any screen it is a blur and not a
+   shape, and a blur is what is drawn: two soft ellipses at the wing bases, pulsing at 0.12s, which is
+   7.2 frames at 60Hz and so does not beat against the frame clock. They disappear when she lands,
+   where the photograph's own folded wings take over. */
+.fly__wingblur {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition: opacity 0.18s ease;
 }
 
-.fly__tergites {
-  fill: none;
-  stroke: #2f2118;
-  stroke-width: 2.6;
-  stroke-linecap: round;
-  opacity: 0.85;
+.fly__wingblur[data-flying='true'] {
+  opacity: 1;
 }
 
-.fly__tip {
-  fill: #2a1d14;
+.fly__wingblur span {
+  position: absolute;
+  display: block;
+  width: 34px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 70% 50%, rgba(226, 224, 216, 0.5), rgba(226, 224, 216, 0.06) 72%);
+  filter: blur(1.1px);
+  transform-origin: 92% 50%;
 }
 
-.fly__thorax {
-  fill: #a07a44;
+.fly__wingblur-a {
+  left: -31px;
+  top: -8px;
 }
 
-.fly__scutum {
-  fill: #6d4f2b;
+.fly__wingblur-b {
+  left: -31px;
+  top: -1px;
 }
 
-.fly__scutellum {
-  fill: #b98d52;
+.fly__wingblur[data-flying='true'] .fly__wingblur-a {
+  animation: fly-wingblur-a 0.12s linear infinite;
 }
 
-.fly__head {
-  fill: #8a6636;
+.fly__wingblur[data-flying='true'] .fly__wingblur-b {
+  animation: fly-wingblur-b 0.12s linear infinite;
 }
 
-.fly__face {
-  fill: #cfa96c;
-}
-
-.fly__eye {
-  fill: #a8291f;
-}
-
-.fly__glint {
-  fill: #f0b3a6;
-  opacity: 0.85;
-}
-
-.fly__bristles {
-  fill: none;
-  stroke: #241a12;
-  stroke-width: 0.85;
-  stroke-linecap: round;
-}
-
-.fly__legs {
-  fill: none;
-  stroke: #35271b;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transform-box: view-box;
-  transform-origin: 34px 23px;
-  transition: transform 0.22s ease;
-}
-
-/* Tucked up under the thorax in flight, splayed out on the ground. */
-.fly__legs[data-tucked='true'] {
-  transform: scale(0.62, 0.66);
-}
-
-.fly__tarsus {
-  stroke-width: 1;
-}
-
-.fly__leg--fore {
-  transform-box: view-box;
-  transform-origin: 40px 23px;
-}
-
-.fly__antenna ellipse {
-  fill: #6d4f2b;
-}
-
-.fly__arista {
-  fill: none;
-  stroke: #35271b;
-  stroke-width: 0.7;
-  stroke-linecap: round;
-}
-
-.fly__arista-branch {
-  fill: none;
-  stroke: #35271b;
-  stroke-width: 0.45;
-  stroke-linecap: round;
-}
-
-.fly__proboscis {
-  fill: none;
-  stroke: #6d4f2b;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-}
-
-.fly__halteres {
-  fill: #b98d52;
-  stroke: #b98d52;
-  stroke-width: 0.9;
-  stroke-linecap: round;
-}
-
-/* Wings: hyaline, so nearly clear with a faint warm cast and visible veins. */
-.fly__wing-blade {
-  fill: #eef2f4;
-  fill-opacity: 0.34;
-  stroke: #9aa7ae;
-  stroke-width: 0.5;
-  stroke-opacity: 0.6;
-}
-
-.fly__veins {
-  fill: none;
-  stroke: #7d8a92;
-  stroke-width: 0.45;
-  stroke-opacity: 0.75;
-}
-
-.fly__alula {
-  fill: #eef2f4;
-  fill-opacity: 0.3;
-  stroke: #9aa7ae;
-  stroke-width: 0.4;
-  stroke-opacity: 0.5;
-}
-
-.fly__wing {
-  transform-box: view-box;
-  transform-origin: 33px 23px;
-}
-
-/* Fast flapping, hinged at the scutellum. Stopped and folded while the fly is sitting. The period
-   is 0.12s, not the 0.06s it was: 60ms is 3.6 frames at a 60Hz refresh, so it beat against the
-   frame clock and read as an irregular wobble rather than a blur, at twice the per-frame cost. */
-.fly__wings[data-flying='true'] .fly__wing--upper {
-  animation: fly-wing-upper 0.12s linear infinite;
-}
-
-.fly__wings[data-flying='true'] .fly__wing--lower {
-  animation: fly-wing-lower 0.12s linear infinite;
-}
-
-/* Landed: the wings swing back and lie flat over the abdomen, as a resting fly holds them. */
-.fly__wings[data-flying='false'] .fly__wing {
-  transition: transform 0.22s ease;
-}
-
-.fly__wings[data-flying='false'] .fly__wing--upper {
-  transform: rotate(9deg) scaleY(0.68);
-}
-
-.fly__wings[data-flying='false'] .fly__wing--lower {
-  transform: rotate(-9deg) scaleY(0.68);
-}
-
-@keyframes fly-wing-upper {
+@keyframes fly-wingblur-a {
   0%,
   100% {
-    transform: rotate(-15deg) scaleY(0.9);
+    transform: rotate(-16deg) scaleY(0.7);
+    opacity: 0.55;
   }
   50% {
-    transform: rotate(14deg) scaleY(1.05);
+    transform: rotate(9deg) scaleY(1.15);
+    opacity: 0.85;
   }
 }
 
-@keyframes fly-wing-lower {
+@keyframes fly-wingblur-b {
   0%,
   100% {
-    transform: rotate(15deg) scaleY(0.9);
+    transform: rotate(13deg) scaleY(1.1);
+    opacity: 0.8;
   }
   50% {
-    transform: rotate(-14deg) scaleY(1.05);
+    transform: rotate(-11deg) scaleY(0.72);
+    opacity: 0.5;
   }
 }
 
-/* The fly is decoration; a browser asking for reduced motion does not get one at all (the Layout
-   also refuses to mount it, this is the belt to that's braces). */
-@media (prefers-reduced-motion: reduce) {
-  .fly {
-    display: none !important;
-  }
-}
 
 /* ---------------------------------------------------------
    12. Responsive & motion

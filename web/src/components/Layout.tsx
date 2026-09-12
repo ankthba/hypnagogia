@@ -109,7 +109,16 @@ export default function Layout() {
           Static viewer. Every number on these pages is read at page-load from <span className="mono">data/*.json</span> and{' '}
           <span className="mono">data/*.bin</span> written by the simulation pipeline. No results are embedded in the site; the
           Methods page carries no numbers of its own either, its parameter table is read from the manifest. The fly is the one
-          drawing on this site that is not data.
+          image on this site that is not data: she is a photograph of a real{' '}
+          <span className="i">Drosophila melanogaster</span>, taken on a sheet of paper under a USB microscope by Hannah Davis,{' '}
+          <a href="https://commons.wikimedia.org/wiki/File:Standing_female_Drosophila_melanogaster.jpg" rel="noreferrer">
+            from Wikimedia Commons
+          </a>
+          , used under{' '}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noreferrer">
+            CC BY-SA 4.0
+          </a>
+          , with the paper behind her subtracted and nothing painted in.
         </p>
       </footer>
 

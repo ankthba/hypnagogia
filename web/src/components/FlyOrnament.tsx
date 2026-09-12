@@ -1,29 +1,34 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * A fruit fly, drawn as inline SVG, that flies around the viewport.
+ * A fruit fly that walks and flies around the viewport.
  *
- * It is decoration and nothing else: it carries no data, it is `pointer-events: none`, and it is
- * the only drawing on this site that is not read out of a data file (the colophon says so). It is
- * painted *over* the page, so it has a soft drop shadow and reads as being above the paper, and it
- * never intercepts a click. It is disabled entirely when the browser asks for reduced motion, and
- * the colophon switch turns it off (it starts off on touch screens and small viewports).
+ * She is a photograph, not a drawing: a female Drosophila melanogaster photographed on a sheet of
+ * white paper under a USB microscope by Hannah Davis, CC BY-SA 4.0, from Wikimedia Commons, with the
+ * paper subtracted by scripts/cutout_fly.py and nothing painted in. web/public/fly/CREDITS.md carries
+ * the full attribution and the colophon shows it on the site. The drawn SVG fly this replaces was a
+ * careful reconstruction and still looked like a reconstruction.
  *
- * The drawing is a dorsal view of Drosophila melanogaster at roughly life proportions: head about
- * a fifth of the body, a tan thorax with a darker scutum and the two rows of dorsocentral and
- * acrostichal bristles, a banded abdomen of five visible tergites tapering to a point, two large
- * red compound eyes with a specular highlight, short aristate antennae, six jointed legs with
- * femur, tibia and a five-segment tarsus, and two hyaline wings carrying the real vein pattern
- * (costa, subcosta, L1 to L5, the two crossveins and the alula).
+ * She is decoration and nothing else: she carries no data, she is `pointer-events: none`, and she is
+ * the only image on this site that is not read out of a data file (the colophon says so). She is
+ * painted *over* the page, casts a soft shadow onto it, and never intercepts a click. She is disabled
+ * entirely when the browser asks for reduced motion, and the colophon switch turns her off (she starts
+ * off on touch screens and small viewports).
  *
- * The motion is a fixed-timestep integration: the fly steers toward a wander target with a limited
- * turn rate, banks into its turns, hovers, and every so often lands, folds its wings, grooms, and
- * takes off again.
+ * The motion is a fixed-timestep integration: she steers toward a wander target with a limited turn
+ * rate, hovers, and every so often lands, stops beating her wings, grooms, and takes off again. The
+ * photograph is a side view, so heading is applied as a rotation only within a quarter turn of level
+ * and as a mirror beyond it: a fly does not fly upside down, and rotating a side view through 180
+ * degrees is exactly what that would look like. The wingbeat is a pair of blurred ellipses behind her,
+ * because at 200 beats a second that is what a wing actually looks like.
  */
 
-/** Body length in CSS pixels. The SVG is 64 x 46 user units, drawn nose-right. */
-const FLY_W = 46;
-const FLY_H = Math.round((FLY_W * 46) / 64);
+/** Body length in CSS pixels. The cut-out photograph is 256 x 126, nose-right. */
+const FLY_W = 52;
+const FLY_H = Math.round((FLY_W * 126) / 256);
+/** Where the wing bases sit in the photograph, as a fraction of its width and height. */
+const WING_X = 0.52;
+const WING_Y = 0.34;
 const STEP = 1 / 60; // fixed timestep, seconds
 const MARGIN = 30; // keep the whole body inside the viewport
 
@@ -69,10 +74,8 @@ function newTarget(s: State, w: number, h: number) {
 
 export default function FlyOrnament() {
   const ref = useRef<HTMLDivElement>(null);
-  const bodyRef = useRef<SVGGElement>(null);
-  const wingsRef = useRef<SVGGElement>(null);
-  const legsRef = useRef<SVGGElement>(null);
-  const foreleg = useRef<SVGGElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const wingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -219,7 +222,7 @@ export default function FlyOrnament() {
     // Attribute writes invalidate style for the subtree they touch, so each is written only when
     // the value it carries has actually changed.
     let flyingNow = true;
-    let groomNow = false;
+    let mirrored = false;
     const frame = (now: number) => {
       acc += Math.min(0.25, (now - last) / 1000);
       last = now;
@@ -227,27 +230,27 @@ export default function FlyOrnament() {
         advance(STEP);
         acc -= STEP;
       }
-      // The wrapper carries position and heading; the inner group carries the bank and the sit, so
-      // the wing animation's own transform-origin is not disturbed by either.
-      el.style.transform = `translate3d(${s.x - FLY_W / 2}px, ${s.y - FLY_H / 2}px, 0) rotate(${s.a}rad)`;
+      // A side view cannot be rotated through half a turn: that draws a fly flying upside down. So the
+      // heading is carried as a rotation while she is pointing rightwards and as a mirror plus the
+      // supplementary rotation while she is pointing leftwards, which keeps her the right way up on
+      // every heading. The switch has a dead band so a fly flying almost straight up does not flicker.
+      const c = Math.cos(s.a);
+      if (c < -0.1) mirrored = true;
+      else if (c > 0.1) mirrored = false;
+      const ang = mirrored ? s.a + Math.PI : s.a;
+      el.style.transform = `translate3d(${s.x - FLY_W / 2}px, ${s.y - FLY_H / 2}px, 0) rotate(${ang}rad)`;
       const body = bodyRef.current;
-      if (body) body.style.transform = `scale(${s.scale.toFixed(3)}, ${(s.scale * Math.cos(s.bank)).toFixed(3)})`;
+      if (body) {
+        // Grooming is a small rock of the whole body: with a photograph there is no separate foreleg to
+        // sweep, and a fly cleaning its eyes does rock.
+        const rock = s.mode === 'land' ? Math.sin(s.groom) * 2.6 : 0;
+        const sx = (mirrored ? -s.scale : s.scale).toFixed(3);
+        body.style.transform = `scale(${sx}, ${s.scale.toFixed(3)}) rotate(${rock.toFixed(2)}deg)`;
+      }
       const flying = s.mode !== 'land';
       if (flying !== flyingNow) {
         flyingNow = flying;
         wingsRef.current?.setAttribute('data-flying', flying ? 'true' : 'false');
-        legsRef.current?.setAttribute('data-tucked', flying ? 'true' : 'false');
-      }
-      const grooming = s.mode === 'land';
-      if (grooming) {
-        const g = foreleg.current;
-        // the front legs sweep over the head, the way a fly cleans its eyes
-        if (g) g.style.transform = `rotate(${(Math.sin(s.groom) * 13).toFixed(2)}deg)`;
-        groomNow = true;
-      } else if (groomNow) {
-        groomNow = false;
-        const g = foreleg.current;
-        if (g) g.style.transform = '';
       }
       raf = requestAnimationFrame(frame);
     };
@@ -257,134 +260,26 @@ export default function FlyOrnament() {
 
   return (
     <div ref={ref} className="fly" aria-hidden="true">
-      <svg width={FLY_W} height={FLY_H} viewBox="0 0 64 46" xmlns="http://www.w3.org/2000/svg" focusable="false">
-        <g ref={bodyRef} className="fly__body">
-          {/* the shadow the fly casts on the page it is flying over */}
-          <ellipse className="fly__shadow" cx="26" cy="25.5" rx="19" ry="8.5" />
-
-          {/* legs: three a side, each femur, tibia and a five-segment tarsus. They splay while the
-              fly is sitting and tuck up under the thorax while it is in the air. */}
-          <g ref={legsRef} className="fly__legs" data-tucked="true">
-            <g className="fly__leg fly__leg--mid-u">
-              <path d="M35 19 L29.5 11 L22.5 7" />
-              <path className="fly__tarsus" d="M22.5 7 L19 5.6" />
-            </g>
-            <g className="fly__leg fly__leg--hind-u">
-              <path d="M31 18.5 L23 12.5 L15 10.5" />
-              <path className="fly__tarsus" d="M15 10.5 L11.2 9.9" />
-            </g>
-            <g className="fly__leg fly__leg--mid-l">
-              <path d="M35 27 L29.5 35 L22.5 39" />
-              <path className="fly__tarsus" d="M22.5 39 L19 40.4" />
-            </g>
-            <g className="fly__leg fly__leg--hind-l">
-              <path d="M31 27.5 L23 33.5 L15 35.5" />
-              <path className="fly__tarsus" d="M15 35.5 L11.2 36.1" />
-            </g>
-            <g ref={foreleg} className="fly__leg fly__leg--fore">
-              <path d="M40 19.5 L45 12.5 L50.5 9.5" />
-              <path className="fly__tarsus" d="M50.5 9.5 L54 8.4" />
-              <path d="M40 26.5 L45 33.5 L50.5 36.5" />
-              <path className="fly__tarsus" d="M50.5 36.5 L54 37.6" />
-            </g>
-          </g>
-
-          {/* abdomen: five visible tergites, dark bands over a tan ground, tapering to the point */}
-          <path className="fly__abdomen" d="M31 23 C31 15.6 24.4 11.4 17 11.4 C9.2 11.4 3.4 16.4 3.4 23 C3.4 29.6 9.2 34.6 17 34.6 C24.4 34.6 31 30.4 31 23 Z" />
-          <g className="fly__tergites">
-            <path d="M27.6 15.6 A 9.6 9.6 0 0 1 27.6 30.4" />
-            <path d="M22.4 12.6 A 11.6 11.6 0 0 1 22.4 33.4" />
-            <path d="M16.6 11.6 A 12 12 0 0 1 16.6 34.4" />
-            <path d="M10.6 13.2 A 10.6 10.6 0 0 1 10.6 32.8" />
-          </g>
-          {/* the male's dark posterior tip */}
-          <path className="fly__tip" d="M3.4 23 C3.4 19.4 5 16.4 7.6 14.6 C6 17 5.2 19.9 5.2 23 C5.2 26.1 6 29 7.6 31.4 C5 29.6 3.4 26.6 3.4 23 Z" />
-
-          {/* wings: hyaline, hinged at the scutellum, carrying the real vein pattern. They beat
-              while the fly is in the air and fold flat over the abdomen when it lands. */}
-          <g ref={wingsRef} className="fly__wings" data-flying="true">
-            <g className="fly__wing fly__wing--upper">
-              <path
-                className="fly__wing-blade"
-                d="M34 17.6 C27 10.4 17 5.6 8.2 5.2 C3.6 5 1.4 7 3.6 9.6 C8.6 15.4 20 19.4 30 19.6 Z"
-              />
-              <g className="fly__veins">
-                <path d="M33 17.4 C25 11.4 15.4 7.2 7.2 6.6" />
-                <path d="M33.2 18.2 C25.4 13 16.4 9.4 8.6 8.6" />
-                <path d="M32.6 19 C25 15.4 16.6 12.6 9.6 11.6" />
-                <path d="M31.4 19.5 C25.6 17.4 19 15.6 13.4 14.8" />
-                <path d="M22.4 12.9 L21.6 16.3" />
-                <path d="M14.4 9.6 L13.6 14.9" />
-              </g>
-              <path className="fly__alula" d="M34.6 18.4 C32 15.8 29 14.6 27 15.4 C25.6 16 26 18 28 19.2 Z" />
-            </g>
-            <g className="fly__wing fly__wing--lower">
-              <path
-                className="fly__wing-blade"
-                d="M34 28.4 C27 35.6 17 40.4 8.2 40.8 C3.6 41 1.4 39 3.6 36.4 C8.6 30.6 20 26.6 30 26.4 Z"
-              />
-              <g className="fly__veins">
-                <path d="M33 28.6 C25 34.6 15.4 38.8 7.2 39.4" />
-                <path d="M33.2 27.8 C25.4 33 16.4 36.6 8.6 37.4" />
-                <path d="M32.6 27 C25 30.6 16.6 33.4 9.6 34.4" />
-                <path d="M31.4 26.5 C25.6 28.6 19 30.4 13.4 31.2" />
-                <path d="M22.4 33.1 L21.6 29.7" />
-                <path d="M14.4 36.4 L13.6 31.1" />
-              </g>
-              <path className="fly__alula" d="M34.6 27.6 C32 30.2 29 31.4 27 30.6 C25.6 30 26 28 28 26.8 Z" />
-            </g>
-          </g>
-
-          {/* halteres, the vestigial hind wings a fly beats as gyroscopes */}
-          <g className="fly__halteres">
-            <path d="M31.5 20.6 L27.4 18.4" />
-            <circle cx="26.6" cy="18" r="1.5" />
-            <path d="M31.5 25.4 L27.4 27.6" />
-            <circle cx="26.6" cy="28" r="1.5" />
-          </g>
-
-          {/* thorax: tan ground with a darker scutum, and the scutellum at its back */}
-          <ellipse className="fly__thorax" cx="39" cy="23" rx="10.6" ry="8.6" />
-          <path className="fly__scutum" d="M43.4 15.6 C37 15 32.2 17.6 31.4 23 C32.2 28.4 37 31 43.4 30.4 C46.6 28.6 48.2 26 48.2 23 C48.2 20 46.6 17.4 43.4 15.6 Z" />
-          <path className="fly__scutellum" d="M31.6 19.4 C29.2 20.2 28.4 21.6 28.4 23 C28.4 24.4 29.2 25.8 31.6 26.6 C32.8 25.4 33.2 24.2 33.2 23 C33.2 21.8 32.8 20.6 31.6 19.4 Z" />
-          {/* the two rows of dorsocentral and acrostichal bristles that a fly is keyed on */}
-          <g className="fly__bristles">
-            <path d="M44.6 17.4 L47.6 14.2" />
-            <path d="M40.4 16.4 L42.6 12.8" />
-            <path d="M36 16.6 L37.6 12.8" />
-            <path d="M32.4 18.6 L33.2 15" />
-            <path d="M44.6 28.6 L47.6 31.8" />
-            <path d="M40.4 29.6 L42.6 33.2" />
-            <path d="M36 29.4 L37.6 33.2" />
-            <path d="M32.4 27.4 L33.2 31" />
-            <path d="M29.6 20.4 L27.6 17.6" />
-            <path d="M29.6 25.6 L27.6 28.4" />
-          </g>
-
-          {/* head, the two large red compound eyes, the ocellar triangle and the aristate antennae */}
-          <ellipse className="fly__head" cx="51.4" cy="23" rx="6" ry="6.6" />
-          <path className="fly__eye" d="M50.4 17.2 C54 16.8 56.8 18.4 57.2 20.6 C57.5 22.2 56 23.4 53.4 23.4 C51 23.4 49.2 22 48.9 20.1 C48.7 18.6 49.3 17.4 50.4 17.2 Z" />
-          <path className="fly__eye" d="M50.4 28.8 C54 29.2 56.8 27.6 57.2 25.4 C57.5 23.8 56 22.6 53.4 22.6 C51 22.6 49.2 24 48.9 25.9 C48.7 27.4 49.3 28.6 50.4 28.8 Z" />
-          <ellipse className="fly__glint" cx="54.6" cy="18.9" rx="1.5" ry="0.9" transform="rotate(-18 54.6 18.9)" />
-          <ellipse className="fly__glint" cx="54.6" cy="27.1" rx="1.5" ry="0.9" transform="rotate(18 54.6 27.1)" />
-          <path className="fly__face" d="M55.6 21.4 C57.8 21.6 58.8 22.2 58.8 23 C58.8 23.8 57.8 24.4 55.6 24.6 Z" />
-          {/* antennae: a short pedicel and funiculus, each with its feathered arista */}
-          <g className="fly__antenna">
-            <ellipse cx="57.4" cy="21.2" rx="1.7" ry="1.2" transform="rotate(-22 57.4 21.2)" />
-            <path className="fly__arista" d="M58.6 20.4 L62.6 18.2" />
-            <path className="fly__arista-branch" d="M59.8 19.8 L59.2 18.2" />
-            <path className="fly__arista-branch" d="M61.2 19 L60.6 17.4" />
-          </g>
-          <g className="fly__antenna">
-            <ellipse cx="57.4" cy="24.8" rx="1.7" ry="1.2" transform="rotate(22 57.4 24.8)" />
-            <path className="fly__arista" d="M58.6 25.6 L62.6 27.8" />
-            <path className="fly__arista-branch" d="M59.8 26.2 L59.2 27.8" />
-            <path className="fly__arista-branch" d="M61.2 27 L60.6 28.6" />
-          </g>
-          {/* proboscis */}
-          <path className="fly__proboscis" d="M57.2 23 L59.4 23" />
-        </g>
-      </svg>
+      <div ref={bodyRef} className="fly__body">
+        {/* the shadow she casts on the page she is flying over */}
+        <div className="fly__shadow" />
+        {/* At about 200 beats a second a wing is a blur and not a shape, so it is drawn as one: two
+            soft ellipses at the wing bases, hidden the moment she lands. The photograph's own wings are
+            folded over her abdomen, which is exactly where a landed fly keeps them. */}
+        <div ref={wingsRef} className="fly__wingblur" data-flying="true" style={{ left: `${WING_X * 100}%`, top: `${WING_Y * 100}%` }}>
+          <span className="fly__wingblur-a" />
+          <span className="fly__wingblur-b" />
+        </div>
+        <img
+          className="fly__photo"
+          src={`${import.meta.env.BASE_URL}fly/fly-256.png`}
+          width={FLY_W}
+          height={FLY_H}
+          alt=""
+          draggable={false}
+          decoding="async"
+        />
+      </div>
     </div>
   );
 }
