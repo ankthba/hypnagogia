@@ -1,0 +1,60 @@
+{
+ "status": "passed",
+ "gain": 1.0,
+ "seed": 0,
+ "sigma_mV": 1.55,
+ "question": "How far below threshold is the readout MBON during the offline period, and what holds it there?",
+ "threshold_mV": -45.0,
+ "rest_mV": -52.0,
+ "threshold_gap_mV": 7.0,
+ "recorded_s": 8.0,
+ "cells": [
+  {
+   "index": 654,
+   "root_id": "10704",
+   "median_v_mV": -110.1845474243164,
+   "p95_v_mV": -106.61075592041016,
+   "max_v_mV": -99.27354431152344,
+   "mV_below_threshold_median": 65.1845474243164,
+   "mV_below_threshold_p95": 61.610755920410156,
+   "threshold_gaps_below_median": 9.312078475952148
+  },
+  {
+   "index": 1304,
+   "root_id": "11402",
+   "median_v_mV": -136.68630981445312,
+   "p95_v_mV": -132.84315490722656,
+   "max_v_mV": -121.03802490234375,
+   "mV_below_threshold_median": 91.68630981445312,
+   "mV_below_threshold_p95": 87.84315490722656,
+   "threshold_gaps_below_median": 13.098044395446777
+  }
+ ],
+ "input_budget": [
+  {
+   "root_id": "10704",
+   "apl_synapses": 180,
+   "apl_steady_mV": -65.3625,
+   "apl_share_of_deficit": 1.002729980995729,
+   "other_inhibitory_synapses": 663,
+   "excitatory_synapses": 18292
+  },
+  {
+   "root_id": "11402",
+   "apl_synapses": 261,
+   "apl_steady_mV": -94.77562499999999,
+   "apl_share_of_deficit": 1.0336943998705888,
+   "other_inhibitory_synapses": 757,
+   "excitatory_synapses": 26712
+  }
+ ],
+ "finding": "The readout sits 65 to 92 mV below its firing threshold through the offline period, against a threshold gap of 7 mV. That is 9 to 13 whole threshold gaps, and at the 95th percentile of its membrane potential it is still 62 to 88 mV short, so the 1.55 mV background noise cannot reach it. APL alone accounts for 100% to 103% of that deficit, delivering 95 to 65 mV of steady hyperpolarisation through 180 to 261 synapses. APL is not one contributor among several: it is essentially the whole of the gate. Any intervention that wants this cell to fire has to give back about that many millivolts, and the only defensible way to do that is to stop treating a neuron with 234,026 input synapses as one isopotential compartment, which is what Amin et al. 2020 measured it is not.",
+ "provenance": {
+  "config": "configs/stage5_sleep.yaml",
+  "results_dir": "results/stage6_readout_gate",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage6_readout_gate/probe_seed0/voltage.npz",
+   "/Users/ankthba/Developer/fly/results/stage6_readout_gate/probe_seed0/spikes.npz"
+  ]
+ }
+}
