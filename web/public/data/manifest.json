@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T05:42:48+00:00",
- "git_commit": "47a7e54",
+ "generated_at": "2026-09-12T07:29:38+00:00",
+ "git_commit": "86f66bf",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -171,6 +171,12 @@
     "cited": true
    },
    {
+    "name": "APL release",
+    "value": "graded, non-spiking",
+    "source": "Amin et al. 2020 eLife 9:e56954",
+    "cited": true
+   },
+   {
     "name": "sign(unknown NT)",
     "value": "+1",
     "source": "no source: neurons with no NT prediction default to excitatory (count reported in manifest)",
@@ -208,22 +214,22 @@
    "status": "passed",
    "file": "stage2_criticality.json",
    "title": "Stage 2 - Criticality",
-   "summary": "network=full; critical regime: NO; operating sigma 1.41 mV"
+   "summary": "network=full; critical regime: NO; operating sigma 1.55 mV"
   },
   "stage3b_feasibility": {
-   "status": "failed",
+   "status": "passed",
    "file": "stage3b_feasibility.json",
    "title": "Stage 3b - Is there a sparse odour code to encode a memory in?",
-   "summary": "NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. Th"
+   "summary": "Modelling APL as a spiking neuron takes the odour response from 4.5% of Kenyon cells at 0.79 Hz to 67.7% at 40.1 Hz, and the offline rate from 0.13 Hz to 32.3 Hz. Real Kenyon cells respond at 6 +/- 5% and idle near 0.1 H"
   },
   "stage3_plasticity": {
    "status": "passed",
    "file": "stage3_plasticity.json",
    "title": "Stage 3 - Plasticity",
-   "summary": "unit test passes (depression only when Kenyon-cell activity precedes dopamine); the readout MBON responds to the calibration odour before pairing (> 5 spikes/s)",
-   "gain": 0.6,
-   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has no sparse odour code to store a memory in (stage 3b). This is an uncited free parameter introduced by this project; see configs/stage3d_gain.yaml.",
-   "source_file": "results/stage3_plasticity_gain0.6/stage3.json"
+   "summary": "unit test passes (depression only when Kenyon-cell activity precedes dopamine); the readout MBON carries a measurable odour signal before pairing, as spikes (> ",
+   "gain": 1.0,
+   "gain_note": "published parameters",
+   "source_file": "results/stage3_plasticity/stage3.json"
   },
   "stage4_learning": {
    "status": "passed",

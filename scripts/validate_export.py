@@ -32,7 +32,7 @@ REQUIRED = {
                            "comparisons[].diff", "comparisons[].ci95", "comparisons[].hedges_g",
                            "comparisons[].p", "comparisons[].n", "comparisons[].survives", "provenance"],
 }
-OPTIONAL_FILES = {"stage3b_feasibility.json", "reference_clips.json", "neuron_atlas.json"}
+OPTIONAL_FILES = {"stage3b_feasibility.json", "neuron_atlas.json"}
 
 
 def get(obj, path):

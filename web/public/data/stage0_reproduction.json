@@ -2159,7 +2159,7 @@
    "results/stage0_validate_malecns/validation.json",
    "results/stage0_engine_check/crossmatch_report.json"
   ],
-  "git_commit": "47a7e54",
-  "generated_at": "2026-09-12T05:42:48+00:00"
+  "git_commit": "86f66bf",
+  "generated_at": "2026-09-12T07:29:38+00:00"
  }
 }
