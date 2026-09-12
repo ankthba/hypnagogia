@@ -71,8 +71,10 @@
   --space-lg: 4.5rem;
   --space-xl: 7rem;
 
-  --measure: 36rem;
-  --measure-wide: 64rem;
+  /* The reading measure applies to running prose only (~70 characters). The page itself is
+     wide: this is a data viewer, so charts, rasters and multi-column tables get the room. */
+  --measure: 70ch;
+  --measure-wide: 1400px;
   --gutter: var(--space-md);
 
   --transition-fast: 0.15s ease;
@@ -308,37 +310,37 @@ a.masthead__name:hover {
    4. Page column
    --------------------------------------------------------- */
 
-/* The column is one wide measure so figures and tables can reach 64rem; prose,
-   headings and status blocks constrain themselves to the 36rem reading measure
-   with .measure / .prose, and everything stays centred on the same axis. */
+/* The page is wide (~1400px including its side padding): figures, rasters, maps and
+   multi-column tables use the whole of it, and headings and their hairline rules span it.
+   Only running prose is held to the reading measure, and it starts at the left edge of the
+   page rather than floating in the centre of it. */
 .page {
   flex: 1;
   width: 100%;
-  max-width: calc(var(--measure-wide) + 2 * var(--gutter));
+  max-width: var(--measure-wide);
   margin: 0 auto;
   padding: var(--space-lg) var(--gutter) var(--space-xl);
 }
 
-.measure,
-.page h1,
-.page h2,
-.page h3 {
+.measure {
   max-width: var(--measure);
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .prose {
   max-width: var(--measure);
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 0;
+  margin-right: 0;
 }
 
+/* Body copy is set flush left, unhyphenated: justification and hyphenation are right for an
+   essay column and wrong next to numbers. */
 .prose p,
 .page .justify p {
-  text-align: justify;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+  text-align: left;
+  -webkit-hyphens: manual;
+  hyphens: manual;
 }
 
 .prose p + p {
@@ -433,17 +435,31 @@ a.masthead__name:hover {
 
 .wide {
   max-width: var(--measure-wide);
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 0;
+  margin-right: 0;
 }
 
-/* Body copy paragraphs in the page column justify like the reference. */
+/* Side-by-side content wherever the wide page leaves room (map beside raster, etc.).
+   Both tracks are minmax(0, 1fr) so a canvas or a scrolling table inside a column can
+   never push the page wider than the viewport. */
+.cols-2 {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1100px) {
+  .cols-2 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
 .page .prose p,
 .page .callout p,
 .page .banner p {
-  text-align: justify;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+  text-align: left;
+  -webkit-hyphens: manual;
+  hyphens: manual;
 }
 
 /* ---------------------------------------------------------
@@ -918,11 +934,13 @@ pre.equations {
    8. Colophon
    --------------------------------------------------------- */
 
+/* The colophon runs the width of the page so its rule and its meta row line up with the
+   content above it; the note inside it keeps the reading measure. */
 .colophon {
   width: 100%;
-  max-width: var(--measure);
+  max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: var(--space-md) var(--space-md) var(--space-lg);
+  padding: var(--space-md) var(--gutter) var(--space-lg);
 }
 
 .colophon__meta {
@@ -938,11 +956,10 @@ pre.equations {
 
 .colophon__note {
   margin-top: 0.75rem;
+  max-width: var(--measure);
   font-size: 0.85rem;
   color: var(--color-muted);
-  text-align: justify;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+  text-align: left;
 }
 
 .colophon a {
@@ -1006,10 +1023,14 @@ pre.equations {
     --gutter: 1.25rem;
   }
 
-  .masthead,
+  .masthead {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
   .colophon {
-    padding-left: 1.75rem;
-    padding-right: 1.75rem;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
   }
 
   .masthead__nav-link {

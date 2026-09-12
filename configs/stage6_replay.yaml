@@ -8,4 +8,5 @@ stage6:
   export_seeds: [0, 1, 2]       # seeds whose raster + correlation trace are exported for the viewer
   export_window_s: 60.0
   export_max_spikes: 200000
+  export_max_activity_spikes: 400000
   criterion: "a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such."

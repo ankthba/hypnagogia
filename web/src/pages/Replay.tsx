@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDataFile } from '../lib/data';
-import { loadRaster, loadTrace, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
-import type { Comparison, Stage5, Stage6 } from '../types';
+import { loadRaster, loadTrace, rasterMaxTimeMs, type ActivityData, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
+import type { Comparison, Manifest, Stage5, Stage6 } from '../types';
 import StageGate from '../components/StageGate';
 import StatusBanner from '../components/StatusBanner';
 import Figure from '../components/Figure';
@@ -10,9 +10,203 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
 import ForestPlot, { REQUIRED_COMPARISONS } from '../components/charts/ForestPlot';
 import RasterViewer from '../components/charts/RasterViewer';
+import NotRunPanel from '../components/NotRunPanel';
+import BrainMap, { AtlasCaption, atlasProvenance, useActivity, useAtlas, type Loadable } from '../components/BrainMap';
+import type { AtlasData } from '../lib/binary';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
 
 type Cond = 'sleep' | 'wake';
+
+/** How long a spike stays lit on the map after it fires. */
+const DECAY_MS = 150;
+
+interface Timeline {
+  start: number;
+  setStart: (v: number) => void;
+  windowS: number;
+  setWindowS: (v: number) => void;
+  playing: boolean;
+  setPlaying: (v: boolean) => void;
+  maxStart: number;
+  durationS: number;
+}
+
+/**
+ * The single clock of the Replay page. It was previously private to the raster; it is lifted here
+ * so the raster, the correlation trace and the brain map are scrubbed and played together.
+ */
+function useTimeline(durationS: number): Timeline {
+  const [windowS, setWindowS] = useState(2);
+  const [start, setStart] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const maxStart = Math.max(0, durationS - windowS);
+  const startRef = useRef(start);
+  useEffect(() => {
+    startRef.current = start;
+  }, [start]);
+
+  useEffect(() => {
+    setStart((v) => Math.min(v, Math.max(0, durationS - windowS)));
+  }, [durationS, windowS]);
+
+  useEffect(() => {
+    if (!playing) return;
+    let raf = 0;
+    let last = performance.now();
+    const step = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      const next = startRef.current + dt; // 1x real time
+      if (next >= maxStart) {
+        setStart(maxStart);
+        setPlaying(false);
+        return;
+      }
+      setStart(next);
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, maxStart]);
+
+  return { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS };
+}
+
+/** Play / pause, scrubber and window length: one set of controls for every panel below it. */
+function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled: boolean }) {
+  const { start, setStart, windowS, setWindowS, playing, setPlaying, maxStart, durationS } = timeline;
+  return (
+    <div className="card">
+      <div className="flex flex-wrap items-center gap-3 small">
+        <button
+          className="control"
+          onClick={() => {
+            if (!playing && start >= maxStart) setStart(0);
+            setPlaying(!playing);
+          }}
+          disabled={disabled}
+        >
+          {playing ? 'Pause' : 'Play'}
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={maxStart}
+          step={0.01}
+          value={Math.min(start, maxStart)}
+          onChange={(e) => {
+            setPlaying(false);
+            setStart(Number(e.target.value));
+          }}
+          className="flex-1 min-w-[160px]"
+          aria-label="window start (s)"
+          disabled={disabled}
+        />
+        <span className="tabular-nums muted">
+          {fmtNum(start, 2)} – {fmtNum(start + windowS, 2)} s / {fmtNum(durationS, 2)} s
+        </span>
+        <label className="flex items-center gap-2 muted">
+          window
+          <select className="control" value={windowS} onChange={(e) => setWindowS(Number(e.target.value))}>
+            {[0.5, 1, 2, 5, 10].map((w) => (
+              <option key={w} value={w}>
+                {w} s
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="mt-2 smaller muted">
+        One scrubber drives the map, the raster and the correlation trace. The map lights the neurons that spiked in the last {DECAY_MS} ms of
+        the window, fading them out over that time; the raster and the trace show the whole window.
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The map figure: the atlas when it exists, and the explicit missing-file panel for whichever of
+ * the two files is absent. It never draws a map from anything but the files it names.
+ */
+function BrainMapBlock({
+  activity,
+  activityPath,
+  timeMs,
+  decayMs,
+  height,
+}: {
+  activity: Loadable<ActivityData> | null;
+  /** the activity sidecar this map would animate from; named in the panel when it is absent */
+  activityPath: string;
+  timeMs: number | null;
+  decayMs: number;
+  height?: number;
+}) {
+  const m = useDataFile<Manifest>('manifest.json');
+  const atlas = useAtlas();
+  const manifest = m.state === 'ready' ? m.data : null;
+  const act: ActivityData | null = activity !== null && activity.state === 'ready' ? activity.data : null;
+
+  if (atlas.state === 'loading') return <div className="small muted py-6">loading neuron_atlas.json …</div>;
+  if (atlas.state === 'failed') {
+    return (
+      <div>
+        <NotRunPanel
+          file={atlas.path}
+          script="scripts/export_web.py"
+          reason={atlas.missing ? 'missing' : 'error'}
+          title="Neuron atlas (soma positions)"
+          note={<span>No map is drawn in its place.</span>}
+        />
+        {!atlas.missing && <div className="mt-2 smaller tone-failed mono">{atlas.message}</div>}
+      </div>
+    );
+  }
+
+  const atlasData: AtlasData = atlas.data;
+  return (
+    <Figure
+      title="Brain map · soma positions, lit by spikes"
+      provenance={atlasProvenance(manifest, act ? [`web/public/data/${activityPath}`, `web/public/data/replay/${act.sidecar.bin}`] : [])}
+      caption={<AtlasCaption atlas={atlasData} activity={act} />}
+    >
+      {activity === null && (
+        <div className="mb-3">
+          <NotRunPanel
+            file={activityPath}
+            script="scripts/06_replay.py"
+            reason="not_run"
+            title="Brain-map activity"
+            note={
+              <span>
+                No activity sidecar is loaded, so nothing on the map is lit. The condition and seed of the file to load come from{' '}
+                <span className="mono">stage6_replay.json</span>; the populations below are the atlas itself and are real.
+              </span>
+            }
+          />
+        </div>
+      )}
+      {activity !== null && activity.state === 'loading' && <div className="small muted mb-2">loading activity binary …</div>}
+      {activity !== null && activity.state === 'failed' && (
+        <div className="mb-3">
+          <NotRunPanel
+            file={activity.missing ? activityPath : activity.path}
+            script="scripts/06_replay.py"
+            reason={activity.missing ? 'missing' : 'error'}
+            title="Brain-map activity for this condition and seed"
+            note={
+              <span>
+                The populations below are the real atlas; nothing is lit because the spikes that would light them have not been exported.{' '}
+                {!activity.missing && <span className="tone-failed mono">{activity.message}</span>}
+              </span>
+            }
+          />
+        </div>
+      )}
+      <BrainMap atlas={atlasData} activity={act} timeMs={act ? timeMs : null} decayMs={decayMs} height={height} />
+    </Figure>
+  );
+}
 
 /** What the stage's status enum means for the memory claim; the raw string is shown for any value outside the contract. */
 function statusSentence(status: Stage6['status'] | string): string {
@@ -36,6 +230,10 @@ export default function Replay() {
   const s6 = useDataFile<Stage6>('stage6_replay.json');
   const s5 = useDataFile<Stage5>('stage5_sleep.json');
   const [cond, setCond] = useState<Cond>('sleep');
+  // With stage 6 results the map lives beside the raster and shares its scrubber. Without them the
+  // atlas is still a real file, so the populations are drawn on their own and the activity sidecar
+  // that would animate them is reported as not yet exported.
+  const s6HasResults = s6.state === 'ready' && (s6.data as Partial<Stage6>)?.status !== 'not_run';
 
   return (
     <div>
@@ -63,6 +261,19 @@ export default function Replay() {
           </StageGate>
         </ErrorBoundary>
       </section>
+
+      {!s6HasResults && s6.state !== 'loading' && (
+        <section className="mt-10">
+          <h2>Brain map · what is simulated, and where</h2>
+          <div className="prose mb-4">
+            <p className="small muted">
+              The map of the simulated neurons is exported independently of the replay stages, so it is drawn here even though stage 6 has
+              produced no results yet. Nothing is lit: lighting the neurons needs the per-seed activity sidecar named below.
+            </p>
+          </div>
+          <BrainMapBlock activity={null} activityPath={`replay/activity_${cond}_seed<k>.json`} timeMs={null} decayMs={DECAY_MS} height={520} />
+        </section>
+      )}
 
       <section className="mt-10">
         <h2>Stage 5 · sleep state</h2>
@@ -110,6 +321,35 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
       cancel = true;
     };
   }, [rasterEntry, traceEntry]);
+
+  // The map's activity sidecar for the same condition/seed. The contract names the file
+  // `replay/activity_<cond>_seed<k>.json`; stage6_replay.json does not list it, so it is derived.
+  const activityPath = seed !== null ? `replay/activity_${cond}_seed${seed}.json` : null;
+  const activity = useActivity(activityPath);
+  const act = activity !== null && activity.state === 'ready' ? activity.data : null;
+
+  const rasterData = raster !== null && raster !== 'loading' && raster.ok ? raster.data : null;
+  const traceData = trace !== null && trace !== 'loading' && trace.ok ? trace.data : null;
+
+  // One clock for the raster, the correlation trace and the map. Its length is the longest span any
+  // of the loaded files reports; nothing is assumed when none of them is loaded.
+  const durationS = useMemo(() => {
+    const cands: number[] = [];
+    if (rasterData) {
+      cands.push(rasterData.sidecar.duration_s ?? 0);
+      cands.push(rasterMaxTimeMs(rasterData) / 1000);
+    }
+    if (traceData) cands.push(traceData.nBins * (traceData.sidecar.dt_s || 0));
+    if (act) {
+      cands.push(act.sidecar.duration_s ?? 0);
+      cands.push(act.maxTMs / 1000);
+    }
+    return Math.max(...cands, 0.001);
+  }, [rasterData, traceData, act]);
+
+  const timeline = useTimeline(durationS);
+  // The map lights the leading edge of the visible window: spikes in the last DECAY_MS of it.
+  const mapTimeMs = (timeline.start + timeline.windowS) * 1000;
 
   const perSeedRows = (d.per_seed ?? []).filter((r) => r.condition === cond);
 
@@ -216,46 +456,61 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
         <ProvenanceFooter provenance={d.provenance} />
       </div>
 
-      <Figure
-        title={`KC ensemble raster - ${cond}${seed !== null ? `, seed ${seed}` : ''}`}
-        provenance={d.provenance}
-        right={
+      <section>
+        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+          <div className="label label--ink">Replay window · {cond}{seed !== null ? `, seed ${seed}` : ''}</div>
           <label className="small muted flex items-center gap-2">
             seed
             <select className="control" value={seed ?? ''} onChange={(e) => setSeedSel(Number(e.target.value))} disabled={seedsForCond.length === 0}>
-              {seedsForCond.map((s) => (
-                <option key={s} value={s}>
-                  {s}
+              {seedsForCond.map((sd) => (
+                <option key={sd} value={sd}>
+                  {sd}
                 </option>
               ))}
             </select>
           </label>
-        }
-        caption="Top: spikes of the ensemble neurons (rows grouped A / B / other KC). Bottom: Pearson correlation between the population vector in each bin and the A and B templates, with the reactivation threshold. Both panels share the time axis; drag the slider or press Play."
-      >
+        </div>
+
         {seedsForCond.length === 0 ? (
-          <div className="notrun small" style={{ maxWidth: 'none' }}>
+          <div className="notrun">
             No raster or trace sidecar is listed in <span className="mono">stage6_replay.json</span> for condition "{cond}". Expected entries under{' '}
-            <span className="mono">rasters[]</span> / <span className="mono">traces[]</span> pointing at <span className="mono">data/replay/raster_{cond}_seed&lt;k&gt;.json</span>; produced by{' '}
-            <span className="mono">scripts/06_replay.py</span> + <span className="mono">scripts/export_web.py</span>.
+            <span className="mono">rasters[]</span> / <span className="mono">traces[]</span> pointing at{' '}
+            <span className="mono">data/replay/raster_{cond}_seed&lt;k&gt;.json</span>; produced by <span className="mono">scripts/06_replay.py</span> +{' '}
+            <span className="mono">scripts/export_web.py</span>.
           </div>
         ) : (
           <>
-            {raster !== null && raster !== 'loading' && !raster.ok && (
-              <div className="mb-2 notrun small" style={{ maxWidth: 'none' }}>
-                raster not available: <span className="mono">{raster.path}</span> - {raster.message}
-              </div>
-            )}
-            {trace !== null && trace !== 'loading' && !trace.ok && (
-              <div className="mb-2 notrun small" style={{ maxWidth: 'none' }}>
-                trace not available: <span className="mono">{trace.path}</span> - {trace.message}
-              </div>
-            )}
-            {(raster === 'loading' || trace === 'loading') && <div className="small muted mb-2">loading binary data …</div>}
-            <RasterViewer raster={raster && raster !== 'loading' && raster.ok ? raster.data : null} trace={trace && trace !== 'loading' && trace.ok ? trace.data : null} />
+            <TimelineControls timeline={timeline} disabled={!rasterData && !traceData && !act} />
+            <div className="cols-2 mt-5">
+              <BrainMapBlock
+                activity={activity}
+                activityPath={activityPath ?? `replay/activity_${cond}_seed<k>.json`}
+                timeMs={mapTimeMs}
+                decayMs={DECAY_MS}
+                height={520}
+              />
+              <Figure
+                title={`KC ensemble raster · ${cond}${seed !== null ? `, seed ${seed}` : ''}`}
+                provenance={d.provenance}
+                caption="Top: spikes of the ensemble neurons (rows grouped A / B / other KC). Bottom: Pearson correlation between the population vector in each bin and the A and B templates, with the reactivation threshold. Both panels, and the map beside them, share the scrubber above."
+              >
+                {raster !== null && raster !== 'loading' && !raster.ok && (
+                  <div className="mb-2 notrun small" style={{ maxWidth: 'none' }}>
+                    raster not available: <span className="mono">{raster.path}</span> - {raster.message}
+                  </div>
+                )}
+                {trace !== null && trace !== 'loading' && !trace.ok && (
+                  <div className="mb-2 notrun small" style={{ maxWidth: 'none' }}>
+                    trace not available: <span className="mono">{trace.path}</span> - {trace.message}
+                  </div>
+                )}
+                {(raster === 'loading' || trace === 'loading') && <div className="small muted mb-2">loading binary data …</div>}
+                <RasterViewer raster={rasterData} trace={traceData} startS={timeline.start} windowS={timeline.windowS} />
+              </Figure>
+            </div>
           </>
         )}
-      </Figure>
+      </section>
 
       <div className="card">
         <div className="label label--ink mb-2">Per-seed metrics - {cond}</div>

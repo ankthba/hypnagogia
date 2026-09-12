@@ -22,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 
+from . import DATA_CACHE
 from .connectome import Connectome, load_connectome, subset_from_config
 
 
@@ -38,14 +39,48 @@ def resolve_group(conn: Connectome, spec: dict) -> np.ndarray:
 
 
 def build_connectome(cspec: dict) -> Connectome:
+    """Build the connectome a job runs on. Degree-preserving shuffles are expensive (~200 s on the full brain),
+    so a shuffled connectome is cached on disk under data/cache/shuffles and reused by every job with the same
+    (dataset, scope, subset, shuffle) specification. The cache stores only the rewired postsynaptic array."""
+    import hashlib
     conn = load_connectome(cspec.get("dataset", "malecns"), cspec.get("version"), scope=cspec.get("scope", "brain"),
                            weight_scale=cspec.get("weight_scale"))
     if cspec.get("subset"):
         conn = subset_from_config(conn, cspec["subset"])
     if cspec.get("shuffle"):
         sh = cspec["shuffle"]
-        conn = conn.degree_preserving_shuffle(int(sh["seed"]), strata=sh.get("strata", "cell_class"),
-                                              swaps_per_edge=int(sh.get("swaps_per_edge", 10)))
+        key = json.dumps({k: cspec.get(k) for k in ("dataset", "version", "scope", "subset")} | {"shuffle": sh}, sort_keys=True, default=str)
+        h = hashlib.sha1(key.encode()).hexdigest()[:16]
+        cdir = DATA_CACHE / "shuffles"; cdir.mkdir(parents=True, exist_ok=True)
+        cfile = cdir / f"{h}.npz"
+        lock = cdir / f"{h}.lock"
+        if cfile.exists():
+            z = np.load(cfile)
+            if len(z["post"]) == conn.E:
+                meta = json.loads(str(z["meta"]))
+                conn = Connectome(ids=conn.ids, pre=conn.pre, post=z["post"], count=conn.count, sign=conn.sign, ann=conn.ann,
+                                  dataset=conn.dataset, version=conn.version, weight_scale=conn.weight_scale,
+                                  name=f"{conn.name}_shuffled_s{sh['seed']}",
+                                  provenance=dict(conn.provenance, **meta, shuffle_cache=str(cfile)),
+                                  filtering_steps=list(conn.filtering_steps) + [{
+                                      "step": f"degree-preserving shuffle (strata={sh.get('strata', 'cell_class')}, seed={sh['seed']}), from cache",
+                                      "n_neurons_before": conn.N, "n_neurons_after": conn.N, "n_connections_before": conn.E,
+                                      "n_connections_after": conn.E, "n_synapses_before": conn.n_synapses, "n_synapses_after": conn.n_synapses}])
+                return conn
+        # another process may be building the same shuffle: wait for it rather than duplicating 200 s of work
+        if lock.exists() and (time.time() - lock.stat().st_mtime) < 1800:
+            while lock.exists() and not cfile.exists() and (time.time() - lock.stat().st_mtime) < 1800:
+                time.sleep(5)
+            if cfile.exists():
+                return build_connectome(cspec)
+        lock.write_text(str(os.getpid()))
+        try:
+            conn = conn.degree_preserving_shuffle(int(sh["seed"]), strata=sh.get("strata", "cell_class"),
+                                                  swaps_per_edge=int(sh.get("swaps_per_edge", 10)))
+            meta = {k: conn.provenance[k] for k in ("shuffle_seed", "shuffle_strata", "swaps_per_edge", "n_successful_swaps", "shuffle_walltime_s") if k in conn.provenance}
+            np.savez_compressed(cfile, post=conn.post, meta=json.dumps(meta))
+        finally:
+            lock.unlink(missing_ok=True)
     return conn
 
 

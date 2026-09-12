@@ -47,8 +47,7 @@ def main():
                 specs.append({"out_dir": str(out / sub), "seed": 500 + sd, "config": c, "name": f"sleep_{tag}_{cond}_{sd}_{rate}",
                               "connectome": cspec, "init_plastic_w": wfile,
                               "drive_groups": {"dfb": {"selector": POPULATIONS[s5["dfb_population"]]["selector"]}},
-                              "record": {"selectors": [{"cell_class": "Kenyon_Cell"}, {"cell_class": "MBON"}, {"cell_class": "DAN"},
-                                                       POPULATIONS[s5["dfb_population"]]["selector"]]},
+                              "record": "all",   # whole brain: needed for the viewer's activity map and for population statistics
                               "plasticity": p,
                               "epochs": [{"name": "warmup", "duration_s": s5["warmup_s"], "drives": ({"dfb": rate} if cond == "sleep" else {})},
                                          {"name": cond, "duration_s": s5["duration_s"], "drives": ({"dfb": rate} if cond == "sleep" else {}),

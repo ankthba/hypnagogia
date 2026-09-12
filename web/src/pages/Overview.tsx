@@ -10,6 +10,8 @@ import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
 import ParamTable from '../components/ParamTable';
 import ErrorBoundary from '../components/ErrorBoundary';
+import BrainMap, { AtlasCaption, atlasProvenance, useAtlas } from '../components/BrainMap';
+import Figure from '../components/Figure';
 import { fmtInt } from '../lib/format';
 
 export default function Overview() {
@@ -238,6 +240,8 @@ function ManifestView({ m }: { m: Manifest }) {
         </p>
         <ProvenanceFooter provenance={prov} />
 
+        <AtlasFigure m={m} />
+
         <h3>Filtering steps</h3>
         <DataTable
           columns={[
@@ -266,6 +270,35 @@ function ManifestView({ m }: { m: Manifest }) {
         <ParamTable params={model.params ?? []} />
         <ProvenanceFooter provenance={prov} />
       </section>
+    </div>
+  );
+}
+
+/**
+ * The populations, at their soma positions. Static: the Replay page is where the map is animated.
+ * Rendered only when the atlas files are actually present; a missing atlas is simply not a figure
+ * on this page (the Replay page is where its absence is reported).
+ */
+function AtlasFigure({ m }: { m: Manifest }) {
+  const atlas = useAtlas();
+  if (atlas.state !== 'ready') return null;
+  return (
+    <div className="mt-8">
+      <Figure
+        title="Where the simulated neurons are"
+        provenance={atlasProvenance(m)}
+        caption={
+          <>
+            <AtlasCaption atlas={atlas.data} /> This map is static; the same map is driven by the replay spikes on the{' '}
+            <Link className="link" to="/replay">
+              Replay
+            </Link>{' '}
+            page.
+          </>
+        }
+      >
+        <BrainMap atlas={atlas.data} height={560} />
+      </Figure>
     </div>
   );
 }

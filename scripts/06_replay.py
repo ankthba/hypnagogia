@@ -16,6 +16,7 @@ from hypnagogia.connectome import load_connectome
 from hypnagogia.model import load_spikes
 from hypnagogia.analysis.replay import analyse_sleep_epoch, binned_matrix, template_correlation
 from hypnagogia.analysis.stats import paired_effect
+from hypnagogia.atlas import export_activity
 
 OUT = RESULTS / "stage6_replay"
 
@@ -110,6 +111,14 @@ def main():
                                "duration_s": float(min(w[1], w[0] + s6["export_window_s"]) - w[0])},
                               open(sub / f"raster_{cond}_seed{sd}.json", "w"))
                     exports["rasters"].append({"seed": sd, "condition": cond, "file": f"replay/raster_{cond}_seed{sd}.json"})
+                    # whole-brain activity for the viewer's neuron map, over the same window
+                    atlas_idx_file = Path("web/public/data/neuron_atlas_index.bin")
+                    if atlas_idx_file.exists():
+                        aidx = np.fromfile(atlas_idx_file, dtype=np.uint32).astype(np.int64)
+                        side = export_activity(i, ts, meta["dt_ms"] * 1e-3, aidx, w[0], min(w[1], w[0] + s6["export_window_s"]),
+                                               sub, f"activity_{cond}_seed{sd}", max_spikes=s6.get("export_max_activity_spikes", 400000), seed=sd)
+                        exports.setdefault("activity", []).append({"seed": sd, "condition": cond, "file": f"replay/activity_{cond}_seed{sd}.json",
+                                                                   "n_spikes_exported": side["n_spikes_exported"], "downsampled": side["downsampled"]})
     # ---- the four comparisons ----
     def pick(net, cond, ens, metric="template_corr_mean"):
         d = {r["seed"]: r.get(metric) for r in rows if r["network"] == net and r["condition"] == cond and r["ensemble"] == ens}
@@ -156,6 +165,7 @@ def main():
                          "reactivation_event": "a bin whose template correlation exceeds the 95th percentile of the size-matched random-ensemble null"},
              "window_ms": bin_s * 1e3, "n_seeds": len(set(r["seed"] for r in rows)),
              "comparisons": comparisons, "per_seed": rows, "traces": exports["traces"], "rasters": exports["rasters"],
+             "activity": exports.get("activity", []),
              "networks_analysed": sorted(set(r["network"] for r in rows)),
              "walltime_s": round(time.time() - t0, 1),
              "provenance": {"config": "configs/stage6_replay.yaml", "results_dir": "results/stage6_replay",

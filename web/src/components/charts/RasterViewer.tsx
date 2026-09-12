@@ -42,7 +42,20 @@ function lowerBound(n: number, key: (i: number) => number, target: number): numb
  * drawn beneath on an identically-mapped time axis. Columns are resolved by name from
  * each sidecar's `columns`, never assumed positionally.
  */
-export default function RasterViewer({ raster, trace }: { raster: RasterData | null; trace: TraceData | null }) {
+export default function RasterViewer({
+  raster,
+  trace,
+  startS,
+  windowS,
+}: {
+  raster: RasterData | null;
+  trace: TraceData | null;
+  /** left edge of the visible window, in seconds; owned by the page so the map and the raster share one clock */
+  startS: number;
+  /** width of the visible window, in seconds */
+  windowS: number;
+}) {
+  const start = startS;
   // Column indices from the sidecars (the loaders guarantee presence; guarded again here).
   const rc = useMemo(() => {
     const cols = raster?.sidecar.columns ?? [];
@@ -78,46 +91,6 @@ export default function RasterViewer({ raster, trace }: { raster: RasterData | n
     const maxT = n > 0 ? tAt(n - 1) : 0;
     return { n, at, tAt, maxT, sorted };
   }, [raster, rc]);
-
-  const durationS = useMemo(() => {
-    const cands = [raster?.sidecar.duration_s ?? 0];
-    if (trace) cands.push(trace.nBins * (trace.sidecar.dt_s || 0));
-    if (spikeIndex) cands.push(spikeIndex.maxT / 1000);
-    return Math.max(...cands, 0.001);
-  }, [raster, trace, spikeIndex]);
-
-  const [windowS, setWindowS] = useState(2);
-  const [start, setStart] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const maxStart = Math.max(0, durationS - windowS);
-  const startRef = useRef(start);
-  useEffect(() => {
-    startRef.current = start;
-  }, [start]);
-
-  useEffect(() => {
-    setStart((s) => Math.min(s, Math.max(0, durationS - windowS)));
-  }, [durationS, windowS]);
-
-  useEffect(() => {
-    if (!playing) return;
-    let raf = 0;
-    let last = performance.now();
-    const step = (now: number) => {
-      const dt = (now - last) / 1000;
-      last = now;
-      const next = startRef.current + dt; // 1x real time
-      if (next >= maxStart) {
-        setStart(maxStart);
-        setPlaying(false);
-        return;
-      }
-      setStart(next);
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, maxStart]);
 
   // Row ordering: ensemble_A first, then ensemble_B, then other_kc; sorted stably by original row.
   const rowOrder = useMemo(() => {
@@ -377,44 +350,6 @@ export default function RasterViewer({ raster, trace }: { raster: RasterData | n
 
   return (
     <div ref={wrapRef} className="w-full">
-      <div className="flex flex-wrap items-center gap-3 mb-3 small">
-        <button
-          className="control"
-          onClick={() => {
-            if (!playing && start >= maxStart) setStart(0);
-            setPlaying((p) => !p);
-          }}
-          disabled={!raster && !trace}
-        >
-          {playing ? 'Pause' : 'Play'}
-        </button>
-        <input
-          type="range"
-          min={0}
-          max={maxStart}
-          step={0.01}
-          value={Math.min(start, maxStart)}
-          onChange={(e) => {
-            setPlaying(false);
-            setStart(Number(e.target.value));
-          }}
-          className="flex-1 min-w-[160px]"
-          aria-label="window start (s)"
-        />
-        <span className="tabular-nums muted">
-          {fmtNum(start, 2)} – {fmtNum(start + windowS, 2)} s / {fmtNum(durationS, 2)} s
-        </span>
-        <label className="flex items-center gap-2 muted">
-          window
-          <select className="control" value={windowS} onChange={(e) => setWindowS(Number(e.target.value))}>
-            {[0.5, 1, 2, 5, 10].map((w) => (
-              <option key={w} value={w}>
-                {w} s
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
       <canvas ref={rasterRef} style={{ width, height: rasterH }} className="block border border-rule" />
       <canvas ref={traceRef} style={{ width, height: traceH }} className="block border border-t-0 border-rule" />
       <div className="legend mt-3">

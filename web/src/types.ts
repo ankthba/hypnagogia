@@ -315,6 +315,51 @@ export interface TraceSidecar {
   threshold_source: string;
 }
 
+/**
+ * `neuron_atlas.json`: the anatomical map of the simulated neurons (soma positions only).
+ * Every count the map states about itself comes from these fields, never from the viewer.
+ */
+export interface AtlasSidecar {
+  bin: string;
+  dtype: 'uint16';
+  shape: [number, number];
+  /** byte offset of the first element in `bin`; absent means 0 */
+  byte_offset?: number;
+  columns: string[];
+  quantisation: {
+    lo_um: [number, number, number];
+    hi_um: [number, number, number];
+    scale: number;
+    formula: string;
+  };
+  axes: { x: string; y: string; z: string; note?: string };
+  groups: { code: number; label: string }[];
+  group_counts: Record<string, number>;
+  n_neurons_in_map: number;
+  n_neurons_simulated: number;
+  n_without_soma_position: number;
+  n_without_soma_position_by_group: Record<string, number>;
+  subsampled: boolean;
+  soma_outside_brain_note: string;
+  source: string;
+  row_to_sim_index?: string;
+}
+
+/** `replay/activity_<condition>_seed<k>.json`: whole-brain spikes for the map animation. */
+export interface ActivitySidecar {
+  bin: string;
+  dtype: 'uint32';
+  shape: [number, number];
+  /** byte offset of the first element in `bin`; absent means 0 */
+  byte_offset?: number;
+  columns: string[];
+  duration_s: number;
+  n_spikes_total: number;
+  n_spikes_exported: number;
+  downsampled: boolean;
+  downsample_note?: string;
+}
+
 export interface RasterSidecar {
   bin: string;
   dtype: 'uint32';

@@ -126,7 +126,7 @@ def main():
         if d:
             d.setdefault("provenance", {}); d["provenance"].update({"git_commit": commit, "generated_at": now})
             json.dump(d, open(WEB_DATA / f"{key}.json", "w"), indent=1, default=str)
-            for extra in ("traces", "rasters"):
+            for extra in ("traces", "rasters", "activity"):
                 for t in d.get(extra, []) or []:
                     src = RESULTS / sub_dir / t["file"]
                     if src.exists():
@@ -136,6 +136,10 @@ def main():
             stages[key] = {"status": d["status"], "file": f"{key}.json", "title": title, "summary": d.get("headline") or d.get("criterion", "")[:160]}
         else:
             stages[key] = {"status": "not_run", "file": f"{key}.json", "title": title, "summary": "not run"}
+
+    # anatomical atlas for the viewer's neuron map (soma positions of the simulated neurons)
+    from hypnagogia.atlas import build_atlas
+    atlas = build_atlas(conn, WEB_DATA, max_neurons=60000)
 
     manifest = {
         "generated_at": now, "git_commit": commit, "pipeline_version": base["pipeline_version"],
@@ -155,6 +159,9 @@ def main():
             "params": base["params_table"], "base_config": "configs/base.yaml",
         },
         "stages": stages,
+        "atlas": {"file": "neuron_atlas.json", "n_neurons_in_map": atlas["n_neurons_in_map"],
+                  "n_neurons_simulated": atlas["n_neurons_simulated"], "subsampled": atlas["subsampled"],
+                  "n_without_soma_position": atlas["n_without_soma_position"]},
     }
     json.dump(manifest, open(WEB_DATA / "manifest.json", "w"), indent=1, default=str)
     print(json.dumps({k: v["status"] for k, v in stages.items()}, indent=1))

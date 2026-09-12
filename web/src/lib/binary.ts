@@ -1,5 +1,5 @@
 import { fetchBinary, fetchJson } from './data';
-import type { RasterSidecar, TraceSidecar } from '../types';
+import type { ActivitySidecar, AtlasSidecar, RasterSidecar, TraceSidecar } from '../types';
 
 export interface RasterData {
   sidecar: RasterSidecar;
@@ -17,10 +17,39 @@ export interface TraceData {
   nCols: number;
 }
 
+/** Atlas: soma positions of the simulated neurons, quantised to uint16 with the sidecar's lo/hi bounds. */
+export interface AtlasData {
+  sidecar: AtlasSidecar;
+  n: number;
+  /** dequantised soma position in micrometres, one entry per atlas row */
+  xUm: Float32Array;
+  yUm: Float32Array;
+  zUm: Float32Array;
+  /** group code per atlas row; the label is sidecar.groups[code] */
+  group: Uint8Array;
+  /** label per group code, from the sidecar (index = code) */
+  groupLabels: string[];
+  lo: [number, number, number];
+  hi: [number, number, number];
+}
+
+/** Activity: spikes as (t_ms, atlas_row), sorted ascending in time so a window is a range. */
+export interface ActivityData {
+  sidecar: ActivitySidecar;
+  n: number;
+  tMs: Uint32Array;
+  atlasRow: Uint32Array;
+  maxTMs: number;
+  /** true when the file was not already time-sorted and was sorted on load */
+  sortedOnLoad: boolean;
+}
+
 export type BinLoad<T> = { ok: true; data: T } | { ok: false; missing: boolean; message: string; path: string };
 
 export const RASTER_COLUMNS = ['t_ms', 'neuron_row'] as const;
 export const TRACE_COLUMNS = ['t_s', 'corr_A', 'corr_B'] as const;
+export const ATLAS_COLUMNS = ['x_q', 'y_q', 'z_q', 'group'] as const;
+export const ACTIVITY_COLUMNS = ['t_ms', 'atlas_row'] as const;
 
 function dirOf(p: string) {
   const i = p.lastIndexOf('/');
@@ -39,6 +68,8 @@ function checkLayout(
   buf: ArrayBuffer,
   required: readonly string[],
   binPath: string,
+  /** bytes per element of the sidecar's dtype */
+  bytes = 4,
 ): { off: number; nRows: number; nCols: number; columns: string[] } | Fail {
   const shape = sc.shape;
   if (!Array.isArray(shape) || shape.length !== 2 || !shape.every((v) => Number.isInteger(v) && v >= 0)) {
@@ -61,8 +92,11 @@ function checkLayout(
     return fail(binPath, `byte_offset malformed in sidecar: ${JSON.stringify(sc.byte_offset)}`);
   }
   const n = nRows * nCols;
-  if ((off as number) + n * 4 > buf.byteLength) {
-    return fail(binPath, `binary is truncated: need ${(off as number) + n * 4} bytes for shape ${JSON.stringify(shape)} at byte_offset ${off}, file has ${buf.byteLength}`);
+  if ((off as number) + n * bytes > buf.byteLength) {
+    return fail(
+      binPath,
+      `binary is truncated: need ${(off as number) + n * bytes} bytes for shape ${JSON.stringify(shape)} at byte_offset ${off}, file has ${buf.byteLength}`,
+    );
   }
   return { off: off as number, nRows, nCols, columns: columns as string[] };
 }
@@ -72,6 +106,14 @@ function readUint32LE(buf: ArrayBuffer, off: number, n: number): Uint32Array {
   const out = new Uint32Array(n);
   const dv = new DataView(buf);
   for (let i = 0; i < n; i++) out[i] = dv.getUint32(off + 4 * i, true);
+  return out;
+}
+
+/** Decode exactly `n` little-endian uint16 values starting at `off`; any byte offset is allowed. */
+function readUint16LE(buf: ArrayBuffer, off: number, n: number): Uint16Array {
+  const out = new Uint16Array(n);
+  const dv = new DataView(buf);
+  for (let i = 0; i < n; i++) out[i] = dv.getUint16(off + 2 * i, true);
   return out;
 }
 
@@ -120,4 +162,127 @@ export async function loadTrace(sidecarPath: string): Promise<BinLoad<TraceData>
   } catch (e) {
     return fail(binPath, e instanceof Error ? e.message : String(e));
   }
+}
+
+/**
+ * Loads the neuron atlas: `neuron_atlas.json` + the uint16 [n, 4] binary it names. The quantised
+ * columns are dequantised to micrometres with the sidecar's own lo_um / hi_um and scale (the
+ * formula the sidecar states: um = lo + q / scale * (hi - lo)). Nothing is inferred: a missing or
+ * malformed sidecar field is an explicit failure, never a guessed default.
+ */
+export async function loadAtlas(sidecarPath = 'neuron_atlas.json'): Promise<BinLoad<AtlasData>> {
+  let binPath = sidecarPath;
+  try {
+    const sc = await fetchJson<AtlasSidecar>(sidecarPath);
+    if (!sc.ok) return fail(sidecarPath, sc.message, sc.missing);
+    const s = sc.data;
+    if (typeof s.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
+    binPath = dirOf(sidecarPath) + s.bin;
+    if (s.dtype !== 'uint16') return fail(binPath, `unexpected dtype ${JSON.stringify(s.dtype)} (contract: uint16)`);
+    const q = s.quantisation;
+    const okTriple = (v: unknown): v is [number, number, number] => Array.isArray(v) && v.length === 3 && v.every((x) => typeof x === 'number' && Number.isFinite(x));
+    if (!q || !okTriple(q.lo_um) || !okTriple(q.hi_um) || typeof q.scale !== 'number' || !(q.scale > 0)) {
+      return fail(sidecarPath, 'quantisation.lo_um / hi_um / scale missing or malformed; positions cannot be dequantised');
+    }
+    if (!Array.isArray(s.groups) || s.groups.some((g) => typeof g?.code !== 'number' || typeof g?.label !== 'string')) {
+      return fail(sidecarPath, 'groups[] missing or malformed (contract: [{code, label}])');
+    }
+    const buf = await fetchBinary(binPath);
+    if (!buf) return fail(binPath, `${binPath} not found`, true);
+    const layout = checkLayout(s, buf, ATLAS_COLUMNS, binPath, 2);
+    if ('ok' in layout) return layout;
+    const { off, nRows, nCols, columns } = layout;
+    const iX = columns.indexOf('x_q');
+    const iY = columns.indexOf('y_q');
+    const iZ = columns.indexOf('z_q');
+    const iG = columns.indexOf('group');
+    const raw = readUint16LE(buf, off, nRows * nCols);
+    const xUm = new Float32Array(nRows);
+    const yUm = new Float32Array(nRows);
+    const zUm = new Float32Array(nRows);
+    const group = new Uint8Array(nRows);
+    const sx = (q.hi_um[0] - q.lo_um[0]) / q.scale;
+    const sy = (q.hi_um[1] - q.lo_um[1]) / q.scale;
+    const sz = (q.hi_um[2] - q.lo_um[2]) / q.scale;
+    for (let i = 0; i < nRows; i++) {
+      const b = i * nCols;
+      xUm[i] = q.lo_um[0] + raw[b + iX] * sx;
+      yUm[i] = q.lo_um[1] + raw[b + iY] * sy;
+      zUm[i] = q.lo_um[2] + raw[b + iZ] * sz;
+      group[i] = raw[b + iG];
+    }
+    const maxCode = s.groups.reduce((m, g) => Math.max(m, g.code), 0);
+    const groupLabels: string[] = new Array(maxCode + 1).fill('');
+    for (const g of s.groups) groupLabels[g.code] = g.label;
+    return {
+      ok: true,
+      data: { sidecar: s, n: nRows, xUm, yUm, zUm, group, groupLabels, lo: q.lo_um, hi: q.hi_um },
+    };
+  } catch (e) {
+    return fail(binPath, e instanceof Error ? e.message : String(e));
+  }
+}
+
+/**
+ * Loads one `replay/activity_<cond>_seed<k>.json` + its uint32 [n_spikes, 2] binary. The spikes are
+ * materialised into two typed arrays sorted by time, so the map can take a window as a contiguous
+ * range instead of rescanning the file on every frame.
+ */
+export async function loadActivity(sidecarPath: string): Promise<BinLoad<ActivityData>> {
+  let binPath = sidecarPath;
+  try {
+    const sc = await fetchJson<ActivitySidecar>(sidecarPath);
+    if (!sc.ok) return fail(sidecarPath, sc.message, sc.missing);
+    const s = sc.data;
+    if (typeof s.bin !== 'string') return fail(sidecarPath, 'sidecar has no "bin" field');
+    binPath = dirOf(sidecarPath) + s.bin;
+    if (s.dtype !== 'uint32') return fail(binPath, `unexpected dtype ${JSON.stringify(s.dtype)} (contract: uint32)`);
+    const buf = await fetchBinary(binPath);
+    if (!buf) return fail(binPath, `${binPath} not found`, true);
+    const layout = checkLayout(s, buf, ACTIVITY_COLUMNS, binPath, 4);
+    if ('ok' in layout) return layout;
+    const { off, nRows, nCols, columns } = layout;
+    const iT = columns.indexOf('t_ms');
+    const iR = columns.indexOf('atlas_row');
+    const raw = readUint32LE(buf, off, nRows * nCols);
+    let tMs = new Uint32Array(nRows);
+    let atlasRow = new Uint32Array(nRows);
+    let sorted = true;
+    for (let i = 0; i < nRows; i++) {
+      tMs[i] = raw[i * nCols + iT];
+      atlasRow[i] = raw[i * nCols + iR];
+      if (i > 0 && tMs[i] < tMs[i - 1]) sorted = false;
+    }
+    if (!sorted) {
+      const order = new Uint32Array(nRows);
+      for (let i = 0; i < nRows; i++) order[i] = i;
+      order.sort((a, b) => tMs[a] - tMs[b]);
+      const t2 = new Uint32Array(nRows);
+      const r2 = new Uint32Array(nRows);
+      for (let k = 0; k < nRows; k++) {
+        t2[k] = tMs[order[k]];
+        r2[k] = atlasRow[order[k]];
+      }
+      tMs = t2;
+      atlasRow = r2;
+    }
+    return {
+      ok: true,
+      data: { sidecar: s, n: nRows, tMs, atlasRow, maxTMs: nRows > 0 ? tMs[nRows - 1] : 0, sortedOnLoad: !sorted },
+    };
+  } catch (e) {
+    return fail(binPath, e instanceof Error ? e.message : String(e));
+  }
+}
+
+/** Largest t_ms in a raster file (the file need not be time-sorted); 0 when empty. */
+export function rasterMaxTimeMs(r: RasterData): number {
+  const iT = r.sidecar.columns.indexOf('t_ms');
+  if (iT < 0) return 0;
+  let m = 0;
+  for (let i = 0; i < r.nSpikes; i++) {
+    const t = r.values[i * r.nCols + iT];
+    if (t > m) m = t;
+  }
+  return m;
 }
