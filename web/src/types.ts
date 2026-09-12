@@ -425,7 +425,6 @@ export interface Stage6 extends StageBase {
   bin_robustness?: Array<{
     bin_ms?: number;
     status?: string;
-    headline?: string;
     events_are_discrete?: boolean | null;
     comparisons?: Array<{ name?: string; label?: string; diff?: number; ci95?: [number, number]; hedges_g?: number; p_permutation?: number; n?: number; survives?: boolean; available?: boolean }>;
     source_file?: string;

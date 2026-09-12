@@ -212,8 +212,11 @@ def main():
                     r = load_json(cand)
                     if not r:
                         continue
+                    # The headline is deliberately not carried across: it is the primary analysis's sentence and
+                    # repeating a re-analysis's copy of it invites the two to drift apart. The row says what the
+                    # robustness question needs: the bin, whether events are discrete there, the verdict, and which
+                    # comparisons showed the predicted effect.
                     rb.append({"bin_ms": r.get("window_ms"), "status": r.get("status"),
-                               "headline": r.get("headline"),
                                "events_are_discrete": (r.get("continuity_check") or {}).get("events_are_discrete"),
                                "fraction_of_bins_called_events": (r.get("continuity_check") or {}).get("fraction_of_bins_called_events"),
                                "comparisons": [{k: c.get(k) for k in ("name", "label", "diff", "ci95", "hedges_g", "p_permutation", "n", "survives", "available")}

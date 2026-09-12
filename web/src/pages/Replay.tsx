@@ -597,13 +597,6 @@ function Stage6View({ d }: { d: Stage6 }) {
             rowKey={(r, i) => `${r.bin_ms}-${i}`}
             empty="no shorter-bin analysis has been written"
           />
-          {d.bin_robustness.map((r, i) =>
-            r.headline ? (
-              <p key={i} className="smaller mt-3 measure">
-                <strong>At {isNum(r.bin_ms) ? `${fmtNum(r.bin_ms, 0)} ms` : 'that bin'}:</strong> {r.headline}
-              </p>
-            ) : null,
-          )}
           <ProvenanceFooter provenance={d.provenance} />
         </div>
       )}

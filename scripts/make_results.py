@@ -620,10 +620,6 @@ def main():
                     w(f"| {r.get('bin_ms', 0):.0f} ms | {'yes' if r.get('events_are_discrete') else 'no'} | "
                       f"{r.get('status')} | {', '.join(surv) if surv else 'none'} |")
                 w()
-                for r in rb:
-                    if r.get("headline"):
-                        w(f"At {r.get('bin_ms', 0):.0f} ms: {r['headline']}")
-                        w()
             sc = obj.get("structure_confound")
             if sc:
                 w("**Is this wiring rather than memory?** " + sc["finding"])
