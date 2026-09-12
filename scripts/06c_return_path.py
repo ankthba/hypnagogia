@@ -41,6 +41,7 @@ from scipy import stats
 from hypnagogia import RESULTS
 from hypnagogia.config import load_config
 from hypnagogia.connectome import load_connectome
+from hypnagogia.model import psp_peak_factor
 
 OUT = RESULTS / "stage6_return_path"
 
@@ -144,10 +145,14 @@ def main():
         per_target = {}
         for q, cnt in zip(conn.post[mm], conn.count[mm]):
             per_target[int(q)] = per_target.get(int(q), 0) + int(cnt)
-        mv_per_spike = float(np.mean(list(per_target.values())) * scale * w_syn) if per_target else 0.0
+        pk = psp_peak_factor(mdl["tau_m_ms"], mdl["tau_syn_ms"])
+        g_per_spike = float(np.mean(list(per_target.values())) * scale * w_syn) if per_target else 0.0
+        mv_per_spike = g_per_spike * pk       # the potential, not the conductance: see model.psp_peak_factor
         rate_seen = max((x["carrier_rate_naive_hz"] for x in per), default=0.0)
-        ceiling_at_rate = mv_per_spike * rate_seen * (mdl["tau_syn_ms"] * 1e-3)
-        ceiling_at_50 = mv_per_spike * 50.0 * (mdl["tau_syn_ms"] * 1e-3)
+        # A steady train is different from a single event: the conductance accumulates to w * rate * tau_syn
+        # and at steady state the membrane sits at that, so the ceiling uses g and needs no kernel factor.
+        ceiling_at_rate = g_per_spike * rate_seen * (mdl["tau_syn_ms"] * 1e-3)
+        ceiling_at_50 = g_per_spike * 50.0 * (mdl["tau_syn_ms"] * 1e-3)
 
         # Is any measured change specific to the cells the carrier touches, or is it the whole population?
         targets = np.unique(conn.post[mm])
@@ -192,7 +197,9 @@ def main():
                 "seeds_with_carrier_firing": len(firing), "seeds_with_carrier_silent": len(silent),
                 "when_carrier_fires": summarise(firing), "when_carrier_silent": summarise(silent),
                 "per_seed": per,
-                "mV_one_carrier_spike_delivers_to_one_target": mv_per_spike,
+                "psp_peak_factor": pk,
+                "conductance_mV_one_carrier_spike_delivers_to_one_target": g_per_spike,
+                "potential_mV_one_carrier_spike_delivers_to_one_target": mv_per_spike,
                 "threshold_gap_mV": float(mdl["v_th_mV"] - mdl["v_rest_mV"]),
                 "ceiling_mV_at_observed_carrier_rate": ceiling_at_rate,
                 "ceiling_mV_if_carrier_fired_at_50hz": ceiling_at_50,
@@ -254,7 +261,7 @@ def main():
             f"engram carrier whose Kenyon-cell targets are enriched for the trained ensemble, "
             f"{loop['carrier_enrichment']:.2f} times, and every other carrier that fires offline contacts the "
             f"ensemble LESS than chance, so on anatomy alone it is the only candidate. But one of its spikes "
-            f"delivers {loop['mV_one_carrier_spike_delivers_to_one_target']:.3f} mV to one of its targets, so even "
+            f"delivers {loop['potential_mV_one_carrier_spike_delivers_to_one_target']:.3f} mV to one of its targets, so even "
             f"firing flat out at 50 Hz it would supply {loop['ceiling_mV_if_carrier_fired_at_50hz']:.3f} mV, which "
             f"is {loop['ceiling_as_fraction_of_threshold_gap_at_50hz']:.2%} of the {gap_:.0f} mV threshold gap. "
             f"Silencing it completely therefore cannot move its targets by anything a Kenyon cell would notice, "

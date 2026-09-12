@@ -23,7 +23,7 @@ from hypnagogia import RESULTS
 from hypnagogia.config import load_config, dump_config
 from hypnagogia.connectome import load_connectome
 from hypnagogia.jobs import run_jobs
-from hypnagogia.model import load_spikes, spikes_in_epoch
+from hypnagogia.model import load_spikes, psp_peak_factor, spikes_in_epoch
 from hypnagogia.populations import NT_CORRECTIONS
 
 OUT = RESULTS / "stage3f_dpm"
@@ -61,8 +61,12 @@ def main():
         "KC_synapses_onto_DPM": int(conn.count[in_m].sum()),
         "n_KCs_presynaptic_to_DPM": int(len(np.unique(conn.pre[in_m]))),
         "DPM_share_of_all_input_onto_KCs": float(conn.count[out_m].sum() / all_to_kc),
-        "one_DPM_spike_delivers_to_each_KC_mV": float(np.mean(list(per_kc.values())) * scale * w_syn) if per_kc else 0.0,
-        "DPM_spike_as_fraction_of_KC_threshold_gap": float(np.mean(list(per_kc.values())) * scale * w_syn / gap) if per_kc else 0.0,
+        "psp_peak_factor": psp_peak_factor(cfg["model"]["tau_m_ms"], cfg["model"]["tau_syn_ms"]),
+        "one_DPM_spike_delivers_to_each_KC_conductance_mV": float(np.mean(list(per_kc.values())) * scale * w_syn) if per_kc else 0.0,
+        "one_DPM_spike_delivers_to_each_KC_potential_mV": float(np.mean(list(per_kc.values())) * scale * w_syn
+                                                                 * psp_peak_factor(cfg["model"]["tau_m_ms"], cfg["model"]["tau_syn_ms"])) if per_kc else 0.0,
+        "DPM_spike_as_fraction_of_KC_threshold_gap": float(np.mean(list(per_kc.values())) * scale * w_syn
+                                                           * psp_peak_factor(cfg["model"]["tau_m_ms"], cfg["model"]["tau_syn_ms"]) / gap) if per_kc else 0.0,
         "annotated_nt": NT_CORRECTIONS["DPM"]["annotated_nt"],
         "measured_nt": NT_CORRECTIONS["DPM"]["measured_nt"],
         "source": NT_CORRECTIONS["DPM"]["source"],

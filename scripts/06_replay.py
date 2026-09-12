@@ -182,6 +182,85 @@ def main():
                               "trained_vs_naive_spike_share",
                               "learned vs unlearned weights, share of offline Kenyon-cell spikes falling in the odour-A ensemble",
                               "greater", SH))
+    # WHETHER A COMPARISON'S TWO ARMS ARE COMPARABLE AT ALL.
+    #
+    # z_vs_random_ensembles standardises each arm against random ensembles drawn from that same run, which
+    # handles a difference in ensemble SIZE. It does not handle a difference in the state the two arms are in.
+    # The degree-preserving shuffle destroys the Kenyon-cell feedback that keeps the odour code sparse, so the
+    # shuffled network encodes a much larger ensemble and idles at a much higher rate, and a comparison across
+    # that gap is not measuring what its name says. This reports the gap so a reader can see it, and the
+    # verdict below refuses to draw the word "artifact" from a comparison whose arms are this far apart.
+    def arm_state(net, cond, ens):
+        r = [x for x in rows if x["network"] == net and x["condition"] == cond and x["ensemble"] == ens]
+        if not r:
+            return None
+        return {"n_seeds": len(r),
+                "ensemble_size_mean": float(np.mean([x["size"] for x in r if x.get("size")])) if any(x.get("size") for x in r) else None,
+                "kc_rate_hz_mean": float(np.mean([x["kc_rate_hz"] for x in r])),
+                "n_spikes_total_kc_mean": float(np.mean([x["n_spikes_total_kc"] for x in r]))}
+
+    def matching(name, a_arm, b_arm, tol=1.5):
+        A, B = arm_state(*a_arm), arm_state(*b_arm)
+        if not A or not B:
+            return None
+        def ratio(k):
+            x, y = A.get(k), B.get(k)
+            return (max(x, y) / min(x, y)) if (x and y and min(x, y) > 0) else None
+        rs, rr = ratio("ensemble_size_mean"), ratio("kc_rate_hz_mean")
+        ok = all(v is None or v <= tol for v in (rs, rr))
+        return {"comparison": name, "arm_a": {"arm": list(a_arm), **A}, "arm_b": {"arm": list(b_arm), **B},
+                "ensemble_size_ratio": rs, "kc_rate_ratio": rr, "tolerance": tol, "arms_are_matched": bool(ok),
+                "note": (f"The two arms differ by {rs:.1f} times in ensemble size and {rr:.1f} times in "
+                         f"Kenyon-cell rate. Standardising against size-matched random ensembles corrects the "
+                         f"first and not the second: the arms are in different states, so this comparison does "
+                         f"not isolate the variable its name refers to and its result should not be read as "
+                         f"evidence about that variable in either direction."
+                         if not ok and rs and rr else
+                         "The two arms are within tolerance on ensemble size and Kenyon-cell rate.")}
+
+    arm_checks = [c for c in (
+        matching("A_vs_B_sleep", (REAL, "sleep", "A"), (REAL, "sleep", "B")),
+        matching("sleep_vs_wake_A", (REAL, "sleep", "A"), (REAL, "wake", "A")),
+        matching("real_vs_shuffled", (REAL, "sleep", "A"), (SHUF, "sleep", "A")),
+        matching("trained_vs_naive_weights", (REAL, "sleep", "A"), (REAL, "sleep_naive", "A")),
+    ) if c]
+    unmatched = {c["comparison"] for c in arm_checks if not c["arms_are_matched"]}
+
+    # WHICH HALF OF A Z-SCORE MOVED.
+    #
+    # A z against a null is (observed minus null mean) over null sd, so it can rise because the effect grew or
+    # because the null's spread shrank, and those mean opposite things. For the two memory comparisons, which
+    # are the only ones that speak to the memory at all, both halves are reported separately.
+    def decompose(name, obs_key, mu_key, sd_key, cond_a="sleep", cond_b="sleep_naive"):
+        out = {"comparison": name, "observed_minus_null": None, "null_sd": None}
+        for lab, cond in (("trained", cond_a), ("naive", cond_b)):
+            r = [x for x in rows if x["network"] == REAL and x["condition"] == cond and x["ensemble"] == "A"]
+            if not r:
+                return None
+            num = [x[obs_key] - x[mu_key] for x in r if x.get(obs_key) is not None and x.get(mu_key) is not None]
+            sd = [x[sd_key] for x in r if x.get(sd_key)]
+            out[f"{lab}_numerator_mean"] = float(np.mean(num)) if num else None
+            out[f"{lab}_null_sd_mean"] = float(np.mean(sd)) if sd else None
+        for half, a, b in (("observed_minus_null", out.get("trained_numerator_mean"), out.get("naive_numerator_mean")),
+                           ("null_sd", out.get("trained_null_sd_mean"), out.get("naive_null_sd_mean"))):
+            out[half] = {"trained": a, "naive": b, "difference": (a - b) if (a is not None and b is not None) else None,
+                         "relative": ((a - b) / abs(b)) if (a is not None and b) else None}
+        n_rel = (out["observed_minus_null"] or {}).get("relative")
+        d_rel = (out["null_sd"] or {}).get("relative")
+        out["carried_by"] = ("the numerator" if (n_rel is not None and d_rel is not None and abs(n_rel) > abs(d_rel))
+                             else "the null's spread" if (n_rel is not None and d_rel is not None) else "not determined")
+        out["note"] = ("A z-score rises when the effect grows OR when the null's spread shrinks. Here it is "
+                       f"carried by {out['carried_by']}."
+                       + (" A difference carried by the null's spread is not evidence that the memory changed "
+                          "the offline activity; it is evidence that the random ensembles became more alike."
+                          if out["carried_by"] == "the null's spread" else ""))
+        return out
+
+    z_decomposition = [d for d in (
+        decompose("trained_vs_naive_weights", "template_corr_mean", "null_corr_mean", "null_corr_sd"),
+        decompose("trained_vs_naive_spike_share", "spike_share_observed", "spike_share_null_mean", "spike_share_null_sd"),
+    ) if d]
+
     # the same three comparisons on the raw correlation, reported so the size-normalisation can be checked
     secondary = [paired(pick(REAL, "sleep", "A"), pick(REAL, "sleep", "B"), "A_vs_B_sleep_raw", "same, raw template correlation", "greater", "template_corr_mean"),
                  paired(pick(REAL, "sleep", "A"), pick(REAL, "wake", "A"), "sleep_vs_wake_A_raw", "same, raw template correlation", "greater", "template_corr_mean"),
@@ -299,9 +378,24 @@ def main():
                                       "effect survived all four null comparisons including the degree-preserving shuffled "
                                       "connectome." + memory_note + wake_note)
     elif others_pos and shuffled_c and shuffled_c.get("available") and not shuffled_c["survives"]:
-        status, headline = "artifact", ("A positive reactivation signal was measured, but it did NOT survive the "
-                                        "degree-preserving shuffled-connectome null: it is an artifact of network structure, "
-                                        "not evidence of replay." + memory_note + wake_note)
+        # "Artifact" is a claim about WHY a signal is there, and the shuffled-connectome null is the only
+        # comparison that can support it. If that null's two arms sit in different states, it cannot, and
+        # saying it anyway would assert a mechanism on the strength of a comparison that does not isolate one.
+        # The verdict stays negative, because the four required comparisons did not all survive; what it stops
+        # doing is naming a cause it has not established.
+        shuffle_check = next((c for c in arm_checks if c["comparison"] == "real_vs_shuffled"), None)
+        if "real_vs_shuffled" in unmatched:
+            status = "failed"
+            headline = ("No evidence of memory replay, and no basis for calling what was measured an artifact "
+                        "either. The odour-A ensemble does score above size-matched random ensembles, but the "
+                        "comparison that would say whether that is structure rather than memory, the "
+                        "degree-preserving shuffled connectome, cannot answer it here. "
+                        + (shuffle_check["note"] if shuffle_check else "Its two arms are not matched.")
+                        + memory_note + wake_note)
+        else:
+            status, headline = "artifact", ("A positive reactivation signal was measured, but it did NOT survive the "
+                                            "degree-preserving shuffled-connectome null: it is an artifact of network structure, "
+                                            "not evidence of replay." + memory_note + wake_note)
     elif not avail:
         status, headline = "not_run", "The replay comparisons could not be computed: the required sleep and wake runs are not available."
     else:
@@ -310,8 +404,26 @@ def main():
                                       "No evidence of memory replay: the odour-A ensemble did not reactivate above chance during "
                                       "simulated sleep. Comparisons that did not show the predicted effect: "
                                       f"{', '.join(failed) if failed else 'none'}." + memory_note + wake_note)
+    for c in comparisons:
+        if c.get("name") in unmatched:
+            chk = next((x for x in arm_checks if x["comparison"] == c["name"]), None)
+            c["arms_are_matched"] = False
+            c["arms_note"] = chk["note"] if chk else "the two arms are not matched"
+        elif any(x["comparison"] == c.get("name") for x in arm_checks):
+            c["arms_are_matched"] = True
+        dz = next((x for x in z_decomposition if x["comparison"] == c.get("name")), None)
+        if dz:
+            c["z_carried_by"] = dz["carried_by"]
+            if dz["carried_by"] == "the null's spread" and c.get("survives"):
+                c["survives_note"] = ("This comparison clears its criterion on a shrinking null rather than a "
+                                      "moving effect, so it should not be read as the memory having changed the "
+                                      "offline activity. See z_decomposition.")
+
     out_d = {"status": status, "criterion": s6["criterion"], "headline": headline,
              "engram_reaches_the_kenyon_cells": causal,
+             "arm_matching": arm_checks,
+             "comparisons_with_unmatched_arms": sorted(unmatched),
+             "z_decomposition": z_decomposition,
              "sleep_state_is_distinguishable": (None if manip is None else manip.get("state_is_distinguishable")),
              "sleep_vs_wake_arm_note": (wake_note.strip() or
                                         "Stage 5 measured the sleep and wake states as distinguishable, so the "

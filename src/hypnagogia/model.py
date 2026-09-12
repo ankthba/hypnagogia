@@ -26,6 +26,26 @@ import numpy as np
 from .connectome import Connectome
 
 
+def psp_peak_factor(tau_m_ms: float, tau_syn_ms: float) -> float:
+    """Peak membrane deflection produced by one unit of synaptic conductance, in this model's own units.
+
+    A synaptic event adds w to g, and the membrane follows dv/dt = (v_rest - v + g)/tau_m while g decays with
+    tau_syn. So w is NOT the size of the postsynaptic potential: the membrane is still charging while g is
+    already decaying, and the peak is w times this factor. For the published constants, tau_m = 20 ms and
+    tau_syn = 5 ms, the factor is 0.157, so a synapse the connectome gives a weight of 7 mV produces a
+    postsynaptic potential of about 1.1 mV.
+
+    This exists because that distinction was got wrong once, in a headline sentence, by a factor of 6.3. Any
+    statement of the form "one spike from X delivers N mV to Y" has to say which of the two it means, and if
+    it means the potential it has to come through here.
+    """
+    tm, ts = float(tau_m_ms), float(tau_syn_ms)
+    if ts <= 0 or tm <= 0 or abs(tm - ts) < 1e-12:
+        raise ValueError(f"need distinct positive time constants, got tau_m={tm}, tau_syn={ts}")
+    t_peak = np.log(tm / ts) / (1.0 / ts - 1.0 / tm)
+    return float((ts / (tm - ts)) * (np.exp(-t_peak / tm) - np.exp(-t_peak / ts)))
+
+
 def _brian():
     import brian2
     return brian2

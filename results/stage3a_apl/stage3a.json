@@ -12,15 +12,20 @@
  "correction": "APL does not fire action potentials; it releases transmitter in proportion to membrane depolarisation (Amin et al. 2020 eLife 9:e56954). It is modelled here as non-spiking, with release rectified at rest and saturating at the spike threshold. The scaling introduces no free parameter: a neuron held at threshold delivers exactly what a spiking synapse delivers at its maximum refractory-limited rate.",
  "why_it_matters": {
   "threshold_gap_mV": 7.0,
-  "one_KC_spike_delivers_to_APL_mV": 7.1615151928404,
-  "KC_spikes_needed_to_fire_APL": 0.9774467848644834,
-  "if_every_presynaptic_KC_spiked_once_APL_receives_mV": 16804.495399999996,
-  "one_APL_spike_delivers_to_each_KC_mV": 6.766210878480466,
-  "APL_spike_as_fraction_of_KC_threshold_gap": 0.966601554068638,
+  "psp_peak_factor": 0.15749013123685912,
+  "psp_peak_factor_note": "A synaptic event adds w to the conductance g, and the membrane follows it with tau_m while g decays with tau_syn, so the postsynaptic potential peaks at this fraction of w. Every 'delivers N mV' figure below is given both ways.",
+  "one_KC_spike_delivers_to_APL_conductance_mV": 7.1615151928404,
+  "one_KC_spike_delivers_to_APL_potential_mV": 1.127867967575195,
+  "one_KC_spike_as_fraction_of_APL_threshold_gap": 0.161123995367885,
+  "KC_spikes_needed_to_fire_APL": 6.206400218147262,
+  "if_every_presynaptic_KC_spiked_once_APL_receives_conductance_mV": 16804.495399999996,
+  "one_APL_spike_delivers_to_each_KC_conductance_mV": 6.766210878480466,
+  "one_APL_spike_delivers_to_each_KC_potential_mV": 1.0656114392281524,
+  "APL_spike_as_fraction_of_KC_threshold_gap": 0.15223020560402176,
   "APL_max_rate_hz_from_refractory": 454.5454545454545,
   "APL_share_of_all_inhibition_onto_KCs": 0.7975350395109102,
   "n_KCs_contacted_by_APL": 4063,
-  "note": "A single Kenyon-cell spike already carries APL most of the way to threshold, and a single APL spike removes more than a full threshold gap from every Kenyon cell it touches, while APL's output rate is capped by the refractory period. A graded controller has become a saturated switch, and it is the only feedback that keeps the odour code sparse."
+  "note": "Six Kenyon-cell spikes carry APL to threshold and a single APL spike removes about a sixth of a threshold gap from every Kenyon cell it touches, so a per-spike account does not by itself make APL a switch. What does is the standing input: APL collects from 4,063 Kenyon cells, so at any Kenyon-cell rate above a fraction of a hertz its membrane sits far past threshold and its release, capped by the refractory period, is pinned at the ceiling. A graded controller has become a saturated one, and it is the only feedback that keeps the odour code sparse. An earlier version of this note said one Kenyon-cell spike suffices, which confused the conductance a synapse delivers with the potential it produces, a factor of 6.3."
  },
  "per_run": [
   {
@@ -153,7 +158,7 @@
   }
  },
  "finding": "With APL modelled as a spiking neuron, as the published model does, an odour drives 52.6% of Kenyon cells at 23.0 Hz and they idle afterwards at 18.1 Hz. Correcting APL to non-spiking release gives 4.54% at 0.79 Hz, idling at 0.134 Hz. Real Kenyon cells respond at 6 +/- 5% of the population and idle near 0.1 Hz, so the corrected model lands on the measurement and the published one misses it by more than two orders of magnitude. Nothing else differs between the two: same connectome, same parameters, same stimulus, same seeds.",
- "walltime_s": 25.6,
+ "walltime_s": 0.1,
  "provenance": {
   "config": "configs/base.yaml",
   "results_dir": "results/stage3a_apl",

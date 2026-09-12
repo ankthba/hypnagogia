@@ -1,0 +1,72 @@
+{
+ "status": "passed",
+ "question": "Where are the Kenyon cells' recurrent synapses: on the dendrites in the calyx, or on the axons?",
+ "source": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/syn-partners-male-cns-v1.0-minconf-0.5-traced-only.feather",
+ "n_synapses_scanned": 124025046,
+ "n_kc_kc_synapses": 1153845,
+ "n_kc_kc_edges": 642933,
+ "by_region": {
+  "lobe": 955703,
+  "elsewhere": 81361,
+  "pedunculus": 82866,
+  "calyx": 33915
+ },
+ "by_neuropil": {
+  "gL(L)": 231454,
+  "gL(R)": 220080,
+  "aL(R)": 105661,
+  "aL(L)": 87779,
+  "bL(L)": 73156,
+  "b'L(L)": 66694,
+  "bL(R)": 59900,
+  "b'L(R)": 54143,
+  "CentralBrain-unspecified": 46695,
+  "PED(R)": 41658,
+  "PED(L)": 41208,
+  "a'L(R)": 29922,
+  "a'L(L)": 26914,
+  "CRE(R)": 23904,
+  "CA(R)": 20202,
+  "CA(L)": 13713,
+  "CRE(L)": 4750,
+  "SCL(R)": 2235,
+  "PLP(R)": 1283,
+  "PLP(L)": 594,
+  "SIP(L)": 385,
+  "SLP(L)": 296,
+  "SLP(R)": 274,
+  "SCL(L)": 255
+ },
+ "axonal_fraction": 0.9000940334273667,
+ "region_definitions": {
+  "calyx": [
+   "CA(R)",
+   "CA(L)"
+  ],
+  "lobe": [
+   "gL(R)",
+   "gL(L)",
+   "aL(R)",
+   "aL(L)",
+   "bL(R)",
+   "bL(L)",
+   "a'L(R)",
+   "a'L(L)",
+   "b'L(R)",
+   "b'L(L)"
+  ],
+  "pedunculus": [
+   "PED(R)",
+   "PED(L)"
+  ]
+ },
+ "finding": "The Kenyon cells' recurrent input is overwhelmingly axonal. Of 1,153,845 Kenyon-cell-to-Kenyon-cell synapses, 33,915 (2.9%) are in the calyx where the dendrites are, and 1,038,569 (90.0%) are in the lobes and pedunculus where the axons are (955,703 lobe, 82,866 pedunculus), with 81,361 (7.1%) elsewhere. The measurement that says this interaction is metabotropic rather than nicotinic is about the axons, so it applies to 90% of the recurrent synapses the model currently makes fast and excitatory.",
+ "provenance": {
+  "config": "configs/base.yaml",
+  "results_dir": "results/stage8_kc_kc",
+  "files": [
+   "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/syn-partners-male-cns-v1.0-minconf-0.5-traced-only.feather",
+   "results/stage8_kc_kc/kc_kc_edges_by_region.npz"
+  ]
+ }
+}

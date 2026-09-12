@@ -15,17 +15,22 @@ from hypnagogia import RESULTS
 from hypnagogia.config import load_config, dump_config
 from hypnagogia.connectome import load_connectome
 from hypnagogia.jobs import run_jobs
-from hypnagogia.model import load_spikes, spikes_in_epoch
+from hypnagogia.model import load_spikes, psp_peak_factor, spikes_in_epoch
 
 OUT = RESULTS / "stage3a_apl"
 ODOR = ["ORN_DM1", "ORN_DM4", "ORN_VA2", "ORN_DM2"]
 
 
 def drive_per_spike(conn, pre_idx, post_idx, w_syn, scale):
-    """Millivolts one SINGLE presynaptic spike delivers to one postsynaptic partner, averaged over connections.
+    """Synaptic CONDUCTANCE one single presynaptic spike delivers to one partner, averaged over connections.
 
     Averaging over connections, not summing over the population: the question is what one spike from one cell
     does to one of its partners, which is what decides whether that partner crosses threshold.
+
+    The returned quantity is the jump in g, not the size of the postsynaptic potential. Those differ by
+    psp_peak_factor(tau_m, tau_syn), which is 0.157 at the published constants, and the caller must apply it
+    before comparing anything to the threshold gap. An earlier version of this script did not, and reported
+    that one Kenyon-cell spike carries APL past threshold when in fact it carries it a sixth of the way.
     """
     m = np.isin(conn.pre, pre_idx) & np.isin(conn.post, post_idx)
     if not m.any():
@@ -50,20 +55,33 @@ def main():
     apl_to_kc, n_kc_t, apl_all_to_kc = drive_per_spike(conn, apl, kc, w_syn, scale)
     inhib_to_kc = int(conn.count[(conn.sign < 0) & np.isin(conn.post, kc)].sum())
     apl_syn_to_kc = int(conn.count[np.isin(conn.pre, apl) & np.isin(conn.post, kc)].sum())
+    # The conductance a spike delivers and the potential it produces differ by the membrane kernel's peak.
+    pk = psp_peak_factor(cfg["model"]["tau_m_ms"], cfg["model"]["tau_syn_ms"])
     why = {
         "threshold_gap_mV": gap,
-        "one_KC_spike_delivers_to_APL_mV": kc_to_apl,
-        "KC_spikes_needed_to_fire_APL": (gap / kc_to_apl if kc_to_apl else None),
-        "if_every_presynaptic_KC_spiked_once_APL_receives_mV": kc_all_to_apl,
-        "one_APL_spike_delivers_to_each_KC_mV": apl_to_kc,
-        "APL_spike_as_fraction_of_KC_threshold_gap": (apl_to_kc / gap if gap else None),
+        "psp_peak_factor": pk,
+        "psp_peak_factor_note": ("A synaptic event adds w to the conductance g, and the membrane follows it with "
+                                 "tau_m while g decays with tau_syn, so the postsynaptic potential peaks at this "
+                                 "fraction of w. Every 'delivers N mV' figure below is given both ways."),
+        "one_KC_spike_delivers_to_APL_conductance_mV": kc_to_apl,
+        "one_KC_spike_delivers_to_APL_potential_mV": kc_to_apl * pk,
+        "one_KC_spike_as_fraction_of_APL_threshold_gap": (kc_to_apl * pk / gap if gap else None),
+        "KC_spikes_needed_to_fire_APL": (gap / (kc_to_apl * pk) if kc_to_apl else None),
+        "if_every_presynaptic_KC_spiked_once_APL_receives_conductance_mV": kc_all_to_apl,
+        "one_APL_spike_delivers_to_each_KC_conductance_mV": apl_to_kc,
+        "one_APL_spike_delivers_to_each_KC_potential_mV": apl_to_kc * pk,
+        "APL_spike_as_fraction_of_KC_threshold_gap": (apl_to_kc * pk / gap if gap else None),
         "APL_max_rate_hz_from_refractory": 1.0 / (cfg["model"]["t_refr_ms"] * 1e-3),
         "APL_share_of_all_inhibition_onto_KCs": (apl_syn_to_kc / inhib_to_kc if inhib_to_kc else None),
         "n_KCs_contacted_by_APL": n_kc_t,
-        "note": ("A single Kenyon-cell spike already carries APL most of the way to threshold, and a single APL "
-                 "spike removes more than a full threshold gap from every Kenyon cell it touches, while APL's "
-                 "output rate is capped by the refractory period. A graded controller has become a saturated "
-                 "switch, and it is the only feedback that keeps the odour code sparse."),
+        "note": ("Six Kenyon-cell spikes carry APL to threshold and a single APL spike removes about a sixth of "
+                 "a threshold gap from every Kenyon cell it touches, so a per-spike account does not by itself "
+                 "make APL a switch. What does is the standing input: APL collects from 4,063 Kenyon cells, so "
+                 "at any Kenyon-cell rate above a fraction of a hertz its membrane sits far past threshold and "
+                 "its release, capped by the refractory period, is pinned at the ceiling. A graded controller "
+                 "has become a saturated one, and it is the only feedback that keeps the odour code sparse. An "
+                 "earlier version of this note said one Kenyon-cell spike suffices, which confused the "
+                 "conductance a synapse delivers with the potential it produces, a factor of 6.3."),
     }
     specs, meta = [], []
     for label, graded in (("apl_spiking", False), ("apl_graded", True)):
@@ -150,7 +168,7 @@ def main():
     json.dump(out, open(OUT / "stage3a.json", "w"), indent=1, default=str)
     print(out["finding"]); print()
     for k, v in why.items():
-        if isinstance(v, float): print(f"  {k}: {v:.3f}")
+        if isinstance(v, float) and not isinstance(v, bool): print(f"  {k}: {v:.4f}")
     print()
     for cond, v in summ.items():
         print(f"  {cond:12s} odour: {v['odor']['frac_kc']:6.2%} of KCs at {v['odor']['kc_rate_hz']:7.3f} Hz | "
