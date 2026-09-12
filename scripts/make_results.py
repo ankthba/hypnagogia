@@ -74,6 +74,21 @@ def main():
     # ---- headline ----
     w("## Headline")
     w()
+    # The two modelling corrections come first whatever the replay verdict turns out to be. They decide what
+    # network every stage below ran on, and the first of them is the largest single effect in the project.
+    if s3a and s3a.get("summary", {}).get("apl_graded") and s3a.get("summary", {}).get("apl_spiking"):
+        g, k = s3a["summary"]["apl_graded"], s3a["summary"]["apl_spiking"]
+        w(f"**Before anything else: the published model treats APL as a spiking neuron, and it is not one.** APL is "
+          f"the mushroom body's feedback inhibitory neuron and it releases transmitter in proportion to its membrane "
+          f"potential rather than in spikes (Amin et al. 2020 eLife 9:e56954). Modelling it with a threshold turns the "
+          f"one graded control of Kenyon-cell sparseness into a switch. At the published parameters, with that "
+          f"threshold in place, an odour drives {k['odor']['frac_kc']:.1%} of Kenyon cells at "
+          f"{k['odor']['kc_rate_hz']:.1f} Hz and they idle afterwards at {k['post']['kc_rate_hz']:.1f} Hz. Without it, "
+          f"at the same parameters, {g['odor']['frac_kc']:.2%} respond at {g['odor']['kc_rate_hz']:.2f} Hz and idle at "
+          f"{g['post']['kc_rate_hz']:.3f} Hz. Real Kenyon cells respond at 6 plus or minus 5 per cent and idle near "
+          f"0.1 Hz. Nothing was tuned to get there: the only difference between the two is whether APL is allowed to "
+          f"fire. A second correction, DPM's transmitter, is reported alongside it in *Stage 3f*.")
+        w()
     if s6:
         w(f"**Stage 6 ({s6['status']}).** {s6['headline']}")
     elif s6v:

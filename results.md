@@ -1,10 +1,12 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T07:29:12+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T07:55:40+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
 ## Headline
+
+**Before anything else: the published model treats APL as a spiking neuron, and it is not one.** APL is the mushroom body's feedback inhibitory neuron and it releases transmitter in proportion to its membrane potential rather than in spikes (Amin et al. 2020 eLife 9:e56954). Modelling it with a threshold turns the one graded control of Kenyon-cell sparseness into a switch. At the published parameters, with that threshold in place, an odour drives 67.7% of Kenyon cells at 40.1 Hz and they idle afterwards at 32.3 Hz. Without it, at the same parameters, 4.54% respond at 0.79 Hz and idle at 0.134 Hz. Real Kenyon cells respond at 6 plus or minus 5 per cent and idle near 0.1 Hz. Nothing was tuned to get there: the only difference between the two is whether APL is allowed to fire. A second correction, DPM's transmitter, is reported alongside it in *Stage 3f*.
 
 **Stage 6 (failed).** In the real network 95% of all time bins clear the reactivation threshold. The ensemble is effectively on continuously, so 'reactivation events' are not discrete episodes and the template correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory reappeared. Every comparison below must be read with that in mind. No evidence of memory replay: the odour-A ensemble did not reactivate above chance during simulated sleep. Comparisons that did not show the predicted effect: A_vs_B_sleep, sleep_vs_wake_A. The learned weights did increase reactivation relative to the identical run with unlearned weights (difference +0.14072, 95% CI [+0.10463, +0.17492]).
 
@@ -303,18 +305,20 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 
 **passed.** Criterion: MBON11 response to odour A must fall relative to odour B from before to after conditioning: the paired difference of deltas (deltaA - deltaB) must be negative with a 95% CI excluding 0 across >= 20 seeds
 
-**Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value there is no sparse odour code to store a memory in (stage 3b) and two odours leave indistinguishable ensembles (stage 3e).
-
 *Membrane potentials and synaptic conductances are reset to rest before every odour presentation; learned weights are not. The model never returns to baseline on its own (stage 3b), so without this the second odour would be delivered into the first odour's ongoing activity and every later measurement would be contaminated.*
 
 - Learning verified: **True**.
-- Output-neuron response to the trained odour A went from 16.95 to 0.00 Hz; to the control odour B from 0.00 to 0.00 Hz.
-- Difference of changes (A minus B): -16.950 Hz, 95% CI [-18.800, -15.200], Hedges' g = -3.84, permutation p = 0.0000, over 20 seeds.
+- Output-neuron response to the trained odour A went from 0.00 to 0.00 Hz; to the control odour B from 0.00 to 0.00 Hz.
+- Difference of changes (A minus B): 0.000 Hz, 95% CI [0.000, 0.000], Hedges' g = 0.00, permutation p = 1.0000, over 20 seeds.
+- The readout MBON does not spike at all in this network, before or after conditioning, because APL modelled as non-spiking holds it below threshold. The spike-level test therefore has no signal on either side and cannot be used. Conditioning is verified instead at the synapse, on the same cell and the same pairing: the synapses driven by odour A alone retain 0.019 of their weight against 0.061 for the synapses driven by odour B alone, paired across 20 seeds (Hedges g = -0.65, 95% CI [-0.069, -0.016], p = 0.0071).
 - The control odour never drove the readout MBON before conditioning (mean 0.00 Hz), so 'no change in the control' is a floor effect and carries no information. The specificity of the plasticity is therefore established synaptically instead: see synaptic_specificity, which splits the weight change by which odour drove the presynaptic Kenyon cell.
+- the readout MBON (MBON11) does not respond to odour A before conditioning (mean 0.00 Hz): no learning can be measured
+- conditioning did not shift the odour-A response relative to odour B (the 95% CI of the difference of deltas includes or exceeds 0)
+- The two odour ensembles are not disjoint: on average 53 of the 61 Kenyon cells odour B drives (86%) also respond to odour A, against 178 cells for A. The A-versus-B comparison in stage 6 is therefore largely a set against a subset of itself, which weakens it, and the size-matched random-ensemble comparison carries more of the weight.
 
 ## Stage 5 - the sleep state
 
-**passed.** Criterion: both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)
+**failed.** Criterion: both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)
 
 **Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value (stage 3b/3d).
 
@@ -322,9 +326,9 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 
 | condition | population rate | Kenyon-cell rate | output-neuron rate | dFB rate |
 |---|---|---|---|---|
-| sleep | 0.9622 Hz | 2.3112 Hz | 5.4706 Hz | 16.92 Hz |
-| wake | 0.9543 Hz | 2.3165 Hz | 5.5001 Hz | 0.01 Hz |
-| sleep_naive | 0.9670 Hz | 2.3764 Hz | 6.6385 Hz | 16.92 Hz |
+| sleep | 0.5449 Hz | 1.2106 Hz | 2.8021 Hz | 16.91 Hz |
+| wake | 0.5679 Hz | 1.2753 Hz | 2.9707 Hz | 0.00 Hz |
+| sleep_naive | 0.5512 Hz | 1.2623 Hz | 3.4584 Hz | 16.92 Hz |
 
 - The dFB population is 32 neurons of types FB6A_a, FB6A_b, FB6A_c, FB6C_a, FB6C_b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K. Hulse et al. 2021 eLife 10:e66039 Fig. 48 (R23E10 -> FB6A, FB6C_a/b, FB6E, FB6G, FB6I, FB6Z, FB7A, FB7K)
 - Clamp rate: 17.0 Hz. no dFB firing rate exists in the literature (Donlea 2014 / Pimentel 2016 report a binary ON/OFF switch); 17 Hz is taken from the UP state of the connected helicon cells ExR1, 16.9 +/- 3.6 Hz (Donlea et al. 2018 Neuron 97:378) - an approximation, not a dFB measurement
