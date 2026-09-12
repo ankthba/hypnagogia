@@ -270,8 +270,14 @@ function BrainMapInner({
    */
   const groups = useMemo(() => {
     const inBox = new Uint8Array(atlas.n);
-    const [lx, ly, lz] = frame.lo;
-    const [hx, hy, hz] = frame.hi;
+    // The box edges are the sidecar's own micrometres, and the positions are float32 dequantisations
+    // of uint16 codes, so a soma written exactly on an edge can land a fraction of a nanometre past
+    // it. The tolerance is one part in 1e6 of the extent: far below a voxel, enough that the counts
+    // here match the sidecar's rather than being one short.
+    const eps = (i: 0 | 1 | 2) => Math.max(1e-6, (frame.hi[i] - frame.lo[i]) * 1e-6);
+    const [ex, ey, ez] = [eps(0), eps(1), eps(2)];
+    const [lx, ly, lz] = [frame.lo[0] - ex, frame.lo[1] - ey, frame.lo[2] - ez];
+    const [hx, hy, hz] = [frame.hi[0] + ex, frame.hi[1] + ey, frame.hi[2] + ez];
     let outside = 0;
     for (let i = 0; i < atlas.n; i++) {
       const ok = atlas.xUm[i] >= lx && atlas.xUm[i] <= hx && atlas.yUm[i] >= ly && atlas.yUm[i] <= hy && atlas.zUm[i] >= lz && atlas.zUm[i] <= hz;
