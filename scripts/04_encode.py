@@ -237,6 +237,20 @@ def main():
                     "by which odour drove the presynaptic Kenyon cell." % (np.mean([r["B_pre"] for r in ok]) if ok else 0.0))
     if not responds: note.append(f"the readout MBON ({s4['readout_mbon_type']}) does not respond to odour A before conditioning (mean {np.mean([r['A_pre'] for r in ok]) if ok else 0:.2f} Hz): no learning can be measured")
     if ok and not learned: note.append("conditioning did not shift the odour-A response relative to odour B (the 95% CI of the difference of deltas includes or exceeds 0)")
+    # How separate the two ensembles actually are. The A-versus-B comparison in stage 6 assumes they are two
+    # different sets of Kenyon cells; if most of B sits inside A, that comparison is between a set and a subset
+    # of itself and is weaker than it looks. Reported here rather than left in the raw numbers.
+    if ok:
+        aa = float(np.mean([r["kc_ensemble_A_size"] for r in ok]))
+        bb = float(np.mean([r["kc_ensemble_B_size"] for r in ok]))
+        ov = float(np.mean([r["kc_overlap"] for r in ok]))
+        frac_b_in_a = (ov / bb) if bb else None
+        if frac_b_in_a is not None and frac_b_in_a > 0.5:
+            note.append("The two odour ensembles are not disjoint: on average %.0f of the %.0f Kenyon cells odour B "
+                        "drives (%.0f%%) also respond to odour A, against %.0f cells for A. The A-versus-B comparison "
+                        "in stage 6 is therefore largely a set against a subset of itself, which weakens it, and the "
+                        "size-matched random-ensemble comparison carries more of the weight."
+                        % (ov, bb, 100 * frac_b_in_a, aa))
     out_d = {"status": status, "criterion": s4["criterion"], "learning_verified": bool(learned or learned_synaptic),
              "learning_verified_spike_level": learned, "learning_verified_synapse_level": learned_synaptic,
              "learning_evidence": evidence, "synaptic_effect": syn_eff,
@@ -266,6 +280,8 @@ def main():
              "readout_mbons": [{"root_id": str(conn.ids[x]), "type": s4["readout_mbon_type"], "side": str(conn.ann.side.iloc[x])} for x in ro],
              "seeds": seeds, "per_seed": rows, "effect": eff, "notes": note,
              "synaptic_specificity_mean": spec_mean, "control_response_is_floor": control_flat,
+             "ensembles_are_disjoint": (bool((np.mean([r["kc_overlap"] for r in ok]) / np.mean([r["kc_ensemble_B_size"] for r in ok])) <= 0.5)
+                                        if ok and np.mean([r["kc_ensemble_B_size"] for r in ok]) else None),
              "kc_ensemble_summary": ({"A_size_mean": float(np.mean([r["kc_ensemble_A_size"] for r in ok])),
                                       "B_size_mean": float(np.mean([r["kc_ensemble_B_size"] for r in ok])),
                                       "overlap_mean": float(np.mean([r["kc_overlap"] for r in ok])),
