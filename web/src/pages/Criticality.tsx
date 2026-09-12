@@ -70,7 +70,7 @@ function Stage1View({ d }: { d: Stage1 }) {
             {
               key: 'param',
               header: 'parameter',
-              render: (r) => (r.sigma_mV != null ? `sigma = ${fmtNum(r.sigma_mV)} mV` : r.rate_hz != null ? `rate = ${fmtNum(r.rate_hz)} Hz` : 'null'),
+              render: (r) => (r.sigma_mV != null ? `sigma = ${fmtNum(r.sigma_mV)} mV` : r.rate_hz != null ? `rate = ${fmtNum(r.rate_hz)} Hz` : 'no parameter stated for this run'),
             },
             { key: 'seed', header: 'seed', render: (r) => r.seed },
             { key: 'rate', header: 'pop. rate (Hz)', render: (r) => fmtNum(r.pop_rate_hz, 4) },
@@ -137,7 +137,7 @@ function Stage2View({ d }: { d: Stage2 }) {
             return (
               <div key={c} className="contents">
                 <dt style={{ color: classColor(c) }}>{c}</dt>
-                <dd className="whitespace-normal">{crit ?? (used ? '(no criterion text in file)' : 'null')}</dd>
+                <dd className="whitespace-normal">{crit ?? (used ? '(no criterion text in file)' : 'no criterion stated in the file')}</dd>
               </div>
             );
           })}

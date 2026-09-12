@@ -46,7 +46,7 @@ export const STATUS_STYLE: Record<StageStatus, { label: string; icon: string; to
   failed: { label: 'failed', icon: '✗', tone: 'failed' },
   artifact: { label: 'artifact', icon: '!', tone: 'artifact' },
   running: { label: 'running', icon: '…', tone: 'running' },
-  not_run: { label: 'not run', icon: '—', tone: 'not_run' },
+  not_run: { label: 'not run', icon: '·', tone: 'not_run' },
 };
 
 /** Chart series: ink, Prussian blue, muted, and the status colours where they mean something. */

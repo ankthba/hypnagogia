@@ -383,7 +383,7 @@ function panelProvenance({
     const bin = clipData?.sidecar.bin ? `${dirOf(clip.file)}${clipData.sidecar.bin}` : clip.file.replace(/\.json$/, '.bin');
     return {
       provenance: {
-        config: p?.config ?? 'null',
+        config: p?.config ?? 'not stated',
         config_hash: p?.config_hash,
         results_dir: p?.results_dir,
         files: [
@@ -517,7 +517,7 @@ function ClockReadout({ clock, durationMs, epochs }: { clock: Clock; durationMs:
           <span className={`smaller mono ${drives.length > 0 ? 'tone-failed' : 'muted'}`}>
             {current ? `${current.name}: ` : 'between epochs: '}
             {/* the numbers are the file's own; reference_clips.json states no unit for them, so none is asserted */}
-            {drives.length > 0 ? `driven — ${drives.map(([k, v]) => `${k} ${fmtNum(v)}`).join(', ')}` : 'no drive'}
+            {drives.length > 0 ? `driven: ${drives.map(([k, v]) => `${k} ${fmtNum(v)}`).join(', ')}` : 'no drive'}
           </span>
         </>
       )}
@@ -575,7 +575,7 @@ function SourceLine({
         ) : (
           <p className="smaller tone-failed">
             Nothing is lit: <span className="mono">web/public/data/{load.path || replay.path}</span>{' '}
-            {load.missing ? 'has not been exported (HTTP 404)' : `could not be used — ${load.message}`}. No reference clip is played in its
+            {load.missing ? 'has not been exported (HTTP 404)' : `could not be used: ${load.message}`}. No reference clip is played in its
             place: this seed and condition name a file, and a file that is named but unusable is the finding, not an absence of one.
           </p>
         )}
@@ -662,7 +662,7 @@ function SpikeFacts({ sc, counted, stated }: { sc: ActivityData['sidecar']; coun
                 {' '}
                 · reference_clips.json states {fmtInt(stated)} active in the run
                 {counted > stated
-                  ? ' — more rows are lit than the run says fired, so one of the two files is stale'
+                  ? ': more rows are lit than the run says fired, so one of the two files is stale'
                   : counted < stated
                     ? ' (a neuron with no soma position has no row here to light)'
                     : ''}

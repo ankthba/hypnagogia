@@ -57,3 +57,25 @@ from the map though still simulated (use the sidecar's counts and `soma_outside_
    note on the canvas itself.
 3. **Give the main column more room.** At 1440 px the content should be roughly 780-820 px wide with the rail
    at 380-400 px, rather than leaving a wide empty margin.
+
+## The map must be live on every page
+
+Reported by the owner: "the neuron map only does stuff on the replay page none of the other pages."
+
+The cause is that the panel only renders activity that the Replay page publishes into a shared context, so on
+Overview, Criticality, Learning and Methods the canvas is a still image.
+
+Required behaviour: the map panel loads and plays activity **itself**, on every route, and does not depend on
+any page publishing to it.
+
+- The panel owns a condition selector (sleep, wake, sleep_naive) and a seed selector, populated from the
+  `replay/activity_<condition>_seed<k>.json` files that actually exist. It defaults to the sleep condition and
+  the lowest available seed.
+- On the Replay page, if the reader changes the seed or condition there, the panel follows that selection, so
+  the two stay in step. On every other route the panel's own selection governs.
+- Playback starts automatically on every route, except under `prefers-reduced-motion`, where it starts paused
+  with a visible play control.
+- Only files the experiment produced may play. If the selected condition and seed have no activity file, the
+  panel says so, names the missing file and `scripts/06_replay.py`, and shows the static atlas. It must never
+  fall back to another seed's data silently, and there are no reference clips any more.
+- Load lazily: fetch only the selected file, not all of them. The activity binaries total tens of megabytes.

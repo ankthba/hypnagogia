@@ -192,7 +192,7 @@ export function atlasProvenance(atlas: AtlasData | null, m: Manifest | null, ext
   if (!p) {
     return {
       provenance: {
-        config: m?.model?.base_config ?? 'null',
+        config: m?.model?.base_config ?? 'not stated',
         files,
         git_commit: siteCommit ?? '',
         generated_at: m?.generated_at,
@@ -206,7 +206,7 @@ export function atlasProvenance(atlas: AtlasData | null, m: Manifest | null, ext
   }
   return {
     provenance: {
-      config: p.config ?? 'null',
+      config: p.config ?? 'not stated',
       config_hash: p.config_hash,
       results_dir: p.results_dir,
       files: [...(p.files ?? []), ...files],
@@ -809,7 +809,7 @@ function BrainMapInner({
       {showStatus && (
         <div className={statusClass}>
           {activity && staleActivity && identity ? (
-            <span className="tone-failed">nothing is lit: this spike file does not belong to this atlas — {identity.message}</span>
+            <span className="tone-failed">nothing is lit: this spike file does not belong to this atlas: {identity.message}</span>
           ) : activity && lit ? (
             <>
               <span>
@@ -819,7 +819,7 @@ function BrainMapInner({
                 {sampleFrac !== null && (
                   <>
                     {' '}
-                    — counted in the {fmtPct(sampleFrac)} of the spikes this file carries ({fmtInt(activity.sidecar.n_spikes_exported)} of{' '}
+                    , counted in the {fmtPct(sampleFrac)} of the spikes this file carries ({fmtInt(activity.sidecar.n_spikes_exported)} of{' '}
                     {fmtInt(activity.sidecar.n_spikes_total)}), so the true numbers are higher
                   </>
                 )}
@@ -916,9 +916,9 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
   const brainBox = sc.view_boxes?.brain;
   return (
     <>
-      Each dot is one neuron's <em>soma position</em> — the cell body, not the neurites: this is not a morphology rendering, and a
-      neuron's arbours may be far from its dot. Positions are {sc.source}, dequantised with the sidecar's own bounds ({fmtNum(atlas.lo[0], 1)}–
-      {fmtNum(atlas.hi[0], 1)} µm in x, {fmtNum(atlas.lo[1], 1)}–{fmtNum(atlas.hi[1], 1)} µm in y, {fmtNum(atlas.lo[2], 1)}–{fmtNum(atlas.hi[2], 1)} µm in z);{' '}
+      Each dot is one neuron's <em>soma position</em>, the cell body, not the neurites: this is not a morphology rendering, and a
+      neuron's arbours may be far from its dot. Positions are {sc.source}, dequantised with the sidecar's own bounds ({fmtNum(atlas.lo[0], 1)} to
+      {fmtNum(atlas.hi[0], 1)} µm in x, {fmtNum(atlas.lo[1], 1)} to {fmtNum(atlas.hi[1], 1)} µm in y, {fmtNum(atlas.lo[2], 1)} to {fmtNum(atlas.hi[2], 1)} µm in z);{' '}
       {sc.axes?.note}.{' '}
       {brainBox && typeof brainBox.n_neurons === 'number' && (
         <>

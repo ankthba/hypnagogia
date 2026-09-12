@@ -89,7 +89,7 @@ export default function ProvenanceFooter({
         <span className="tone-failed">{commitNote}</span>
       ) : (
         <>
-          commit <span className="mono">{commit || 'null'}</span>
+          commit <span className="mono">{commit || 'not stated'}</span>
         </>
       )}
       {note && <> · {note}</>}

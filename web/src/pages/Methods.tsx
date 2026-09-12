@@ -158,5 +158,5 @@ export default function Methods() {
 
 /** Provenance for a figure whose only source is manifest.json itself. */
 function manifestProvenance(m: Manifest): Provenance {
-  return { config: m.model?.base_config ?? 'null', files: ['web/public/data/manifest.json'], git_commit: m.git_commit, generated_at: m.generated_at };
+  return { config: m.model?.base_config ?? 'not stated', files: ['web/public/data/manifest.json'], git_commit: m.git_commit, generated_at: m.generated_at };
 }

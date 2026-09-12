@@ -151,7 +151,7 @@ function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled
         <span className="tabular-nums muted">
           {durationKnown ? (
             <>
-              {fmtNum(start, 2)} – {fmtNum(start + windowS, 2)} s / {fmtNum(durationS, 2)} s
+              {fmtNum(start, 2)} to {fmtNum(start + windowS, 2)} s / {fmtNum(durationS, 2)} s
             </>
           ) : (
             /* no raster, trace or activity file reports a duration: none is shown rather than a made-up one */
@@ -595,15 +595,15 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
                 ),
             },
             { key: 'n', header: 'name', render: (r) => <span className="mono">{r.kind === 'missing' ? r.name : r.c.name}</span> },
-            { key: 'm', header: 'metric', render: (r) => (r.kind === 'missing' ? '—' : r.c.metric) },
-            { key: 'x', header: 'x mean', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.x_mean, 4)) },
-            { key: 'y', header: 'y mean', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.y_mean, 4)) },
-            { key: 'd', header: 'diff', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.diff, 4)) },
-            { key: 'ci', header: 'diff CI95', render: (r) => (r.kind === 'missing' ? '—' : fmtCI(r.c.ci95, 4)) },
-            { key: 'g', header: 'Hedges g', render: (r) => (r.kind === 'missing' ? '—' : fmtNum(r.c.hedges_g, 3)) },
-            { key: 'gci', header: 'g CI95', render: (r) => (r.kind === 'missing' ? '—' : fmtCI(r.c.g_ci95, 3)) },
-            { key: 'p', header: 'p', render: (r) => (r.kind === 'missing' ? '—' : fmtP(r.c.p)) },
-            { key: 'nn', header: 'n', render: (r) => (r.kind === 'missing' ? '—' : fmtInt(r.c.n)) },
+            { key: 'm', header: 'metric', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : r.c.metric) },
+            { key: 'x', header: 'x mean', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtNum(r.c.x_mean, 4)) },
+            { key: 'y', header: 'y mean', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtNum(r.c.y_mean, 4)) },
+            { key: 'd', header: 'diff', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtNum(r.c.diff, 4)) },
+            { key: 'ci', header: 'diff CI95', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtCI(r.c.ci95, 4)) },
+            { key: 'g', header: 'Hedges g', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtNum(r.c.hedges_g, 3)) },
+            { key: 'gci', header: 'g CI95', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtCI(r.c.g_ci95, 3)) },
+            { key: 'p', header: 'p', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtP(r.c.p)) },
+            { key: 'nn', header: 'n', render: (r) => (r.kind === 'missing' ? NOT_MEASURED : fmtInt(r.c.n)) },
             {
               key: 's',
               header: 'survives',
@@ -795,7 +795,7 @@ function Stage5View({ d }: { d: Stage5 }) {
           <div className="label label--ink mb-2">Dorsal fan-shaped body clamp</div>
           <dl className="kv">
             <dt>dFB cell types</dt>
-            <dd className="whitespace-normal">{(d.dfb?.cell_types ?? []).join(', ') || 'null'}</dd>
+            <dd className="whitespace-normal">{(d.dfb?.cell_types ?? []).join(', ') || 'not stated'}</dd>
             <dt>n neurons</dt>
             <dd>{fmtInt(d.dfb?.n_neurons)}</dd>
             <dt>selection source</dt>

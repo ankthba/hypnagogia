@@ -120,11 +120,11 @@ function Stage4View({ d }: { d: Stage4 }) {
               { key: 'v', header: 'value', render: (r) => <span className="whitespace-normal">{r[1]}</span> },
             ]}
             rows={[
-              ['odor A ORN types', (d.protocol?.odor_A?.orn_types ?? []).join(', ') || 'null'],
+              ['odor A ORN types', (d.protocol?.odor_A?.orn_types ?? []).join(', ') || 'not stated'],
               ['odor A n ORNs / rate', `${fmtInt(d.protocol?.odor_A?.n_orns)} / ${fmtNum(d.protocol?.odor_A?.rate_hz)} Hz`],
-              ['odor B ORN types', (d.protocol?.odor_B?.orn_types ?? []).join(', ') || 'null'],
+              ['odor B ORN types', (d.protocol?.odor_B?.orn_types ?? []).join(', ') || 'not stated'],
               ['odor B n ORNs / rate', `${fmtInt(d.protocol?.odor_B?.n_orns)} / ${fmtNum(d.protocol?.odor_B?.rate_hz)} Hz`],
-              ['DAN types', (d.protocol?.dans?.types ?? []).join(', ') || 'null'],
+              ['DAN types', (d.protocol?.dans?.types ?? []).join(', ') || 'not stated'],
               ['DAN n / rate', `${fmtInt(d.protocol?.dans?.n)} / ${fmtNum(d.protocol?.dans?.rate_hz)} Hz`],
               ['n pairings', fmtInt(d.protocol?.n_pairings)],
               ['odor duration', `${fmtNum(d.protocol?.odor_s)} s`],
@@ -132,7 +132,7 @@ function Stage4View({ d }: { d: Stage4 }) {
               ['test window', `${fmtNum(d.protocol?.test_s)} s`],
               ['background noise sigma', `${fmtNum(d.protocol?.sigma_mV)} mV`],
               ['seeds', (d.seeds ?? []).join(', ')],
-              ['readout MBONs', (d.readout_mbons ?? []).map((m) => `${m.type} (${m.root_id})`).join(', ') || 'null'],
+              ['readout MBONs', (d.readout_mbons ?? []).map((m) => `${m.type} (${m.root_id})`).join(', ') || 'not stated'],
             ]}
             rowKey={(r) => r[0]}
           />

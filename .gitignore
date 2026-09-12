@@ -30,3 +30,4 @@ results/**/job.result.json
 results/**/meta.json
 results/**/analysis.json
 scripts/.run_variant_active.sh
+scripts/.run_sparse.sh

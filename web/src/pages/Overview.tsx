@@ -115,7 +115,7 @@ function Stage0View({ d }: { d: Stage0 }) {
       <StatusBanner status={d.status} title="Reproduction of the published example" criterion={d.criterion} reasons={d.reasons} />
       <div className="card">
         <div className="mb-3 small">
-          <span className="label label--ink">target</span> = <span className="mono break-all">{t?.source ?? 'null'}</span>
+          <span className="label label--ink">target</span> = <span className="mono break-all">{t?.source ?? 'not stated'}</span>
         </div>
         <DataTable columns={cols} rows={rows} rowKey={(r) => r.name} rowClass={(_, i) => (i === 0 ? 'row--emph' : '')} />
         {d.discrepancies && d.discrepancies.length > 0 && (
@@ -170,7 +170,7 @@ interface RepRow {
   total_spikes: number | null;
 }
 
-/** Per-trial values from the file: min–max summary with the full list underneath (never truncated). */
+/** Per-trial values from the file: min to max summary with the full list underneath (never truncated). */
 function PerTrial({ values }: { values: number[] | null }) {
   if (!values) return <span className="muted">null</span>;
   if (values.length === 0) return <span className="muted">[] (empty)</span>;
@@ -180,7 +180,7 @@ function PerTrial({ values }: { values: number[] | null }) {
   return (
     <span className="whitespace-normal">
       <span>
-        {fmtNum(mn, 3)} – {fmtNum(mx, 3)} (n = {fmtInt(values.length)})
+        {fmtNum(mn, 3)} to {fmtNum(mx, 3)} (n = {fmtInt(values.length)})
       </span>
       <span className="block mono muted max-w-[28rem]" style={{ fontSize: '0.75rem' }}>
         {values.map((v) => fmtNum(v, 3)).join(', ')}
@@ -191,7 +191,7 @@ function PerTrial({ values }: { values: number[] | null }) {
 
 /** Provenance for figures whose only source is manifest.json itself. */
 function manifestProvenance(m: Manifest): Provenance {
-  return { config: m.model?.base_config ?? 'null', files: ['web/public/data/manifest.json'], git_commit: m.git_commit, generated_at: m.generated_at };
+  return { config: m.model?.base_config ?? 'not stated', files: ['web/public/data/manifest.json'], git_commit: m.git_commit, generated_at: m.generated_at };
 }
 
 function ManifestView({ m }: { m: Manifest }) {
