@@ -210,24 +210,11 @@ neither field cannot be checked and the viewer says that too, rather than implyi
 When `downsampled` is true the viewer must say so *at the counts themselves*, not only in the caption,
 because every neuron and spike count it prints is then a count within a uniform random sample.
 
-## `reference_clips.json` + `clips/<name>.json` + `clips/<name>.bin`
-Real simulations of this model, exported so the neuron map has something true to show before the replay
-stage produces activity of its own. They are NOT demo or synthetic data: each is a normal run of the
-pipeline (`scripts/07_reference_clips.py`, `configs/reference_clips.yaml`) with its own provenance.
-```json
-{"clips": [{"name": "sugar_pulses", "title": "...", "description": "...", "file": "clips/sugar_pulses.json",
-            "duration_s": 12.5, "n_spikes_total": 0, "n_spikes_exported": 0, "downsampled": false,
-            "sigma_mV": 0.0, "seed": 11, "n_neurons_simulated": 144209, "n_active_neurons": 0,
-            "epochs": [{"name": "on", "t_start_s": 0.5, "t_end_s": 1.5, "drives": {"drive": 200.0}}],
-            "provenance": {"config": "...", "results_dir": "...", "files": ["..."]}}],
- "note": "..."}
-```
-Each `clips/<name>.json` has the same shape as `replay/activity_*.json` (uint32 `[n, 2]` of `t_ms`,
-`atlas_row`). **Viewer rule:** a clip may play in the neuron map only when the selected seed/condition has no
-`replay/activity_*` file. Whenever a clip is on screen the map must name it and show its title, so a reader
-can never mistake a reference simulation for the replay result. A clip is never used on the Replay page's
-result figures, only as the map's ambient state.
-
+## Reference clips (REMOVED)
+Reference activity clips were used only while the replay stage had produced no activity of its own. Real
+experimental activity now exists under `replay/activity_*`, so the map shows only that. The map must never
+play anything other than activity produced by the experiment itself; if a seed or condition has no activity
+file, it renders the explicit "not yet run" state.
 
 ## `stage3b_feasibility.json`
 The feasibility findings that gate stages 4-6: whether the model has a sparse odour code at all, how little
