@@ -64,6 +64,15 @@ def main():
                        "comparisons": r.get("comparisons") or []})
         if rb:
             s6["bin_robustness"] = sorted(rb, key=lambda x: x.get("bin_ms") or 0)
+        # Side analyses of the same offline period, read from their own result directories so the document
+        # does not depend on the web exporter having run first.
+        for field, path in (("offline_memory_trace", "stage9_offline_trace/offline_trace.json"),
+                            ("return_path", "stage6_return_path/return_path.json"),
+                            ("readout_gate", "stage6_readout_gate/readout_gate.json"),
+                            ("recurrence_census", "stage8_kc_kc/kc_kc_compartments.json")):
+            extra = load(RESULTS / path)
+            if extra:
+                s6[field] = {k: v for k, v in extra.items() if k not in ("per_seed", "per_run", "by_run")}
     # the labelled reduced-gain variant, if it has been run
     variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
     s6v = load(variant_dirs[-1] / "stage6.json") if variant_dirs else None
@@ -330,10 +339,13 @@ def main():
         w("| quantity | value |")
         w("|---|---|")
         w(f"| threshold gap | {y['threshold_gap_mV']:.1f} mV |")
-        w(f"| one Kenyon-cell spike delivers to APL | {y['one_KC_spike_delivers_to_APL_mV']:.2f} mV |")
-        w(f"| Kenyon-cell spikes needed to fire APL | {y['KC_spikes_needed_to_fire_APL']:.2f} |")
-        w(f"| one APL spike delivers to each Kenyon cell | {y['one_APL_spike_delivers_to_each_KC_mV']:.2f} mV, "
+        w(f"| one Kenyon-cell spike delivers to APL | {y['one_KC_spike_delivers_to_APL_potential_mV']:.2f} mV of "
+          f"membrane potential ({y['one_KC_spike_delivers_to_APL_conductance_mV']:.2f} mV of conductance), "
+          f"{y['one_KC_spike_as_fraction_of_APL_threshold_gap']:.0%} of a threshold gap |")
+        w(f"| Kenyon-cell spikes needed to fire APL | {y['KC_spikes_needed_to_fire_APL']:.1f} |")
+        w(f"| one APL spike delivers to each Kenyon cell | {y['one_APL_spike_delivers_to_each_KC_potential_mV']:.2f} mV, "
           f"{y['APL_spike_as_fraction_of_KC_threshold_gap']:.0%} of a full threshold gap |")
+        w(f"| conductance-to-potential factor for these time constants | {y['psp_peak_factor']:.3f} |")
         w(f"| APL's maximum rate, set by the refractory period | {y['APL_max_rate_hz_from_refractory']:.0f} Hz |")
         w(f"| APL's share of all inhibition onto Kenyon cells | {y['APL_share_of_all_inhibition_onto_KCs']:.1%} |")
         w()
@@ -634,6 +646,30 @@ def main():
                     surv = [c["name"] for c in (r.get("comparisons") or []) if c.get("available") and c.get("survives")]
                     w(f"| {r.get('bin_ms', 0):.0f} ms | {'yes' if r.get('events_are_discrete') else 'no'} | "
                       f"{r.get('status')} | {', '.join(surv) if surv else 'none'} |")
+                w()
+            om = obj.get("offline_memory_trace")
+            if om and om.get("summary"):
+                sm = om["summary"]
+                w("### Is the memory legible offline, even though the ensemble does not reactivate?")
+                w()
+                w(f"**{om.get('finding', '')}**")
+                w()
+                w("| quantity | value |")
+                w("|---|---|")
+                w(f"| drive through the learned synapses, trained | {sm['drive_trained_mV_per_s']:,.0f} mV/s |")
+                w(f"| the same run with unlearned weights | {sm['drive_naive_mV_per_s']:,.0f} mV/s |")
+                w(f"| change | {sm['total_change_pct_mean']:+.1f}% +/- {sm['total_change_pct_sd']:.1f}, "
+                  f"paired t = {sm['paired_t']:+.1f}, p = {sm['p_value']:.1e} |")
+                w(f"| of which, learned weights on unchanged activity | {sm['weight_term_pct_mean']:+.1f}% |")
+                w(f"| of which, changed activity on unlearned weights | {sm['activity_term_pct_mean']:+.1f}% |")
+                w(f"| total plastic weight actually moved | {sm['plastic_weight_change_pct_mean']:+.2f}% |")
+                w(f"| amplification of the engram in the output | {sm['amplification_over_weight_change']:.0f}x |")
+                w(f"| episodic? | {'yes' if sm.get('is_episodic') else 'no'} "
+                  f"(bin-to-bin coefficient of variation {sm.get('per_bin_ratio_cv_mean', float('nan')):.2f}) |")
+                w()
+            rc = obj.get("recurrence_census")
+            if rc and rc.get("by_region"):
+                w(f"*Where the Kenyon cells' recurrent synapses are: {rc['finding']}*")
                 w()
             sc = obj.get("structure_confound")
             if sc:

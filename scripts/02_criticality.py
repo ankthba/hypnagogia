@@ -6,7 +6,7 @@ Usage: python scripts/02_criticality.py [--subset] [--seeds 0,1,2] [--sigmas 1,2
 import argparse, json, sys, time
 import numpy as np
 from hypnagogia import RESULTS
-from hypnagogia.config import load_config, dump_config
+from hypnagogia.config import load_config, dump_config, with_deviations
 from hypnagogia.connectome import load_connectome, subset_from_config
 from hypnagogia.populations import SUBSET_MB_CX
 from hypnagogia.jobs import run_jobs
@@ -16,15 +16,16 @@ from hypnagogia.analysis.criticality import analyse_population, CRITERIA
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--subset", action="store_true"); ap.add_argument("--seeds", default=None); ap.add_argument("--sigmas", default=None)
-    ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--analyse-only", action="store_true"); ap.add_argument("--tag", default="")
     ap.add_argument("--gain", type=float, default=1.0,
                     help="multiplier on every synaptic weight; 1.0 is the published model. Values below 1 are a "
                          "labelled deviation (see configs/stage3d_gain.yaml) and are written to a separate directory.")
     a = ap.parse_args()
     cfg = load_config("stage2_criticality"); s2 = cfg["stage2"]
+    cfg = with_deviations(cfg)
     sigmas = [float(x) for x in a.sigmas.split(",")] if a.sigmas else s2["sigma_values_mV"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s2["seeds"]
-    tag = ("subset" if a.subset else "full") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
+    tag = ("subset" if a.subset else "full") + ("" if a.gain == 1.0 else f"_gain{a.gain}") + (a.tag or "")
     OUT = RESULTS / "stage2_criticality" / tag; OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain",
              "weight_scale": cfg["dataset"]["weight_scale"] * a.gain,

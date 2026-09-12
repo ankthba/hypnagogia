@@ -416,3 +416,77 @@ def apply_nt_corrections(conn: Connectome, names: list[str]) -> Connectome:
                           "n_neurons_before": conn.N, "n_neurons_after": conn.N,
                           "n_connections_before": conn.E, "n_connections_after": conn.E,
                           "n_synapses_before": conn.n_synapses, "n_synapses_after": conn.n_synapses}])
+
+
+def apply_synapse_deviations(conn: Connectome, names: list[str], repo_root: Path | None = None,
+                             retained_fraction: float = 0.0) -> Connectome:
+    """Apply labelled deviations to the synaptic substrate, from populations.SYNAPSE_DEVIATIONS.
+
+    Unlike apply_nt_corrections, which substitutes a measured transmitter for a predicted one and leaves the
+    model's rules alone, these change what the model counts as a synapse on evidence that does not fully
+    determine the change. Every one is a deviation, is recorded as one in the provenance, and must be labelled
+    wherever its results appear.
+
+    The only mechanism provided is removing synapses: an edge's count is reduced by the number of its synapses
+    that fall in the named region and satisfy the entry's scope. Reducing the count is exactly how this model
+    expresses a weaker connection, since weight is count times a global scale, so nothing else has to change.
+    """
+    from .populations import SYNAPSE_DEVIATIONS
+    names = [n for n in (names or []) if n in SYNAPSE_DEVIATIONS]
+    if not names or retained_fraction >= 1.0:
+        return conn
+    keep_f = float(retained_fraction)
+    root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
+    count = conn.count.copy()
+    applied = []
+    for n in names:
+        e = SYNAPSE_DEVIATIONS[n]
+        tbl = root / e["edge_table"]
+        if not tbl.exists():
+            raise FileNotFoundError(f"deviation '{n}' needs {tbl}, produced by scripts/08_kc_kc_compartments.py")
+        z = np.load(tbl)
+        pre, post, in_region = z["pre"], z["post"], z[e["region"]]
+        keep = in_region > 0
+        if e.get("exclude_postsynaptic_types_matching"):
+            ct = conn.ann["cell_type"].astype(str)
+            bad = ct.str.contains(e["exclude_postsynaptic_types_matching"], regex=True, na=False).to_numpy()
+            keep &= ~bad[post]
+        pre, post, in_region = pre[keep], post[keep], in_region[keep]
+        # locate those (pre, post) pairs in the edge arrays; both are unique per pair
+        key = conn.pre.astype(np.int64) * conn.N + conn.post.astype(np.int64)
+        want = pre.astype(np.int64) * conn.N + post.astype(np.int64)
+        order = np.argsort(key)
+        pos = np.searchsorted(key[order], want)
+        pos = np.clip(pos, 0, len(order) - 1)
+        idx = order[pos]
+        hit = key[idx] == want
+        # keep_f of the affected synapses stay; the rest go. Counts are integers, which is what the weight is
+        # made of, and most affected edges carry one or two synapses, so flooring a fraction of them would
+        # remove nothing at all at intermediate settings. Rounding is therefore stochastic with a fixed seed:
+        # an edge with an expected removal of 0.5 synapses loses one half the time, the total removed matches
+        # the fraction asked for, and the same seed gives the same network every run.
+        take = np.minimum(count[idx[hit]].astype(np.int64), in_region[hit].astype(np.int64))
+        want = take * (1.0 - keep_f)
+        rng = np.random.default_rng(20260912)
+        take = np.floor(want).astype(np.int64) + (rng.random(len(want)) < (want - np.floor(want))).astype(np.int64)
+        take = np.minimum(take, np.minimum(count[idx[hit]].astype(np.int64), in_region[hit].astype(np.int64)))
+        removed = int(take.sum())
+        count[idx[hit]] = np.maximum(count[idx[hit]].astype(np.int64) - take, 0).astype(count.dtype)
+        applied.append({"deviation": n, "region": e["region"], "retained_fraction": keep_f,
+                        "n_edges": int(hit.sum()),
+                        "n_synapses_removed": removed,
+                        "n_edges_not_found": int((~hit).sum()),
+                        "what": e["what"], "measurement": e["measurement"],
+                        "why_it_is_a_deviation_and_not_a_correction": e["why_it_is_a_deviation_and_not_a_correction"],
+                        "scope_the_evidence_covers": e["scope_the_evidence_covers"],
+                        "do_not_cite": e["do_not_cite"]})
+    total_removed = int(conn.count.sum() - count.sum())
+    return Connectome(ids=conn.ids, pre=conn.pre, post=conn.post, count=count, sign=conn.sign, ann=conn.ann,
+                      dataset=conn.dataset, version=conn.version, weight_scale=conn.weight_scale,
+                      name=conn.name + "_dev_" + "_".join(names),
+                      provenance=dict(conn.provenance, synapse_deviations=applied),
+                      filtering_steps=list(conn.filtering_steps) + [{
+                          "step": f"LABELLED DEVIATION: {', '.join(names)} ({total_removed:,} synapses removed)",
+                          "n_neurons_before": conn.N, "n_neurons_after": conn.N,
+                          "n_connections_before": conn.E, "n_connections_after": conn.E,
+                          "n_synapses_before": conn.n_synapses, "n_synapses_after": int(count.sum())}])

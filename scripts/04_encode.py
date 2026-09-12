@@ -7,7 +7,7 @@ import argparse, json, sys, time
 from pathlib import Path
 import numpy as np, pandas as pd
 from hypnagogia import RESULTS
-from hypnagogia.config import load_config, dump_config
+from hypnagogia.config import load_config, dump_config, with_deviations
 from hypnagogia.connectome import load_connectome
 from hypnagogia.jobs import run_jobs
 from hypnagogia.model import load_spikes, spikes_in_epoch
@@ -28,8 +28,9 @@ def operating_sigma(cfg, network="full", gain=1.0):
     return 0.0, "no stage-2 result available: background noise off"
 
 
-def eta_from_stage3(cfg, gain=1.0):
-    p = RESULTS / ("stage3_plasticity" if gain == 1.0 else f"stage3_plasticity_gain{gain}") / "stage3.json"
+def eta_from_stage3(cfg, gain=1.0, tag=""):
+    p = (RESULTS / ("stage3_plasticity" + ("" if gain == 1.0 else f"_gain{gain}") + (tag or ""))
+         / "stage3.json")
     if p.exists():
         s3 = json.load(open(p))
         e = s3.get("calibration", {}).get("chosen_eta_ltd")
@@ -73,10 +74,12 @@ def build_epochs(s4, plastic_conditioning=True):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", default=None); ap.add_argument("--shuffled", action="store_true")
     ap.add_argument("--analyse-only", action="store_true"); ap.add_argument("--gain", type=float, default=1.0)
+    ap.add_argument("--tag", default="")
     a = ap.parse_args()
     cfg = load_config("stage4_encode"); s4 = cfg["stage4"]; pl = cfg["plasticity"]
+    cfg = with_deviations(cfg)
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s4["seeds"]
-    tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
+    tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}") + (a.tag or "")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
     # Conditioning happens against a quiet mushroom body, not against the offline background. In a real fly the
     # Kenyon-cell spontaneous rate is about 0.1 Hz (Turner, Bazhenov & Laurent 2008), so an odour-evoked ensemble
@@ -88,7 +91,7 @@ def main():
     sigma_src = (f"conditioning_sigma_mV in configs/stage4_encode.yaml ({sigma} mV); the offline background "
                  f"({sigma_offline} mV, from {sigma_src}) is applied in stage 5"
                  if s4.get("conditioning_sigma_mV") is not None else sigma_src)
-    eta, eta_src = eta_from_stage3(cfg, gain=a.gain)
+    eta, eta_src = eta_from_stage3(cfg, gain=a.gain, tag=a.tag)
     conn = load_connectome("malecns", "v1.0", "brain")
     kc, mbon = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON")
     ro = conn.select(cell_type=s4["readout_mbon_type"])

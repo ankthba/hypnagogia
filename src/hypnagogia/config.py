@@ -66,3 +66,41 @@ def get(cfg: dict, dotted: str, default: Any = None) -> Any:
             return default
         cur = cur[part]
     return cur
+
+
+def deviation_names() -> list[str]:
+    """Labelled synaptic deviations this process should apply, from the HYPNAGOGIA_DEVIATION environment.
+
+    Deliberately not a key in configs/base.yaml. A key present in every job spec changes every spec hash and
+    invalidates every completed run, and an arm that does not use a deviation should not pay for its
+    existence. Setting it here means only the arm that asks for one has it, and the name travels into the
+    resolved config, the run's meta.json and the connectome's provenance, so it cannot be applied silently.
+    """
+    import os
+    return [x.strip() for x in os.environ.get("HYPNAGOGIA_DEVIATION", "").split(",") if x.strip()]
+
+
+def deviation_retained() -> float:
+    """Fraction of the affected synapses a deviation LEAVES IN PLACE, from HYPNAGOGIA_DEVIATION_RETAINED.
+
+    A deviation whose only setting is all-or-nothing hides how much of the conclusion depends on it. This
+    makes the strength a swept quantity, so the arm can be reported as a curve the way the synaptic gain is,
+    with 1.0 the published model and 0.0 the literature's position.
+    """
+    import os
+    v = os.environ.get("HYPNAGOGIA_DEVIATION_RETAINED", "0").strip()
+    try:
+        f = float(v)
+    except ValueError:
+        raise ValueError(f"HYPNAGOGIA_DEVIATION_RETAINED must be a number in [0, 1], got {v!r}")
+    if not 0.0 <= f <= 1.0:
+        raise ValueError(f"HYPNAGOGIA_DEVIATION_RETAINED must be in [0, 1], got {f}")
+    return f
+
+
+def with_deviations(cfg: dict) -> dict:
+    """Attach the process's labelled deviations to a resolved config, if there are any."""
+    names = deviation_names()
+    if names:
+        cfg = dict(cfg, synapse_deviations={"names": names, "retained_fraction": deviation_retained()})
+    return cfg

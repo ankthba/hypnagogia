@@ -205,6 +205,18 @@ def main():
             if key == "stage6_replay" and s6b:
                 d["structure_confound"] = s6b
             if key == "stage6_replay":
+                # The offline memory trace and the recurrence census: both are about the same offline period
+                # the replay test scores, and neither is replay, so they travel with the replay result rather
+                # than as stages of their own.
+                for field, path in (("offline_memory_trace", "stage9_offline_trace/offline_trace.json"),
+                                    ("return_path", "stage6_return_path/return_path.json"),
+                                    ("readout_gate", "stage6_readout_gate/readout_gate.json"),
+                                    ("recurrence_census", "stage8_kc_kc/kc_kc_compartments.json"),
+                                    ("offline_state_audit", "stage7_offline_state/offline_state.json")):
+                    extra = load_json(RESULTS / path)
+                    if extra:
+                        d[field] = {k: v for k, v in extra.items() if k not in ("per_seed", "per_run", "by_run")}
+            if key == "stage6_replay":
                 # The same runs re-analysed at shorter bins, written by 06_replay.py --bin-ms with --out-tag.
                 # The primary bin is the cited one; these say whether the verdict depends on that choice.
                 rb = []

@@ -6,7 +6,7 @@ import argparse, json, time
 from pathlib import Path
 import numpy as np
 from hypnagogia import RESULTS
-from hypnagogia.config import load_config, dump_config
+from hypnagogia.config import load_config, dump_config, with_deviations
 from hypnagogia.connectome import load_connectome
 from hypnagogia.populations import POPULATIONS
 from hypnagogia.jobs import run_jobs
@@ -27,11 +27,13 @@ def main():
     ap.add_argument("--tag", default="", help="extra suffix on the results directory")
     a = ap.parse_args()
     cfg = load_config("stage5_sleep"); s5 = cfg["stage5"]; s4 = cfg["stage4"]
+    cfg = with_deviations(cfg)
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s5["seeds"]
     rates = [float(x) for x in a.rates.split(",")] if a.rates else [s5["dfb_clamp_rate_hz"]]
     tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}") + (a.tag or "")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
-    s4dir = RESULTS / "stage4_learning" / (("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}"))
+    s4dir = (RESULTS / "stage4_learning"
+             / (("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}") + (a.tag or "")))
     if not (s4dir / "stage4.json").exists():
         raise SystemExit(f"no stage-4 result at {s4dir}: run scripts/04_encode.py with the same --gain first")
     s4j = json.load(open(s4dir / "stage4.json"))

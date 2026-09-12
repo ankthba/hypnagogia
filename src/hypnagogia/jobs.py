@@ -23,7 +23,8 @@ from pathlib import Path
 import numpy as np
 
 from . import DATA_CACHE
-from .connectome import Connectome, apply_nt_corrections, load_connectome, subset_from_config
+from .connectome import (Connectome, apply_nt_corrections, apply_synapse_deviations,
+                         load_connectome, subset_from_config)
 
 
 def resolve_group(conn: Connectome, spec: dict) -> np.ndarray:
@@ -90,6 +91,12 @@ def run_job(spec: dict) -> dict:
     # Cells whose connectome transmitter is contradicted by a direct published measurement. Applied from the
     # config so every stage gets the same network without having to ask, and recorded in the run's meta.json.
     conn = apply_nt_corrections(conn, (spec["config"].get("nt_corrections") or {}).get("populations") or [])
+    # Labelled deviations to the synaptic substrate. Deliberately NOT given a default in configs/base.yaml:
+    # a key present in every job spec would change every spec hash and invalidate every completed run, and a
+    # deviation should cost nothing to the arm that does not use it. An arm that wants one sets it explicitly.
+    _dev = spec["config"].get("synapse_deviations") or {}
+    conn = apply_synapse_deviations(conn, _dev.get("names") or [],
+                                    retained_fraction=float(_dev.get("retained_fraction", 0.0)))
     groups = {k: resolve_group(conn, v) for k, v in spec.get("drive_groups", {}).items()}
     rec = spec.get("record", "all")
     record = "all" if rec == "all" else resolve_group(conn, rec)

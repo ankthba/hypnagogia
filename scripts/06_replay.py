@@ -11,7 +11,7 @@ import argparse, json, time
 from pathlib import Path
 import numpy as np
 from hypnagogia import RESULTS
-from hypnagogia.config import load_config, dump_config
+from hypnagogia.config import load_config, dump_config, with_deviations
 from hypnagogia.connectome import load_connectome
 from hypnagogia.model import load_spikes
 from hypnagogia.analysis.replay import analyse_sleep_epoch, binned_matrix, template_correlation
@@ -44,7 +44,7 @@ def main():
     ap.add_argument("--out-tag", default="")
     a = ap.parse_args()
     gain_suffix = "" if a.gain == 1.0 else f"_gain{a.gain}"
-    suffix = gain_suffix + (a.tag or "")     # stage 5 directories carry the tag; stage 4 directories do not
+    suffix = gain_suffix + (a.tag or "")     # stage 4 and stage 5 directories both carry the arm's tag
     cfg = load_config("stage6_replay"); s6 = cfg["stage6"]
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s6["seeds"]
     bin_s = (a.bin_ms or s6["bin_ms"]) / 1e3
@@ -57,7 +57,7 @@ def main():
     t0 = time.time()
     tmpl = {}
     for tag in (f"real{suffix}", f"shuffled{suffix}"):
-        p = RESULTS / "stage4_learning" / (tag[: len(tag) - len(a.tag)] if a.tag else tag) / "kc_templates.json"
+        p = RESULTS / "stage4_learning" / tag / "kc_templates.json"
         if p.exists():
             tmpl[tag] = json.load(open(p))
     if f"real{suffix}" not in tmpl:
