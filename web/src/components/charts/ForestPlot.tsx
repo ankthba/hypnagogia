@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Comparison } from '../../types';
 import { fmtNum, fmtCI, fmtP, fmtInt } from '../../lib/format';
 import { SERIES } from '../../lib/colors';
@@ -21,7 +22,7 @@ type Row = { kind: 'present'; c: Comparison } | { kind: 'missing'; name: string 
  * comparison absent from the file is drawn as an explicit red "missing" row; names outside the contract
  * are labelled unexpected.
  */
-export default function ForestPlot({ comparisons }: { comparisons: Comparison[] }) {
+function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
   const present = comparisons ?? [];
   const rows: Row[] = [
     ...REQUIRED_COMPARISONS.map<Row>((n) => {
@@ -147,3 +148,7 @@ function niceTicks(lo: number, hi: number, n: number): number[] {
   for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-12; v += step) out.push(Number(v.toFixed(10)));
   return out;
 }
+
+/** Memoised: it is a static SVG beside a 60 fps scrubber and depends on none of the scrubber's state. */
+const ForestPlot = memo(ForestPlotInner);
+export default ForestPlot;

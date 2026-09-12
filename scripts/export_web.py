@@ -117,6 +117,31 @@ def main():
     else:
         stages["stage2_criticality"] = {"status": "not_run", "file": "stage2_criticality.json", "title": "Stage 2 - Criticality", "summary": "not run"}
 
+    # ---- stages 3b / 3c / 3d: the feasibility findings that gate everything downstream ----
+    s3b = load_json(RESULTS / "stage3b_odor" / "stage3b.json")
+    s3bi = load_json(RESULTS / "stage3b_odor" / "ignition_threshold.json")
+    s3c = load_json(RESULTS / "stage3c_control" / "stage3c.json")
+    s3d = load_json(RESULTS / "stage3d_gain" / "stage3d.json")
+    if s3b or s3c or s3d:
+        feas = {"status": (s3b or {}).get("status", "not_run"),
+                "criterion": (s3b or {}).get("criterion", ""),
+                "headline": (s3b or {}).get("finding", ""),
+                "odor_calibration": ({k: v for k, v in s3b.items() if k != "per_run"} if s3b else None),
+                "ignition_threshold": s3bi,
+                "dataset_control": ({k: v for k, v in s3c.items() if k != "per_run"} if s3c else None),
+                "gain_sensitivity": ({k: v for k, v in s3d.items() if k != "per_run"} if s3d else None),
+                "provenance": prov("configs/stage3b_odor.yaml + configs/stage3d_gain.yaml",
+                                   "results/stage3b_odor + results/stage3c_control + results/stage3d_gain",
+                                   ["results/stage3b_odor/stage3b.json", "results/stage3b_odor/ignition_threshold.json",
+                                    "results/stage3c_control/stage3c.json", "results/stage3d_gain/stage3d.json"], commit, now)}
+        json.dump(feas, open(WEB_DATA / "stage3b_feasibility.json", "w"), indent=1, default=str)
+        stages["stage3b_feasibility"] = {"status": feas["status"], "file": "stage3b_feasibility.json",
+                                         "title": "Stage 3b - Is there a sparse odour code to encode a memory in?",
+                                         "summary": feas["headline"][:220]}
+    else:
+        stages["stage3b_feasibility"] = {"status": "not_run", "file": "stage3b_feasibility.json",
+                                         "title": "Stage 3b - Is there a sparse odour code to encode a memory in?", "summary": "not run"}
+
     # ---- stages 3-6: copy through when present ----
     for key, sub_dir, fname, title in [("stage3_plasticity", "stage3_plasticity", "stage3.json", "Stage 3 - Plasticity"),
                                        ("stage4_learning", "stage4_learning", "stage4.json", "Stage 4 - Learning"),

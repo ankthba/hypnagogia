@@ -276,12 +276,30 @@ function ManifestView({ m }: { m: Manifest }) {
 
 /**
  * The populations, at their soma positions. Static: the Replay page is where the map is animated.
- * Rendered only when the atlas files are actually present; a missing atlas is simply not a figure
- * on this page (the Replay page is where its absence is reported).
+ *
+ * An atlas that has simply not been exported yet is not a figure on this page (the Replay page is
+ * where its absence is reported). An atlas that IS present but cannot be read - a bad quantisation
+ * block, the wrong dtype, a truncated binary - is a different state and is reported here, because
+ * silence would hide a broken file behind the same blank space as an unrun export.
  */
 function AtlasFigure({ m }: { m: Manifest }) {
   const atlas = useAtlas();
-  if (atlas.state !== 'ready') return null;
+  if (atlas.state === 'loading') return null;
+  if (atlas.state === 'failed') {
+    if (atlas.missing) return null;
+    return (
+      <div className="mt-8">
+        <NotRunPanel
+          file={atlas.path}
+          script="scripts/export_web.py"
+          reason="error"
+          title="Neuron atlas (soma positions)"
+          note={<span>The file is present but could not be read, so no map is drawn in its place.</span>}
+        />
+        <div className="mt-2 smaller tone-failed mono">{atlas.message}</div>
+      </div>
+    );
+  }
   return (
     <div className="mt-8">
       <Figure

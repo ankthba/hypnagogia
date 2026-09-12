@@ -31,6 +31,7 @@ little-endian typed arrays with a JSON sidecar giving `dtype`, `shape`,
     "base_config": "configs/base.yaml"
   },
   "stages": {
+    "stage3b_feasibility": {"status": "...", "file": "stage3b_feasibility.json", "title": "Stage 3b - Is there a sparse odour code to encode a memory in?", "summary": "..."},
     "stage0_reproduction": {"status": "passed|failed|not_run|running", "file": "stage0_reproduction.json", "title": "Reproduce Shiu et al. sugar GRN -> MN9", "summary": "one line"},
     "stage1_noise":        {"status": "...", "file": "stage1_noise.json", ...},
     "stage2_criticality":  {"status": "...", "file": "stage2_criticality.json", ...},
@@ -211,3 +212,26 @@ Each `clips/<name>.json` has the same shape as `replay/activity_*.json` (uint32 
 `replay/activity_*` file. Whenever a clip is on screen the map must name it and show its title, so a reader
 can never mistake a reference simulation for the replay result. A clip is never used on the Replay page's
 result figures, only as the map's ambient state.
+
+
+## `stage3b_feasibility.json`
+The feasibility findings that gate stages 4-6: whether the model has a sparse odour code at all, how little
+input it takes to ignite the whole network, whether the same happens on the FlyWire networks, and how far the
+synaptic gain would have to move from the published value for sparse coding to exist.
+```json
+{"status": "passed|failed|not_run", "criterion": "...", "headline": "...",
+ "odor_calibration": {"grid": [{"set": "1 glomerulus", "n_orn": 74, "rate_hz": 10, "frac_kc_active": 0.57,
+                                "spikes_per_active_kc": 53.6, "pop_rate_hz_odor": 0.0, "pop_rate_hz_post": 0.0,
+                                "sparse": false, "transient": false, "usable": false}],
+                      "target_frac_kc": [0.05, 0.10], "reference": "...", "finding": "..."},
+ "ignition_threshold": {"glomerulus": "ORN_DM1", "rate_hz": 50.0, "smallest_igniting_drive": 1, "finding": "...",
+                        "grid": [{"n_driven": 1, "fraction_ignited": 1.0, "pop_rate_odor_mean": 0.0, "pop_rate_post_mean": 0.0}]},
+ "dataset_control": {"finding": "...", "grid": [{"condition": "flywire_783", "rate_hz": 50.0, "n_neurons": 138639,
+                                                 "frac_ignited": 0.0, "frac_kc_odor": 0.0, "n_active_odor": 0,
+                                                 "pop_rate_odor": 0.0, "pop_rate_post": 0.0}]},
+ "gain_sensitivity": {"WARNING": "...", "chosen_gain": 0.3, "finding": "...",
+                      "grid": [{"gain": 1.0, "w_syn_effective_mV": 0.16, "frac_kc_odor": 0.67, "sparse": false, "usable": false}]},
+ "provenance": {...}}
+```
+**Viewer rule for `gain_sensitivity`:** its `WARNING` text must be rendered with the figure, and every number
+from it must be marked as coming from a deviation from the published parameters. It is never the headline.

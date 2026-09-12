@@ -359,7 +359,6 @@ a.masthead__name:hover {
     top: var(--space-sm);
     max-height: calc(100svh - 2 * var(--space-sm));
     overflow-y: auto;
-    overscroll-behavior: contain;
     padding: var(--space-lg) 0 var(--space-sm);
   }
 }
@@ -1192,7 +1191,6 @@ pre.equations {
   z-index: -1;
   pointer-events: none;
   will-change: transform;
-  contain: layout style paint;
 }
 
 .fly svg {

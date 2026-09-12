@@ -294,12 +294,23 @@ function BrainMapInner({
     return { starts, nBins };
   }, [activity]);
 
+  /**
+   * What ties this activity file to this atlas, if anything: `atlas_row` values exported against a
+   * different atlas are all in range and all land on real somata, so no bounds check can tell a
+   * current pairing from a stale one - only the identity the exporter stamps into both sidecars.
+   * A mismatch lights nothing here, whatever the caller does with it; an unstamped file is drawn but
+   * is reported as unverifiable.
+   */
+  const identity = useMemo(() => (activity ? checkAtlasIdentity(activity.sidecar, atlas) : null), [activity, atlas]);
+  const staleActivity = identity?.state === 'mismatch';
+
   // Neurons lit in the current window, deduplicated, each at the alpha of its most recent spike.
   // The stamp array marks which neurons are already in the list for this frame, so the dedupe
   // costs one array write per spike instead of a set lookup.
   const stampRef = useRef<{ gen: Int32Array; pos: Int32Array; n: number; counter: number } | null>(null);
   const lit = useMemo(() => {
     if (!activity || !index || timeMs === null || !Number.isFinite(timeMs)) return null;
+    if (staleActivity) return null; // the file indexes a different atlas: nothing here is lit
     if (!stampRef.current || stampRef.current.n !== atlas.n) {
       stampRef.current = { gen: new Int32Array(atlas.n), pos: new Int32Array(atlas.n), n: atlas.n, counter: 0 };
     }
@@ -339,7 +350,7 @@ function BrainMapInner({
       }
     }
     return { rows, alphas, spikes, oob, nNeurons: rows.length };
-  }, [activity, index, timeMs, decayMs, atlas.n]);
+  }, [activity, index, timeMs, decayMs, atlas.n, staleActivity]);
 
   /**
    * The palette as literal canvas colours. Resolving one `var()` costs a DOM insertion and a forced
@@ -457,13 +468,6 @@ function BrainMapInner({
   }, [lit, view, canvasW, canvasH, atlas, C, variant]);
 
   const sc = atlas.sidecar;
-  /**
-   * What ties this activity file to this atlas, if anything: `atlas_row` values exported against a
-   * different atlas are all in range and all land on real somata, so only the exporter's stamp can
-   * tell a current pairing from a stale one. A mismatch is the caller's to refuse; an unstamped file
-   * is reported here, because it cannot be checked either way.
-   */
-  const identity = useMemo(() => (activity ? checkAtlasIdentity(activity.sidecar, atlas) : null), [activity, atlas]);
   /** the fraction of its spikes the activity file actually carries, when it carries a sample */
   const sampleFrac =
     activity && activity.sidecar.downsampled && activity.sidecar.n_spikes_total > 0
@@ -515,7 +519,11 @@ function BrainMapInner({
       )}
       {showStatus && (
       <div className={variant === 'panel' ? 'legend legend--tight mt-1' : 'legend mt-1'}>
-        {activity && lit ? (
+        {activity && staleActivity && identity ? (
+          <span className="tone-failed">
+            nothing is lit: this spike file does not belong to this atlas — {identity.message}
+          </span>
+        ) : activity && lit ? (
           <>
             <span>
               <strong>{fmtInt(lit.nNeurons)}</strong> neurons spiking in the last {fmtInt(decayMs)} ms
