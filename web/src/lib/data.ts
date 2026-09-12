@@ -64,8 +64,16 @@ export async function fetchBinary(relPath: string): Promise<ArrayBuffer | null> 
 /** Repository URL used by provenance footers to link config/data paths at a commit. */
 export const REPO_URL = 'https://github.com/ankthba/hypnagogia';
 
-/** Load a JSON file under public/data. Never substitutes any default data. */
-export function useDataFile<T>(relPath: string | null): Loaded<T> {
+/**
+ * Load a JSON file under public/data. Never substitutes any default data.
+ *
+ * `defer` holds the request back until the browser is idle. The site-wide map panel needs
+ * `stage6_replay.json` only to know which seeds and conditions exist, and that file is 179 kB; on
+ * a page that is not about replay it must not compete with the atlas, the page's own stage file or
+ * the first paint. It is the same cached promise the Replay page uses, so nothing is fetched twice.
+ */
+export function useDataFile<T>(relPath: string | null, opts?: { defer?: boolean }): Loaded<T> {
+  const defer = opts?.defer ?? false;
   const [state, setState] = useState<Loaded<T>>({ state: 'loading' });
   useEffect(() => {
     let cancelled = false;
@@ -74,16 +82,34 @@ export function useDataFile<T>(relPath: string | null): Loaded<T> {
       return;
     }
     setState({ state: 'loading' });
-    fetchJson<T>(relPath).then((res) => {
+    const run = () => {
       if (cancelled) return;
-      if (res.ok) setState({ state: 'ready', data: res.data, path: relPath });
-      else if (res.missing) setState({ state: 'missing', path: relPath });
-      else setState({ state: 'error', path: relPath, message: res.message });
-    });
+      fetchJson<T>(relPath).then((res) => {
+        if (cancelled) return;
+        if (res.ok) setState({ state: 'ready', data: res.data, path: relPath });
+        else if (res.missing) setState({ state: 'missing', path: relPath });
+        else setState({ state: 'error', path: relPath, message: res.message });
+      });
+    };
+    let cancelIdle: (() => void) | null = null;
+    if (defer && !jsonCache.has(dataUrl(relPath))) {
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+      if (typeof ric === 'function') {
+        const id = ric(run, { timeout: 2500 });
+        const cic = (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+        cancelIdle = () => cic?.(id);
+      } else {
+        const t = window.setTimeout(run, 400);
+        cancelIdle = () => window.clearTimeout(t);
+      }
+    } else {
+      run();
+    }
     return () => {
       cancelled = true;
+      cancelIdle?.();
     };
-  }, [relPath]);
+  }, [relPath, defer]);
   return state;
 }
 

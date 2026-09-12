@@ -1,70 +1,69 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { ActivityData, Loadable } from './binary';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 /**
- * The channel between the Replay page and the persistent neuron-map panel in the right-hand rail.
+ * The one seed and condition the whole site is looking at.
  *
- * The panel lives in the Layout, outside the routed Outlet, so it cannot see which seed/condition
- * the Replay page has selected. The Replay page publishes that *selection* here, together with the
- * state of the file it names; the panel plays it in preference to anything else.
+ * The neuron-map panel lives in the Layout, outside the routed Outlet, and the Replay page has its
+ * own condition and seed controls; before this they were two independent selections and the rail
+ * could be playing a different run from the one the page was describing. There is now one
+ * selection, held here, that both of them read and both of them write.
  *
- * What is published is the selection, not only the payload. That distinction is the contract: a
- * reference clip may stand in only when the selected seed/condition has no `replay/activity_*` file
- * at all. A file that exists but is missing from disk, truncated, malformed, or refused for a stale
- * atlas fingerprint is not an absent file - it is the finding the reader has to see, and the rail
- * must report it rather than quietly lighting up a different simulation beside it.
- *
- * Nothing is fabricated by this module: it carries a file path and, when the parse succeeded, the
- * typed arrays that came out of that file. The panel runs its own clock: it is not slaved to the
- * Replay page's scrubber, so scrubbing there does not re-render the whole layout.
+ * The selection is a pair of names, not a payload: the file it implies is
+ * `replay/activity_<condition>_seed<seed>.json`, and whether that file exists, parses, and belongs
+ * to the loaded atlas is decided where it is loaded. A file that is named but missing or stale is
+ * the finding the reader has to see, and nothing else is ever animated in its place.
  */
 
-export interface ReplayActivitySelection {
-  /** the sidecar this selection names, e.g. "replay/activity_sleep_seed0.json" */
-  path: string;
+export interface MapSelection {
   condition: string;
   seed: number;
-  /** the state of that file: loading, parsed, or a failure the panel must report */
-  load: Loadable<ActivityData>;
+}
+
+/** One `(condition, seed)` the replay stage says it exported activity for. */
+export interface ActivityRef extends MapSelection {
+  /** the sidecar path the stage file states, relative to public/data */
+  file: string;
 }
 
 interface Ctx {
-  replay: ReplayActivitySelection | null;
-  publish: (sel: ReplayActivitySelection | null) => void;
+  selection: MapSelection | null;
+  setSelection: (s: MapSelection) => void;
 }
 
-const MapSourceContext = createContext<Ctx>({ replay: null, publish: () => {} });
+const MapSelectionContext = createContext<Ctx>({ selection: null, setSelection: () => {} });
 
 export function MapSourceProvider({ children }: { children: ReactNode }) {
-  const [replay, setReplay] = useState<ReplayActivitySelection | null>(null);
-  const publish = useCallback((sel: ReplayActivitySelection | null) => setReplay(sel), []);
-  const value = useMemo(() => ({ replay, publish }), [replay, publish]);
-  return <MapSourceContext.Provider value={value}>{children}</MapSourceContext.Provider>;
+  const [selection, setSel] = useState<MapSelection | null>(null);
+  const setSelection = useCallback((s: MapSelection) => {
+    setSel((prev) => (prev && prev.condition === s.condition && prev.seed === s.seed ? prev : s));
+  }, []);
+  const value = useMemo(() => ({ selection, setSelection }), [selection, setSelection]);
+  return <MapSelectionContext.Provider value={value}>{children}</MapSelectionContext.Provider>;
 }
 
-/** Read the currently published replay selection (the panel). */
-export function useReplayActivity(): ReplayActivitySelection | null {
-  return useContext(MapSourceContext).replay;
+export function useMapSelection(): Ctx {
+  return useContext(MapSelectionContext);
 }
 
 /**
- * Publish the replay selection for the map panel (the Replay page). Publish it whenever a concrete
- * activity path is identified, whatever state that file is in; publish `null` only when stage 6 has
- * named no seed/condition, which is the one case in which a reference clip may play instead. The
- * publication is cleared when the page unmounts.
+ * The `(condition, seed)` pairs the replay stage states it exported whole-brain activity for, read
+ * out of `stage6_replay.json`'s own `activity[]` list. Nothing is assumed: a stage file that lists
+ * none yields none, and the panel then renders the "not yet run" state.
  */
-export function usePublishReplayActivity(sel: ReplayActivitySelection | null) {
-  const { publish } = useContext(MapSourceContext);
-  const path = sel?.path ?? null;
-  const condition = sel?.condition ?? null;
-  const seed = sel?.seed ?? null;
-  const load = sel?.load ?? null;
-  useEffect(() => {
-    if (path && condition !== null && seed !== null && load) {
-      publish({ path, condition, seed, load });
-    } else {
-      publish(null);
-    }
-  }, [publish, path, condition, seed, load]);
-  useEffect(() => () => publish(null), [publish]);
+export function activityRefs(stage: unknown): ActivityRef[] {
+  const list = (stage as { activity?: unknown } | null)?.activity;
+  if (!Array.isArray(list)) return [];
+  const out: ActivityRef[] = [];
+  for (const e of list) {
+    const r = e as { condition?: unknown; seed?: unknown; file?: unknown };
+    if (typeof r?.condition !== 'string' || typeof r?.seed !== 'number' || !Number.isFinite(r.seed)) continue;
+    out.push({ condition: r.condition, seed: r.seed, file: typeof r.file === 'string' ? r.file : activityPath(r.condition, r.seed) });
+  }
+  out.sort((a, b) => (a.condition === b.condition ? a.seed - b.seed : a.condition.localeCompare(b.condition)));
+  return out;
+}
+
+/** The contract's filename for one run's whole-brain activity. */
+export function activityPath(condition: string, seed: number): string {
+  return `replay/activity_${condition}_seed${seed}.json`;
 }

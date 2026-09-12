@@ -166,7 +166,26 @@ def analyse_sleep_epoch(i: np.ndarray, t_step: np.ndarray, dt_s: float, kc: np.n
             v = coactivation(M, pick)
             if np.isfinite(v):
                 co_null.append(v)
-        ent = {"size": int(tmpl.sum()), "template_corr_mean": (float(np.mean(r[finite])) if finite.any() else None),
+        # Over-representation: what share of the offline Kenyon-cell spikes come from ensemble members, against
+        # the share expected from the ensemble's size? A per-bin correlation is noisy when a bin holds one or two
+        # spikes, which is the situation in a genuinely sparse offline state, whereas a share of total spikes is
+        # stable at low counts. Reported alongside, never instead of, the template correlation.
+        tot = float(M.sum())
+        share_obs = float(M[rows].sum() / tot) if tot > 0 else None
+        share_exp = float(len(rows) / len(kc))
+        share_null = []
+        for _ in range(min(n_random, 200)):
+            pick = rng.choice(len(kc), size=len(rows), replace=False)
+            if tot > 0:
+                share_null.append(float(M[pick].sum() / tot))
+        sn_mu = float(np.mean(share_null)) if share_null else None
+        sn_sd = float(np.std(share_null)) if len(share_null) > 1 else None
+        ent = {"size": int(tmpl.sum()),
+               "spike_share_observed": share_obs, "spike_share_expected_from_size": share_exp,
+               "spike_share_null_mean": sn_mu, "spike_share_null_sd": sn_sd,
+               "spike_share_ratio": (share_obs / sn_mu if (share_obs is not None and sn_mu) else None),
+               "spike_share_z": ((share_obs - sn_mu) / sn_sd if (share_obs is not None and sn_sd) else None),
+               "n_spikes_total_kc": int(tot), "n_spikes_in_ensemble": int(M[rows].sum()), "template_corr_mean": (float(np.mean(r[finite])) if finite.any() else None),
                "template_corr_p95": (float(np.percentile(r[finite], 95)) if finite.any() else None),
                "template_corr_max": (float(np.max(r[finite])) if finite.any() else None),
                "null_corr_mean": nm, "null_corr_sd": ns, "threshold_corr": thr,

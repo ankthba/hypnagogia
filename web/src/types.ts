@@ -293,21 +293,41 @@ export interface Comparison {
   ci95: [number, number];
   hedges_g: number;
   g_ci95: [number, number];
-  p: number;
+  /**
+   * The headline p value. It is optional because an export written before the field existed does
+   * not carry one, and the viewer omits the label rather than printing a placeholder for it.
+   * `p_wilcoxon` and `p_permutation` are the two tests behind it where the file states them.
+   */
+  p?: number | null;
+  p_wilcoxon?: number | null;
+  p_permutation?: number | null;
   n: number;
   survives: boolean;
+  /** direction the comparison was pre-registered in, where the file states it */
+  direction?: string;
+  /** whether the run that would produce this comparison happened at all */
+  available?: boolean;
 }
 export interface Stage6PerSeed {
   seed: number;
   condition: string;
-  network: 'real' | 'shuffled';
-  ensemble: 'A' | 'B' | 'random';
+  /** the network this row was run on, as the file names it (e.g. "real_gain0.6", "shuffled_gain0.6") */
+  network: string;
+  ensemble: string;
   template_corr_mean: number;
   template_corr_p95: number;
   n_reactivation_events: number;
-  coactivation_z: number | null;
-  sequence_rho: number | null;
-  sequence_p: number | null;
+  coactivation_z?: number | null;
+  /**
+   * The sequence score. DATA_CONTRACT.md gives it as two flat fields; the stage file writes a
+   * `sequence` block instead. The viewer reads whichever the file it loaded actually carries, and
+   * prints nothing where neither is present.
+   */
+  sequence_rho?: number | null;
+  sequence_p?: number | null;
+  sequence?: { rho_mean?: number | null; rho_abs_mean?: number | null; p?: number | null; n_events_scored?: number | null } | null;
+  z_vs_random_ensembles?: number | null;
+  size?: number | null;
 }
 export interface Stage6 extends StageBase {
   headline: string;
@@ -315,9 +335,23 @@ export interface Stage6 extends StageBase {
   window_ms: number;
   n_seeds: number;
   comparisons: Comparison[];
+  /**
+   * The names of the pre-registered comparisons, as the stage file itself states them. When the
+   * file does not carry the list the viewer falls back to the four names DATA_CONTRACT.md fixes,
+   * and says which of the two it used.
+   */
+  required_four?: string[];
+  /** the file's own explanation of any comparison beyond the pre-registered set */
+  fifth_comparison_note?: string;
+  /** the synaptic-gain deviation this stage ran at, and the sentence that must travel with it */
+  gain?: number;
+  gain_note?: string;
+  metric_note?: string;
   per_seed: Stage6PerSeed[];
   traces: { seed: number; condition: string; file: string }[];
   rasters: { seed: number; condition: string; file: string }[];
+  /** the whole-brain activity files the stage exported, one per condition and seed */
+  activity?: { seed: number; condition: string; file: string; n_spikes_exported?: number; downsampled?: boolean }[];
 }
 
 export interface TraceSidecar {
@@ -429,43 +463,10 @@ export interface RasterSidecar {
   duration_s: number;
 }
 
-/**
- * `reference_clips.json`. Real simulations of this model exported by
- * `scripts/07_reference_clips.py` so the neuron map has something true to show before the replay
- * stage produces activity of its own. They are never demo or synthetic data; each carries its own
- * provenance and the viewer must always name the clip that is on screen.
+/*
+ * Reference activity clips are gone. They existed only while the replay stage had produced no
+ * activity of its own; `replay/activity_*` now exists, and DATA_CONTRACT.md fixes that the map
+ * plays that and nothing else. The types, the loader and the panel that read `reference_clips.json`
+ * were deleted with them, so no code path can reach for a second source again.
  */
-export interface ReferenceClipEpoch {
-  name: string;
-  t_start_s: number;
-  t_end_s: number;
-  drives?: Record<string, number>;
-}
 
-export interface ReferenceClip {
-  name: string;
-  title: string;
-  description: string;
-  /** path under public/data of the activity sidecar, e.g. "clips/sugar_pulses.json" */
-  file: string;
-  duration_s: number;
-  n_spikes_total: number;
-  n_spikes_exported: number;
-  downsampled: boolean;
-  sigma_mV: number;
-  seed: number;
-  n_neurons_simulated: number;
-  n_active_neurons: number;
-  epochs?: ReferenceClipEpoch[];
-  /**
-   * The clip's own provenance block. It carries no `git_commit` and no `generated_at`: the viewer
-   * says so rather than printing the manifest's, which belongs to the web export and not to the run.
-   */
-  provenance?: SidecarProvenance;
-}
-
-export interface ReferenceClipsFile {
-  clips: ReferenceClip[];
-  note?: string;
-  walltime_s?: number;
-}

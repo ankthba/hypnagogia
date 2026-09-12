@@ -1,60 +1,46 @@
-import { memo, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import BrainMap, {
-  AtlasCaption,
-  PROJECTIONS,
-  PROJECTION_SHORT,
-  VncToggle,
-  atlasProvenance,
-  useActivity,
-  useAtlas,
-  type MapSourceLabel,
-  type Projection,
-} from './BrainMap';
+import { memo, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import BrainMap, { AtlasCaption, VncToggle, atlasProvenance, useActivity, useAtlas, type MapSourceLabel, type TimeSource } from './BrainMap';
 import NotRunPanel from './NotRunPanel';
 import ProvenanceFooter from './ProvenanceFooter';
 import { useDataFile } from '../lib/data';
 import { useMediaQuery, useViewportHeight } from '../lib/media';
-import { useReplayActivity, type ReplayActivitySelection } from '../lib/mapSource';
+import { activityPath, activityRefs, useMapSelection, type ActivityRef } from '../lib/mapSource';
 import { fmtInt, fmtNum } from '../lib/format';
 import type { ActivityData, AtlasData } from '../lib/binary';
-import type { Manifest, Provenance, ReferenceClip, ReferenceClipEpoch, ReferenceClipsFile } from '../types';
+import type { Manifest } from '../types';
 
 /**
  * The persistent neuron map in the right-hand rail (and, where there is no rail, in the page's own
  * map slot). It is on every page, and it is never blank while `neuron_atlas.json` is readable: the
  * atlas alone draws the populations.
  *
- * What it plays, in the order the data contract fixes:
- *   1. the activity of the seed/condition selected on the Replay page, whenever that page has named
- *      one (published through MapSourceContext). If that file is missing, unreadable or paired with
- *      a different atlas, the panel says so and lights nothing. A named-but-broken file is a finding
- *      the reader must see, not an absence a reference clip may fill;
- *   2. otherwise one of the reference clips listed in `reference_clips.json` - real simulations of
- *      this model written by `scripts/07_reference_clips.py`, looped, and named on the canvas itself
- *      as a reference simulation rather than the replay result;
- *   3. otherwise nothing animates, and the panel says so and names the script that would fix it.
- *
- * There is no demo mode: every spike drawn here was read out of a binary the pipeline wrote.
+ * There is exactly one thing it can animate, and it is the experiment's own output: the file
+ * `replay/activity_<condition>_seed<k>.json` for the seed and condition selected here (the same
+ * selection the Replay page's controls read and write). If that file is absent, unreadable, or
+ * paired with a different atlas, the panel says so, names the file and the script that writes it,
+ * and lights nothing. There is no second source and no demo mode: every spike drawn here was read
+ * out of a binary the pipeline wrote.
  */
 
-/** A spike stays lit for this long on the panel map, fading out (MAP_SPEC.md:38: a 150 ms tail). */
+/** A spike stays lit for this long on the panel map, fading out (MAP_SPEC.md: a 150 ms tail). */
 const DECAY_MS = 150;
 /** Fixed simulation step for the loop, so the playback rate does not depend on the frame rate. */
 const STEP_MS = 1000 / 60;
+/** The script that writes the activity files, named wherever one is missing. */
+const REPLAY_SCRIPT = 'scripts/06_replay.py';
 
 // ---------------------------------------------------------------- the loop clock
 
 /**
- * The playback clock, as a subscription rather than as state.
+ * The playback clock, as a mutable store rather than as state.
  *
  * This panel is mounted by the Layout on every page, so its loop runs site-wide and permanently.
- * Holding the time in `useState` here would reconcile the whole subtree - the projection control,
- * the play button, the clip picker, the source text, the provenance footer - sixty times a second
- * for a value none of them reads. Instead the tick writes into a store, and only the two leaves that
- * actually render a time subscribe to it. (The Replay page already does the equivalent by scoping
- * its timeline to ReplayWindow.)
+ * Holding the time in `useState` here would reconcile the whole subtree, the selectors, the play
+ * button, the source text, the provenance footer, sixty times a second for a value none of them
+ * reads. The map reads the store directly inside its own draw loop; only the small clock readout
+ * subscribes.
  */
-interface Clock {
+interface Clock extends TimeSource {
   subscribe: (cb: () => void) => () => void;
   get: () => number;
 }
@@ -85,6 +71,9 @@ function useMapClock(durationMs: number, playing: boolean, sourceKey: string): C
     let raf = 0;
     let last = performance.now();
     let acc = 0;
+    // The readout is 2 decimal places of seconds, so notifying its subscriber more than about
+    // twenty times a second changes nothing on screen and costs a React render each time.
+    let lastNotify = 0;
     const tick = (now: number) => {
       acc += Math.min(250, now - last);
       last = now;
@@ -97,7 +86,10 @@ function useMapClock(durationMs: number, playing: boolean, sourceKey: string): C
       // window wraps with the clock and the seam is one frame like any other.
       if (t >= durationMs) t -= Math.floor(t / durationMs) * durationMs;
       store.t = t;
-      store.subs.forEach((cb) => cb());
+      if (now - lastNotify > 50) {
+        lastNotify = now;
+        store.subs.forEach((cb) => cb());
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -116,9 +108,8 @@ function useClockTime(clock: Clock): number {
 export default function MapPanel() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(380);
-  // Coalesced to one update per frame, like the map's own observer and the raster's: dragging a
-  // window edge otherwise re-renders the whole panel once per observed pixel, and each of those
-  // renders rebuilds the props of the canvas below.
+  // Coalesced to one update per frame, like the map's own observer: dragging a window edge
+  // otherwise re-renders the whole panel once per observed pixel.
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -129,7 +120,7 @@ export default function MapPanel() {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        setWidth((w) => (w === pending ? w : pending));
+        setWidth((w) => (Math.abs(w - pending) < 2 ? w : pending));
       });
     });
     ro.observe(el);
@@ -147,25 +138,49 @@ export default function MapPanel() {
   const manifest = m.state === 'ready' ? m.data : null;
   const atlas = useAtlas();
   const atlasData: AtlasData | null = atlas.state === 'ready' ? atlas.data : null;
-  const clipsFile = useDataFile<ReferenceClipsFile>('reference_clips.json');
-  const replay = useReplayActivity();
 
-  const clips: ReferenceClip[] = clipsFile.state === 'ready' && Array.isArray(clipsFile.data.clips) ? clipsFile.data.clips : [];
+  // Which runs exist is the stage file's own statement. It is fetched when the browser is idle:
+  // on a page that is not about replay it must not compete with the atlas or the first paint.
+  const s6 = useDataFile<unknown>('stage6_replay.json', { defer: true });
+  const refs: ActivityRef[] = useMemo(() => (s6.state === 'ready' ? activityRefs(s6.data) : []), [s6]);
+
+  const { selection, setSelection } = useMapSelection();
+  // The first run the stage file lists is the default, and only until something selects another.
+  useEffect(() => {
+    if (!selection && refs.length > 0) setSelection({ condition: refs[0].condition, seed: refs[0].seed });
+  }, [selection, refs, setSelection]);
+
+  const conditions = useMemo(() => [...new Set(refs.map((r) => r.condition))], [refs]);
+  const seedsForCond = useMemo(
+    () => (selection ? refs.filter((r) => r.condition === selection.condition).map((r) => r.seed) : []),
+    [refs, selection],
+  );
+
+  /** the stage file's own entry for the selected pair, when it lists one */
+  const exact = useMemo(
+    () => (selection ? (refs.find((r) => r.condition === selection.condition && r.seed === selection.seed) ?? null) : null),
+    [refs, selection],
+  );
+  const listed = exact !== null;
+  const path = selection ? (exact?.file ?? activityPath(selection.condition, selection.seed)) : null;
 
   /**
-   * Source choice. A clip may stand in only when the Replay page has named no activity file at all.
-   * `replay` is published whenever a file *is* named, in whatever state it loaded, so a named file
-   * that is missing or stale suppresses the clips exactly as a loaded one does - the panel reports
-   * the failure instead of animating something else beside the page's "nothing is lit".
+   * Changing the condition keeps the seed when that seed exists for it and otherwise falls back to
+   * the first seed the stage file lists for the new condition. A pair the file does not list is
+   * never assembled here.
    */
-  const [clipName, setClipName] = useState<string | null>(null);
-  const clip: ReferenceClip | null = replay ? null : (clips.find((c) => c.name === clipName) ?? clips[0] ?? null);
-  const clipLoad = useActivity(clip ? clip.file : null);
-
-  const replayData = replay && replay.load.state === 'ready' ? replay.load.data : null;
-  const clipData = clipLoad?.state === 'ready' ? clipLoad.data : null;
-  const activity: ActivityData | null = replay ? replayData : clipData;
-  const sourceKey = replay ? `replay:${replay.path}` : clip ? `clip:${clip.name}` : 'none';
+  const setCondition = (c: string) => {
+    const forC = refs.filter((r) => r.condition === c).map((r) => r.seed);
+    if (forC.length === 0) return;
+    const keep = selection && forC.includes(selection.seed) ? selection.seed : forC[0];
+    setSelection({ condition: c, seed: keep });
+  };
+  const setSeed = (s: number) => {
+    if (selection) setSelection({ condition: selection.condition, seed: s });
+  };
+  const load = useActivity(path);
+  const activity: ActivityData | null = load?.state === 'ready' ? load.data : null;
+  const sourceKey = path ?? 'none';
 
   // The loop length: the sidecar's own duration, never shorter than the last spike it holds.
   const durationMs = activity ? Math.max(Math.round((activity.sidecar.duration_s ?? 0) * 1000), activity.maxTMs + 1) : 0;
@@ -177,16 +192,16 @@ export default function MapPanel() {
   }, [reduceMotion]);
 
   const clock = useMapClock(durationMs, playing && canPlay, sourceKey);
+  /** what the map's draw loop reads: the clock while something is playing, nothing otherwise */
+  const time = useMemo<TimeSource>(() => ({ get: () => (activity && durationMs > 0 ? clock.get() : null) }), [clock, activity, durationMs]);
 
-  const [projection, setProjection] = useState<Projection>('frontal');
   // Framed on view_boxes.brain by default; the switch below opens it out to view_boxes.all.
   const [showVnc, setShowVnc] = useState(false);
 
   /**
-   * The canvas takes the projection's own aspect; this is only the ceiling it may not pass. It is
-   * budgeted against the viewport rather than fixed, because in the rail the whole panel has to fit
-   * inside `calc(100dvh - 2rem)`: a constant tall enough for a large screen gives a small one a
-   * nested scrollbar, which then eats the wheel over the map and hides the provenance below it.
+   * The canvas takes the frame's own aspect; this is only the ceiling it may not pass. It is
+   * budgeted against the viewport rather than fixed, so on a short screen the panel does not grow
+   * taller than the page wants to give it.
    */
   const mapHeight = narrow
     ? Math.round(Math.min(width * 1.5, 460))
@@ -197,24 +212,15 @@ export default function MapPanel() {
   /** Neurons that actually spike in the loaded file, counted from the binary rather than trusted. */
   const activeCounted = useMemo(() => (activity ? countDistinctRows(activity.atlasRow) : null), [activity]);
 
-  // Memoised so a re-render that changes nothing about the source (a resize, the clock's own
-  // subscribers) hands MapCanvas the same object and its memo() actually holds.
   const source: MapSourceLabel = useMemo(
     () =>
-      replay
-        ? {
-            text: `replay result · ${replay.condition}, seed ${replay.seed}${replayData ? '' : ' · not loaded, nothing is lit'}`,
-          }
-        : clip
-          ? { text: `REFERENCE SIMULATION · ${clip.title} · not the replay result`, reference: true }
-          : { text: 'atlas only · no spikes loaded' },
-    [replay, replayData, clip],
+      selection
+        ? { text: `replay activity · ${selection.condition}, seed ${selection.seed}${activity ? '' : ' · not loaded, nothing is lit'}` }
+        : { text: 'atlas only · no run selected' },
+    [selection, activity],
   );
 
-  const prov = useMemo(
-    () => panelProvenance({ clip, clipData, replay, atlas: atlasData, manifest }),
-    [clip, clipData, replay, atlasData, manifest],
-  );
+  const prov = useMemo(() => atlasProvenance(atlasData, manifest, path ? [`web/public/data/${path}`] : []), [atlasData, manifest, path]);
 
   if (atlas.state === 'loading') {
     return (
@@ -245,29 +251,44 @@ export default function MapPanel() {
     <div ref={wrapRef} className="map-panel">
       <PanelHead source={source} />
 
-      <MapCanvas
-        clock={clock}
+      <BrainMap
         atlas={atlas.data}
         activity={activity}
         source={source}
-        durationMs={durationMs}
-        mapHeight={mapHeight}
-        projection={projection}
-        setProjection={setProjection}
+        time={time}
+        decayMs={DECAY_MS}
+        // the panel loops, so the decay window wraps at the seam instead of being cut off at 0
+        loopMs={durationMs > 0 ? durationMs : undefined}
+        height={mapHeight}
         showVnc={showVnc}
-        setShowVnc={setShowVnc}
+        onShowVncChange={setShowVnc}
+        variant="panel"
+        background="page"
+        showVncControl={false}
+        showLegend
+        showStatus
       />
 
-      {/* The identity of what is on screen sits immediately under the picture (and on it), not at
-          the far end of the panel below the legend, the status line and the controls. */}
+      {/* Which run is on screen, and the controls that change it. Both are in the panel itself, so
+          the map is a usable instrument on every page and not only on the Replay page. */}
+      <RunPicker
+        conditions={conditions}
+        seeds={seedsForCond}
+        selection={selection}
+        setCondition={setCondition}
+        setSeed={setSeed}
+        state={s6.state}
+        nRuns={refs.length}
+      />
+
       <SourceLine
-        replay={replay}
-        clip={clip}
-        clipActivity={clipData}
-        clipFailed={clipLoad?.state === 'failed' ? clipLoad : null}
-        clipsState={clipsFile.state}
-        clipsCount={clips.length}
-        note={clipsFile.state === 'ready' ? clipsFile.data.note : undefined}
+        condition={selection?.condition ?? null}
+        seed={selection?.seed ?? null}
+        path={path}
+        listed={listed}
+        load={load}
+        s6State={s6.state}
+        nRuns={refs.length}
         activeCounted={activeCounted}
         canPlay={canPlay}
         playing={playing}
@@ -275,21 +296,6 @@ export default function MapPanel() {
       />
 
       <div className="map-panel__controls">
-        <div className="segmented" role="tablist" aria-label="projection">
-          {PROJECTIONS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              role="tab"
-              aria-selected={projection === p}
-              className="segmented__option"
-              data-text={PROJECTION_SHORT[p]}
-              onClick={() => setProjection(p)}
-            >
-              {PROJECTION_SHORT[p]}
-            </button>
-          ))}
-        </div>
         <button
           type="button"
           className="control map-panel__play"
@@ -300,33 +306,20 @@ export default function MapPanel() {
         >
           {playing ? '❙❙ pause' : '▶ play'}
         </button>
-        {canPlay && <ClockReadout clock={clock} durationMs={durationMs} epochs={clip?.epochs} />}
+        {canPlay && <ClockReadout clock={clock} durationMs={durationMs} />}
         {atlas.data.sidecar.view_boxes?.brain && <VncToggle atlas={atlas.data} on={showVnc} set={setShowVnc} compact />}
       </div>
 
-      {/* MAP_SPEC.md:46-47 attaches this caption to the map, and this is the map that is on every
-          page: soma positions and not morphology, and the receptor neurons that are simulated but
-          have no soma in the volume. It is folded because the rail has a height budget, never
-          omitted, and every number in it is the sidecar's own. */}
+      {/* MAP_SPEC.md attaches this caption to the map, and this is the map that is on every page:
+          soma positions and not morphology, and the receptor neurons that are simulated but have no
+          soma in the volume. It is folded because the rail has a height budget, never omitted, and
+          every number in it is the sidecar's own. */}
       <details className="map-panel__more map-panel__caption">
         <summary className="smaller">what these dots are</summary>
         <p className="smaller">
           <AtlasCaption atlas={atlas.data} activity={activity} />
         </p>
       </details>
-
-      {!replay && clips.length > 1 && (
-        <label className="map-panel__select small muted">
-          reference simulation
-          <select className="control" value={clip?.name ?? ''} onChange={(e) => setClipName(e.target.value)}>
-            {clips.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.title}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
 
       <ProvenanceFooter provenance={prov.provenance} commitNote={prov.commitNote} note={prov.note} />
     </div>
@@ -349,298 +342,195 @@ function countDistinctRows(rows: Uint32Array): number {
   return n;
 }
 
-/** The directory part of a sidecar path, so its `bin` resolves the way the loader resolves it. */
-function dirOf(p: string): string {
-  const i = p.lastIndexOf('/');
-  return i >= 0 ? p.slice(0, i + 1) : '';
-}
-
-/**
- * The footer's provenance, and what has to be said about it.
- *
- * A reference clip's block states a config, a results directory and the run's own outputs, but no
- * commit and no time. Those are not filled in from the manifest: the manifest's commit is when the
- * *web export* ran, and printing it here - with every file in the list hyperlinked to it - would
- * claim the run was made at a commit `reference_clips.json` never mentions. The footer says the
- * commit is not stated, and names the site's build commit as the separate fact that it is.
- */
-function panelProvenance({
-  clip,
-  clipData,
-  replay,
-  atlas,
-  manifest,
-}: {
-  clip: ReferenceClip | null;
-  clipData: ActivityData | null;
-  replay: ReplayActivitySelection | null;
-  atlas: AtlasData | null;
-  manifest: Manifest | null;
-}): { provenance: Provenance; commitNote?: ReactNode; note?: ReactNode } {
-  if (clip) {
-    const p = clip.provenance;
-    // the binary is what drives every frame, so it belongs in the list beside its sidecar
-    const bin = clipData?.sidecar.bin ? `${dirOf(clip.file)}${clipData.sidecar.bin}` : clip.file.replace(/\.json$/, '.bin');
-    return {
-      provenance: {
-        config: p?.config ?? 'not stated',
-        config_hash: p?.config_hash,
-        results_dir: p?.results_dir,
-        files: [
-          ...(p?.files ?? []),
-          `web/public/data/${clip.file}`,
-          `web/public/data/${bin}`,
-          'web/public/data/reference_clips.json',
-          'web/public/data/neuron_atlas.json',
-          'web/public/data/neuron_atlas.bin',
-        ],
-        git_commit: p?.git_commit ?? '',
-        generated_at: p?.generated_at,
-      },
-      commitNote: p?.git_commit ? undefined : (
-        <>
-          commit not stated by reference_clips.json
-          {manifest?.git_commit ? <> (this site was built at {manifest.git_commit})</> : null}
-        </>
-      ),
-    };
-  }
-  return atlasProvenance(atlas, manifest, replay ? [`web/public/data/${replay.path}`] : []);
-}
-
 /**
  * The panel's head. It names the instrument and, on the same rule, what the instrument is currently
- * showing - so the identity is above the picture as well as on it.
+ * showing, so the identity is above the picture as well as carried by it.
  */
 function PanelHead({ source }: { source: MapSourceLabel }) {
   return (
     <div className="map-panel__head">
       <div className="map-panel__head-row">
         <span className="label label--ink">neuron map</span>
-        <span className="smaller muted">soma positions</span>
+        <span className="smaller muted">soma positions, 3D</span>
       </div>
-      <div className={`smaller map-panel__head-source${source.reference ? ' tone-failed' : ' muted'}`}>{source.text}</div>
+      <div className="smaller map-panel__head-source muted">{source.text}</div>
     </div>
   );
 }
 
 /**
- * The canvas, and nothing else. It subscribes to the clock, so it is the only part of the panel that
- * re-renders on a frame.
+ * Condition and seed. Both lists are read from `stage6_replay.json`'s own `activity[]`, so the
+ * panel offers exactly the runs the pipeline says it exported and never a combination it invented.
  */
-const MapCanvas = memo(function MapCanvas({
-  clock,
-  atlas,
-  activity,
-  source,
-  durationMs,
-  mapHeight,
-  projection,
-  setProjection,
-  showVnc,
-  setShowVnc,
+function RunPicker({
+  conditions,
+  seeds,
+  selection,
+  setCondition,
+  setSeed,
+  state,
+  nRuns,
 }: {
-  clock: Clock;
-  atlas: AtlasData;
-  activity: ActivityData | null;
-  source: MapSourceLabel;
-  durationMs: number;
-  mapHeight: number;
-  projection: Projection;
-  setProjection: (p: Projection) => void;
-  showVnc: boolean;
-  setShowVnc: (v: boolean) => void;
+  conditions: string[];
+  seeds: number[];
+  selection: { condition: string; seed: number } | null;
+  setCondition: (c: string) => void;
+  setSeed: (s: number) => void;
+  state: 'loading' | 'missing' | 'error' | 'ready';
+  nRuns: number;
 }) {
-  const timeMs = useClockTime(clock);
+  if (state === 'loading') return <div className="map-panel__runs small muted">reading stage6_replay.json for the runs that exist …</div>;
+  if (nRuns === 0) {
+    return (
+      <div className="map-panel__runs small tone-failed">
+        {state === 'ready'
+          ? 'stage6_replay.json lists no activity files, so there is no run to select.'
+          : state === 'missing'
+            ? 'stage6_replay.json is absent, so the runs that exist cannot be read.'
+            : 'stage6_replay.json could not be read, so the runs that exist cannot be listed.'}
+      </div>
+    );
+  }
   return (
-    <BrainMap
-      atlas={atlas}
-      activity={activity}
-      source={source}
-      timeMs={activity && durationMs > 0 ? timeMs : null}
-      decayMs={DECAY_MS}
-      // the panel loops, so the decay window wraps at the seam instead of being cut off at 0
-      loopMs={durationMs > 0 ? durationMs : undefined}
-      height={mapHeight}
-      projection={projection}
-      onProjectionChange={setProjection}
-      showVnc={showVnc}
-      onShowVncChange={setShowVnc}
-      variant="panel"
-      background="page"
-      showProjectionControl={false}
-      showVncControl={false}
-      showLegend
-      showStatus
-    />
-  );
-});
-
-/**
- * The time readout and, for a clip that has them, the stimulation epochs.
- *
- * The second half matters as much as the first: `sugar_pulses` is a *driven* clip, so the cascade a
- * reader watches sweep across the brain is stimulus-locked. Next to a page asking whether an
- * ensemble reactivates spontaneously, a driven frame must never be readable as a spontaneous one.
- * The schedule is otherwise buried in the clip's prose description.
- */
-function ClockReadout({ clock, durationMs, epochs }: { clock: Clock; durationMs: number; epochs?: ReferenceClipEpoch[] }) {
-  const timeMs = useClockTime(clock);
-  const usable = (epochs ?? []).filter((e) => Number.isFinite(e.t_start_s) && Number.isFinite(e.t_end_s) && e.t_end_s > e.t_start_s);
-  const span = Math.max(durationMs, ...usable.map((e) => e.t_end_s * 1000));
-  const tS = timeMs / 1000;
-  const current = usable.find((e) => tS >= e.t_start_s && tS < e.t_end_s) ?? null;
-  const drives = Object.entries(current?.drives ?? {});
-  return (
-    <div className="map-panel__clock">
-      <span className="smaller muted mono">
-        {fmtNum(timeMs / 1000, 2)} / {fmtNum(durationMs / 1000, 2)} s
-      </span>
-      {usable.length > 0 && (
-        <>
-          <div className="epoch-strip" aria-hidden="true">
-            {usable.map((e, i) => {
-              const on = Object.keys(e.drives ?? {}).length > 0;
-              return (
-                <span
-                  key={`${e.name}-${i}`}
-                  className={`epoch-strip__seg${on ? ' epoch-strip__seg--on' : ''}${e === current ? ' epoch-strip__seg--now' : ''}`}
-                  style={{
-                    left: `${(100 * e.t_start_s * 1000) / span}%`,
-                    width: `${(100 * (e.t_end_s - e.t_start_s) * 1000) / span}%`,
-                  }}
-                />
-              );
-            })}
-            <span className="epoch-strip__head" style={{ left: `${(100 * timeMs) / span}%` }} />
-          </div>
-          <span className={`smaller mono ${drives.length > 0 ? 'tone-failed' : 'muted'}`}>
-            {current ? `${current.name}: ` : 'between epochs: '}
-            {/* the numbers are the file's own; reference_clips.json states no unit for them, so none is asserted */}
-            {drives.length > 0 ? `driven: ${drives.map(([k, v]) => `${k} ${fmtNum(v)}`).join(', ')}` : 'no drive'}
-          </span>
-        </>
-      )}
+    <div className="map-panel__runs">
+      <label className="map-panel__runs-row">
+        <span className="label">condition</span>
+        <div className="segmented" role="tablist" aria-label="condition">
+          {conditions.map((c) => (
+            <button
+              key={c}
+              type="button"
+              role="tab"
+              aria-selected={selection?.condition === c}
+              className="segmented__option"
+              data-text={c}
+              onClick={() => setCondition(c)}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </label>
+      <label className="map-panel__runs-row">
+        <span className="label">seed</span>
+        <select
+          className="control"
+          value={selection?.seed ?? ''}
+          onChange={(e) => setSeed(Number(e.target.value))}
+          disabled={seeds.length === 0}
+          aria-label="seed"
+        >
+          {seeds.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+      </label>
     </div>
   );
 }
 
+/** The time readout, the only part of the panel that re-renders while the map plays. */
+function ClockReadout({ clock, durationMs }: { clock: Clock; durationMs: number }) {
+  const timeMs = useClockTime(clock);
+  return (
+    <span className="smaller muted mono tabular-nums">
+      {fmtNum(timeMs / 1000, 2)} / {fmtNum(durationMs / 1000, 2)} s
+    </span>
+  );
+}
+
 /**
- * What is on screen, said plainly. A reference clip is always announced as a reference simulation
- * and never as the replay result, and it carries its own config and results directory.
+ * What is on screen, said plainly: the run, the file it came out of, and the counts that file
+ * states. When the file is missing this is the "not yet run" state, and it names the file and the
+ * script that writes it.
  */
-function SourceLine({
-  replay,
-  clip,
-  clipActivity,
-  clipFailed,
-  clipsState,
-  clipsCount,
-  note,
+const SourceLine = memo(function SourceLine({
+  condition,
+  seed,
+  path,
+  listed,
+  load,
+  s6State,
+  nRuns,
   activeCounted,
   canPlay,
   playing,
   reduceMotion,
 }: {
-  replay: ReplayActivitySelection | null;
-  clip: ReferenceClip | null;
-  clipActivity: ActivityData | null;
-  clipFailed: { missing: boolean; path: string; message: string } | null;
-  clipsState: 'loading' | 'missing' | 'error' | 'ready';
-  clipsCount: number;
-  note?: string;
+  condition: string | null;
+  seed: number | null;
+  path: string | null;
+  /** false when the selection names a run stage6_replay.json does not list */
+  listed: boolean;
+  load: ReturnType<typeof useActivity>;
+  s6State: 'loading' | 'missing' | 'error' | 'ready';
+  nRuns: number;
   activeCounted: number | null;
   /** false when no file is loaded: there is then nothing to say about playback */
   canPlay: boolean;
   playing: boolean;
   reduceMotion: boolean;
 }) {
-  if (replay) {
-    const load = replay.load;
+  if (!path || condition === null || seed === null) {
     return (
       <div className="map-panel__source">
-        <div className="label label--ink">
-          replay activity · {replay.condition}, seed {replay.seed}
-        </div>
-        {load.state === 'ready' ? (
-          <>
-            <p className="smaller">
-              The spikes on the map are the replay window of the selected seed and condition, as stage 6 exported it. This is the replay
-              result itself, not a reference simulation.
-            </p>
-            <SpikeFacts sc={load.data.sidecar} counted={activeCounted} stated={null} />
-          </>
-        ) : load.state === 'loading' ? (
-          <p className="smaller muted">loading the activity binary for this seed …</p>
-        ) : (
-          <p className="smaller tone-failed">
-            Nothing is lit: <span className="mono">web/public/data/{load.path || replay.path}</span>{' '}
-            {load.missing ? 'has not been exported (HTTP 404)' : `could not be used: ${load.message}`}. No reference clip is played in its
-            place: this seed and condition name a file, and a file that is named but unusable is the finding, not an absence of one.
-          </p>
-        )}
-        <div className="smaller mono muted">web/public/data/{replay.path}</div>
-        {canPlay && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
-      </div>
-    );
-  }
-
-  if (clipsState === 'loading') return <div className="map-panel__source small muted">loading reference_clips.json …</div>;
-
-  if (clipsState !== 'ready' || clipsCount === 0 || !clip) {
-    return (
-      <div className="map-panel__source">
-        <div className="label tone-failed">no activity has been simulated yet</div>
+        <div className="label tone-failed">no replay activity has been exported</div>
         <p className="smaller">
-          The map shows the atlas only: the populations are real, and nothing is lit because no spikes exist to light them. The replay
-          stage has exported no <span className="mono">replay/activity_&lt;cond&gt;_seed&lt;k&gt;.json</span>, and{' '}
-          <span className="mono">reference_clips.json</span>{' '}
-          {clipsState === 'missing' ? 'is absent' : clipsState === 'error' ? 'could not be read' : 'lists no clips'}. Run{' '}
-          <span className="mono">python scripts/07_reference_clips.py</span> (then{' '}
-          <span className="mono">python scripts/export_web.py</span>) to give the map something true to play.
+          The map shows the atlas only: the populations are real, and nothing is lit because no spikes exist to light them. Expected files{' '}
+          <span className="mono">web/public/data/replay/activity_&lt;condition&gt;_seed&lt;k&gt;.json</span> and their{' '}
+          <span className="mono">.bin</span>, listed in <span className="mono">stage6_replay.json</span>'s{' '}
+          <span className="mono">activity[]</span>
+          {s6State === 'missing' ? ', which is itself absent' : s6State === 'error' ? ', which could not be read' : nRuns === 0 ? ', which lists none' : ''}.
+          Run <span className="mono">python {REPLAY_SCRIPT}</span>, then <span className="mono">python scripts/export_web.py</span>.
         </p>
       </div>
     );
   }
 
-  const sc = clipActivity?.sidecar ?? null;
   return (
     <div className="map-panel__source">
-      {/* The clip's title is on the head rule and stamped into the canvas; this is the claim that
-          goes with it, kept in the body where the numbers are. */}
-      <div className="label tone-failed">reference simulation · not the replay result</div>
-      {clipFailed && (
+      <div className="label label--ink">
+        replay activity · {condition}, seed {seed}
+      </div>
+      {!listed && (
         <p className="smaller tone-failed">
-          Nothing is lit: <span className="mono">web/public/data/{clipFailed.path}</span>{' '}
-          {clipFailed.missing ? 'is absent (HTTP 404)' : `could not be read - ${clipFailed.message}`}.
+          <span className="mono">stage6_replay.json</span> does not list this condition and seed in its <span className="mono">activity[]</span>;
+          the path below is the contract's naming convention applied to the selection, not a file the stage file names.
         </p>
       )}
-      {sc && <SpikeFacts sc={sc} counted={activeCounted} stated={clip.n_active_neurons} />}
+      {load === null || load.state === 'loading' ? (
+        <p className="smaller muted">loading the activity binary for this run …</p>
+      ) : load.state === 'ready' ? (
+        <>
+          <p className="smaller">
+            The spikes on the map are the whole-brain activity of this run, over the same window as its raster and its correlation trace, as
+            stage 6 exported it. It is the experiment's own output; nothing else is ever animated here.
+          </p>
+          <SpikeFacts sc={load.data.sidecar} counted={activeCounted} />
+        </>
+      ) : (
+        <p className="smaller tone-failed">
+          Nothing is lit: <span className="mono">web/public/data/{load.path || path}</span>{' '}
+          {load.missing ? 'has not been exported (HTTP 404)' : `could not be used: ${load.message}`}. Nothing is played in its place. Run{' '}
+          <span className="mono">python {REPLAY_SCRIPT}</span>, then <span className="mono">python scripts/export_web.py</span>.
+        </p>
+      )}
+      <div className="smaller mono muted">web/public/data/{path}</div>
       {canPlay && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
-      {/* The prose is folded away so the resting panel fits the rail's height: what a reader must
-          not miss - that this is a reference simulation and not the result - is above, on the
-          canvas and in the head. The config and every file are in the provenance line below, which
-          is never folded. */}
-      <details className="map-panel__more">
-        <summary className="smaller">what this simulation is</summary>
-        <p className="smaller">{clip.description}</p>
-        {note && <p className="smaller muted">{note}</p>}
-      </details>
     </div>
   );
-}
+});
 
 /**
  * Counts read out of the activity sidecar itself, and one counted out of the binary.
  *
- * The active-neuron figure the panel prints is counted from the file that is on screen - distinct
- * `atlas_row` values - the way the legend counts the populations from the atlas binary rather than
- * trusting the sidecar. `reference_clips.json`'s own figure is printed beside it, labelled as the
- * different quantity it is: a neuron that spiked but has no soma position has no row in the atlas
- * and no dot to light, so the manifest's count is legitimately the larger of the two. Only the
- * impossible direction - more rows lit than the run says fired - is flagged as a disagreement.
+ * The active-neuron figure the panel prints is counted from the file that is on screen (distinct
+ * `atlas_row` values), the way the legend counts the populations from the atlas binary rather than
+ * trusting the sidecar.
  */
-function SpikeFacts({ sc, counted, stated }: { sc: ActivityData['sidecar']; counted: number | null; stated: number | null }) {
+function SpikeFacts({ sc, counted }: { sc: ActivityData['sidecar']; counted: number | null }) {
   return (
     <dl className="map-panel__facts">
       <dt>spikes</dt>
@@ -650,24 +540,15 @@ function SpikeFacts({ sc, counted, stated }: { sc: ActivityData['sidecar']; coun
       </dd>
       <dt>downsampled</dt>
       <dd className={sc.downsampled ? 'tone-failed' : undefined}>
-        {sc.downsampled ? `yes - the map shows a sample of the spikes, not all of them${sc.downsample_note ? ` (${sc.downsample_note})` : ''}` : 'no'}
+        {sc.downsampled
+          ? `yes: the map shows a sample of the spikes, not all of them${sc.downsample_note ? ` (${sc.downsample_note})` : ''}`
+          : 'no'}
       </dd>
       {counted !== null && (
         <>
           <dt>neurons lit</dt>
           <dd>
             {fmtInt(counted)} <span className="muted">atlas rows, counted in this file</span>
-            {stated !== null && (
-              <span className={counted > stated ? 'tone-failed' : 'muted'}>
-                {' '}
-                · reference_clips.json states {fmtInt(stated)} active in the run
-                {counted > stated
-                  ? ': more rows are lit than the run says fired, so one of the two files is stale'
-                  : counted < stated
-                    ? ' (a neuron with no soma position has no row here to light)'
-                    : ''}
-              </span>
-            )}
           </dd>
         </>
       )}
@@ -679,9 +560,5 @@ function SpikeFacts({ sc, counted, stated }: { sc: ActivityData['sidecar']; coun
 
 function LoopNote({ playing, reduceMotion }: { playing: boolean; reduceMotion: boolean }) {
   if (playing) return <p className="smaller muted">Playing at 1× real time; it restarts from 0 when it reaches the end.</p>;
-  return (
-    <p className="smaller muted">
-      Paused{reduceMotion ? ' (this browser asks for reduced motion)' : ''}. Press play to run it.
-    </p>
-  );
+  return <p className="smaller muted">Paused{reduceMotion ? ' (this browser asks for reduced motion)' : ''}. Press play to run it.</p>;
 }

@@ -159,6 +159,7 @@ def main():
     # cross those boundaries therefore use z_vs_random_ensembles, which standardises each measurement against
     # size-matched random ensembles drawn from that same run. The raw correlation is reported alongside.
     Z = "z_vs_random_ensembles"
+    SH = "spike_share_z"   # robust at the low spike counts of a genuinely sparse offline state
     A_sleep_z, B_sleep_z = pick(REAL, "sleep", "A", Z), pick(REAL, "sleep", "B", Z)
     A_wake_z, A_sh_z, A_naive_z = pick(REAL, "wake", "A", Z), pick(SHUF, "sleep", "A", Z), pick(REAL, "sleep_naive", "A", Z)
     A_sleep = pick(REAL, "sleep", "A")
@@ -173,6 +174,11 @@ def main():
     # with learned versus unlearned weights.
     comparisons.append(paired(A_sleep_z, A_naive_z, "trained_vs_naive_weights",
                               "learned vs unlearned synaptic weights, odour-A ensemble in sleep", "greater", Z))
+    # the same memory-specific test on the low-count-robust metric
+    comparisons.append(paired(pick(REAL, "sleep", "A", SH), pick(REAL, "sleep_naive", "A", SH),
+                              "trained_vs_naive_spike_share",
+                              "learned vs unlearned weights, share of offline Kenyon-cell spikes falling in the odour-A ensemble",
+                              "greater", SH))
     # the same three comparisons on the raw correlation, reported so the size-normalisation can be checked
     secondary = [paired(pick(REAL, "sleep", "A"), pick(REAL, "sleep", "B"), "A_vs_B_sleep_raw", "same, raw template correlation", "greater", "template_corr_mean"),
                  paired(pick(REAL, "sleep", "A"), pick(REAL, "wake", "A"), "sleep_vs_wake_A_raw", "same, raw template correlation", "greater", "template_corr_mean"),
@@ -218,6 +224,7 @@ def main():
         if not continuity["events_are_discrete"] else
         f"At most {100 * worst:.0f}% of time bins clear the reactivation threshold, so events are discrete episodes.")
     FOUR = ("A_vs_B_sleep", "sleep_vs_wake_A", "real_vs_shuffled", "A_vs_random_ensembles")
+    ADDITIONAL = ("trained_vs_naive_weights", "trained_vs_naive_spike_share")
     avail = [c for c in comparisons if c.get("available")]
     core = [c for c in avail if c["name"] in FOUR]
     naive_c = next((c for c in comparisons if c["name"] == "trained_vs_naive_weights"), None)
