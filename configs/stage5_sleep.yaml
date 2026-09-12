@@ -17,5 +17,6 @@ stage5:
   reset_at_offline_onset: true         # see reset_note in the output: without it, persistence masquerades as replay
   plastic_during_sleep: false          # the engram is held fixed while it is read out, so the measurement cannot change it
   conditions: ["sleep", "wake"]
+  naive_weight_arm: true               # repeat sleep with unlearned weights; see the note in scripts/05_sleep.py
   seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
   criterion: "both conditions run to completion for every seed with the learned weights loaded, dFB neurons fire in the sleep condition and not in the wake condition, and KC activity is non-zero in at least one condition (otherwise the replay test has no data)"

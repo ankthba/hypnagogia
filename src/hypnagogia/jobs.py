@@ -97,7 +97,7 @@ def run_job(spec: dict) -> dict:
         pl["post_idx"] = resolve_group(conn, pl.pop("post"))
         pl["dan_idx"] = resolve_group(conn, pl.pop("dan"))
     init_w = None
-    if spec.get("init_plastic_w"):
+    if spec.get("init_plastic_w"):   # None means start from the connectome weights, i.e. an unlearned network
         init_w = np.load(spec["init_plastic_w"])["w_final_mV"].astype(np.float64)
     rv = resolve_group(conn, spec["record_v"]) if spec.get("record_v") else None
     sim = Simulation(conn, spec["config"], spec["out_dir"], spec["seed"], groups, record=record, plasticity=pl,

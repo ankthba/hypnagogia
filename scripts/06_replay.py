@@ -74,7 +74,7 @@ def main():
                 ids_all = t[f"{nm}_pre"]; rk = (t.get("_order") or {}).get(f"{nm}_pre")
                 if rk and len(rk) == len(ids_all):
                     ordr[nm] = np.array([r for x, r in zip(ids_all, rk) if x in id2idx], dtype=np.int64)
-            for cond in ("sleep", "wake"):
+            for cond in ("sleep", "wake", "sleep_naive"):
                 d = run_dir(tag, cond, sd)
                 if not (d / "spikes.npz").exists():
                     continue
@@ -156,11 +156,18 @@ def main():
     REAL, SHUF = f"real{suffix}", f"shuffled{suffix}"
     A_sleep = pick(REAL, "sleep", "A"); B_sleep = pick(REAL, "sleep", "B")
     A_wake = pick(REAL, "wake", "A"); A_sleep_sh = pick(SHUF, "sleep", "A")
+    A_naive = pick(REAL, "sleep_naive", "A")
     A_rand = {r["seed"]: r.get("null_corr_mean") for r in rows if r["network"] == REAL and r["condition"] == "sleep" and r["ensemble"] == "A"}
     comparisons.append(paired(A_sleep, B_sleep, "A_vs_B_sleep", "trained (A) vs unpaired (B) ensemble, during sleep", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_wake, "sleep_vs_wake_A", "sleep vs wake, odour-A ensemble", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_sleep_sh, "real_vs_shuffled", "real vs degree-preserving shuffled connectome, odour-A ensemble in sleep", "greater", "template_corr_mean"))
     comparisons.append(paired(A_sleep, A_rand, "A_vs_random_ensembles", "odour-A ensemble vs size-matched random KC ensembles, during sleep", "greater", "template_corr_mean"))
+    # Fifth comparison, not in the original four but necessary here: does the MEMORY contribute anything? The
+    # learned weights sit on Kenyon-cell -> output-neuron synapses, which are downstream of the Kenyon cells being
+    # measured, so learning may be unable to change which cells reactivate. This compares the identical sleep run
+    # with learned versus unlearned weights.
+    comparisons.append(paired(A_sleep, A_naive, "trained_vs_naive_weights",
+                              "learned vs unlearned synaptic weights, odour-A ensemble in sleep", "greater", "template_corr_mean"))
     # sequence-order preservation, reported when the reactivation events contain enough ordered members to score
     seq = [r for r in rows if r["network"] == REAL and r["condition"] == "sleep" and r["ensemble"] == "A"
            and isinstance(r.get("sequence"), dict) and r["sequence"].get("rho_mean") is not None]
@@ -178,20 +185,38 @@ def main():
                                      "where events contained at least four ensemble members with distinct template ranks.")}
         if len(nul) == len(rho) and len(rho) >= 3:
             sequence_summary["effect_vs_shuffle"] = paired_effect(rho, nul, name="sequence_vs_shuffle")
+    FOUR = ("A_vs_B_sleep", "sleep_vs_wake_A", "real_vs_shuffled", "A_vs_random_ensembles")
     avail = [c for c in comparisons if c.get("available")]
-    all_survive = bool(avail) and len(avail) == 4 and all(c["survives"] for c in avail)
+    core = [c for c in avail if c["name"] in FOUR]
+    naive_c = next((c for c in comparisons if c["name"] == "trained_vs_naive_weights"), None)
+    all_survive = len(core) == 4 and all(c["survives"] for c in core)
     shuffled_c = next((c for c in comparisons if c["name"] == "real_vs_shuffled"), None)
-    others_pos = [c for c in avail if c["name"] != "real_vs_shuffled" and c["survives"]]
+    others_pos = [c for c in core if c["name"] != "real_vs_shuffled" and c["survives"]]
+    memory_note = ""
+    if naive_c and naive_c.get("available"):
+        memory_note = (" The memory itself contributed nothing measurable: the identical sleep run with unlearned weights "
+                       "gave the same reactivation (learned minus unlearned = "
+                       f"{naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]). That is "
+                       "expected in this model, because the learned synapses lie downstream of the Kenyon cells being "
+                       "measured and cannot change which of them switch on."
+                       if not naive_c["survives"] else
+                       " The learned weights did increase reactivation relative to the identical run with unlearned "
+                       f"weights (difference {naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]).")
     if all_survive:
-        status, headline = "passed", "The odour-A Kenyon-cell ensemble reactivated above chance during simulated sleep, and the effect survived all four null comparisons including the degree-preserving shuffled connectome."
+        status, headline = "passed", ("The odour-A Kenyon-cell ensemble reactivated above chance during simulated sleep, and the "
+                                      "effect survived all four null comparisons including the degree-preserving shuffled "
+                                      "connectome." + memory_note)
     elif others_pos and shuffled_c and shuffled_c.get("available") and not shuffled_c["survives"]:
-        status, headline = "artifact", "A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay."
+        status, headline = "artifact", ("A positive reactivation signal was measured, but it did NOT survive the "
+                                        "degree-preserving shuffled-connectome null: it is an artifact of network structure, "
+                                        "not evidence of replay." + memory_note)
     elif not avail:
         status, headline = "not_run", "The replay comparisons could not be computed: the required sleep and wake runs are not available."
     else:
-        failed = [c["name"] for c in avail if not c["survives"]]
-        status, headline = "failed", ("No evidence of memory replay: the odour-A ensemble did not reactivate above chance during simulated sleep. "
-                                      f"Comparisons that did not show the predicted effect: {', '.join(failed) if failed else 'none'}.")
+        failed = [c["name"] for c in core if not c["survives"]]
+        status, headline = "failed", ("No evidence of memory replay: the odour-A ensemble did not reactivate above chance during "
+                                      "simulated sleep. Comparisons that did not show the predicted effect: "
+                                      f"{', '.join(failed) if failed else 'none'}." + memory_note)
     out_d = {"status": status, "criterion": s6["criterion"], "headline": headline,
              "metrics": {"template_correlation": "Pearson correlation, per time bin, between the Kenyon-cell population activity vector and the odour's KC ensemble template (Tatsuno et al. 2006 template matching; bin as stated)",
                          "coactivation": "mean zero-lag pairwise correlation among ensemble members, standardised against size-matched random KC ensembles (Wilson & McNaughton 1994)",

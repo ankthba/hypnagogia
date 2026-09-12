@@ -46,11 +46,16 @@ def main():
         cspec = {"dataset": "malecns", "version": "v1.0", "scope": "brain", "weight_scale": cfg["dataset"]["weight_scale"] * a.gain}
         if a.shuffled:
             cspec["shuffle"] = {"seed": sd, "strata": "cell_class", "swaps_per_edge": 10}
-        for cond in s5["conditions"]:
-            for rate in (rates if cond == "sleep" else [0.0]):
+        # 'sleep_naive' repeats the sleep condition with the UNLEARNED weights. The memory in this model lives in
+        # Kenyon-cell -> output-neuron synapses, which are downstream of the Kenyon cells whose reactivation is being
+        # measured, so learning cannot change which Kenyon cells switch on. Without this arm a positive result could
+        # not be attributed to the memory at all: it would only show that some ensembles reactivate more than others.
+        arms = list(s5["conditions"]) + (["sleep_naive"] if s5.get("naive_weight_arm", True) else [])
+        for cond in arms:
+            for rate in (rates if cond.startswith("sleep") else [0.0]):
                 sub = f"{cond}_seed{sd}" + (f"_rate{rate}" if cond == "sleep" and rate != s5["dfb_clamp_rate_hz"] else "")
                 specs.append({"out_dir": str(out / sub), "seed": 500 + sd, "config": c, "name": f"sleep_{tag}_{cond}_{sd}_{rate}",
-                              "connectome": cspec, "init_plastic_w": wfile,
+                              "connectome": cspec, "init_plastic_w": (None if cond == "sleep_naive" else wfile),
                               "drive_groups": {"dfb": {"selector": POPULATIONS[s5["dfb_population"]]["selector"]}},
                               "record": "all",   # whole brain: needed for the viewer's activity map and for population statistics
                               "plasticity": p,
@@ -58,7 +63,8 @@ def main():
                                           "note": "the state the network is left in by conditioning, measured before the reset"},
                                          {"name": "warmup", "duration_s": s5["warmup_s"], "drives": ({"dfb": rate} if cond == "sleep" else {}),
                                           "reset": bool(s5.get("reset_at_offline_onset", True))},
-                                         {"name": cond, "duration_s": s5["duration_s"], "drives": ({"dfb": rate} if cond == "sleep" else {}),
+                                         {"name": cond, "duration_s": s5["duration_s"],
+                                          "drives": ({"dfb": rate} if cond.startswith("sleep") else {}),
                                           "plastic": s5["plastic_during_sleep"]}]})
     t0 = time.time()
     if not a.analyse_only:
@@ -79,7 +85,7 @@ def main():
             carry = {"pop_rate_hz": float(mc.sum() / car[0]["duration_s"] / meta["n_neurons"]),
                      "kc_rate_hz": float(np.isin(i[mc], kc).sum() / car[0]["duration_s"] / len(kc)),
                      "n_kc_active": int(len(np.unique(i[mc][np.isin(i[mc], kc)])))}
-        ep = [e for e in meta["epochs"] if e["name"] in ("sleep", "wake")][0]
+        ep = [e for e in meta["epochs"] if e["name"] in ("sleep", "wake", "sleep_naive")][0]
         dur = ep["duration_s"]; t = ts * meta["dt_ms"] * 1e-3
         m = (t >= ep["t_start_s"]) & (t < ep["t_end_s"]); ii = i[m]
         rows.append({"seed": int(sp["name"].split("_")[-2]), "condition": ep["name"], "dfb_rate_clamp_hz": float(sp["name"].split("_")[-1]),
@@ -91,7 +97,7 @@ def main():
                      "carryover_before_reset": carry, "file": sp["out_dir"] + "/spikes.npz"})
     ok = [r for r in rows if "error" not in r]
     summary = []
-    for cond in s5["conditions"]:
+    for cond in list(s5["conditions"]) + (["sleep_naive"] if s5.get("naive_weight_arm", True) else []):
         g = [r for r in ok if r["condition"] == cond and (cond == "wake" or r["dfb_rate_clamp_hz"] == s5["dfb_clamp_rate_hz"])]
         if g:
             summary.append({"condition": cond, "n_seeds": len(g), **{f"{k}_mean": float(np.mean([r[k] for r in g])) for k in ("pop_rate_hz", "kc_rate_hz", "mbon_rate_hz", "dfb_rate_hz", "frac_kc_active")},
@@ -110,8 +116,9 @@ def main():
                      "clamp_rate_hz": s5["dfb_clamp_rate_hz"],
                      "rate_source": "no dFB firing rate exists in the literature (Donlea 2014 / Pimentel 2016 report a binary ON/OFF switch); 17 Hz is taken from the UP state of the connected helicon cells ExR1, 16.9 +/- 3.6 Hz (Donlea et al. 2018 Neuron 97:378) - an approximation, not a dFB measurement",
                      "nt_in_model": {str(k): int(v) for k, v in conn.ann.nt.iloc[dfb].value_counts().items()}},
-             "conditions": {"sleep": {"description": f"dFB clamped active at {s5['dfb_clamp_rate_hz']} Hz Poisson drive, background noise on, no odour input"},
-                            "wake": {"description": "dFB off, background noise on, no odour input (identical in every other respect)"}},
+             "conditions": {"sleep": {"description": f"dFB clamped active at {s5['dfb_clamp_rate_hz']} Hz Poisson drive, background noise on, no odour input, learned weights loaded"},
+                            "wake": {"description": "dFB off, background noise on, no odour input, learned weights loaded (identical in every other respect)"},
+                            "sleep_naive": {"description": "identical to sleep but with the UNLEARNED weights, to test whether the memory contributes anything to reactivation at all"}},
              "sigma_mV": sigma, "plastic_during_sleep": s5["plastic_during_sleep"], "duration_s": s5["duration_s"],
              "reset_at_offline_onset": bool(s5.get("reset_at_offline_onset", True)),
              "reset_note": ("Membrane potentials and synaptic conductances are reset to rest at the start of the offline "
