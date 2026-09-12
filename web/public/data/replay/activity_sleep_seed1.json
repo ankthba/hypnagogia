@@ -1,0 +1,19 @@
+{
+ "bin": "activity_sleep_seed1.bin",
+ "dtype": "uint32",
+ "shape": [
+  400000,
+  2
+ ],
+ "columns": [
+  "t_ms",
+  "atlas_row"
+ ],
+ "n_atlas_rows": 126109,
+ "atlas_fingerprint": "sha256:723055c4acfbbaa08b4d077a804b1ee02830ac4dc0545c0a6f9770d1ee3f5c3f",
+ "duration_s": 40.0,
+ "n_spikes_total": 5672170,
+ "n_spikes_exported": 400000,
+ "downsampled": true,
+ "downsample_note": "5672170 spikes fell in the window; a uniform random sample of 400000 is shown"
+}

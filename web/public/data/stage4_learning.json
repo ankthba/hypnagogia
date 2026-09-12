@@ -18430,8 +18430,8 @@
    "results/stage4_learning/real_gain0.6/seed18/plastic_w.npz",
    "results/stage4_learning/real_gain0.6/seed19/plastic_w.npz"
   ],
-  "git_commit": "b95f2f5",
-  "generated_at": "2026-09-12T04:58:22+00:00"
+  "git_commit": "dc0d27f",
+  "generated_at": "2026-09-12T05:19:17+00:00"
  },
  "source_file": "results/stage4_learning/real_gain0.6/stage4.json"
 }

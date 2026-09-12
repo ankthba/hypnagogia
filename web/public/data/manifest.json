@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T04:58:22+00:00",
- "git_commit": "b95f2f5",
+ "generated_at": "2026-09-12T05:19:17+00:00",
+ "git_commit": "dc0d27f",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -244,10 +244,13 @@
    "source_file": "results/stage5_sleep/real_gain0.6/stage5.json"
   },
   "stage6_replay": {
-   "status": "not_run",
+   "status": "failed",
    "file": "stage6_replay.json",
    "title": "Stage 6 - Replay",
-   "summary": "not run"
+   "summary": "In the real network 95% of all time bins clear the reactivation threshold. The ensemble is effectively on continuously, so 'reactivation events' are not discrete episodes and the template correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory reappeared. Every comparison below must be read with that in mind. No evidence of memory replay: the odour-A ensemble did not reactivate above chance during simulated sleep. Comparisons that did not show the predicted effect: A_vs_B_sleep, sleep_vs_wake_A. The learned weights did increase reactivation relative to the identical run with unlearned weights (difference +0.14072, 95% CI [+0.10463, +0.17492]).",
+   "gain": 0.6,
+   "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has neither a sparse odour code nor a quiet background (stages 2 and 3b). This is an uncited free parameter introduced by this project.",
+   "source_file": "/Users/ankthba/Developer/fly/results/stage6_replay_gain0.6/replay/activity_sleep_naive_seed2.json"
   }
  },
  "atlas": {

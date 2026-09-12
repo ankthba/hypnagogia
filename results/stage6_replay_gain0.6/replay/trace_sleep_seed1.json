@@ -1,0 +1,1 @@
+{"bin": "trace_sleep_seed1.bin", "dtype": "float32", "shape": [400, 3], "columns": ["t_s", "corr_A", "corr_B"], "dt_s": 0.1, "threshold_corr": null, "threshold_source": "95th percentile of the per-bin 95th percentiles over size-matched random KC ensembles"}

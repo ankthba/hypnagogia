@@ -1,20 +1,12 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T04:58:24+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T05:19:19+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
 ## Headline
 
-**The replay test as specified cannot be run on this model, and the reason is itself the result.**
-
-Two independent findings block it, and neither came from tuning anything:
-
-1. *There is no critical regime, because the network is bistable.* Sweeping the background noise never produces a sustained intermediate activity level. Seeds at the same noise amplitude either stay silent or ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls inside a gap of more than four orders of magnitude that the model cannot occupy.
-2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a single receptor neuron driven at 50 Hz, ignites the whole network, and the activity never decays: the population rate after the odour is as high as during it, indefinitely. More than half of all Kenyon cells fire, where a real fly uses 5 to 10 per cent with a few spikes each.
-3. *This is the published model, not this dataset.* Olfactory input ignites EVERY network tested, at every rate, including the FlyWire v630 and v783 datasets that Shiu et al. published on. The runaway is a property of the model, not of the male CNS connectome. The gustatory pathway behaves completely differently with the same code and parameters: it never ignites the male CNS at any rate tested, and ignites the FlyWire networks only at the highest rate (150 Hz) when all 122 labellar neurons are driven at once. The 21-neuron stimulus the paper actually used stays well below that (stage 0). So the instability is specific to the olfactory pathway, and the published benchmark was never in a position to reveal it. Without the 0.581 FlyWire-equivalence scaling the male CNS ignites on everything, including the gustatory pathway, which is independent evidence that the scaling belongs there.
-
-A memory needs a sparse, odour-specific ensemble, and a replay test needs a quiet background for that ensemble to reappear against. This model, at this scale and with the published parameters, provides neither. Reporting that is the honest outcome; the alternative would have been to change parameters until the plots looked right, which this project does not do.
+**Stage 6 (failed).** In the real network 95% of all time bins clear the reactivation threshold. The ensemble is effectively on continuously, so 'reactivation events' are not discrete episodes and the template correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory reappeared. Every comparison below must be read with that in mind. No evidence of memory replay: the odour-A ensemble did not reactivate above chance during simulated sleep. Comparisons that did not show the predicted effect: A_vs_B_sleep, sleep_vs_wake_A. The learned weights did increase reactivation relative to the identical run with unlearned weights (difference +0.14072, 95% CI [+0.10463, +0.17492]).
 
 ## What was simulated
 
@@ -305,7 +297,36 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 
 ## Stage 6 - the replay test
 
-**Not run.**
+**failed.** Criterion: a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such.
+
+**Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has neither a sparse odour code nor a quiet background (stages 2 and 3b). This is an uncited free parameter introduced by this project.
+
+**In the real network 95% of all time bins clear the reactivation threshold. The ensemble is effectively on continuously, so 'reactivation events' are not discrete episodes and the template correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory reappeared. Every comparison below must be read with that in mind. No evidence of memory replay: the odour-A ensemble did not reactivate above chance during simulated sleep. Comparisons that did not show the predicted effect: A_vs_B_sleep, sleep_vs_wake_A. The learned weights did increase reactivation relative to the identical run with unlearned weights (difference +0.14072, 95% CI [+0.10463, +0.17492]).**
+
+*The four required comparisons use z_vs_random_ensembles, each run standardised against size-matched random Kenyon-cell ensembles drawn from that same run, because ensemble sizes differ between odours and between the real and shuffled networks and the raw template correlation depends on template size. comparisons_raw_metric repeats three of them on the raw correlation so the effect of that choice can be seen.*
+
+| comparison | required? | difference | 95% CI | Hedges' g | p | seeds | shows the predicted effect |
+|---|---|---|---|---|---|---|---|
+| trained (A) vs unpaired (B) ensemble, during sleep | additional | -2.85288 | [-4.54210, -1.20136] | -0.70 | 0.0037 | 20 | **no** |
+| sleep vs wake, odour-A ensemble | additional | +0.00518 | [-0.01875, +0.03072] | +0.09 | 0.6954 | 20 | **no** |
+| real vs degree-preserving shuffled connectome, odour-A ensemble in sleep | additional | +42.10297 | [+33.12256, +49.36840] | +2.18 | 0.0000 | 20 | yes |
+| odour-A ensemble vs size-matched random KC ensembles, during sleep | additional | +0.61635 | [+0.57190, +0.64517] | +6.73 | 0.0000 | 20 | yes |
+| learned vs unlearned synaptic weights, odour-A ensemble in sleep | additional | +0.14072 | [+0.10463, +0.17492] | +1.64 | 0.0000 | 20 | yes |
+
+The same comparisons on the raw template correlation, without size normalisation:
+
+| comparison | difference | 95% CI | Hedges' g | p |
+|---|---|---|---|---|
+| A_vs_B_sleep_raw | -0.02150 | [-0.02376, -0.01906] | -3.81 | 0.0000 |
+| sleep_vs_wake_A_raw | +0.00011 | [-0.00005, +0.00027] | +0.29 | 0.1894 |
+| real_vs_shuffled_raw | +0.58060 | [+0.52191, +0.62822] | +4.51 | 0.0000 |
+
+Ensemble sizes actually used (Kenyon cells), which is why the size-normalised statistic is the primary one:
+
+- real_gain0.6: sleep 326, wake 326, sleep_naive 326
+- shuffled_gain0.6: sleep 152
+
+**Sequence order.** Spearman rank correlation between within-event first-spike order and the order of the odour response, against a cell-identity shuffle (Foster & Wilson 2006). Reported only where events contained at least four ensemble members with distinct template ranks. Scored on 20 seeds over 3948 reactivation events: mean absolute rank correlation 0.158 against a cell-identity shuffle mean of 0.048.
 
 ## What this is not
 

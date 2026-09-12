@@ -193,6 +193,29 @@ def main():
                                      "where events contained at least four ensemble members with distinct template ranks.")}
         if len(nul) == len(rho) and len(rho) >= 3:
             sequence_summary["effect_vs_shuffle"] = paired_effect(rho, nul, name="sequence_vs_shuffle")
+    # Is "reactivation" even a discrete event here? If most time bins clear the threshold, the ensemble is
+    # simply on all the time and the event framing is meaningless: a template correlation measured against a
+    # continuously active population reflects how active those particular cells are, not whether a memory
+    # reappeared. This is computed before any comparison is interpreted.
+    def frac_bins(net, cond, ens):
+        g = [r for r in rows if r["network"] == net and r["condition"] == cond and r["ensemble"] == ens
+             and r.get("n_bins")]
+        return (float(np.mean([r["n_reactivation_events"] / r["n_bins"] for r in g])) if g else None)
+    continuity = {"bin_ms": bin_s * 1e3,
+                  "fraction_of_bins_called_events": {f"{n}/{c}/{e}": frac_bins(n, c, e)
+                                                     for n in sorted(set(r["network"] for r in rows))
+                                                     for c in sorted(set(r["condition"] for r in rows if r["network"] == n))
+                                                     for e in ("A", "B") if frac_bins(n, c, e) is not None},
+                  "kc_fraction_active_during_offline": float(np.mean([r["kc_rate_hz"] for r in rows if r.get("kc_rate_hz")]))}
+    worst = max([v for v in continuity["fraction_of_bins_called_events"].values() if v is not None] or [0.0])
+    continuity["events_are_discrete"] = bool(worst < 0.25)
+    continuity["note"] = (
+        (f"In the real network {100 * worst:.0f}% of all time bins clear the reactivation threshold. The ensemble is "
+         f"effectively on continuously, so 'reactivation events' are not discrete episodes and the template "
+         f"correlation mostly reflects how active those particular Kenyon cells are rather than whether a memory "
+         f"reappeared. Every comparison below must be read with that in mind.")
+        if not continuity["events_are_discrete"] else
+        f"At most {100 * worst:.0f}% of time bins clear the reactivation threshold, so events are discrete episodes.")
     FOUR = ("A_vs_B_sleep", "sleep_vs_wake_A", "real_vs_shuffled", "A_vs_random_ensembles")
     avail = [c for c in comparisons if c.get("available")]
     core = [c for c in avail if c["name"] in FOUR]
@@ -210,7 +233,11 @@ def main():
                        if not naive_c["survives"] else
                        " The learned weights did increase reactivation relative to the identical run with unlearned "
                        f"weights (difference {naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]).")
-    if all_survive:
+    if all_survive and not continuity["events_are_discrete"]:
+        status = "artifact"
+        headline = ("All four null comparisons showed the predicted effect, but the result cannot be read as replay: "
+                    + continuity["note"] + memory_note)
+    elif all_survive:
         status, headline = "passed", ("The odour-A Kenyon-cell ensemble reactivated above chance during simulated sleep, and the "
                                       "effect survived all four null comparisons including the degree-preserving shuffled "
                                       "connectome." + memory_note)
@@ -222,7 +249,8 @@ def main():
         status, headline = "not_run", "The replay comparisons could not be computed: the required sleep and wake runs are not available."
     else:
         failed = [c["name"] for c in core if not c["survives"]]
-        status, headline = "failed", ("No evidence of memory replay: the odour-A ensemble did not reactivate above chance during "
+        status, headline = "failed", (("" if continuity["events_are_discrete"] else continuity["note"] + " ") +
+                                      "No evidence of memory replay: the odour-A ensemble did not reactivate above chance during "
                                       "simulated sleep. Comparisons that did not show the predicted effect: "
                                       f"{', '.join(failed) if failed else 'none'}." + memory_note)
     out_d = {"status": status, "criterion": s6["criterion"], "headline": headline,
@@ -230,7 +258,8 @@ def main():
                          "coactivation": "mean zero-lag pairwise correlation among ensemble members, standardised against size-matched random KC ensembles (Wilson & McNaughton 1994)",
                          "sequence": "Spearman rank correlation between within-event first-spike order and the odour-response order, with a cell-identity shuffle null (Foster & Wilson 2006)",
                          "reactivation_event": "a bin whose template correlation exceeds the 95th percentile of the size-matched random-ensemble null"},
-             "window_ms": bin_s * 1e3, "n_seeds": len(set(r["seed"] for r in rows)), "gain": a.gain,
+             "continuity_check": continuity,
+           "window_ms": bin_s * 1e3, "n_seeds": len(set(r["seed"] for r in rows)), "gain": a.gain,
              "gain_note": ("published parameters" if a.gain == 1.0 else
                            f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
                            f"published value the network has neither a sparse odour code nor a quiet background (stages 2 "
