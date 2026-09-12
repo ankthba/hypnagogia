@@ -23,8 +23,8 @@ from pathlib import Path
 import numpy as np
 
 from . import DATA_CACHE
-from .connectome import (Connectome, apply_nt_corrections, apply_synapse_deviations,
-                         load_connectome, subset_from_config)
+from .connectome import (Connectome, apply_injected_potentiation, apply_nt_corrections,
+                         apply_synapse_deviations, load_connectome, subset_from_config)
 
 
 def resolve_group(conn: Connectome, spec: dict) -> np.ndarray:
@@ -97,6 +97,12 @@ def run_job(spec: dict) -> dict:
     _dev = spec["config"].get("synapse_deviations") or {}
     conn = apply_synapse_deviations(conn, _dev.get("names") or [],
                                     retained_fraction=float(_dev.get("retained_fraction", 0.0)))
+    # An injected positive control for the detector. Never present unless an arm asks for it by name, and the
+    # name says what it is. See connectome.apply_injected_potentiation.
+    _inj = spec.get("injected_potentiation")
+    if _inj:
+        conn = apply_injected_potentiation(conn, resolve_group(conn, _inj), float(_inj["factor"]),
+                                           label=_inj.get("label", "injected positive control"))
     groups = {k: resolve_group(conn, v) for k, v in spec.get("drive_groups", {}).items()}
     rec = spec.get("record", "all")
     record = "all" if rec == "all" else resolve_group(conn, rec)

@@ -490,3 +490,48 @@ def apply_synapse_deviations(conn: Connectome, names: list[str], repo_root: Path
                           "n_neurons_before": conn.N, "n_neurons_after": conn.N,
                           "n_connections_before": conn.E, "n_connections_after": conn.E,
                           "n_synapses_before": conn.n_synapses, "n_synapses_after": int(count.sum())}])
+
+
+def apply_injected_potentiation(conn: Connectome, index: np.ndarray, factor: float,
+                                label: str = "injected positive control") -> Connectome:
+    """Multiply the weight of connections BETWEEN the given neurons. This is an INJECTED POSITIVE CONTROL.
+
+    Nothing in this function is a result and nothing it produces may ever be reported as one. It exists to
+    answer a question the project cannot otherwise answer: if memory replay were present in this network,
+    would the stage-6 pipeline detect it? Every negative result in the project is uninterpretable until that
+    is known, because a negative from a blind detector means nothing.
+
+    The mechanism is the one the model lacks and the hippocampus has: the potentiated synapses lie BETWEEN the
+    cells whose reactivation is scored, rather than one stage downstream of them. The factor is chosen by the
+    experimenter and is not measured by anything, which is precisely why the output is a calibration and not a
+    finding. `factor` of 1.0 is a no-op.
+
+    Weight in this model is synapse count times a global scale, so potentiation multiplies the count.
+    """
+    factor = float(factor)
+    if factor == 1.0 or len(index) == 0:
+        return conn
+    if factor < 0:
+        raise ValueError(f"factor must be non-negative, got {factor}")
+    idx = np.zeros(conn.N, dtype=bool)
+    idx[np.asarray(index, dtype=np.int64)] = True
+    m = idx[conn.pre] & idx[conn.post]
+    count = conn.count.copy()
+    before = int(count[m].sum())
+    count[m] = np.rint(count[m].astype(np.float64) * factor).astype(count.dtype)
+    after = int(count[m].sum())
+    rec = {"label": label, "factor": factor, "n_neurons": int(idx.sum()), "n_connections": int(m.sum()),
+           "synapses_before": before, "synapses_after": after,
+           "IS_NOT_A_RESULT": ("An experimenter chose this factor. It is a positive control for the detector, "
+                               "not a measurement, not learned, and not a property of the connectome. Any "
+                               "output derived from it must be labelled as injected wherever it appears.")}
+    return Connectome(ids=conn.ids, pre=conn.pre, post=conn.post, count=count, sign=conn.sign, ann=conn.ann,
+                      dataset=conn.dataset, version=conn.version, weight_scale=conn.weight_scale,
+                      name=f"{conn.name}_INJECTED_x{factor:g}",
+                      provenance=dict(conn.provenance, injected_potentiation=rec),
+                      filtering_steps=list(conn.filtering_steps) + [{
+                          "step": f"INJECTED POSITIVE CONTROL, NOT A RESULT: connections among {int(idx.sum())} "
+                                  f"neurons multiplied by {factor:g} ({before:,} -> {after:,} synapses)",
+                          "n_neurons_before": conn.N, "n_neurons_after": conn.N,
+                          "n_connections_before": conn.E, "n_connections_after": conn.E,
+                          "n_synapses_before": conn.n_synapses, "n_synapses_after": int(count.sum())}])

@@ -1,0 +1,108 @@
+{
+ "status": "failed",
+ "IS_NOT_A_RESULT": "INJECTED POSITIVE CONTROL, NOT A RESULT. The recurrent connections among the trained ensemble were multiplied by a factor chosen by the experimenter. Nothing here is learned, measured, or a property of the connectome, and no output derived from it may be reported as evidence about the fly or about the published model. Its only purpose is to test whether the stage-6 detector can find replay when replay is present.",
+ "question": "Can the stage-6 detector find replay when replay is injected?",
+ "sigma_mV": 1.4,
+ "on_the_silent_branch": true,
+ "duration_s": 20.0,
+ "factors": [
+  10.0,
+  30.0,
+  100.0,
+  300.0
+ ],
+ "seeds": [
+  0
+ ],
+ "any_factor_produced_episodes": false,
+ "smallest_episodic_factor": null,
+ "per_run": [
+  {
+   "factor": 10.0,
+   "seed": 0,
+   "ensemble_size": 176,
+   "ensemble_rate_hz": 0.0,
+   "one_way_ignition": false,
+   "on_at_start": false,
+   "on_at_end": false,
+   "other_kc_rate_hz": 9.002057613168723e-05,
+   "ratio_to_other_kcs": 0.0,
+   "frac_bins_on": 0.0,
+   "n_episodes": 0,
+   "episode_duration_s_mean": 0.0,
+   "episode_duration_s_max": 0.0,
+   "per_bin_cv": 0.0,
+   "latched": false,
+   "silent": true,
+   "episodic": false
+  },
+  {
+   "factor": 30.0,
+   "seed": 0,
+   "ensemble_size": 176,
+   "ensemble_rate_hz": 0.0,
+   "one_way_ignition": false,
+   "on_at_start": false,
+   "on_at_end": false,
+   "other_kc_rate_hz": 9.002057613168723e-05,
+   "ratio_to_other_kcs": 0.0,
+   "frac_bins_on": 0.0,
+   "n_episodes": 0,
+   "episode_duration_s_mean": 0.0,
+   "episode_duration_s_max": 0.0,
+   "per_bin_cv": 0.0,
+   "latched": false,
+   "silent": true,
+   "episodic": false
+  },
+  {
+   "factor": 100.0,
+   "seed": 0,
+   "ensemble_size": 176,
+   "ensemble_rate_hz": 0.0,
+   "one_way_ignition": false,
+   "on_at_start": false,
+   "on_at_end": false,
+   "other_kc_rate_hz": 9.002057613168723e-05,
+   "ratio_to_other_kcs": 0.0,
+   "frac_bins_on": 0.0,
+   "n_episodes": 0,
+   "episode_duration_s_mean": 0.0,
+   "episode_duration_s_max": 0.0,
+   "per_bin_cv": 0.0,
+   "latched": false,
+   "silent": true,
+   "episodic": false
+  },
+  {
+   "factor": 300.0,
+   "seed": 0,
+   "ensemble_size": 176,
+   "ensemble_rate_hz": 0.0,
+   "one_way_ignition": false,
+   "on_at_start": false,
+   "on_at_end": false,
+   "other_kc_rate_hz": 9.002057613168723e-05,
+   "ratio_to_other_kcs": 0.0,
+   "frac_bins_on": 0.0,
+   "n_episodes": 0,
+   "episode_duration_s_mean": 0.0,
+   "episode_duration_s_max": 0.0,
+   "per_bin_cv": 0.0,
+   "latched": false,
+   "silent": true,
+   "episodic": false
+  }
+ ],
+ "finding": "INJECTED POSITIVE CONTROL, NOT A RESULT. The recurrent connections among the trained ensemble were multiplied by a factor chosen by the experimenter. Nothing here is learned, measured, or a property of the connectome, and no output derived from it may be reported as evidence about the fly or about the published model. Its only purpose is to test whether the stage-6 detector can find replay when replay is present. No factor in the scan produced episodic reactivation. The ensemble is either silent or, once the recurrence is strong enough to ignite it, latched on continuously, which is what a network with no adaptation and no synaptic depression does. If that holds across the range, the finding is that this model class cannot represent an episode even when the mechanism for one is handed to it.",
+ "provenance": {
+  "config": "configs/stage5_sleep.yaml",
+  "results_dir": "results/stage11_injected",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage11_injected/quiet_x10_seed0",
+   "/Users/ankthba/Developer/fly/results/stage11_injected/quiet_x30_seed0",
+   "/Users/ankthba/Developer/fly/results/stage11_injected/quiet_x100_seed0",
+   "/Users/ankthba/Developer/fly/results/stage11_injected/quiet_x300_seed0"
+  ]
+ }
+}
