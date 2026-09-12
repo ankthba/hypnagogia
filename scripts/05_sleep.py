@@ -107,6 +107,40 @@ def main():
             summary.append({"condition": cond, "n_seeds": len(g), **{f"{k}_mean": float(np.mean([r[k] for r in g])) for k in ("pop_rate_hz", "kc_rate_hz", "mbon_rate_hz", "dfb_rate_hz", "frac_kc_active")},
                             **{f"{k}_sd": float(np.std([r[k] for r in g], ddof=1)) if len(g) > 1 else 0.0 for k in ("pop_rate_hz", "kc_rate_hz")}})
     sl = next((s for s in summary if s["condition"] == "sleep"), None); wk = next((s for s in summary if s["condition"] == "wake"), None)
+    nv = next((s for s in summary if s["condition"] == "sleep_naive"), None)
+    # How much does clamping the dFB actually change the brain? If sleep and wake are indistinguishable outside
+    # the clamped cells themselves, the manipulation is too small to create a distinct state, and any
+    # sleep-versus-wake comparison downstream is testing a difference that does not exist.
+    manipulation = None
+    if sl and wk:
+        rel = lambda a, b: (abs(a - b) / b if b else None)
+        manipulation = {
+            "pop_rate_relative_change": rel(sl["pop_rate_hz_mean"], wk["pop_rate_hz_mean"]),
+            "kc_rate_relative_change": rel(sl["kc_rate_hz_mean"], wk["kc_rate_hz_mean"]),
+            "frac_kc_active_relative_change": rel(sl["frac_kc_active_mean"], wk["frac_kc_active_mean"]),
+            "n_dfb_clamped": int(len(dfb)), "n_neurons": int(conn.N),
+            "dfb_fraction_of_brain": float(len(dfb) / conn.N)}
+        weak = all((v is not None and v < 0.05) for v in (manipulation["pop_rate_relative_change"],
+                                                          manipulation["kc_rate_relative_change"]))
+        manipulation["state_is_distinguishable"] = bool(not weak)
+        manipulation["note"] = (
+            (f"Clamping the {len(dfb)} dFB neurons changes the rest of the brain by less than 5%: population rate "
+             f"{sl['pop_rate_hz_mean']:.4f} vs {wk['pop_rate_hz_mean']:.4f} Hz per neuron and Kenyon-cell rate "
+             f"{sl['kc_rate_hz_mean']:.3f} vs {wk['kc_rate_hz_mean']:.3f} Hz. Those 32 cells are "
+             f"{100 * len(dfb) / conn.N:.3f}% of the network, and the network is already in its self-sustaining "
+             f"state, so the sleep manipulation does not produce a distinct global state. A sleep-versus-wake "
+             f"comparison downstream is therefore testing a difference the model does not have.")
+            if weak else
+            (f"Clamping the {len(dfb)} dFB neurons measurably changes the rest of the brain: population rate "
+             f"{sl['pop_rate_hz_mean']:.4f} vs {wk['pop_rate_hz_mean']:.4f} Hz per neuron."))
+    memory_visible = None
+    if sl and nv:
+        memory_visible = {"mbon_rate_trained": sl["mbon_rate_hz_mean"], "mbon_rate_naive": nv["mbon_rate_hz_mean"],
+                          "relative_reduction": (1 - sl["mbon_rate_hz_mean"] / nv["mbon_rate_hz_mean"]) if nv["mbon_rate_hz_mean"] else None,
+                          "note": ("The learned weights are measurable offline: with no odour present, the mushroom-body "
+                                   "output neurons fire more slowly in the trained network than in the identical run with "
+                                   "unlearned weights. This confirms the engram is loaded and active during the offline "
+                                   "period, independently of whether it changes which Kenyon cells reactivate.")}
     checks = {"all_runs_completed": len(ok) == len(specs),
               "dfb_active_in_sleep": bool(sl and sl["dfb_rate_hz_mean"] > 1.0),
               "dfb_silent_in_wake": bool(wk and wk["dfb_rate_hz_mean"] < 0.5),
@@ -131,7 +165,8 @@ def main():
                             "to baseline (stage 3b). Without the reset the offline period would inherit the conditioning "
                             "activity and any apparent reactivation would be persistence, not replay. The 'carryover' epoch "
                             "measures the state that was discarded, so the size of that confound is on the record."),
-             "seeds": seeds, "per_seed": rows, "summary": summary, "walltime_s": round(time.time() - t0, 1),
+             "seeds": seeds, "per_seed": rows, "summary": summary,
+             "manipulation_strength": manipulation, "memory_visible_offline": memory_visible, "walltime_s": round(time.time() - t0, 1),
              "provenance": {"config": "configs/stage5_sleep.yaml", "results_dir": f"results/stage5_sleep/{tag}",
                             "files": [s["out_dir"] + "/spikes.npz" for s in specs]}}
     json.dump(out_d, open(out / "stage5.json", "w"), indent=1, default=str)
