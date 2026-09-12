@@ -247,6 +247,7 @@ export default function MapPanel() {
         clipsCount={clips.length}
         note={clipsFile.state === 'ready' ? clipsFile.data.note : undefined}
         activeCounted={activeCounted}
+        canPlay={canPlay}
         playing={playing}
         reduceMotion={reduceMotion}
       />
@@ -504,6 +505,7 @@ function SourceLine({
   clipsCount,
   note,
   activeCounted,
+  canPlay,
   playing,
   reduceMotion,
 }: {
@@ -515,6 +517,8 @@ function SourceLine({
   clipsCount: number;
   note?: string;
   activeCounted: number | null;
+  /** false when no file is loaded: there is then nothing to say about playback */
+  canPlay: boolean;
   playing: boolean;
   reduceMotion: boolean;
 }) {
@@ -543,7 +547,7 @@ function SourceLine({
           </p>
         )}
         <div className="smaller mono muted">web/public/data/{replay.path}</div>
-        <LoopNote playing={playing} reduceMotion={reduceMotion} />
+        {canPlay && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
       </div>
     );
   }
@@ -569,9 +573,9 @@ function SourceLine({
   const sc = clipActivity?.sidecar ?? null;
   return (
     <div className="map-panel__source">
+      {/* The clip's title is on the head rule and stamped into the canvas; this is the claim that
+          goes with it, kept in the body where the numbers are. */}
       <div className="label tone-failed">reference simulation · not the replay result</div>
-      <div className="map-panel__title">{clip.title}</div>
-      <p className="smaller">{clip.description}</p>
       {clipFailed && (
         <p className="smaller tone-failed">
           Nothing is lit: <span className="mono">web/public/data/{clipFailed.path}</span>{' '}
@@ -579,21 +583,29 @@ function SourceLine({
         </p>
       )}
       {sc && <SpikeFacts sc={sc} counted={activeCounted} stated={clip.n_active_neurons} />}
-      <div className="smaller mono muted">
-        config: {clip.provenance?.config ?? 'null'}
-        {clip.provenance?.results_dir ? ` · results: ${clip.provenance.results_dir}` : ''}
-      </div>
-      <LoopNote playing={playing} reduceMotion={reduceMotion} />
-      {note && <p className="smaller muted">{note}</p>}
+      {canPlay && <LoopNote playing={playing} reduceMotion={reduceMotion} />}
+      {/* The prose is folded away so the resting panel fits the rail's height: what a reader must
+          not miss - that this is a reference simulation and not the result - is above, on the
+          canvas and in the head. The config and every file are in the provenance line below, which
+          is never folded. */}
+      <details className="map-panel__more">
+        <summary className="smaller">what this simulation is</summary>
+        <p className="smaller">{clip.description}</p>
+        {note && <p className="smaller muted">{note}</p>}
+      </details>
     </div>
   );
 }
 
 /**
- * Counts read out of the activity sidecar itself. The active-neuron figure is counted from the
- * binary that is on screen, the way the legend counts the populations; the number
- * `reference_clips.json` states is shown beside it only when the two disagree, because then one of
- * the two files is stale and the reader is entitled to know which number came from where.
+ * Counts read out of the activity sidecar itself, and one counted out of the binary.
+ *
+ * The active-neuron figure the panel prints is counted from the file that is on screen - distinct
+ * `atlas_row` values - the way the legend counts the populations from the atlas binary rather than
+ * trusting the sidecar. `reference_clips.json`'s own figure is printed beside it, labelled as the
+ * different quantity it is: a neuron that spiked but has no soma position has no row in the atlas
+ * and no dot to light, so the manifest's count is legitimately the larger of the two. Only the
+ * impossible direction - more rows lit than the run says fired - is flagged as a disagreement.
  */
 function SpikeFacts({ sc, counted, stated }: { sc: ActivityData['sidecar']; counted: number | null; stated: number | null }) {
   return (
@@ -609,10 +621,20 @@ function SpikeFacts({ sc, counted, stated }: { sc: ActivityData['sidecar']; coun
       </dd>
       {counted !== null && (
         <>
-          <dt>active neurons</dt>
+          <dt>neurons lit</dt>
           <dd>
-            {fmtInt(counted)} <span className="muted">counted in this file</span>
-            {stated !== null && stated !== counted && <span className="tone-failed"> · reference_clips.json says {fmtInt(stated)}</span>}
+            {fmtInt(counted)} <span className="muted">atlas rows, counted in this file</span>
+            {stated !== null && (
+              <span className={counted > stated ? 'tone-failed' : 'muted'}>
+                {' '}
+                · reference_clips.json states {fmtInt(stated)} active in the run
+                {counted > stated
+                  ? ' — more rows are lit than the run says fired, so one of the two files is stale'
+                  : counted < stated
+                    ? ' (a neuron with no soma position has no row here to light)'
+                    : ''}
+              </span>
+            )}
           </dd>
         </>
       )}

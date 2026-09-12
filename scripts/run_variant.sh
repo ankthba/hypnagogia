@@ -3,7 +3,7 @@
 #   scripts/run_variant.sh 0.3        # the reduced-gain variant (a labelled deviation)
 #   scripts/run_variant.sh 1.0        # the published model
 # Every stage writes to its own gain-tagged directory, so the two tracks never mix.
-set -euo pipefail
+set -uo pipefail   # deliberately NOT -e: a failing stage is reported and the run continues
 cd "$(dirname "$0")/.."
 source .venv/bin/activate
 G="${1:?usage: run_variant.sh <gain> [seeds]}"
@@ -21,8 +21,10 @@ log "stage 2 background sweep at gain $G"
 python -u scripts/02_criticality.py --gain "$G" --sigmas "$SIGMAS" --seeds 0,1,2 2>&1 | tail -30
 fi
 
+if [ "${SKIP_STAGE3:-0}" != "1" ]; then
 log "stage 3 plasticity calibration at gain $G"
 python -u scripts/03_plasticity.py --gain "$G" 2>&1 | tail -20
+fi
 
 log "stage 4 encoding at gain $G (real network)"
 python -u scripts/04_encode.py --gain "$G" --seeds "$SEEDS" 2>&1 | tail -25

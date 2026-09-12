@@ -135,7 +135,11 @@ def run_jobs(specs: list[dict], n_parallel: int = 8, skip_existing: bool = True)
             f.write(spec_json)
         t0 = time.time()
         p = subprocess.run([py, "-m", "hypnagogia.jobs", str(spec_path)], env=env, capture_output=True, text=True)
-        (out_dir / "job.log").write_text(p.stdout + "\n--- stderr ---\n" + p.stderr)
+        try:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            (out_dir / "job.log").write_text(p.stdout + "\n--- stderr ---\n" + p.stderr)
+        except OSError as e:
+            return k, {"error": f"output directory unavailable ({e}); stdout tail: {p.stdout[-500:]}", "returncode": p.returncode}
         if p.returncode != 0:
             return k, {"error": p.stderr[-3000:], "returncode": p.returncode, "walltime_s": time.time() - t0}
         try:
@@ -146,10 +150,14 @@ def run_jobs(specs: list[dict], n_parallel: int = 8, skip_existing: bool = True)
         r["walltime_s"] = round(time.time() - t0, 1)
         return k, r
 
+    # A failure in one job is recorded and reported; it must never take the whole batch down.
     with ThreadPoolExecutor(max_workers=max(1, int(n_parallel))) as ex:
-        futs = [ex.submit(_one, k, s) for k, s in enumerate(specs)]
+        futs = {ex.submit(_one, k, s): k for k, s in enumerate(specs)}
         for f in as_completed(futs):
-            k, r = f.result()
+            try:
+                k, r = f.result()
+            except Exception as e:  # pragma: no cover
+                k, r = futs[f], {"error": f"{type(e).__name__}: {e}"}
             results[k] = r
     return results
 

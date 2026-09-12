@@ -126,7 +126,15 @@ export default function SigmaChart({
             label={narrow ? undefined : { value: yLabel, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
           />
           {refY?.map((r) => (
-            <ReferenceLine key={r.label} y={r.y} stroke={SERIES.ink} strokeDasharray="4 4" label={{ value: r.label, fill: SERIES.ink, fontSize: 12, position: 'right' }} />
+            /* narrow: the label goes inside the plot, on the left, where the low-sigma band is
+               empty - outside it there is no margin left to render into and it is clipped */
+            <ReferenceLine
+              key={r.label}
+              y={r.y}
+              stroke={SERIES.ink}
+              strokeDasharray="4 4"
+              label={{ value: r.label, fill: SERIES.ink, fontSize: narrow ? 11 : 12, position: narrow ? 'insideBottomLeft' : 'right' }}
+            />
           ))}
           <Tooltip
             cursor={{ stroke: SERIES.axis }}

@@ -1318,12 +1318,26 @@ pre.equations {
   max-width: none;
 }
 
-.map-panel__title {
-  margin-top: 0.2rem;
-  font-size: 1rem;
-  font-style: italic;
-  line-height: 1.3;
+/* Folded prose in the rail. The identity, the counts and the provenance are never inside it. */
+.map-panel__more {
+  margin-top: 0.5rem;
+}
+
+.map-panel__more > summary {
+  cursor: pointer;
+  color: var(--color-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--color-underline-quiet);
+  text-underline-offset: 0.2em;
+}
+
+.map-panel__more > summary:hover {
   color: var(--color-fg);
+}
+
+.map-panel__more p {
+  margin-top: 0.35rem;
+  max-width: none;
 }
 
 .map-panel__facts {
@@ -1540,6 +1554,8 @@ pre.equations {
     margin-top: -0.4rem;
     margin-bottom: -0.4rem;
     min-height: 44px;
+    /* a one-word control ("wake", "Dark") is only ~28px of text wide; the target is 44 square */
+    min-width: 44px;
   }
 
   .masthead__nav-link {

@@ -28,8 +28,8 @@ def operating_sigma(cfg, network="full", gain=1.0):
     return 0.0, "no stage-2 result available: background noise off"
 
 
-def eta_from_stage3(cfg):
-    p = RESULTS / "stage3_plasticity" / "stage3.json"
+def eta_from_stage3(cfg, gain=1.0):
+    p = RESULTS / ("stage3_plasticity" if gain == 1.0 else f"stage3_plasticity_gain{gain}") / "stage3.json"
     if p.exists():
         s3 = json.load(open(p))
         e = s3.get("calibration", {}).get("chosen_eta_ltd")
@@ -88,7 +88,7 @@ def main():
     sigma_src = (f"conditioning_sigma_mV in configs/stage4_encode.yaml ({sigma} mV); the offline background "
                  f"({sigma_offline} mV, from {sigma_src}) is applied in stage 5"
                  if s4.get("conditioning_sigma_mV") is not None else sigma_src)
-    eta, eta_src = eta_from_stage3(cfg)
+    eta, eta_src = eta_from_stage3(cfg, gain=a.gain)
     conn = load_connectome("malecns", "v1.0", "brain")
     kc, mbon = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON")
     ro = conn.select(cell_type=s4["readout_mbon_type"])
