@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useDataFile } from '../lib/data';
 import type { Stage1, Stage2, PerSigma, PowerLawFit } from '../types';
 import StageGate from '../components/StageGate';
+import { MapSlot } from '../components/Layout';
 import StatusBanner from '../components/StatusBanner';
 import Figure from '../components/Figure';
 import DataTable from '../components/DataTable';
@@ -24,6 +25,7 @@ export default function Criticality() {
         whether any value puts the network in a critical regime (branching ratio near 1, power-law avalanches). The regime
         chosen here is the background state for every later stage.
       </p></div>
+      <MapSlot />
 
       <section className="mt-8">
         <h2>Stage 1 · noise models</h2>
@@ -143,7 +145,7 @@ function Stage2View({ d }: { d: Stage2 }) {
         <ProvenanceFooter provenance={d.provenance} />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="cols-2">
         <Figure
           title="Branching ratio m (MR estimator) vs sigma"
           provenance={d.provenance}
@@ -225,7 +227,7 @@ function Stage2View({ d }: { d: Stage2 }) {
                 </span>
               ))}
             </div>
-            <div className="grid gap-8 lg:grid-cols-2">
+            <div className="cols-2">
               <Figure title={`Avalanche size CCDF, sigma = ${fmtNum(sigmaSel)} mV`} provenance={d.provenance}>
                 <CcdfChart
                   xLabel="avalanche size (spikes)"

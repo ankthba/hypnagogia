@@ -4,6 +4,7 @@ import ParamTable from '../components/ParamTable';
 import NotRunPanel from '../components/NotRunPanel';
 import ErrorBoundary from '../components/ErrorBoundary';
 import ProvenanceFooter from '../components/ProvenanceFooter';
+import { MapSlot } from '../components/Layout';
 
 /**
  * Static documentation. Prose here describes the method and contains no results.
@@ -14,6 +15,7 @@ export default function Methods() {
   return (
     <div>
       <h1 className="page-title">Methods</h1>
+      <MapSlot />
 
       <div className="prose">
         <h2 style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}>Model</h2>

@@ -15,6 +15,7 @@ stage4:
   iti_s: 3.0
   gap_s: 3.0
   warmup_s: 1.0
+  conditioning_sigma_mV: 0.0           # quiet mushroom body during conditioning; see the note in scripts/04_encode.py
   reset_between_presentations: true    # required: the model never returns to baseline on its own (stage 3b)
   readout_mbon_type: MBON11            # MBON-gamma1pedc>alpha/beta, the compartment PPL101 innervates
   seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]

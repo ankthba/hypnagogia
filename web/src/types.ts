@@ -11,6 +11,23 @@ export interface Provenance {
   generated_at?: string;
 }
 
+/**
+ * A provenance block on a *sidecar* rather than a stage file. Stage files always carry the full
+ * object; the atlas and the reference clips carry a partial one - notably no `git_commit` and no
+ * `generated_at`. Every field is therefore optional, so the viewer has to decide what to say about
+ * an absent one instead of silently filling it in from somewhere else.
+ */
+export interface SidecarProvenance {
+  config?: string;
+  config_hash?: string;
+  results_dir?: string;
+  files?: string[];
+  git_commit?: string;
+  generated_at?: string;
+  /** the module that wrote the file, when the block states one */
+  written_by?: string;
+}
+
 export interface ModelParam {
   name: string;
   value: string | number;
@@ -366,6 +383,14 @@ export interface AtlasSidecar {
   n_with_soma_position?: number;
   soma_outside_brain_note: string;
   source: string;
+  /**
+   * The atlas's own provenance block: the config that was read, the cache it was written into and
+   * the upstream annotation file the soma positions came from. It carries no `git_commit` or
+   * `generated_at` of its own, so the viewer states the absence rather than substituting the
+   * manifest's. Absent in atlases exported before the block existed, in which case the footer says
+   * so instead of quietly showing the manifest's `base_config` as though the atlas had named it.
+   */
+  provenance?: SidecarProvenance;
   row_to_sim_index?: string;
   /** identity of this row numbering (sha256 of neuron_atlas_index.bin); absent in atlases exported before it existed */
   atlas_fingerprint?: string;
@@ -432,8 +457,11 @@ export interface ReferenceClip {
   n_neurons_simulated: number;
   n_active_neurons: number;
   epochs?: ReferenceClipEpoch[];
-  /** the clip's own provenance block; it carries no git_commit of its own, the manifest's is used */
-  provenance: { config: string; results_dir?: string; files: string[]; git_commit?: string; generated_at?: string };
+  /**
+   * The clip's own provenance block. It carries no `git_commit` and no `generated_at`: the viewer
+   * says so rather than printing the manifest's, which belongs to the web export and not to the run.
+   */
+  provenance?: SidecarProvenance;
 }
 
 export interface ReferenceClipsFile {

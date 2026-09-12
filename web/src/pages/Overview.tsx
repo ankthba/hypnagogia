@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useDataFile, STAGES } from '../lib/data';
 import type { Manifest, StageEntry, Stage0, Provenance } from '../types';
 import StageGate from '../components/StageGate';
+import { MapSlot } from '../components/Layout';
 import StatusBanner from '../components/StatusBanner';
 import ProvenanceFooter from '../components/ProvenanceFooter';
 import { fmtNum } from '../lib/format';
@@ -29,6 +30,7 @@ export default function Overview() {
           <span className="mono">data/manifest.json</span>.
         </p>
       </div>
+      <MapSlot />
 
       {m.state === 'loading' && <div className="mt-6 small muted measure">loading manifest.json …</div>}
       {m.state === 'missing' && (

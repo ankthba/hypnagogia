@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Provenance } from '../types';
 import { REPO_URL } from '../lib/data';
 
@@ -12,8 +13,25 @@ function RepoLink({ path, commit }: { path: string; commit: string }) {
   );
 }
 
-/** Required under every figure: "config: … · data: … · commit …", built from the stage's provenance object; each path links to the repository at that commit. */
-export default function ProvenanceFooter({ provenance }: { provenance: Provenance | undefined }) {
+/**
+ * Required under every figure: "config: … · data: … · commit …", built from the stage's provenance
+ * object; each path links to the repository at that commit.
+ *
+ * `commitNote` is for the files that state no commit of their own (the atlas sidecar, the reference
+ * clips). Their footers say so, in place of a commit, rather than borrowing the manifest's - the
+ * manifest's commit is when the *site* was exported, not when the run was made, and hyperlinking a
+ * result file to it would claim a provenance the file never states. `note` is any further clause the
+ * caller must add about where these fields came from.
+ */
+export default function ProvenanceFooter({
+  provenance,
+  commitNote,
+  note,
+}: {
+  provenance: Provenance | undefined;
+  commitNote?: ReactNode;
+  note?: ReactNode;
+}) {
   if (!provenance) {
     return <div className="provenance provenance--missing">provenance object missing from stage file</div>;
   }
@@ -30,14 +48,22 @@ export default function ProvenanceFooter({ provenance }: { provenance: Provenanc
               <RepoLink path={f} commit={commit} />
             </span>
           ))}{' '}
-      · commit{' '}
+      ·{' '}
       {HEX.test(commit) ? (
-        <a className="mono" href={`${REPO_URL}/commit/${commit}`} target="_blank" rel="noreferrer">
-          {commit}
-        </a>
+        <>
+          commit{' '}
+          <a className="mono" href={`${REPO_URL}/commit/${commit}`} target="_blank" rel="noreferrer">
+            {commit}
+          </a>
+        </>
+      ) : commitNote ? (
+        <span className="tone-failed">{commitNote}</span>
       ) : (
-        <span className="mono">{commit || 'null'}</span>
+        <>
+          commit <span className="mono">{commit || 'null'}</span>
+        </>
       )}
+      {note && <> · {note}</>}
     </div>
   );
 }

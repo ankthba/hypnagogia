@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { CLASS_LABELS, classColor, classBand, SERIES, type ClassLabel } from '../../lib/colors';
 import { fmtNum } from '../../lib/format';
+import { useNarrowViewport } from '../../lib/media';
 
 export interface SigmaPoint {
   sigma: number;
@@ -32,6 +33,16 @@ export interface SigmaBand {
 }
 
 const TICK = { fontSize: 12, fill: SERIES.axis };
+const TICK_SM = { fontSize: 10, fill: SERIES.axis };
+
+/** Keep at most `max` ticks, both ends included, so sigma labels cannot collide on a phone. */
+function thinTicks(ticks: number[], max: number): number[] {
+  if (ticks.length <= max) return ticks;
+  const step = Math.ceil((ticks.length - 1) / (max - 1));
+  const out = ticks.filter((_, i) => i % step === 0);
+  if (out[out.length - 1] !== ticks[ticks.length - 1]) out.push(ticks[ticks.length - 1]);
+  return out;
+}
 
 /** Geometric band edges around each sigma on a log axis. */
 function bandEdges(sigmas: number[]): { s: number; lo: number; hi: number }[] {
@@ -60,6 +71,7 @@ export default function SigmaChart({
   height?: number;
   yDomain?: [number | 'auto', number | 'auto'];
 }) {
+  const narrow = useNarrowViewport();
   const edges = bandEdges(bands.map((b) => b.sigma));
   const bandCls = new Map(bands.map((b) => [b.sigma, b.cls]));
   const xs = edges.map((e) => e.s);
@@ -76,10 +88,15 @@ export default function SigmaChart({
     ...[...new Set(drawable.map((p) => String(p.cls)).filter((c) => !known.has(c)))],
   ];
 
+  // Narrow: at most four sigma ticks, smaller type, no rotated labels needed, and the y-axis name
+  // moves out of the SVG into a line of text under it so the plot keeps its width.
+  const tick = narrow ? TICK_SM : TICK;
+  const h = narrow ? Math.max(200, Math.round(height * 0.82)) : height;
+  const xTicks = narrow ? thinTicks(xs, 4) : xs;
   return (
     <div>
-      <ResponsiveContainer width="100%" height={height}>
-        <ScatterChart margin={{ top: 10, right: 16, bottom: 28, left: 8 }}>
+      <ResponsiveContainer width="100%" height={h} minHeight={190}>
+        <ScatterChart margin={narrow ? { top: 8, right: 10, bottom: 24, left: 0 } : { top: 10, right: 16, bottom: 28, left: 8 }}>
           <CartesianGrid stroke={SERIES.grid} />
           {edges.map((e) => (
             <ReferenceArea key={e.s} x1={e.lo} x2={e.hi} fill={classBand(bandCls.get(e.s))} fillOpacity={1} stroke="none" ifOverflow="hidden" />
@@ -90,20 +107,23 @@ export default function SigmaChart({
             scale="log"
             domain={[xMin, xMax]}
             allowDataOverflow
-            ticks={xs}
+            ticks={xTicks}
             tickFormatter={(v) => fmtNum(v, 3)}
             stroke={SERIES.axis}
-            tick={TICK}
-            label={{ value: 'noise sigma (mV)', position: 'insideBottom', offset: -16, fill: SERIES.axis, fontSize: 13 }}
+            tick={tick}
+            minTickGap={narrow ? 12 : 5}
+            label={{ value: 'noise sigma (mV)', position: 'insideBottom', offset: narrow ? -14 : -16, fill: SERIES.axis, fontSize: narrow ? 11 : 13 }}
           />
           <YAxis
             type="number"
             dataKey="y"
             domain={yDomain ?? ['auto', 'auto']}
             stroke={SERIES.axis}
-            tick={TICK}
+            tick={tick}
+            width={narrow ? 42 : 66}
+            tickCount={narrow ? 4 : undefined}
             tickFormatter={(v) => fmtNum(v, 3)}
-            label={{ value: yLabel, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
+            label={narrow ? undefined : { value: yLabel, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
           />
           {refY?.map((r) => (
             <ReferenceLine key={r.label} y={r.y} stroke={SERIES.ink} strokeDasharray="4 4" label={{ value: r.label, fill: SERIES.ink, fontSize: 12, position: 'right' }} />
@@ -129,9 +149,9 @@ export default function SigmaChart({
           />
           <Legend
             verticalAlign="top"
-            height={24}
+            height={narrow ? 40 : 24}
             payload={present.map((c) => ({ value: c, type: 'circle', color: classColor(c), id: c }))}
-            wrapperStyle={{ fontSize: 13, color: SERIES.axis }}
+            wrapperStyle={{ fontSize: narrow ? 11 : 13, color: SERIES.axis, lineHeight: 1.4 }}
           />
           <Scatter data={drawable} isAnimationActive={false}>
             {drawable.some((p) => p.err) && <ErrorBar dataKey="err" width={4} strokeWidth={1.2} stroke={SERIES.ink} direction="y" />}
@@ -141,6 +161,7 @@ export default function SigmaChart({
           </Scatter>
         </ScatterChart>
       </ResponsiveContainer>
+      {narrow && <div className="smaller muted">vertical axis: {yLabel}.</div>}
       {dropped > 0 && (
         <div className="smaller tone-failed">
           {dropped} point(s) not drawn: {droppedSigma0 > 0 && `${droppedSigma0} at sigma ≤ 0 (not drawable on a log axis)`}

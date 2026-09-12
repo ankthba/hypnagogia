@@ -3,6 +3,7 @@ import { useDataFile } from '../lib/data';
 import { checkAtlasIdentity, loadRaster, loadTrace, rasterMaxTimeMs, type ActivityData, type RasterData, type TraceData, type BinLoad } from '../lib/binary';
 import type { Comparison, Manifest, Stage5, Stage6 } from '../types';
 import StageGate from '../components/StageGate';
+import { MapSlot } from '../components/Layout';
 import StatusBanner from '../components/StatusBanner';
 import Figure from '../components/Figure';
 import DataTable from '../components/DataTable';
@@ -103,7 +104,7 @@ function TimelineControls({ timeline, disabled }: { timeline: Timeline; disabled
             setPlaying(false);
             setStart(Number(e.target.value));
           }}
-          className="flex-1 min-w-[160px]"
+          className="timeline-scrub"
           aria-label="window start (s)"
           disabled={disabled}
         />
@@ -281,6 +282,7 @@ export default function Replay() {
         from Stage 5, more than the unpaired ensemble, more than in wake, more than in a shuffled connectome, and more than
         random ensembles of the same size? Selected condition: <em>{cond}</em>.
       </p></div>
+      <MapSlot />
 
       <section className="mt-6">
         <ErrorBoundary label="Stage 6">
@@ -650,7 +652,7 @@ function Stage5View({ d }: { d: Stage5 }) {
   return (
     <div className="space-y-4">
       <StatusBanner status={d.status} title="Sleep-state induction" criterion={d.criterion} reasons={d.reasons} />
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="cols-2">
         <div className="card">
           <div className="label label--ink mb-2">Dorsal fan-shaped body clamp</div>
           <dl className="kv">

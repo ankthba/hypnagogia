@@ -31,8 +31,6 @@ interface State {
   mode: Mode;
   /** seconds left in the current mode (rest) or until the next target (cruise) */
   timer: number;
-  /** wing flap phase, seconds */
-  phase: number;
 }
 
 const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
@@ -59,6 +57,9 @@ export default function FlyOrnament() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // The Layout also refuses to mount the fly under reduced motion and the CSS hides it; this is the
+    // component's own guard, so the rAF loop never runs invisibly if it is ever mounted from elsewhere.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const vw = () => window.innerWidth;
     const vh = () => window.innerHeight;
 
@@ -71,13 +72,16 @@ export default function FlyOrnament() {
       ty: 0,
       mode: 'cruise',
       timer: rand(1.5, 4),
-      phase: 0,
     };
     newTarget(s, vw(), vh());
 
     const advance = (dt: number) => {
       const w = vw();
       const h = vh();
+      // Clamp before the mode switch, not after it: a window narrowed (or a phone rotated) while the
+      // fly is sitting would otherwise leave it parked outside the viewport for the whole rest.
+      s.x = Math.min(Math.max(MARGIN, s.x), Math.max(MARGIN + 1, w - MARGIN));
+      s.y = Math.min(Math.max(MARGIN, s.y), Math.max(MARGIN + 1, h - MARGIN));
       s.timer -= dt;
 
       if (s.mode === 'rest') {
@@ -144,13 +148,14 @@ export default function FlyOrnament() {
         s.a = -s.a;
         newTarget(s, w, h);
       }
-
-      s.phase += dt;
     };
 
     let raf = 0;
     let last = performance.now();
     let acc = 0;
+    // The wing state is a dataset write, i.e. setAttribute, i.e. a style invalidation of the wing
+    // subtree. It flips a handful of times a minute, so it is written only when it changes.
+    let flyingNow = true;
     const frame = (now: number) => {
       acc += Math.min(0.25, (now - last) / 1000);
       last = now;
@@ -159,8 +164,12 @@ export default function FlyOrnament() {
         acc -= STEP;
       }
       el.style.transform = `translate3d(${s.x - FLY_W / 2}px, ${s.y - FLY_H / 2}px, 0) rotate(${s.a}rad)`;
-      const wings = wingsRef.current;
-      if (wings) wings.dataset.flying = s.mode === 'rest' ? 'false' : 'true';
+      const want = s.mode !== 'rest';
+      if (want !== flyingNow) {
+        flyingNow = want;
+        const wings = wingsRef.current;
+        if (wings) wings.dataset.flying = want ? 'true' : 'false';
+      }
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);

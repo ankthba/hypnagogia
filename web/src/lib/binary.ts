@@ -86,6 +86,16 @@ export interface ActivityData {
 
 export type BinLoad<T> = { ok: true; data: T } | { ok: false; missing: boolean; message: string; path: string };
 
+/**
+ * A file the viewer is in the middle of loading. It lives here rather than in a component because
+ * the map-source channel carries it too: the rail panel has to know that a replay activity file was
+ * *selected and failed*, which is a different fact from no file having been selected at all.
+ */
+export type Loadable<T> =
+  | { state: 'loading' }
+  | { state: 'ready'; data: T }
+  | { state: 'failed'; missing: boolean; path: string; message: string };
+
 export const RASTER_COLUMNS = ['t_ms', 'neuron_row'] as const;
 export const TRACE_COLUMNS = ['t_s', 'corr_A', 'corr_B'] as const;
 export const ATLAS_COLUMNS = ['x_q', 'y_q', 'z_q', 'group'] as const;

@@ -2,6 +2,7 @@ import { memo } from 'react';
 import type { Comparison } from '../../types';
 import { fmtNum, fmtCI, fmtP, fmtInt } from '../../lib/format';
 import { SERIES } from '../../lib/colors';
+import { useNarrowViewport } from '../../lib/media';
 
 const INK = SERIES.ink;
 const MUTED = SERIES.axis;
@@ -23,6 +24,10 @@ type Row = { kind: 'present'; c: Comparison } | { kind: 'missing'; name: string 
  * are labelled unexpected.
  */
 function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
+  // Below ~700px there is no room for a label column beside the whiskers, so the row is stacked:
+  // name and verdict on the first line, the metric line under it, the CI bar under that. The
+  // viewBox then matches the container's own width instead of being scaled down to illegibility.
+  const narrow = useNarrowViewport();
   const present = comparisons ?? [];
   const rows: Row[] = [
     ...REQUIRED_COMPARISONS.map<Row>((n) => {
@@ -43,44 +48,53 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
   lo -= pad;
   hi += pad;
 
-  const W = 720;
-  const labelW = 250;
-  const plotW = W - labelW - 130;
-  const rowH = 44;
-  const top = 26;
+  const W = narrow ? 340 : 720;
+  const labelW = narrow ? 8 : 250;
+  const plotW = narrow ? W - 16 : W - labelW - 130;
+  const rowH = narrow ? 82 : 44;
+  const top = narrow ? 22 : 26;
   const H = top + rows.length * rowH + 30;
   const x = (v: number) => labelW + ((v - lo) / (hi - lo)) * plotW;
-
-  const ticks = niceTicks(lo, hi, 6);
+  /** vertical offset of the whisker line inside a row: centred when wide, third line when stacked */
+  const barDy = narrow ? 56 : rowH / 2;
+  const ticks = niceTicks(lo, hi, narrow ? 4 : 6);
+  const badgeW = narrow ? 68 : 74;
+  const badgeX = W - badgeW - 4;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[640px]" role="img" aria-label="Effect sizes with 95% confidence intervals">
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className={narrow ? 'w-full' : 'w-full min-w-[640px]'}
+      role="img"
+      aria-label="Effect sizes with 95% confidence intervals"
+    >
       <line x1={x(0)} x2={x(0)} y1={top - 8} y2={H - 26} stroke={INK} strokeDasharray="4 4" />
       {ticks.map((t) => (
         <g key={t}>
           <line x1={x(t)} x2={x(t)} y1={H - 26} y2={H - 21} stroke={MUTED} />
-          <text x={x(t)} y={H - 8} textAnchor="middle" fontSize={12} fill={MUTED}>
+          <text x={x(t)} y={H - 8} textAnchor="middle" fontSize={narrow ? 10.5 : 12} fill={MUTED}>
             {fmtNum(t, 2)}
           </text>
         </g>
       ))}
-      <text x={labelW + plotW / 2} y={12} textAnchor="middle" fontSize={12} fill={MUTED}>
+      <text x={labelW + plotW / 2} y={12} textAnchor="middle" fontSize={narrow ? 10.5 : 12} fill={MUTED}>
         Hedges g (95% CI) · dashed line = no effect
       </text>
       {rows.map((r, i) => {
-        const cy = top + i * rowH + rowH / 2;
+        const y0 = top + i * rowH;
+        const cy = y0 + barDy;
         if (r.kind === 'missing') {
           return (
             <g key={`missing-${r.name}`}>
-              <rect x={0} y={cy - rowH / 2} width={W} height={rowH} fill={BAD_WASH} />
-              <text x={8} y={cy - 4} fontSize={13} fill={BAD} fontWeight={500}>
+              <rect x={0} y={y0} width={W} height={rowH} fill={BAD_WASH} />
+              <text x={8} y={y0 + 16} fontSize={narrow ? 12 : 13} fill={BAD} fontWeight={500}>
                 {r.name}
               </text>
-              <text x={8} y={cy + 12} fontSize={11.5} fill={BAD}>
+              <text x={8} y={y0 + 32} fontSize={11.5} fill={BAD}>
                 comparison missing from stage6_replay.json
               </text>
-              <rect x={W - 78} y={cy - 9} width={74} height={18} rx={2} fill="none" stroke={BAD} />
-              <text x={W - 41} y={cy + 4} fontSize={10} letterSpacing="0.12em" textAnchor="middle" fill={BAD}>
+              <rect x={badgeX} y={narrow ? y0 + 42 : y0 + rowH / 2 - 9} width={badgeW} height={18} rx={2} fill="none" stroke={BAD} />
+              <text x={badgeX + badgeW / 2} y={(narrow ? y0 + 42 : y0 + rowH / 2 - 9) + 13} fontSize={10} letterSpacing="0.12em" textAnchor="middle" fill={BAD}>
                 MISSING
               </text>
             </g>
@@ -94,11 +108,11 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
         const finite = typeof g === 'number' && Number.isFinite(g);
         return (
           <g key={c.name}>
-            {i % 2 === 1 && <rect x={0} y={cy - rowH / 2} width={W} height={rowH} fill={STRIPE} />}
-            <text x={8} y={cy - 4} fontSize={13} fill={INK}>
+            {i % 2 === 1 && <rect x={0} y={y0} width={W} height={rowH} fill={STRIPE} />}
+            <text x={8} y={y0 + 16} fontSize={narrow ? 12.5 : 13} fill={INK}>
               {c.label}
             </text>
-            <text x={8} y={cy + 12} fontSize={11.5} fill={MUTED}>
+            <text x={8} y={y0 + 32} fontSize={11.5} fill={MUTED}>
               {c.metric} · n = {fmtInt(c.n)} · p = {fmtP(c.p)}
               {unexpected && (
                 <tspan fill={BAD} fontWeight={500}>
@@ -115,20 +129,43 @@ function ForestPlotInner({ comparisons }: { comparisons: Comparison[] }) {
               </>
             )}
             {finite ? (
-              <circle cx={x(g)} cy={cy} r={6} fill={color} stroke={SERIES.mat} strokeWidth={1.5} />
+              <circle cx={x(g)} cy={cy} r={narrow ? 5 : 6} fill={color} stroke={SERIES.mat} strokeWidth={1.5} />
             ) : (
               <text x={labelW + plotW / 2} y={cy + 4} fontSize={12} fill={BAD} textAnchor="middle">
                 g = null
               </text>
             )}
-            <text x={labelW + plotW + 10} y={cy - 2} fontSize={12} fill={INK}>
-              g = {fmtNum(g, 3)}
-            </text>
-            <text x={labelW + plotW + 10} y={cy + 11} fontSize={11.5} fill={MUTED}>
-              {fmtCI(c.g_ci95, 2)}
-            </text>
-            <rect x={W - 78} y={cy - 9} width={74} height={18} rx={2} fill={c.survives ? GOOD_WASH : BAD_WASH} stroke={color} />
-            <text x={W - 41} y={cy + 4} fontSize={10} letterSpacing="0.12em" textAnchor="middle" fill={color}>
+            {narrow ? (
+              <text x={8} y={y0 + 74} fontSize={11.5} fill={INK}>
+                g = {fmtNum(g, 3)} <tspan fill={MUTED}>{fmtCI(c.g_ci95, 2)}</tspan>
+              </text>
+            ) : (
+              <>
+                <text x={labelW + plotW + 10} y={cy - 2} fontSize={12} fill={INK}>
+                  g = {fmtNum(g, 3)}
+                </text>
+                <text x={labelW + plotW + 10} y={cy + 11} fontSize={11.5} fill={MUTED}>
+                  {fmtCI(c.g_ci95, 2)}
+                </text>
+              </>
+            )}
+            <rect
+              x={badgeX}
+              y={narrow ? y0 + 62 : y0 + rowH / 2 - 9}
+              width={badgeW}
+              height={18}
+              rx={2}
+              fill={c.survives ? GOOD_WASH : BAD_WASH}
+              stroke={color}
+            />
+            <text
+              x={badgeX + badgeW / 2}
+              y={(narrow ? y0 + 62 : y0 + rowH / 2 - 9) + 13}
+              fontSize={10}
+              letterSpacing="0.12em"
+              textAnchor="middle"
+              fill={color}
+            >
               {c.survives ? 'SURVIVES' : 'DOES NOT'}
             </text>
           </g>

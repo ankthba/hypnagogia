@@ -78,7 +78,16 @@ def main():
     seeds = [int(x) for x in a.seeds.split(",")] if a.seeds else s4["seeds"]
     tag = ("shuffled" if a.shuffled else "real") + ("" if a.gain == 1.0 else f"_gain{a.gain}")
     out = OUT / tag; out.mkdir(parents=True, exist_ok=True); dump_config(cfg, out / "config.resolved.yaml")
-    sigma, sigma_src = operating_sigma(cfg, gain=a.gain)
+    # Conditioning happens against a quiet mushroom body, not against the offline background. In a real fly the
+    # Kenyon-cell spontaneous rate is about 0.1 Hz (Turner, Bazhenov & Laurent 2008), so an odour-evoked ensemble
+    # stands out against near-silence. Conditioning at the offline background instead would leave every Kenyon
+    # cell with a large eligibility trace when the dopaminergic neurons fire, and the plasticity would not be
+    # odour-specific. The offline background is used in stage 5, where it belongs.
+    sigma_offline, sigma_src = operating_sigma(cfg, gain=a.gain)
+    sigma = float(s4["conditioning_sigma_mV"]) if s4.get("conditioning_sigma_mV") is not None else sigma_offline
+    sigma_src = (f"conditioning_sigma_mV in configs/stage4_encode.yaml ({sigma} mV); the offline background "
+                 f"({sigma_offline} mV, from {sigma_src}) is applied in stage 5"
+                 if s4.get("conditioning_sigma_mV") is not None else sigma_src)
     eta, eta_src = eta_from_stage3(cfg)
     conn = load_connectome("malecns", "v1.0", "brain")
     kc, mbon = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON")
@@ -170,7 +179,8 @@ def main():
                           "odor_B": {"orn_types": s4["odor_B_orn_types"], "n_orns": int(len(conn.select(cell_type=s4["odor_B_orn_types"]))), "rate_hz": s4["odor_rate_hz"]},
                           "dans": {"types": [s4["dan_type"]], "n": int(len(conn.select(cell_type=s4["dan_type"]))), "rate_hz": s4["dan_rate_hz"]},
                           "n_pairings": s4["n_pairings"], "odor_s": s4["odor_duration_s"], "iti_s": s4["iti_s"], "test_s": s4["odor_duration_s"],
-                          "sigma_mV": sigma, "sigma_source": sigma_src, "eta_ltd": eta, "eta_source": eta_src,
+                          "sigma_mV": sigma, "sigma_source": sigma_src, "sigma_offline_mV": sigma_offline,
+                          "eta_ltd": eta, "eta_source": eta_src,
                           "total_duration_s": sum(e["duration_s"] for e in build_epochs(s4))},
              "readout_mbons": [{"root_id": str(conn.ids[x]), "type": s4["readout_mbon_type"], "side": str(conn.ann.side.iloc[x])} for x in ro],
              "seeds": seeds, "per_seed": rows, "effect": eff, "notes": note,

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { REPO_URL, useDataFile } from '../lib/data';
 import { MapSourceProvider } from '../lib/mapSource';
-import { usePrefersReducedMotion } from '../lib/media';
+import { useMediaQuery, usePrefersReducedMotion } from '../lib/media';
 import MapPanel from './MapPanel';
 import FlyOrnament from './FlyOrnament';
 import type { Manifest } from '../types';
@@ -15,43 +16,61 @@ const NAV = [
   { to: '/methods', label: 'Methods' },
 ];
 
+/** Where the map goes when there is no room for a rail: each page drops this after its intro. */
+export const MAP_SLOT_ID = 'map-slot';
+
+/** Rendered by every page immediately after its intro prose; empty (and hidden) in the wide layout. */
+export function MapSlot() {
+  return <div id={MAP_SLOT_ID} className="map-slot" />;
+}
+
 /**
  * Masthead and nav across the top; below them a two-column body: the page content on the left and
- * the neuron map in a sticky rail on the right, on every page. Below 1100px the rail becomes a
- * normal full-width block under the content.
+ * the neuron map in a sticky rail on the right. Below 1100px there is no room for two columns, so
+ * the rail is not squeezed: the map moves into the page itself, as a full-width block directly
+ * after the page intro (the slot each page renders there).
  */
 export default function Layout() {
   const m = useDataFile<Manifest>('manifest.json');
   const commit = m.state === 'ready' ? m.data.git_commit : null;
   const isHex = commit ? /^[0-9a-f]{7,40}$/i.test(commit) : false;
   const fly = useFlySetting();
+  const twoColumn = useMediaQuery('(min-width: 1100px)');
 
   return (
     <MapSourceProvider>
+      {/* The inner box holds the reading measure; the header itself takes the shell's geometry from
+          1100px up, so the title and nav centre over the text column and not over the map rail. */}
       <header className="masthead">
-        <NavLink to="/" className="masthead__name" end>
-          hypnagogia
-        </NavLink>
-        <div className="masthead__tagline">whole-brain Drosophila LIF · replay during simulated sleep</div>
-        <nav className="masthead__nav" aria-label="pages">
-          {NAV.map((n, i) => (
-            <span key={n.to}>
-              {i > 0 && ' '}
-              <NavLink to={n.to} end={n.to === '/'} className="masthead__nav-link" data-text={n.label}>
-                {n.label}
-              </NavLink>
-            </span>
-          ))}
-        </nav>
+        <div className="masthead__inner">
+          <NavLink to="/" className="masthead__name" end>
+            hypnagogia
+          </NavLink>
+          <div className="masthead__tagline">whole-brain Drosophila LIF · replay during simulated sleep</div>
+          <nav className="masthead__nav" aria-label="pages">
+            {NAV.map((n, i) => (
+              <span key={n.to}>
+                {i > 0 && ' '}
+                <NavLink to={n.to} end={n.to === '/'} className="masthead__nav-link" data-text={n.label}>
+                  {n.label}
+                </NavLink>
+              </span>
+            ))}
+          </nav>
+        </div>
       </header>
 
-      <div className="shell">
+      <div className="shell" data-two-column={twoColumn ? 'true' : 'false'}>
         <main className="page">
           <Outlet />
         </main>
-        <aside className="rail" aria-label="neuron map">
-          <MapPanel />
-        </aside>
+        {twoColumn ? (
+          <aside className="rail" aria-label="neuron map">
+            <MapPanel />
+          </aside>
+        ) : (
+          <InlineMap />
+        )}
       </div>
 
       <footer className="colophon">
@@ -93,6 +112,30 @@ export default function Layout() {
   );
 }
 
+/**
+ * The map in the single-column layout. It is portalled into the page's own slot so it lands after
+ * the intro rather than below every figure on the page; a page that renders no slot (or a route
+ * still mounting) gets it at the end of the shell, which is where the aside used to sit.
+ */
+function InlineMap() {
+  const { pathname } = useLocation();
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    // the slot belongs to the page, so it exists only after the route's own commit
+    const raf = requestAnimationFrame(() => setSlot(document.getElementById(MAP_SLOT_ID)));
+    return () => {
+      cancelAnimationFrame(raf);
+      setSlot(null);
+    };
+  }, [pathname]);
+  const panel = (
+    <section className="rail rail--inline" aria-label="neuron map">
+      <MapPanel />
+    </section>
+  );
+  return slot ? createPortal(panel, slot) : panel;
+}
+
 // ---------------------------------------------------------------- the fly switch
 
 interface FlySetting {
@@ -108,13 +151,18 @@ interface FlySetting {
  */
 function useFlySetting(): FlySetting {
   const reduce = usePrefersReducedMotion();
-  const [wanted, setWanted] = useState<boolean>(() => {
+  // On a phone or any touch screen the fly is noise in a small viewport, so it starts off there.
+  // An explicit choice, either way, is remembered and wins over the default.
+  const smallOrTouch = useMediaQuery('(max-width: 899px), (pointer: coarse)');
+  const [stored, setStored] = useState<string | null>(() => {
     try {
-      return localStorage.getItem('fly') !== 'off';
+      return localStorage.getItem('fly');
     } catch {
-      return true;
+      return null;
     }
   });
+  const wanted = stored === 'on' ? true : stored === 'off' ? false : !smallOrTouch;
+  const setWanted = (v: boolean) => setStored(v ? 'on' : 'off');
   const set = (v: boolean) => {
     setWanted(v);
     try {

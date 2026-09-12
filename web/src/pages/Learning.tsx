@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDataFile } from '../lib/data';
 import type { Stage3, Stage4 } from '../types';
 import StageGate from '../components/StageGate';
+import { MapSlot } from '../components/Layout';
 import StatusBanner from '../components/StatusBanner';
 import Figure from '../components/Figure';
 import DataTable from '../components/DataTable';
@@ -24,6 +25,7 @@ export default function Learning() {
         DAN activation and checks that the MBON response to A, but not to the unpaired odor B, changes. Only if learning
         is verified here does the replay test in Stage 6 have a memory to look for.
       </p></div>
+      <MapSlot />
 
       <section className="mt-8">
         <h2>Stage 4 · associative conditioning</h2>
@@ -86,7 +88,7 @@ function Stage4View({ d }: { d: Stage4 }) {
         </Callout>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="cols-2">
         <Figure title="MBON response to odor A (paired) - before vs after" provenance={d.provenance} caption="Thin lines: individual seeds; thick line: mean across seeds. Response = mean readout-MBON rate during the test window.">
           <PairedPlot seeds={seeds.map((s) => ({ seed: s.seed, pre: s.A_pre, post: s.A_post }))} color={SERIES.A} label="MBON rate (Hz)" />
         </Figure>
@@ -109,7 +111,7 @@ function Stage4View({ d }: { d: Stage4 }) {
         <ProvenanceFooter provenance={d.provenance} />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="cols-2">
         <div className="card">
           <div className="label label--ink mb-2">Protocol</div>
           <DataTable

@@ -90,8 +90,10 @@
   --text-h2: clamp(1.35rem, 1.15rem + 0.9vw, 1.75rem);
   --text-h3: clamp(1.15rem, 1.06rem + 0.4vw, 1.3rem);
 
-  /* Width of the sticky right-hand rail that carries the neuron map. */
-  --rail-w: 380px;
+  /* Width of the sticky right-hand rail that carries the neuron map. It grows with the window
+     rather than stepping at a breakpoint: a step would widen the rail without widening
+     --measure-wide, so one pixel of extra window would cost the text column 40px of measure. */
+  --rail-w: clamp(340px, 26vw, 420px);
 
   --transition-fast: 0.15s ease;
 
@@ -356,12 +358,15 @@ a.masthead__name:hover {
    Both tracks are minmax(0, ...) so a canvas or a scrolling table inside either can never push
    the document wider than the viewport. Below 1100px the rail is a normal full-width block
    underneath the content. */
+/* The vertical start offset lives on the grid, not on either track: put it on .page and the rail
+   starts level with the text, but put it inside the *sticky* rail and those pixels travel with it
+   and are subtracted from its scroll budget for the life of the page. */
 .shell {
   flex: 1;
   width: 100%;
   max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: 0 var(--gutter-right) 0 var(--gutter-left);
+  padding: var(--space-lg) var(--gutter-right) 0 var(--gutter-left);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
@@ -371,7 +376,7 @@ a.masthead__name:hover {
 .page {
   min-width: 0;
   width: 100%;
-  padding: var(--space-lg) 0 var(--space-xl);
+  padding: 0 0 var(--space-xl);
 }
 
 .rail {
@@ -388,19 +393,25 @@ a.masthead__name:hover {
 
   /* Sticky beside the text. The masthead scrolls away with the page, so the offset is a small
      margin rather than a nav height; the rail keeps its own scrollbar when it is taller than
-     the viewport. */
+     the viewport. The sticky box is exactly the panel: no padding of its own to carry around. */
   .rail {
     position: sticky;
     top: var(--space-sm);
     max-height: calc(100dvh - 2 * var(--space-sm));
     overflow-y: auto;
-    padding: var(--space-lg) 0 var(--space-sm);
+    padding: 0 0 var(--space-sm);
   }
-}
 
-@media (min-width: 1440px) {
-  :root {
-    --rail-w: 420px;
+  /* The masthead takes the shell's geometry so it centres over the text column rather than over
+     the whole window; centred on the viewport its nav row ends inside the rail track. */
+  .masthead {
+    max-width: var(--measure-wide);
+    padding-right: calc(var(--gutter-right) + var(--rail-w) + var(--space-md));
+  }
+
+  .masthead__inner {
+    max-width: var(--measure);
+    margin-inline: auto;
   }
 }
 
@@ -1166,8 +1177,21 @@ pre.equations {
 .map-panel {
   border: 1px solid var(--color-border);
   border-radius: 2px;
-  padding: 0.9rem 0.9rem 0.75rem;
+  padding: clamp(0.6rem, 0.35rem + 1vw, 0.9rem) clamp(0.6rem, 0.35rem + 1vw, 0.9rem) 0.75rem;
   background: var(--color-bg);
+}
+
+/* The scrubber gets a whole row of its own once the control strip cannot hold it beside the
+   play button, the clock and the window selector. */
+.timeline-scrub {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .timeline-scrub {
+    flex-basis: 100%;
+  }
 }
 
 .map-panel__head {
@@ -1364,13 +1388,15 @@ pre.equations {
   transform-origin: 21px 16px;
 }
 
-/* Fast flapping, hinged at the thorax. Stopped while the fly is sitting. */
+/* Fast flapping, hinged at the thorax. Stopped while the fly is sitting. The period is 0.12s, not
+   the 0.06s it was: 60ms is 3.6 frames at a 60Hz refresh, so it beat against the frame clock and
+   read as an irregular wobble rather than a blur, at twice the per-frame style/paint cost. */
 .fly__wings[data-flying='true'] .fly__wing--upper {
-  animation: fly-wing-upper 0.06s linear infinite;
+  animation: fly-wing-upper 0.12s linear infinite;
 }
 
 .fly__wings[data-flying='true'] .fly__wing--lower {
-  animation: fly-wing-lower 0.06s linear infinite;
+  animation: fly-wing-lower 0.12s linear infinite;
 }
 
 @keyframes fly-wing-upper {

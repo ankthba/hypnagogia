@@ -17,3 +17,17 @@ export function useMediaQuery(query: string): boolean {
 export function usePrefersReducedMotion(): boolean {
   return useMediaQuery('(prefers-reduced-motion: reduce)');
 }
+
+/**
+ * True on a viewport narrow enough that a chart has to be laid out differently: fewer axis ticks,
+ * smaller type, a stacked legend. 700px is the point at which the page's single column drops below
+ * roughly 640 CSS pixels of drawable width inside a figure mat.
+ */
+export function useNarrowViewport(maxPx = 700): boolean {
+  return useMediaQuery(`(max-width: ${maxPx}px)`);
+}
+
+/** True on a touch screen, where hover does not exist and hit targets must be finger-sized. */
+export function useCoarsePointer(): boolean {
+  return useMediaQuery('(pointer: coarse)');
+}

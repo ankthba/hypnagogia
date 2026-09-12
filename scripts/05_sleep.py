@@ -29,7 +29,9 @@ def main():
     if not (s4dir / "stage4.json").exists():
         raise SystemExit(f"no stage-4 result at {s4dir}: run scripts/04_encode.py with the same --gain first")
     s4j = json.load(open(s4dir / "stage4.json"))
-    sigma = s4j["protocol"]["sigma_mV"]; eta = s4j["protocol"]["eta_ltd"]
+    # the offline background, not the (quiet) conditioning background
+    sigma = s4j["protocol"].get("sigma_offline_mV", s4j["protocol"]["sigma_mV"])
+    eta = s4j["protocol"]["eta_ltd"]
     conn = load_connectome("malecns", "v1.0", "brain")
     dfb = conn.select(**POPULATIONS[s5["dfb_population"]]["selector"])
     kc, mbon = conn.select(cell_class="Kenyon_Cell"), conn.select(cell_class="MBON")

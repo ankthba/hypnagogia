@@ -1,5 +1,5 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { checkAtlasIdentity, loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad } from '../lib/binary';
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { checkAtlasIdentity, loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad, type Loadable } from '../lib/binary';
 import { CHART_FONT, SERIES, resolveColors, useThemeVersion } from '../lib/colors';
 import { fmtInt, fmtNum, fmtPct } from '../lib/format';
 import type { AtlasViewBox, Manifest, Provenance } from '../types';
@@ -64,6 +64,9 @@ const specRadius = (s: GroupSpec, dark: boolean) => (dark ? s.r : s.rLight ?? s.
 
 /** The accent a spiking neuron is drawn in (`--color-link`), per MAP_SPEC.md. */
 const ACCENT = { dark: '#8fb3d4', light: '#2f5575' };
+/** Ink for the source stamp burned into the canvas (`--color-fg` / `--color-failed`, both themes). */
+const STAMP_INK = { dark: '#e8e6df', light: '#262624' };
+const STAMP_FAILED = { dark: '#d98b82', light: '#9a3f35' };
 /** Point radii are quoted at this canvas width and scale linearly with it. */
 const REF_W = 400;
 /** Fraction of the view box padded onto each side, so an edge soma is not clipped by the frame. */
@@ -103,7 +106,7 @@ function parseRgb(css: string): [number, number, number] {
 
 // ---------------------------------------------------------------- loading hooks
 
-export type Loadable<T> = { state: 'loading' } | { state: 'ready'; data: T } | { state: 'failed'; missing: boolean; path: string; message: string };
+export type { Loadable };
 
 /** Loads the atlas once (module-level promise cache: both pages share the parse). */
 let atlasPromise: Promise<BinLoad<AtlasData>> | null = null;
@@ -155,20 +158,100 @@ export function useActivity(path: string | null): Loadable<ActivityData> | null 
   return st;
 }
 
+/** A provenance object plus whatever the footer has to say about where its fields came from. */
+export interface FigureProvenance {
+  provenance: Provenance;
+  /** shown in place of the commit when no file states one */
+  commitNote?: ReactNode;
+  /** a further clause about the block itself */
+  note?: ReactNode;
+}
+
+const ATLAS_WEB_FILES = ['web/public/data/neuron_atlas.json', 'web/public/data/neuron_atlas.bin'];
+
 /**
- * Provenance for a figure whose sources are the atlas files themselves (they carry no provenance
- * block of their own). The config and commit are the manifest's, i.e. the export that wrote them.
+ * Provenance for a figure drawn from the atlas.
+ *
+ * `neuron_atlas.json` carries its own `provenance` block, and that block is what is shown: the
+ * config it was actually written from, its results directory, and the upstream annotation file the
+ * soma positions came from - which nothing else on the page names. The two web copies (and any
+ * activity file the figure also draws) are appended, because they are what the browser read.
+ *
+ * The block states no commit and no time, so neither is invented: the footer says so and names the
+ * commit the *site* was built at as a separate, clearly-labelled fact. An atlas exported before the
+ * block existed falls back to the manifest's `base_config` and says that too, rather than letting a
+ * config the atlas never named read as one it did.
  */
-export function atlasProvenance(m: Manifest | null, extraFiles: string[] = []): Provenance {
+export function atlasProvenance(atlas: AtlasData | null, m: Manifest | null, extraFiles: string[] = []): FigureProvenance {
+  const p = atlas?.sidecar.provenance;
+  const siteCommit = m?.git_commit;
+  const files = [...ATLAS_WEB_FILES, ...extraFiles];
+  if (!p) {
+    return {
+      provenance: {
+        config: m?.model?.base_config ?? 'null',
+        files,
+        git_commit: siteCommit ?? '',
+        generated_at: m?.generated_at,
+      },
+      note: (
+        <span className="tone-failed">
+          neuron_atlas.json states no provenance block: the config above is the manifest's model.base_config, not one the atlas names
+        </span>
+      ),
+    };
+  }
   return {
-    config: m?.model?.base_config ?? 'null',
-    files: ['web/public/data/neuron_atlas.json', 'web/public/data/neuron_atlas.bin', ...extraFiles],
-    git_commit: m?.git_commit ?? '',
-    generated_at: m?.generated_at,
+    provenance: {
+      config: p.config ?? 'null',
+      config_hash: p.config_hash,
+      results_dir: p.results_dir,
+      files: [...(p.files ?? []), ...files],
+      git_commit: p.git_commit ?? '',
+      generated_at: p.generated_at,
+    },
+    commitNote: p.git_commit ? undefined : (
+      <>commit not stated by neuron_atlas.json{siteCommit ? <> (this site was built at {siteCommit})</> : null}</>
+    ),
+    note: p.written_by ? (
+      <>
+        written by <span className="mono">{p.written_by}</span>
+      </>
+    ) : undefined,
   };
 }
 
 // ---------------------------------------------------------------- the map
+
+/**
+ * The current device pixel ratio, as state.
+ *
+ * It changes when the window is dragged to a display of a different density, or when the browser is
+ * zoomed. Sampling it only at draw time is not enough: the visible canvas would be resized to the
+ * new backing-store size while the cached offscreen background is still at the old one. There is no
+ * `resize`-style event for it, so the idiom is a `(resolution: Ndppx)` media query re-subscribed at
+ * each change.
+ */
+function useDevicePixelRatio(): number {
+  const [dpr, setDpr] = useState(() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    let mq: MediaQueryList | null = null;
+    const onChange = () => {
+      setDpr(window.devicePixelRatio || 1);
+      resub();
+    };
+    const resub = () => {
+      mq?.removeEventListener('change', onChange);
+      mq = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      mq.addEventListener('change', onChange);
+    };
+    setDpr(window.devicePixelRatio || 1);
+    resub();
+    return () => mq?.removeEventListener('change', onChange);
+  }, []);
+  return dpr;
+}
 
 /** A framing box the map can be fitted to, and where the sidecar states it came from. */
 type Frame = { lo: [number, number, number]; hi: [number, number, number]; from: 'view_box' | 'quantisation'; box: AtlasViewBox | null };
@@ -181,11 +264,27 @@ function frameFor(atlas: AtlasData, key: 'brain' | 'all'): Frame {
   return { lo: atlas.lo, hi: atlas.hi, from: 'quantisation', box: null };
 }
 
+/**
+ * What the map is showing, stated on the map itself.
+ *
+ * It is a required prop, and it is plain text rather than a node, because it is stamped into the
+ * canvas bitmap as well as rendered over it: a screenshot cropped to the picture then still carries
+ * the identity of what it is a picture of. `reference` marks the case the contract cares about most
+ * - a real reference simulation standing in for a result that does not exist yet - and draws the
+ * stamp in the failed tone.
+ */
+export interface MapSourceLabel {
+  text: string;
+  reference?: boolean;
+}
+
 function BrainMapInner({
   atlas,
   activity = null,
+  source,
   timeMs = null,
   decayMs = 150,
+  loopMs,
   height = 480,
   projection: projectionProp,
   onProjectionChange,
@@ -201,10 +300,19 @@ function BrainMapInner({
   atlas: AtlasData;
   /** spikes to light up; null renders the populations only (no activity) */
   activity?: ActivityData | null;
+  /** required: what this map is showing, drawn onto the canvas as well as over it */
+  source: MapSourceLabel;
   /** current scrub time in milliseconds; null means no activity is shown */
   timeMs?: number | null;
   /** a spike stays lit for this long, fading out */
   decayMs?: number;
+  /**
+   * Length of the loop when the caller is playing this file on repeat. The decay window then wraps
+   * across the seam instead of being truncated at 0, so the lit set does not collapse to the first
+   * frame's worth of spikes and rebuild over the next `decayMs`. Omit it (the Replay page does) when
+   * the timeline runs once and 0 really is the beginning.
+   */
+  loopMs?: number;
   /** the tallest the plot area may be; the canvas takes the projection's aspect within it */
   height?: number;
   projection?: Projection;
@@ -235,6 +343,7 @@ function BrainMapInner({
   const bgRef = useRef<HTMLCanvasElement | null>(null);
   const [width, setWidth] = useState(400);
   const themeVersion = useThemeVersion();
+  const dpr = useDevicePixelRatio();
 
   // Width changes are coalesced to one per frame: dragging a window edge otherwise rebuilds the
   // whole background layer once per pixel.
@@ -411,20 +520,27 @@ function BrainMapInner({
     const generation = stamp.counter;
     const t1 = timeMs;
     const t0 = timeMs - decayMs;
-    const b0 = Math.max(0, Math.floor(t0 / BIN_MS));
-    const b1 = Math.min(index.nBins - 1, Math.floor(t1 / BIN_MS));
     const rows: number[] = [];
     const alphas: number[] = [];
     let spikes = 0;
     let oob = 0;
     let offView = 0;
-    if (b1 >= b0) {
+    const inBox = groups.inBox;
+
+    /**
+     * Every spike in [lo, hi], lit at the alpha its age gives it. `age` is how long ago the spike
+     * fired *on the clock the viewer is watching*, which for the wrapped half of a looped window is
+     * not `t1 - t`: those spikes are at the end of the file and the playhead has just passed 0.
+     */
+    const scan = (lo: number, hi: number, age: (t: number) => number) => {
+      const b0 = Math.max(0, Math.floor(lo / BIN_MS));
+      const b1 = Math.min(index.nBins - 1, Math.floor(hi / BIN_MS));
+      if (b1 < b0) return;
       const from = index.starts[b0];
       const to = index.starts[b1 + 1];
-      const inBox = groups.inBox;
       for (let k = from; k < to; k++) {
         const t = activity.tMs[k];
-        if (t < t0 || t > t1) continue;
+        if (t < lo || t > hi) continue;
         spikes++;
         const row = activity.atlasRow[k];
         if (row >= atlas.n) {
@@ -436,7 +552,7 @@ function BrainMapInner({
           offView++;
           continue;
         }
-        const a = decayMs > 0 ? Math.max(0.0, 1 - (t1 - t) / decayMs) : 1;
+        const a = decayMs > 0 ? Math.max(0, 1 - age(t) / decayMs) : 1;
         if (stamp.gen[row] === generation) {
           const p = stamp.pos[row];
           if (a > alphas[p]) alphas[p] = a;
@@ -447,9 +563,16 @@ function BrainMapInner({
           alphas.push(a);
         }
       }
-    }
+    };
+
+    // The tail of the loop, when the playhead has wrapped and the window reaches back past 0. Without
+    // this the window is truncated at 0 and the lit set collapses to whatever sits at the very start
+    // of the file, then rebuilds over the next decayMs: a visible blink on every repeat.
+    if (loopMs && loopMs > 0 && t0 < 0) scan(loopMs + t0, loopMs, (t) => t1 + loopMs - t);
+    scan(Math.max(0, t0), t1, (t) => t1 - t);
+
     return { rows, alphas, spikes, oob, offView, nNeurons: rows.length };
-  }, [activity, index, timeMs, decayMs, atlas.n, staleActivity, groups]);
+  }, [activity, index, timeMs, decayMs, loopMs, atlas.n, staleActivity, groups]);
 
   /**
    * The palette as literal canvas colours. Only the background and the axis ink are tokens; the
@@ -460,7 +583,16 @@ function BrainMapInner({
     if (!wrap) return null;
     const resolved = resolveColors(wrap, { bg: background === 'page' ? 'var(--color-bg)' : SERIES.mat, axis: SERIES.axis });
     const dark = isDarkColor(resolved.bg);
-    return { bg: resolved.bg, axis: resolved.axis, dark, accent: dark ? ACCENT.dark : ACCENT.light };
+    return {
+      bg: resolved.bg,
+      axis: resolved.axis,
+      dark,
+      accent: dark ? ACCENT.dark : ACCENT.light,
+      // the stamp is picked by the canvas's own background, like every other colour here: the white
+      // figure mat is light in both themes, so a token would be invisible on it in the dark theme
+      ink: dark ? STAMP_INK.dark : STAMP_INK.light,
+      failed: dark ? STAMP_FAILED.dark : STAMP_FAILED.light,
+    };
     // themeVersion is the signal that the same var() now resolves to a different colour
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wrap, background, themeVersion]);
@@ -468,7 +600,6 @@ function BrainMapInner({
   // Background layer: every neuron in the frame, drawn once per size / projection / frame / theme.
   useEffect(() => {
     if (!C) return;
-    const dpr = window.devicePixelRatio || 1;
     const w = Math.round(canvasW * dpr);
     const h = Math.round(canvasH * dpr);
     // the offscreen canvas is reused: a theme or projection change at an unchanged size only repaints
