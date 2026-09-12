@@ -18,10 +18,15 @@ export interface ModelParam {
   cited: boolean;
 }
 
+/** One row of the connectome filter chain as the pipeline writes it (src/hypnagogia/connectome.py); a count the step did not measure is null. */
 export interface FilteringStep {
   step: string;
-  n_before: number;
-  n_after: number;
+  n_neurons_before: number | null;
+  n_neurons_after: number | null;
+  n_connections_before: number | null;
+  n_connections_after: number | null;
+  n_synapses_before: number | null;
+  n_synapses_after: number | null;
 }
 
 export interface StageEntry {
@@ -51,6 +56,8 @@ export interface Manifest {
     neurons_simulated_subset: number;
     connections_full: number;
     synapses_full: number;
+    /** synapses_full times weight_scale, as the exporter writes it; absent from older manifests. */
+    synapses_full_scaled?: number;
     connections_subset: number;
     synapses_subset: number;
     filtering_steps: FilteringStep[];
@@ -99,8 +106,9 @@ export interface Stage1 extends StageBase {
   noise_models: { name: string; equation: string; param: string }[];
   runs: {
     noise_model: string;
-    sigma_mV?: number;
-    rate_hz?: number;
+    /** the export writes both keys and nulls the one the model does not use */
+    sigma_mV?: number | null;
+    rate_hz?: number | null;
     seed: number;
     pop_rate_hz: number;
     frac_active: number;

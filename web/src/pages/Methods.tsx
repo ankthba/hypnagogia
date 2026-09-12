@@ -19,7 +19,7 @@ export default function Methods() {
         <h2 style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}>Model</h2>
         <p>
           The network is the leaky integrate-and-fire model of Shiu et al. 2024 (<i>Nature</i>, "A Drosophila computational brain
-          model reveals sensorimotor processing"), run in Brian2 over the male CNS connectome v1.0 (Janelia FlyEM, Google Research
+          model reveals sensorimotor processing"), run in Brian2 over the male CNS connectome (Janelia FlyEM, Google Research
           and Cambridge; <i>Cell</i> 2026). Only the brain is simulated: the connectome covers the whole central nervous system, and
           the brain-only scope used here is recorded in the manifest's filtering steps. The data version actually used is recorded in{' '}
           <span className="mono">manifest.model.data_version</span> and shown on the Overview page. Every reconstructed neuron is a
@@ -28,9 +28,9 @@ export default function Methods() {
         </p>
         <p>
           Shiu et al.'s constants were fitted on FlyWire, whose synapse detection counts differently from the CNS reconstruction.
-          To keep those constants meaningful, every CNS synapse count is scaled by 0.581 to FlyWire-equivalent units before the
-          synaptic weight <span className="mono">W_syn</span> is formed; the factor as actually applied is in the parameter table
-          below. FlyWire itself (v630) appears in exactly one place: the Stage 0 engine check, which re-runs the published example
+          To keep those constants meaningful, every CNS synapse count is multiplied by the <span className="mono">weight_scale</span>{' '}
+          factor recorded in the parameter table below (FlyWire-equivalent units) before the synaptic weight{' '}
+          <span className="mono">W_syn</span> is formed. FlyWire itself (v630) appears in exactly one place: the Stage 0 engine check, which re-runs the published example
           on the substrate Shiu et al. shipped it with and compares against their released output.
         </p>
         <p className="small muted">

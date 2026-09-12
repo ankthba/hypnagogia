@@ -1,0 +1,116 @@
+{
+ "sigma_mV": 0.5,
+ "seed": 1,
+ "file": "results/stage2_criticality/full/sigma0.5_seed1/spikes.npz",
+ "n_spikes": 0,
+ "duration_s": 4.0,
+ "pop_rate_hz": 0.0,
+ "frac_active": 0.0,
+ "subpopulation_rates": {
+  "KC": {
+   "n": 4064,
+   "rate_hz": 0.0,
+   "frac_active": 0.0
+  },
+  "MBON": {
+   "n": 97,
+   "rate_hz": 0.0,
+   "frac_active": 0.0
+  },
+  "DAN": {
+   "n": 340,
+   "rate_hz": 0.0,
+   "frac_active": 0.0
+  },
+  "ORN": {
+   "n": 2635,
+   "rate_hz": 0.0,
+   "frac_active": 0.0
+  }
+ },
+ "branching_ratio_mr": {
+  "m": null,
+  "tau_s": null,
+  "ci95": [
+   null,
+   null
+  ],
+  "b": null,
+  "offset": null,
+  "k_max": 250,
+  "bin_s": 0.002,
+  "n_bins": 2000,
+  "note": "series too short or constant"
+ },
+ "r_k": [],
+ "branching_ratio_naive": null,
+ "avalanches": {
+  "bin_ms": 4000.0,
+  "bin_requested_ms": 4000.0,
+  "bin_mult": 1.0,
+  "n": 0,
+  "frac_time_active": 0.0,
+  "applicable": true
+ },
+ "size_fit": {
+  "n": 0,
+  "alpha": null,
+  "xmin": null,
+  "xmax": null,
+  "sigma": null,
+  "n_tail": 0,
+  "R_vs_exponential": null,
+  "p_vs_exponential": null,
+  "R_vs_lognormal": null,
+  "p_vs_lognormal": null,
+  "R_vs_truncated_power_law": null,
+  "p_vs_truncated_power_law": null,
+  "truncated_lambda": null,
+  "note": "fewer than 50 avalanches or <5 distinct values: no fit"
+ },
+ "duration_fit": {
+  "n": 0,
+  "alpha": null,
+  "xmin": null,
+  "xmax": null,
+  "sigma": null,
+  "n_tail": 0,
+  "R_vs_exponential": null,
+  "p_vs_exponential": null,
+  "R_vs_lognormal": null,
+  "p_vs_lognormal": null,
+  "R_vs_truncated_power_law": null,
+  "p_vs_truncated_power_law": null,
+  "truncated_lambda": null,
+  "note": "fewer than 50 avalanches or <5 distinct values: no fit"
+ },
+ "size_ccdf": {
+  "x": [],
+  "y": []
+ },
+ "duration_ccdf": {
+  "x": [],
+  "y": []
+ },
+ "classification": "silent",
+ "reasons": [
+  "rate 0.0000 Hz/neuron, 0 avalanches, 0.0% neurons active"
+ ],
+ "robustness_bin_mult": {
+  "0.5": {
+   "classification": "silent",
+   "n_avalanches": 0,
+   "alpha": null,
+   "R_vs_exponential": null,
+   "R_vs_lognormal": null
+  },
+  "2.0": {
+   "classification": "silent",
+   "n_avalanches": 0,
+   "alpha": null,
+   "R_vs_exponential": null,
+   "R_vs_lognormal": null
+  }
+ },
+ "walltime_s": 99.8
+}

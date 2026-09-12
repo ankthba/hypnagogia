@@ -68,7 +68,7 @@ function Stage1View({ d }: { d: Stage1 }) {
             {
               key: 'param',
               header: 'parameter',
-              render: (r) => (r.sigma_mV !== undefined ? `sigma = ${fmtNum(r.sigma_mV)} mV` : r.rate_hz !== undefined ? `rate = ${fmtNum(r.rate_hz)} Hz` : 'null'),
+              render: (r) => (r.sigma_mV != null ? `sigma = ${fmtNum(r.sigma_mV)} mV` : r.rate_hz != null ? `rate = ${fmtNum(r.rate_hz)} Hz` : 'null'),
             },
             { key: 'seed', header: 'seed', render: (r) => r.seed },
             { key: 'rate', header: 'pop. rate (Hz)', render: (r) => fmtNum(r.pop_rate_hz, 4) },
@@ -140,6 +140,7 @@ function Stage2View({ d }: { d: Stage2 }) {
             );
           })}
         </dl>
+        <ProvenanceFooter provenance={d.provenance} />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">

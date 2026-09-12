@@ -14,6 +14,20 @@ export default {
       display: serif,
       mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
     },
+    // STYLE.md: no radius above 2px and no drop shadows. Declared at the theme root (not under
+    // `extend`) so rounded-xl / rounded-full / shadow-* cannot reintroduce them.
+    borderRadius: {
+      none: '0',
+      DEFAULT: '2px',
+      sm: '2px',
+      md: '2px',
+      lg: '2px',
+      full: '2px',
+    },
+    boxShadow: {
+      none: 'none',
+      DEFAULT: 'none',
+    },
     extend: {
       colors: {
         bg: 'var(--color-bg)',
@@ -27,12 +41,13 @@ export default {
         mat: 'var(--color-mat)',
         passed: 'var(--color-passed)',
         failed: 'var(--color-failed)',
+        // Preflight paints placeholder text with colors.gray.400; point it at the muted token.
+        gray: { 400: 'var(--color-muted)' },
       },
-      borderRadius: {
-        DEFAULT: '2px',
-        sm: '2px',
-        md: '2px',
-        lg: '2px',
+      // Preflight's `*, ::before, ::after { border-color }` reads this, so a bare `border` utility
+      // gets the hairline token instead of Tailwind grey.
+      borderColor: {
+        DEFAULT: 'var(--color-border)',
       },
       maxWidth: {
         measure: 'var(--measure)',

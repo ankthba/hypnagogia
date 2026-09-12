@@ -28,7 +28,7 @@ export default function PairedPlot({ seeds, color, label, height = 260 }: { seed
         <CartesianGrid stroke={SERIES.grid} />
         <XAxis dataKey="phase" type="category" stroke={SERIES.axis} tick={{ ...TICK, fontSize: 13 }} padding={{ left: 40, right: 40 }} />
         <YAxis stroke={SERIES.axis} tick={TICK} tickFormatter={(v) => fmtNum(v, 3)} label={{ value: label, angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 4)} />
+        <Tooltip cursor={{ stroke: SERIES.axis }} contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 4)} />
         <Legend wrapperStyle={{ fontSize: 12, color: SERIES.axis }} />
         {seeds.map((s) => (
           <Line key={s.seed} type="linear" dataKey={`s${s.seed}`} name={`seed ${s.seed}`} stroke={color} strokeOpacity={0.4} strokeWidth={1.2} dot={{ r: 3, fill: color, strokeWidth: 0 }} isAnimationActive={false} />

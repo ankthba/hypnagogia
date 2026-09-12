@@ -31,8 +31,14 @@ Chart series: ink, Prussian blue, muted; never saturated Tailwind colours.
 
 **Structure.** Hairline rules (`1px solid var(--color-border)`) for structure, no drop shadows, no
 rounded cards larger than 2px radius, generous vertical space (`--space-md: 2.5rem`, `--space-lg: 4.5rem`).
-Centered column; prose measure 36rem, figures may extend to 64rem. Masthead: site name centered in
-italic-free display serif, nav row underneath in small serif links, current page italic + muted.
+
+**Width: this is a data viewer, not aniketh.net's essay column.** Take the palette, the typeface and the
+hairline/spacing feel from aniketh.net, but NOT its 36rem measure. Use a wide page (max-width ~1400px with
+comfortable side padding) so charts, rasters and multi-column tables have room. Prose paragraphs get a
+readable measure (~70ch) inside that wide page; figures, tables and charts use the full width. Do not
+justify body text or hyphenate (that is right for an essay, wrong next to numbers). Masthead: site name
+top-left or centered in the display serif, nav row of the five pages in small serif links, current page
+italic + muted.
 Selection colour: background ink, text bg. Links: inherit colour, underline with `--color-link-underline`.
 Theme toggle in the footer ("colophon"): System / Light / Dark, stored in localStorage key `theme`,
 applied as `data-theme` on `<html>` before paint.

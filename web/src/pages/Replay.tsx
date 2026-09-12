@@ -14,6 +14,24 @@ import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct } from '../lib/format';
 
 type Cond = 'sleep' | 'wake';
 
+/** What the stage's status enum means for the memory claim; the raw string is shown for any value outside the contract. */
+function statusSentence(status: Stage6['status'] | string): string {
+  switch (status) {
+    case 'passed':
+      return 'The pre-registered replay criterion was met and every null comparison survived.';
+    case 'failed':
+      return 'The pre-registered replay criterion was not met.';
+    case 'artifact':
+      return 'A positive signal was observed but did not survive the shuffled-connectome null, so it cannot be attributed to the learned memory.';
+    case 'not_run':
+      return 'Stage 6 has not been run.';
+    case 'running':
+      return 'Stage 6 is still running; the file is provisional.';
+    default:
+      return `status: ${String(status)}`;
+  }
+}
+
 export default function Replay() {
   const s6 = useDataFile<Stage6>('stage6_replay.json');
   const s5 = useDataFile<Stage5>('stage5_sleep.json');
@@ -120,6 +138,7 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
       </div>
 
       <StatusBanner status={d.status} title="Replay verdict" criterion={d.criterion} reasons={d.reasons}>
+        <div>{statusSentence(d.status)}</div>
         <div>
           {fmtInt(nSurvive)} of {fmtInt(comparisons.length)} comparisons listed in the file survive
           {missingRequired.length > 0 && (

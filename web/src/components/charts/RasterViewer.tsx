@@ -18,9 +18,9 @@ const CANVAS_VARS = {
   threshold: SERIES.threshold,
   zero: 'var(--color-border-hover)',
   bad: SERIES.failed,
-  washA: 'rgba(38, 38, 36, 0.05)',
-  washB: 'rgba(47, 85, 117, 0.07)',
-  washOther: 'rgba(111, 105, 94, 0.05)',
+  washA: 'var(--wash-ink)',
+  washB: 'var(--wash-link)',
+  washOther: 'var(--wash-muted)',
 };
 const FONT_SM = `10.5px ${CHART_FONT}`;
 const FONT_MD = `12px ${CHART_FONT}`;

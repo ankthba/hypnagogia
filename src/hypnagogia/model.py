@@ -124,15 +124,15 @@ class Simulation:
             # --- dopamine-gated, anti-Hebbian two-factor rule at KC->MBON (see configs/base.yaml 'plasticity') ---
             psyn = Synapses(neu, neu, model="""w : volt
                                               w0 : volt (constant)
-                                              de/dt = -e/tau_e : 1 (clock-driven)
+                                              delig/dt = -elig/tau_e : 1 (clock-driven)
                                               plastic : 1 (shared)""",
-                            on_pre="g_post += w; e += 1; w = clip(w + plastic*eta_ltp*da_post*w0, w_min_frac*w0, w_max_frac*w0)",
-                            delay=m["delay_ms"] * ms, name="psyn")
+                            on_pre="g_post += w; elig += 1; w = clip(w + plastic*eta_ltp*da_post*w0, w_min_frac*w0, w_max_frac*w0)",
+                            delay=m["delay_ms"] * ms, namespace=ns, name="psyn")
             ppre, ppost = conn.pre[plastic_mask], conn.post[plastic_mask]
             psyn.connect(i=ppre, j=ppost)
             psyn.w0 = w_all_mV[plastic_mask] * mV
             psyn.w = (self.init_plastic_w if self.init_plastic_w is not None else w_all_mV[plastic_mask]) * mV
-            psyn.e = 0.0; psyn.plastic = 0.0
+            psyn.elig = 0.0; psyn.plastic = 0.0
             # DAN -> MBON synapses in the connectome define the compartment gating
             dan = np.zeros(N, bool); dan[np.asarray(pl["dan_idx"], dtype=np.int64)] = True
             dm = dan[conn.pre] & mbon[conn.post] & (conn.count >= int(pl.get("dan_mbon_min_synapses", 1)))
@@ -147,8 +147,8 @@ class Simulation:
             counts = ends - starts
             li = np.repeat(d_pre, counts)
             lj = np.concatenate([order[s:e] for s, e in zip(starts, ends)]) if counts.sum() else np.array([], dtype=np.int64)
-            ltd = Synapses(neu, psyn, on_pre="w_post = clip(w_post - plastic_post*eta_ltd*e_post*w0_post, w_min_frac*w0_post, w_max_frac*w0_post)",
-                           delay=m["delay_ms"] * ms, name="ltd")
+            ltd = Synapses(neu, psyn, on_pre="w_post = clip(w_post - plastic_post*eta_ltd*elig_post*w0_post, w_min_frac*w0_post, w_max_frac*w0_post)",
+                           delay=m["delay_ms"] * ms, namespace=ns, name="ltd")
             ltd.connect(i=li.astype(np.int64), j=lj.astype(np.int64))
             objs += [psyn, dsyn, ltd]
             if pl.get("record_w_dt_s"):

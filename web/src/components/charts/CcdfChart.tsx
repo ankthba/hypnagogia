@@ -70,7 +70,7 @@ export default function CcdfChart({ series, xLabel, height = 280 }: { series: Cc
             tickFormatter={(v) => decadeLabel(Number(v))}
             label={{ value: 'P(X ≥ x)', angle: -90, position: 'insideLeft', fill: SERIES.axis, fontSize: 13 }}
           />
-          <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 4)} />
+          <Tooltip cursor={{ stroke: SERIES.axis }} contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtNum(v, 4)} />
           <Legend verticalAlign="top" height={24} wrapperStyle={{ fontSize: 13, color: SERIES.axis }} />
           {prepared.map((s) => (
             <Scatter key={s.name} name={s.name} data={s.pts} fill={s.color} line={{ stroke: s.color, strokeWidth: 1 }} shape={<circle r={2} />} isAnimationActive={false} />

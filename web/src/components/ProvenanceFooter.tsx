@@ -4,9 +4,9 @@ import { REPO_URL } from '../lib/data';
 const HEX = /^[0-9a-f]{7,40}$/i;
 
 function RepoLink({ path, commit }: { path: string; commit: string }) {
-  if (!HEX.test(commit)) return <>{path}</>;
+  if (!HEX.test(commit)) return <span className="mono">{path}</span>;
   return (
-    <a href={`${REPO_URL}/blob/${commit}/${path.replace(/^\//, '')}`} target="_blank" rel="noreferrer">
+    <a className="mono" href={`${REPO_URL}/blob/${commit}/${path.replace(/^\//, '')}`} target="_blank" rel="noreferrer">
       {path}
     </a>
   );
@@ -32,11 +32,11 @@ export default function ProvenanceFooter({ provenance }: { provenance: Provenanc
           ))}{' '}
       · commit{' '}
       {HEX.test(commit) ? (
-        <a href={`${REPO_URL}/commit/${commit}`} target="_blank" rel="noreferrer">
+        <a className="mono" href={`${REPO_URL}/commit/${commit}`} target="_blank" rel="noreferrer">
           {commit}
         </a>
       ) : (
-        commit || 'null'
+        <span className="mono">{commit || 'null'}</span>
       )}
     </div>
   );

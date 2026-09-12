@@ -26,7 +26,7 @@ little-endian typed arrays with a JSON sidecar giving `dtype`, `shape`,
     "synapses_full": 54492922,
     "connections_subset": 0,
     "synapses_subset": 0,
-    "filtering_steps": [{"step": "...", "n_before": 0, "n_after": 0}],
+    "filtering_steps": [{"step": "...", "n_neurons_before": 0, "n_neurons_after": 0, "n_connections_before": 0, "n_connections_after": 0, "n_synapses_before": null, "n_synapses_after": 0}],
     "params": [{"name": "V_rest", "value": "-52 mV", "source": "Kakaria & de Bivort 2017 (via Shiu 2024)", "cited": true}],
     "base_config": "configs/base.yaml"
   },
@@ -168,3 +168,28 @@ Raster sidecar `replay/raster_<cond>_seed<k>.json` (downsampled: ensemble neuron
 {"bin": "raster_sleep_seed0.bin", "dtype": "uint32", "shape": [n_spikes, 2], "columns": ["t_ms", "neuron_row"],
  "neuron_rows": [{"row": 0, "root_id": "..", "group": "ensemble_A|ensemble_B|other_kc"}], "duration_s": 0.0}
 ```
+
+## `neuron_atlas.json` + `neuron_atlas.bin` (+ `neuron_atlas_index.bin`)
+The anatomical map of the simulated neurons, written by `scripts/export_web.py` from male CNS soma positions.
+```json
+{"bin": "neuron_atlas.bin", "dtype": "uint16", "shape": [n, 4], "columns": ["x_q", "y_q", "z_q", "group"],
+ "quantisation": {"lo_um": [x,y,z], "hi_um": [x,y,z], "scale": 65535, "formula": "um = lo + q / 65535 * (hi - lo)"},
+ "axes": {"x": "medial-lateral", "y": "dorsal-ventral", "z": "anterior-posterior", "note": "..."},
+ "groups": [{"code": 0, "label": "other"}, {"code": 1, "label": "KC"}, ...],
+ "group_counts": {...}, "n_neurons_in_map": 60000, "n_neurons_simulated": 144209,
+ "n_without_soma_position": 18100, "n_without_soma_position_by_group": {...}, "subsampled": true,
+ "soma_outside_brain_note": "...", "source": "..."}
+```
+`neuron_atlas_index.bin` is `uint32[n]`: the simulation index of each atlas row (not needed by the viewer).
+Default projection: x (horizontal) vs y (vertical), y increasing downward, which gives the frontal view of
+the brain. The map must state that it shows soma positions, not neurites or morphology.
+
+## `replay/activity_<condition>_seed<k>.json` + `.bin`
+Whole-brain spikes for the map animation, for the same window as the raster and trace of that seed.
+```json
+{"bin": "activity_sleep_seed0.bin", "dtype": "uint32", "shape": [n_spikes, 2], "columns": ["t_ms", "atlas_row"],
+ "duration_s": 60.0, "n_spikes_total": 812344, "n_spikes_exported": 400000, "downsampled": true,
+ "downsample_note": "..."}
+```
+`atlas_row` indexes `neuron_atlas.bin`. When `downsampled` is true the viewer must say so, because the map
+then shows a uniform random sample of the spikes, not all of them.

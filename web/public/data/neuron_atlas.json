@@ -1,0 +1,101 @@
+{
+ "bin": "neuron_atlas.bin",
+ "dtype": "uint16",
+ "shape": [
+  60000,
+  4
+ ],
+ "columns": [
+  "x_q",
+  "y_q",
+  "z_q",
+  "group"
+ ],
+ "quantisation": {
+  "lo_um": [
+   19.744,
+   38.256,
+   81.232
+  ],
+  "hi_um": [
+   748.864,
+   551.232,
+   1069.656
+  ],
+  "scale": 65535,
+  "formula": "um = lo + q / 65535 * (hi - lo)"
+ },
+ "axes": {
+  "x": "medial-lateral (image x)",
+  "y": "dorsal-ventral (image y)",
+  "z": "anterior-posterior (image z)",
+  "note": "male CNS v1.0 image coordinates, 8 nm voxels, converted to micrometres; not registered to a standard template"
+ },
+ "groups": [
+  {
+   "code": 0,
+   "label": "other"
+  },
+  {
+   "code": 1,
+   "label": "KC"
+  },
+  {
+   "code": 2,
+   "label": "MBON"
+  },
+  {
+   "code": 3,
+   "label": "DAN"
+  },
+  {
+   "code": 4,
+   "label": "dFB"
+  },
+  {
+   "code": 5,
+   "label": "ORN"
+  },
+  {
+   "code": 6,
+   "label": "ALPN"
+  },
+  {
+   "code": 7,
+   "label": "CX"
+  },
+  {
+   "code": 8,
+   "label": "optic"
+  }
+ ],
+ "group_counts": {
+  "other": 11919,
+  "KC": 4050,
+  "MBON": 96,
+  "DAN": 340,
+  "dFB": 0,
+  "ORN": 0,
+  "ALPN": 680,
+  "CX": 2944,
+  "optic": 39971
+ },
+ "n_neurons_in_map": 60000,
+ "n_neurons_simulated": 144209,
+ "n_without_soma_position": 18100,
+ "n_without_soma_position_by_group": {
+  "other": 2975,
+  "KC": 14,
+  "MBON": 1,
+  "DAN": 0,
+  "dFB": 0,
+  "ORN": 2635,
+  "ALPN": 6,
+  "CX": 6,
+  "optic": 12463
+ },
+ "soma_outside_brain_note": "Ascending neurons are part of the brain-scope network because they carry input into the brain, but their somata sit in the ventral nerve cord, so they appear below the brain in the map. Olfactory receptor neurons have no soma in the volume at all and are absent from the map while still being simulated.",
+ "subsampled": true,
+ "source": "male CNS v1.0 body-annotations somaLocation (8 nm voxels)",
+ "row_to_sim_index": "see neuron_atlas_index.bin (uint32, one simulation index per atlas row)"
+}

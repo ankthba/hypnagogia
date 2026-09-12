@@ -1,0 +1,112 @@
+{
+ "name": "crit_1.45_0",
+ "seed": 100,
+ "dataset": "malecns",
+ "version": "v1.0",
+ "network": "brain",
+ "n_neurons": 144209,
+ "n_connections": 21868062,
+ "n_synapses_raw": 101079336,
+ "weight_scale": 0.581,
+ "dt_ms": 0.1,
+ "duration_s": 5.0,
+ "epochs": [
+  {
+   "name": "noise",
+   "duration_s": 5.0,
+   "drives": {},
+   "plastic": false,
+   "sigma_mV": null,
+   "note": "",
+   "t_start_s": 0.0,
+   "t_end_s": 5.0
+  }
+ ],
+ "noise": {
+  "mode": "gaussian",
+  "sigma_mV": 1.45,
+  "poisson": {
+   "rate_hz": 0.0,
+   "n_inputs": 1,
+   "weight_mV": 0.275
+  }
+ },
+ "model": {
+  "v_rest_mV": -52.0,
+  "v_reset_mV": -52.0,
+  "v_th_mV": -45.0,
+  "tau_m_ms": 20.0,
+  "tau_syn_ms": 5.0,
+  "t_refr_ms": 2.2,
+  "delay_ms": 1.8,
+  "w_syn_mV": 0.275,
+  "dt_ms": 0.1,
+  "sign_rule": "GABA & glutamate -1 (Liu & Wilson 2013), ACh/DA/OA/5-HT +1 (Shiu et al. 2024); histamine -1 (HisCl, Hardie 1989 - pipeline decision)"
+ },
+ "drive": {
+  "f_poi": 250,
+  "no_refractory_when_driven": true
+ },
+ "drive_groups": {},
+ "drive_group_ids": {},
+ "record": "all",
+ "n_spikes": 565,
+ "n_active": 529,
+ "walltime_build_run_s": 100.4,
+ "walltime_total_s": 101.2,
+ "brian2": "2.10.1",
+ "filtering_steps": [
+  {
+   "step": "bodies in body-annotations table",
+   "n_neurons_before": 211577,
+   "n_neurons_after": 211577,
+   "n_connections_before": 25563197,
+   "n_connections_after": 25563197,
+   "n_synapses_before": null,
+   "n_synapses_after": null
+  },
+  {
+   "step": "status == 'Traced' (proofread neurons)",
+   "n_neurons_before": 211577,
+   "n_neurons_after": 165122,
+   "n_connections_before": 25563197,
+   "n_connections_after": 25563197,
+   "n_synapses_before": null,
+   "n_synapses_after": 124025046
+  },
+  {
+   "step": "scope == 'brain': drop superclass vnc_* (VNC), ENS, and Traced bodies with no superclass",
+   "n_neurons_before": 165122,
+   "n_neurons_after": 144209,
+   "n_connections_before": 25563197,
+   "n_connections_after": 21868062,
+   "n_synapses_before": 124025046,
+   "n_synapses_after": 101079336
+  }
+ ],
+ "connectome_provenance": {
+  "source_files": [
+   "body-annotations-male-cns-v1.0-minconf-0.5.feather",
+   "body-neurotransmitters-male-cns-v1.0.feather",
+   "connectome-weights-male-cns-v1.0-minconf-0.5-traced-only.feather"
+  ],
+  "nt_rule": {
+   "acetylcholine": 1,
+   "dopamine": 1,
+   "octopamine": 1,
+   "serotonin": 1,
+   "gaba": -1,
+   "glutamate": -1,
+   "histamine": -1
+  },
+  "n_nt_unknown_sign_plus": 2494,
+  "nt_source_counts": {
+   "consensus_nt": 161520,
+   "none": 2494,
+   "predicted_nt": 781,
+   "celltype_predicted_nt": 327
+  },
+  "n_histamine_neurons": 5924,
+  "parent": "cns"
+ }
+}

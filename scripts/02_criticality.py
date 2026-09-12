@@ -90,6 +90,13 @@ def main():
         ms = [p["branching_ratio_mr"]["m"] for p in rows if p["branching_ratio_mr"]["m"] is not None]
         labels = [p["classification"] for p in rows]
         maj = max(set(labels), key=labels.count)
+        # Bistability: at one sigma some seeds stay quiescent and others ignite into the high-rate state. That is a
+        # bimodal ignition probability, not a continuous approach to a critical point, so it gets its own label.
+        rates = [p["pop_rate_hz"] for p in rows]
+        quiescent = [r for r in rates if r < 0.05]
+        ignited = [r for r in rates if r >= 0.05]
+        if quiescent and ignited:
+            maj = "bistable"
         kcr = [p.get("subpopulation_rates", {}).get("KC", {}).get("rate_hz") for p in rows]
         kcr = [x for x in kcr if x is not None]
         summ.append({"sigma_mV": sg, "n_seeds": len(rows),
@@ -99,10 +106,16 @@ def main():
                      "pop_rate_hz_sd": float(np.std([p["pop_rate_hz"] for p in rows], ddof=1)) if len(rows) > 1 else 0.0,
                      "frac_active_mean": float(np.mean([p["frac_active"] for p in rows])),
                      "m_mean": float(np.mean(ms)) if ms else None, "m_sd": float(np.std(ms, ddof=1)) if len(ms) > 1 else 0.0,
-                     "classification": maj, "labels": labels})
+                     "classification": maj, "labels": labels,
+                     "n_ignited": len(ignited), "n_quiescent": len(quiescent),
+                     "ignition_probability": float(len(ignited) / len(rates)),
+                     "pop_rate_hz_ignited_mean": (float(np.mean(ignited)) if ignited else None),
+                     "pop_rate_hz_quiescent_mean": (float(np.mean(quiescent)) if quiescent else None),
+                     "kc_rate_hz_ignited_mean": (float(np.mean([p["subpopulation_rates"]["KC"]["rate_hz"] for p in rows if p["pop_rate_hz"] >= 0.05])) if ignited else None),
+                     "kc_rate_hz_quiescent_mean": (float(np.mean([p["subpopulation_rates"]["KC"]["rate_hz"] for p in rows if p["pop_rate_hz"] < 0.05])) if quiescent else None)})
     # transition sharpness: the narrowest bracket between the highest silent sigma and the lowest saturated sigma
     sil = [s["sigma_mV"] for s in summ if s["classification"] == "silent"]
-    sat = [s["sigma_mV"] for s in summ if s["classification"] == "saturated"]
+    sat = [s["sigma_mV"] for s in summ if s["classification"] in ("saturated", "bistable")]
     bracket = {"highest_silent_sigma_mV": (max(sil) if sil else None), "lowest_saturated_sigma_mV": (min(sat) if sat else None)}
     if bracket["highest_silent_sigma_mV"] and bracket["lowest_saturated_sigma_mV"]:
         lo, hi = bracket["highest_silent_sigma_mV"], bracket["lowest_saturated_sigma_mV"]
@@ -112,6 +125,10 @@ def main():
         bracket["classifications_inside_bracket"] = [{"sigma_mV": s["sigma_mV"], "classification": s["classification"],
                                                       "pop_rate_hz_mean": s.get("pop_rate_hz_mean")} for s in inter]
     KC_SPONTANEOUS_HZ = 0.1   # Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734: KC spontaneous rate 0.1 +/- 0.4 spikes/s
+    bist = [s for s in summ if s["classification"] == "bistable"]
+    ignition = [{"sigma_mV": s["sigma_mV"], "ignition_probability": s.get("ignition_probability"), "n_seeds": s["n_seeds"],
+                 "pop_rate_hz_quiescent_mean": s.get("pop_rate_hz_quiescent_mean"), "pop_rate_hz_ignited_mean": s.get("pop_rate_hz_ignited_mean"),
+                 "kc_rate_hz_quiescent_mean": s.get("kc_rate_hz_quiescent_mean"), "kc_rate_hz_ignited_mean": s.get("kc_rate_hz_ignited_mean")} for s in summ]
     crit = [s for s in summ if s["classification"] == "critical" and s["m_mean"] is not None]
     if crit:
         op = min(crit, key=lambda s: abs(s["m_mean"] - 1.0)); has_crit = True
@@ -129,6 +146,11 @@ def main():
         else:
             op = None; reason = "NO critical regime and no active non-saturated sigma: every sigma is silent or saturated."
     out = {"status": "passed" if per and not any("error" in p for p in per) else "failed", "has_critical_regime": has_crit,
+           "is_bistable": bool(bist), "bistable_sigmas_mV": [s["sigma_mV"] for s in bist], "ignition_curve": ignition,
+           "bistability_note": ("At one or more noise amplitudes, independent seeds either stayed quiescent or ignited into the "
+                                "high-rate state, with nothing in between. The transition is therefore a stochastic ignition of a "
+                                "bistable network, not a continuous approach to a critical point. This is the expected behaviour of a "
+                                "network with no spike-frequency adaptation and no short-term synaptic depression."),
            "criterion": "sweep completes for all sigma x seeds; classification per CRITERIA; a missing critical band is a finding, not a failure",
            "network": tag, "n_neurons": conn.N, "n_connections": conn.E, "duration_s": s2["duration_s"], "warmup_s": s2["warmup_s"], "seeds": seeds,
            "criteria": CRITERIA, "sigma_values_mV": all_sigmas, "sigma_values_requested_this_run": sigmas, "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],

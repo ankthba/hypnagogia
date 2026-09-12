@@ -226,13 +226,14 @@ function ManifestView({ m }: { m: Manifest }) {
           <Stat label="neurons simulated (subset)" value={fmtInt(model.neurons_simulated_subset)} />
           <Stat label="connections (full)" value={fmtInt(model.connections_full)} />
           <Stat label="synapses (full)" value={fmtInt(model.synapses_full)} />
+          <Stat label="synapses (full, scaled)" value={fmtInt(model.synapses_full_scaled)} />
           <Stat label="connections (subset)" value={fmtInt(model.connections_subset)} />
           <Stat label="synapses (subset)" value={fmtInt(model.synapses_subset)} />
         </div>
         <p className="mt-3 smaller muted">
           "full" is the entire brain-scope connectome after filtering; "subset" is the reduced network some stages use when noted on
-          their page. Synapse counts are the connectome's counts after the scaling to FlyWire-equivalent units recorded in the
-          parameter table.
+          their page. "synapses (full)" is the connectome's raw synapse count, before the <span className="mono">weight_scale</span>{' '}
+          factor in the parameter table; "synapses (full, scaled)" is that count times the factor, as the exporter recorded it.
           {model.neurons_simulated_subset === 0 && ' neurons simulated (subset) is 0: no subset network was built.'}
         </p>
         <ProvenanceFooter provenance={prov} />
@@ -241,9 +242,12 @@ function ManifestView({ m }: { m: Manifest }) {
         <DataTable
           columns={[
             { key: 'step', header: 'step', render: (s) => <span className="whitespace-normal">{s.step}</span> },
-            { key: 'before', header: 'n before', render: (s) => fmtInt(s.n_before) },
-            { key: 'after', header: 'n after', render: (s) => fmtInt(s.n_after) },
-            { key: 'removed', header: 'removed', render: (s) => fmtInt(s.n_before - s.n_after) },
+            { key: 'nb', header: 'neurons before', render: (s) => fmtInt(s.n_neurons_before) },
+            { key: 'na', header: 'neurons after', render: (s) => fmtInt(s.n_neurons_after) },
+            { key: 'cb', header: 'connections before', render: (s) => fmtInt(s.n_connections_before) },
+            { key: 'ca', header: 'connections after', render: (s) => fmtInt(s.n_connections_after) },
+            { key: 'sb', header: 'synapses before', render: (s) => fmtInt(s.n_synapses_before) },
+            { key: 'sa', header: 'synapses after', render: (s) => fmtInt(s.n_synapses_after) },
           ]}
           rows={model.filtering_steps ?? []}
           rowKey={(_, i) => i}
