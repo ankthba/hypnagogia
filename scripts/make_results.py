@@ -274,16 +274,38 @@ def main():
         for g in s3bi["grid"]:
             w(f"| {g['n_driven']} | {g['fraction_ignited']:.0%} | {g['pop_rate_odor_mean']:.4f} Hz/neuron | {g['pop_rate_post_mean']:.4f} Hz/neuron |")
         w()
+    w("## Stage 3d - how far from the published model would you have to go?")
+    w()
+    if s3d:
+        w(f"**This section is a labelled deviation from the published parameters.** {s3d['WARNING']}")
+        w()
+        w(f"Question asked: {s3d['question']}")
+        w()
+        w(f"{s3d['finding']}")
+        w()
+        w("| gain | effective W_syn | Kenyon cells responding | spikes per responding cell | rate during | rate after | sparse | transient |")
+        w("|---|---|---|---|---|---|---|---|")
+        for g in s3d["grid"]:
+            w(f"| {g['gain']:.2f}{' (published)' if g['gain'] == 1.0 else ''} | {g['w_syn_effective_mV']} mV | {g['frac_kc_odor']:.1%} | "
+              f"{g['spikes_per_active_kc']:.1f} | {g['pop_rate_odor']:.4f} | {g['pop_rate_post']:.4f} | "
+              f"{'yes' if g['sparse'] else 'no'} | {'yes' if g['transient'] else 'no'} |")
+        w()
+    else:
+        w("**Not run.**")
+        w()
     w("## Stage 3c - is the runaway the model, or this dataset?")
     w()
     if s3c:
         w(f"{s3c['finding']}")
         w()
-        w("| network | neurons | drive | probability of ignition | Kenyon cells responding | neurons active | rate during | rate after |")
-        w("|---|---|---|---|---|---|---|---|")
+        if s3c.get("pathway_control"):
+            w(f"**Pathway control.** {s3c['pathway_control']}")
+            w()
+        w("| network | pathway | neurons driven | drive | probability of ignition | Kenyon cells responding | neurons active | rate during | rate after |")
+        w("|---|---|---|---|---|---|---|---|---|")
         for g in s3c["grid"]:
-            w(f"| {g['condition']} | {g['n_neurons']:,} | {int(g['rate_hz'])} Hz | {g['frac_ignited']:.0%} | {g['frac_kc_odor']:.1%} | "
-              f"{g['n_active_odor']:.0f} | {g['pop_rate_odor']:.4f} | {g['pop_rate_post']:.4f} |")
+            w(f"| {g['condition']} | {g.get('pathway', 'olfactory')} | {g['n_orn']} | {int(g['rate_hz'])} Hz | {g['frac_ignited']:.0%} | "
+              f"{g['frac_kc_odor']:.1%} | {g['n_active_odor']:.0f} | {g['pop_rate_odor']:.4f} | {g['pop_rate_post']:.4f} |")
         w()
     else:
         w("**Not run.**")

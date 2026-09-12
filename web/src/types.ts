@@ -333,8 +333,22 @@ export interface AtlasSidecar {
     formula: string;
   };
   axes: { x: string; y: string; z: string; note?: string };
+  /**
+   * Framing boxes the exporter computed. `brain` is the default view: it excludes the ascending
+   * neurons whose somata sit below the brain / ventral-nerve-cord plane, which otherwise stretch
+   * the vertical extent to three times the brain's and squash the brain into the top of the frame.
+   * `all` is every mapped soma. Absent in atlases exported before the boxes existed, in which case
+   * the map falls back to the quantisation bounds and says so.
+   */
+  view_boxes?: Record<string, AtlasViewBox | undefined>;
+  /** the plane the `brain` box cuts at, in micrometres */
+  brain_z_max_um?: number;
+  /** how many somata lie below that plane (i.e. are in `all` but not in `brain`) */
+  n_somata_below_brain_plane?: number;
   groups: { code: number; label: string }[];
   group_counts: Record<string, number>;
+  /** per-group counts inside `view_boxes.brain`; the legend's figure while the brain view is on */
+  group_counts_in_brain_view?: Record<string, number>;
   n_neurons_in_map: number;
   n_neurons_simulated: number;
   n_without_soma_position: number;
