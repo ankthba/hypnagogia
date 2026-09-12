@@ -48,13 +48,13 @@ class Simulation:
         self.epochs: list[dict] = []
 
     def add_epoch(self, name: str, duration_s: float, drives: dict[str, float] | None = None,
-                  plastic: bool = False, sigma_mV: float | None = None, note: str = ""):
+                  plastic: bool = False, sigma_mV: float | None = None, note: str = "", reset: bool = False):
         drives = drives or {}
         for k in drives:
             if k not in self.drive_groups:
                 raise KeyError(f"epoch '{name}' drives unknown group '{k}'; known: {list(self.drive_groups)}")
         self.epochs.append({"name": name, "duration_s": float(duration_s), "drives": {k: float(v) for k, v in drives.items()},
-                            "plastic": bool(plastic), "sigma_mV": sigma_mV, "note": note})
+                            "plastic": bool(plastic), "sigma_mV": sigma_mV, "note": note, "reset": bool(reset)})
 
     # ---------------------------------------------------------------------------------------
     def run(self, clean: bool = True) -> dict:
@@ -191,6 +191,16 @@ class Simulation:
         t = 0.0
         epoch_table = []
         for ep in self.epochs:
+            if ep.get("reset"):
+                # Return the network to its resting state before this epoch. The model has no adaptation or
+                # synaptic depression, so once a stimulus has pushed it into its self-sustaining state it stays
+                # there indefinitely (stage 3b). Without this reset an offline period would simply inherit the
+                # stimulus-driven activity, and any "reactivation" measured in it would be persistence, not
+                # replay. Learned synaptic weights are NOT touched; only membrane potentials, synaptic
+                # conductances and the dopamine trace are cleared.
+                neu.v = ns["v_rest"]; neu.g = 0 * mV
+                if pl:
+                    neu.da = 0.0
             if drv is not None:
                 rate_arr = np.zeros(len(all_driven))
                 for k, r in ep["drives"].items():

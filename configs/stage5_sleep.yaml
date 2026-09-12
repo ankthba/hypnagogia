@@ -13,6 +13,8 @@ stage5:
   dfb_rate_sensitivity_hz: [8.5, 34.0]
   duration_s: 60.0                     # offline period analysed for reactivation
   warmup_s: 2.0
+  carryover_s: 2.0                     # the state conditioning leaves behind, measured before the reset
+  reset_at_offline_onset: true         # see reset_note in the output: without it, persistence masquerades as replay
   plastic_during_sleep: false          # the engram is held fixed while it is read out, so the measurement cannot change it
   conditions: ["sleep", "wake"]
   seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]

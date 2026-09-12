@@ -103,7 +103,8 @@ def run_job(spec: dict) -> dict:
     sim = Simulation(conn, spec["config"], spec["out_dir"], spec["seed"], groups, record=record, plasticity=pl,
                      init_plastic_w=init_w, name=spec.get("name", "sim"), record_v=rv, record_v_dt_s=spec.get("record_v_dt_s", 0.001))
     for ep in spec["epochs"]:
-        sim.add_epoch(ep["name"], ep["duration_s"], ep.get("drives"), ep.get("plastic", False), ep.get("sigma_mV"), ep.get("note", ""))
+        sim.add_epoch(ep["name"], ep["duration_s"], ep.get("drives"), ep.get("plastic", False), ep.get("sigma_mV"),
+                      ep.get("note", ""), ep.get("reset", False))
     out = sim.run(clean=True)
     out["group_sizes"] = {k: int(len(v)) for k, v in groups.items()}
     return out

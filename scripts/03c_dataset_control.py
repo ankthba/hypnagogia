@@ -88,26 +88,43 @@ def main():
                              "pop_rate_post": float(np.mean([r["post"]["pop_rate_hz"] for r in g]))})
     olf = [g for g in grid if g["pathway"] == "olfactory"]
     gus = [g for g in grid if g["pathway"] == "gustatory"]
-    mc = [g for g in olf if g["condition"] == "malecns_scaled" and g["frac_ignited"] > 0]
-    fw = [g for g in olf if g["condition"].startswith("flywire") and g["frac_ignited"] > 0]
-    gus_ign = [g for g in gus if g["frac_ignited"] > 0]
-    pathway_note = ("The gustatory control never ignites any network at any rate tested, with the same code and the same "
-                    "parameters, so the runaway is specific to the olfactory pathway and is not an artefact of how the "
-                    "stimulus is delivered." if gus and not gus_ign else
-                    ("The gustatory pathway also ignites, so the effect is not specific to the olfactory pathway."
-                     if gus_ign else "No gustatory control was run."))
-    if mc and not fw:
-        finding = ("Olfactory input ignites the male CNS network but NOT the FlyWire networks that Shiu et al. simulated, "
-                   "at identical parameters and the same stimulus. The runaway is a property of this dataset at this scale, "
-                   "not of the published model.")
-    elif mc and fw:
-        finding = ("Olfactory input ignites BOTH the male CNS and the FlyWire networks at identical parameters. The runaway "
-                   "is a property of the published model when it is driven through the olfactory pathway, not of the male "
-                   "CNS dataset. The published sugar-neuron benchmark does not reveal it because that stimulus is small.")
-    elif not mc and not fw:
-        finding = "No condition ignited: olfactory input is tolerated by every network tested."
+    published = [g for g in olf if g["condition"].startswith("flywire")]
+    def frac(rows):
+        return (float(np.mean([r["frac_ignited"] for r in rows])) if rows else None)
+    olf_always = bool(olf) and all(g["frac_ignited"] == 1.0 for g in olf)
+    gus_mc = [g for g in gus if g["condition"] == "malecns_scaled"]
+    gus_fw = [g for g in gus if g["condition"].startswith("flywire")]
+    gus_mc_never = bool(gus_mc) and all(g["frac_ignited"] == 0.0 for g in gus_mc)
+    gus_fw_ign = [g for g in gus_fw if g["frac_ignited"] > 0]
+    parts = []
+    if olf_always:
+        parts.append("Olfactory input ignites EVERY network tested, at every rate, including the FlyWire v630 and v783 "
+                     "datasets that Shiu et al. published on. The runaway is a property of the model, not of the male CNS "
+                     "connectome.")
+    elif [g for g in published if g["frac_ignited"] > 0]:
+        parts.append("Olfactory input ignites the published FlyWire networks as well as the male CNS.")
     else:
-        finding = "The FlyWire networks ignite but the male CNS does not."
+        parts.append("Olfactory input ignites the male CNS but not the published FlyWire networks.")
+    if gus_mc_never and gus_fw_ign:
+        lo = min(g["rate_hz"] for g in gus_fw_ign)
+        parts.append(f"The gustatory pathway behaves completely differently with the same code and parameters: it never "
+                     f"ignites the male CNS at any rate tested, and ignites the FlyWire networks only at the highest rate "
+                     f"({lo:.0f} Hz) when all {gus_fw[0]['n_orn']} labellar neurons are driven at once. The 21-neuron "
+                     f"stimulus the paper actually used stays well below that (stage 0). So the instability is specific to "
+                     f"the olfactory pathway, and the published benchmark was never in a position to reveal it.")
+    elif gus_mc_never:
+        parts.append("The gustatory pathway never ignites any network at any rate tested, so the instability is specific "
+                     "to the olfactory pathway and is not an artefact of how the stimulus is delivered.")
+    elif gus_fw_ign or [g for g in gus_mc if g["frac_ignited"] > 0]:
+        parts.append("The gustatory pathway also ignites at the higher rates, so the instability is not confined to the "
+                     "olfactory pathway.")
+    uns = [g for g in grid if g["condition"] == "malecns_unscaled"]
+    if uns and all(g["frac_ignited"] == 1.0 for g in uns):
+        parts.append("Without the 0.581 FlyWire-equivalence scaling the male CNS ignites on everything, including the "
+                     "gustatory pathway, which is independent evidence that the scaling belongs there.")
+    finding = " ".join(parts)
+    pathway_note = (f"Ignition probability by pathway: olfactory {frac(olf):.0%} of conditions, gustatory {frac(gus):.0%}. "
+                    f"Same code, same parameters, same networks, same rates.")
     out = {"status": "passed", "criterion": "descriptive control, no pass/fail: the same olfactory stimulus is run on every dataset",
            "conditions": CONDITIONS, "pathways": {k: str(v) for k, v in PATHWAYS.items()}, "rates_hz": RATES, "seeds": SEEDS,
            "grid": grid, "per_run": rows, "finding": finding, "pathway_control": pathway_note,

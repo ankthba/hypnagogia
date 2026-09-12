@@ -52,7 +52,10 @@ def main():
                               "drive_groups": {"dfb": {"selector": POPULATIONS[s5["dfb_population"]]["selector"]}},
                               "record": "all",   # whole brain: needed for the viewer's activity map and for population statistics
                               "plasticity": p,
-                              "epochs": [{"name": "warmup", "duration_s": s5["warmup_s"], "drives": ({"dfb": rate} if cond == "sleep" else {})},
+                              "epochs": [{"name": "carryover", "duration_s": s5.get("carryover_s", 2.0),
+                                          "note": "the state the network is left in by conditioning, measured before the reset"},
+                                         {"name": "warmup", "duration_s": s5["warmup_s"], "drives": ({"dfb": rate} if cond == "sleep" else {}),
+                                          "reset": bool(s5.get("reset_at_offline_onset", True))},
                                          {"name": cond, "duration_s": s5["duration_s"], "drives": ({"dfb": rate} if cond == "sleep" else {}),
                                           "plastic": s5["plastic_during_sleep"]}]})
     t0 = time.time()
@@ -66,6 +69,14 @@ def main():
             i, ts, meta = load_spikes(sp["out_dir"])
         except Exception as e:
             rows.append({"name": sp["name"], "error": str(e)}); continue
+        car = [e for e in meta["epochs"] if e["name"] == "carryover"]
+        carry = None
+        if car:
+            tt = ts * meta["dt_ms"] * 1e-3
+            mc = (tt >= car[0]["t_start_s"]) & (tt < car[0]["t_end_s"])
+            carry = {"pop_rate_hz": float(mc.sum() / car[0]["duration_s"] / meta["n_neurons"]),
+                     "kc_rate_hz": float(np.isin(i[mc], kc).sum() / car[0]["duration_s"] / len(kc)),
+                     "n_kc_active": int(len(np.unique(i[mc][np.isin(i[mc], kc)])))}
         ep = [e for e in meta["epochs"] if e["name"] in ("sleep", "wake")][0]
         dur = ep["duration_s"]; t = ts * meta["dt_ms"] * 1e-3
         m = (t >= ep["t_start_s"]) & (t < ep["t_end_s"]); ii = i[m]
@@ -74,7 +85,8 @@ def main():
                      "kc_rate_hz": float(np.isin(ii, kc).sum() / dur / len(kc)), "n_kc_active": int(len(np.unique(ii[np.isin(ii, kc)]))),
                      "mbon_rate_hz": float(np.isin(ii, mbon).sum() / dur / len(mbon)),
                      "dfb_rate_hz": float(np.isin(ii, dfb).sum() / dur / max(len(dfb), 1)),
-                     "frac_kc_active": float(len(np.unique(ii[np.isin(ii, kc)])) / len(kc)), "file": sp["out_dir"] + "/spikes.npz"})
+                     "frac_kc_active": float(len(np.unique(ii[np.isin(ii, kc)])) / len(kc)),
+                     "carryover_before_reset": carry, "file": sp["out_dir"] + "/spikes.npz"})
     ok = [r for r in rows if "error" not in r]
     summary = []
     for cond in s5["conditions"]:
@@ -96,6 +108,13 @@ def main():
              "conditions": {"sleep": {"description": f"dFB clamped active at {s5['dfb_clamp_rate_hz']} Hz Poisson drive, background noise on, no odour input"},
                             "wake": {"description": "dFB off, background noise on, no odour input (identical in every other respect)"}},
              "sigma_mV": sigma, "plastic_during_sleep": s5["plastic_during_sleep"], "duration_s": s5["duration_s"],
+             "reset_at_offline_onset": bool(s5.get("reset_at_offline_onset", True)),
+             "reset_note": ("Membrane potentials and synaptic conductances are reset to rest at the start of the offline "
+                            "period; learned synaptic weights are not touched. The model has no adaptation or short-term "
+                            "depression, so once conditioning has pushed it into its self-sustaining state it never returns "
+                            "to baseline (stage 3b). Without the reset the offline period would inherit the conditioning "
+                            "activity and any apparent reactivation would be persistence, not replay. The 'carryover' epoch "
+                            "measures the state that was discarded, so the size of that confound is on the record."),
              "seeds": seeds, "per_seed": rows, "summary": summary, "walltime_s": round(time.time() - t0, 1),
              "provenance": {"config": "configs/stage5_sleep.yaml", "results_dir": f"results/stage5_sleep/{tag}",
                             "files": [s["out_dir"] + "/spikes.npz" for s in specs]}}

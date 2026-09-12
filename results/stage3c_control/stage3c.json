@@ -31,6 +31,10 @@
    "weight_scale": 1.0
   }
  ],
+ "pathways": {
+  "olfactory": "{'cell_type': 'ORN_DM1'}",
+  "gustatory": "{'cell_type': {'regex': '^LB3[a-d]?$'}}"
+ },
  "rates_hz": [
   10.0,
   50.0,
@@ -44,6 +48,7 @@
  "grid": [
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "n_seeds": 3,
    "n_orn": 74,
@@ -57,6 +62,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "n_seeds": 3,
    "n_orn": 74,
@@ -70,6 +76,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "n_seeds": 3,
    "n_orn": 74,
@@ -82,7 +89,50 @@
    "pop_rate_post": 2.8795521315128276
   },
   {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "n_seeds": 3,
+   "n_orn": 78,
+   "n_neurons": 144209,
+   "n_kc": 4064,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 90.33333333333333,
+   "pop_rate_odor": 0.006240941966174095,
+   "pop_rate_post": 7.704866624906289e-07
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "n_seeds": 3,
+   "n_orn": 78,
+   "n_neurons": 144209,
+   "n_kc": 4064,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 214.66666666666666,
+   "pop_rate_odor": 0.0456397774526324,
+   "pop_rate_post": 3.775384646204082e-05
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "n_seeds": 3,
+   "n_orn": 78,
+   "n_neurons": 144209,
+   "n_kc": 4064,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 716.6666666666666,
+   "pop_rate_odor": 0.1925399940364332,
+   "pop_rate_post": 0.0005277833638060808
+  },
+  {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "n_seeds": 3,
    "n_orn": 74,
@@ -96,6 +146,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "n_seeds": 3,
    "n_orn": 74,
@@ -109,6 +160,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "n_seeds": 3,
    "n_orn": 74,
@@ -121,7 +173,50 @@
    "pop_rate_post": 7.396145717519556
   },
   {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "n_seeds": 3,
+   "n_orn": 78,
+   "n_neurons": 144209,
+   "n_kc": 4064,
+   "frac_ignited": 1.0,
+   "frac_kc_odor": 1.0,
+   "n_active_odor": 14973.0,
+   "pop_rate_odor": 5.4567560508243815,
+   "pop_rate_post": 7.392170006341105
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "n_seeds": 3,
+   "n_orn": 78,
+   "n_neurons": 144209,
+   "n_kc": 4064,
+   "frac_ignited": 1.0,
+   "frac_kc_odor": 0.6692093175853019,
+   "n_active_odor": 11847.333333333334,
+   "pop_rate_odor": 4.565963289392479,
+   "pop_rate_post": 7.184913717051102
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "n_seeds": 3,
+   "n_orn": 78,
+   "n_neurons": 144209,
+   "n_kc": 4064,
+   "frac_ignited": 1.0,
+   "frac_kc_odor": 1.0,
+   "n_active_odor": 14903.0,
+   "pop_rate_odor": 6.491497294436084,
+   "pop_rate_post": 7.396818352375912
+  },
+  {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "n_seeds": 3,
    "n_orn": 68,
@@ -135,6 +230,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "n_seeds": 3,
    "n_orn": 68,
@@ -148,6 +244,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "n_seeds": 3,
    "n_orn": 68,
@@ -160,7 +257,50 @@
    "pop_rate_post": 3.436414797503669
   },
   {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "n_seeds": 3,
+   "n_orn": 122,
+   "n_neurons": 138639,
+   "n_kc": 5177,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 159.33333333333334,
+   "pop_rate_odor": 0.010853126946001245,
+   "pop_rate_post": 8.014419543642923e-07
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "n_seeds": 3,
+   "n_orn": 122,
+   "n_neurons": 138639,
+   "n_kc": 5177,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 519.6666666666666,
+   "pop_rate_odor": 0.10466511347215911,
+   "pop_rate_post": 0.00021879365354145175
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "n_seeds": 3,
+   "n_orn": 122,
+   "n_neurons": 138639,
+   "n_kc": 5177,
+   "frac_ignited": 1.0,
+   "frac_kc_odor": 0.6501835039598224,
+   "n_active_odor": 8877.666666666666,
+   "pop_rate_odor": 3.4065162039541543,
+   "pop_rate_post": 3.438211630365353
+  },
+  {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "n_seeds": 3,
    "n_orn": 63,
@@ -174,6 +314,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "n_seeds": 3,
    "n_orn": 63,
@@ -187,6 +328,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "n_seeds": 3,
    "n_orn": 63,
@@ -197,11 +339,54 @@
    "n_active_odor": 8258.333333333334,
    "pop_rate_odor": 3.6446755625327056,
    "pop_rate_post": 3.580034013605442
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "n_seeds": 3,
+   "n_orn": 112,
+   "n_neurons": 127400,
+   "n_kc": 5095,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 151.0,
+   "pop_rate_odor": 0.010803244374672947,
+   "pop_rate_post": 1.7442874585731726e-06
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "n_seeds": 3,
+   "n_orn": 112,
+   "n_neurons": 127400,
+   "n_kc": 5095,
+   "frac_ignited": 0.0,
+   "frac_kc_odor": 0.0,
+   "n_active_odor": 493.0,
+   "pop_rate_odor": 0.10870486656200941,
+   "pop_rate_post": 0.0005572998430141287
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "n_seeds": 3,
+   "n_orn": 112,
+   "n_neurons": 127400,
+   "n_kc": 5095,
+   "frac_ignited": 1.0,
+   "frac_kc_odor": 0.639450441609421,
+   "n_active_odor": 8598.0,
+   "pop_rate_odor": 3.66034275248561,
+   "pop_rate_post": 3.5785522414093847
   }
  ],
  "per_run": [
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 0,
    "n_orn": 74,
@@ -223,6 +408,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 1,
    "n_orn": 74,
@@ -244,6 +430,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 2,
    "n_orn": 74,
@@ -265,6 +452,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 0,
    "n_orn": 74,
@@ -286,6 +474,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 1,
    "n_orn": 74,
@@ -307,6 +496,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 2,
    "n_orn": 74,
@@ -328,6 +518,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 0,
    "n_orn": 74,
@@ -349,6 +540,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 1,
    "n_orn": 74,
@@ -370,6 +562,7 @@
   },
   {
    "condition": "malecns_scaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 2,
    "n_orn": 74,
@@ -390,7 +583,206 @@
    "ignited": true
   },
   {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 0,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.0064420389850841486,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 89
+   },
+   "post": {
+    "pop_rate_hz": 2.3114599874718867e-06,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 1
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 1,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.00629641700587342,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 91
+   },
+   "post": {
+    "pop_rate_hz": 0.0,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 0
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 2,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.005984369907564715,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 91
+   },
+   "post": {
+    "pop_rate_hz": 0.0,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 0
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 0,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.046425673848372845,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 219
+   },
+   "post": {
+    "pop_rate_hz": 1.618021991230321e-05,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 7
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 1,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.04625924872927487,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 218
+   },
+   "post": {
+    "pop_rate_hz": 3.929481978702208e-05,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 17
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 2,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.0442344097802495,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 207
+   },
+   "post": {
+    "pop_rate_hz": 5.7786499686797174e-05,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 25
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 0,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.19745646942978592,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 741
+   },
+   "post": {
+    "pop_rate_hz": 0.0006402744165297127,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 205
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 1,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.19592397145809207,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 737
+   },
+   "post": {
+    "pop_rate_hz": 0.0005293243371310621,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 191
+   },
+   "ignited": false
+  },
+  {
+   "condition": "malecns_scaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 2,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.1842395412214217,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 672
+   },
+   "post": {
+    "pop_rate_hz": 0.00041375133775746774,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 165
+   },
+   "ignited": false
+  },
+  {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 0,
    "n_orn": 74,
@@ -412,6 +804,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 1,
    "n_orn": 74,
@@ -433,6 +826,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 2,
    "n_orn": 74,
@@ -454,6 +848,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 0,
    "n_orn": 74,
@@ -475,6 +870,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 1,
    "n_orn": 74,
@@ -496,6 +892,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 2,
    "n_orn": 74,
@@ -517,6 +914,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 0,
    "n_orn": 74,
@@ -538,6 +936,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 1,
    "n_orn": 74,
@@ -559,6 +958,7 @@
   },
   {
    "condition": "malecns_unscaled",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 2,
    "n_orn": 74,
@@ -579,7 +979,206 @@
    "ignited": true
   },
   {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 0,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 5.884722867504802,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 93.42101377952756,
+    "n_active": 15093
+   },
+   "post": {
+    "pop_rate_hz": 7.386906041462969,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.51066272965879,
+    "n_active": 14245
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 1,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 6.391716189696898,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 101.1931594488189,
+    "n_active": 15154
+   },
+   "post": {
+    "pop_rate_hz": 7.383598342220896,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.5009842519685,
+    "n_active": 14139
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 2,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 4.093829095271446,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 64.55659448818898,
+    "n_active": 14672
+   },
+   "post": {
+    "pop_rate_hz": 7.40600563533945,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.58817257217848,
+    "n_active": 14295
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 0,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 6.327996172222261,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 100.15846456692914,
+    "n_active": 14602
+   },
+   "post": {
+    "pop_rate_hz": 7.399656054753864,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.58316929133858,
+    "n_active": 14409
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 1,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 0.9366683078032578,
+    "frac_kc": 0.007627952755905512,
+    "kc_rate_hz": 0.05388779527559055,
+    "n_active": 5943
+   },
+   "post": {
+    "pop_rate_hz": 6.759404752824026,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 106.46366469816273,
+    "n_active": 15236
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 2,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 6.433225388151919,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 102.1998031496063,
+    "n_active": 14997
+   },
+   "post": {
+    "pop_rate_hz": 7.395680343575413,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.60047572178478,
+    "n_active": 14337
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 0,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 6.615329140344916,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 101.75984251968504,
+    "n_active": 14830
+   },
+   "post": {
+    "pop_rate_hz": 7.402697936097378,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.48687664041995,
+    "n_active": 14452
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 1,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 6.350311006941315,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 97.05831692913385,
+    "n_active": 14996
+   },
+   "post": {
+    "pop_rate_hz": 7.395541655976165,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.55142716535433,
+    "n_active": 14470
+   },
+   "ignited": true
+  },
+  {
+   "condition": "malecns_unscaled",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 2,
+   "n_orn": 78,
+   "n_kc": 4064,
+   "n_neurons": 144209,
+   "odor": {
+    "pop_rate_hz": 6.508851736022024,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 100.37278543307086,
+    "n_active": 14883
+   },
+   "post": {
+    "pop_rate_hz": 7.392215465054192,
+    "frac_kc": 1.0,
+    "kc_rate_hz": 118.60236220472441,
+    "n_active": 14416
+   },
+   "ignited": true
+  },
+  {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 0,
    "n_orn": 68,
@@ -601,6 +1200,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 1,
    "n_orn": 68,
@@ -622,6 +1222,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 2,
    "n_orn": 68,
@@ -643,6 +1244,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 0,
    "n_orn": 68,
@@ -664,6 +1266,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 1,
    "n_orn": 68,
@@ -685,6 +1288,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 2,
    "n_orn": 68,
@@ -706,6 +1310,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 0,
    "n_orn": 68,
@@ -727,6 +1332,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 1,
    "n_orn": 68,
@@ -748,6 +1354,7 @@
   },
   {
    "condition": "flywire_783",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 2,
    "n_orn": 68,
@@ -768,7 +1375,206 @@
    "ignited": true
   },
   {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 0,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 0.010906022114989289,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 158
+   },
+   "post": {
+    "pop_rate_hz": 2.4043258630928766e-06,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 1
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 1,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 0.010906022114989289,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 163
+   },
+   "post": {
+    "pop_rate_hz": 0.0,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 0
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 2,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 0.01074733660802516,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 157
+   },
+   "post": {
+    "pop_rate_hz": 0.0,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 0
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 0,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 0.102099697776239,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 516
+   },
+   "post": {
+    "pop_rate_hz": 0.0005145257347018756,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 133
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 1,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 0.10407605363570135,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 522
+   },
+   "post": {
+    "pop_rate_hz": 4.5682191398764656e-05,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 19
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 2,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 0.10781958900453696,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 521
+   },
+   "post": {
+    "pop_rate_hz": 9.617303452371507e-05,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 38
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 0,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 3.4850078260806843,
+    "frac_kc": 0.6497971798338806,
+    "kc_rate_hz": 29.72397141201468,
+    "n_active": 8878
+   },
+   "post": {
+    "pop_rate_hz": 3.4363827398254942,
+    "frac_kc": 0.6517288004635889,
+    "kc_rate_hz": 31.747730345760093,
+    "n_active": 8514
+   },
+   "ignited": true
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 1,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 3.476006030049265,
+    "frac_kc": 0.6507629901487348,
+    "kc_rate_hz": 29.67104500676067,
+    "n_active": 8871
+   },
+   "post": {
+    "pop_rate_hz": 3.443761615899326,
+    "frac_kc": 0.6546262314081515,
+    "kc_rate_hz": 31.825896593908954,
+    "n_active": 8605
+   },
+   "ignited": true
+  },
+  {
+   "condition": "flywire_783",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 2,
+   "n_orn": 122,
+   "n_kc": 5177,
+   "n_neurons": 138639,
+   "odor": {
+    "pop_rate_hz": 3.258534755732514,
+    "frac_kc": 0.6499903418968515,
+    "kc_rate_hz": 27.79293026849527,
+    "n_active": 8884
+   },
+   "post": {
+    "pop_rate_hz": 3.4344905353712396,
+    "frac_kc": 0.6521151245895306,
+    "kc_rate_hz": 31.670723069989055,
+    "n_active": 8659
+   },
+   "ignited": true
+  },
+  {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 0,
    "n_orn": 63,
@@ -790,6 +1596,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 1,
    "n_orn": 63,
@@ -811,6 +1618,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 10.0,
    "seed": 2,
    "n_orn": 63,
@@ -832,6 +1640,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 0,
    "n_orn": 63,
@@ -853,6 +1662,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 1,
    "n_orn": 63,
@@ -874,6 +1684,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 50.0,
    "seed": 2,
    "n_orn": 63,
@@ -895,6 +1706,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 0,
    "n_orn": 63,
@@ -916,6 +1728,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 1,
    "n_orn": 63,
@@ -937,6 +1750,7 @@
   },
   {
    "condition": "flywire_630",
+   "pathway": "olfactory",
    "rate_hz": 150.0,
    "seed": 2,
    "n_orn": 63,
@@ -955,50 +1769,253 @@
     "n_active": 8249
    },
    "ignited": true
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 0,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 0.010839874411302982,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 151
+   },
+   "post": {
+    "pop_rate_hz": 0.0,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 0
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 1,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 0.01086342229199372,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 150
+   },
+   "post": {
+    "pop_rate_hz": 2.616431187859759e-06,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 1
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 10.0,
+   "seed": 2,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 0.010706436420722136,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 152
+   },
+   "post": {
+    "pop_rate_hz": 2.616431187859759e-06,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 1
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 0,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 0.11155416012558869,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 510
+   },
+   "post": {
+    "pop_rate_hz": 0.0007692307692307692,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 204
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 1,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 0.1126138147566719,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 495
+   },
+   "post": {
+    "pop_rate_hz": 0.0005939298796441654,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 154
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 50.0,
+   "seed": 2,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 0.10194662480376766,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 474
+   },
+   "post": {
+    "pop_rate_hz": 0.0003087388801674516,
+    "frac_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "n_active": 111
+   },
+   "ignited": false
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 0,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 3.683806907378336,
+    "frac_kc": 0.6388616290480864,
+    "kc_rate_hz": 28.754072620215897,
+    "n_active": 8600
+   },
+   "post": {
+    "pop_rate_hz": 3.5805729984301413,
+    "frac_kc": 0.6453385672227674,
+    "kc_rate_hz": 30.22427216225057,
+    "n_active": 8399
+   },
+   "ignited": true
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 1,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 3.6778100470957615,
+    "frac_kc": 0.6404317958783121,
+    "kc_rate_hz": 28.841216879293427,
+    "n_active": 8603
+   },
+   "post": {
+    "pop_rate_hz": 3.576551543694401,
+    "frac_kc": 0.6410206084396467,
+    "kc_rate_hz": 30.162250572456657,
+    "n_active": 8395
+   },
+   "ignited": true
+  },
+  {
+   "condition": "flywire_630",
+   "pathway": "gustatory",
+   "rate_hz": 150.0,
+   "seed": 2,
+   "n_orn": 112,
+   "n_kc": 5095,
+   "n_neurons": 127400,
+   "odor": {
+    "pop_rate_hz": 3.6194113029827317,
+    "frac_kc": 0.6390578999018646,
+    "kc_rate_hz": 28.33503434739941,
+    "n_active": 8591
+   },
+   "post": {
+    "pop_rate_hz": 3.5785321821036105,
+    "frac_kc": 0.6429833169774288,
+    "kc_rate_hz": 30.245665685312396,
+    "n_active": 8377
+   },
+   "ignited": true
   }
  ],
- "finding": "Olfactory input ignites BOTH the male CNS and the FlyWire networks at identical parameters. The runaway is a property of the published model when it is driven through the olfactory pathway, not of the male CNS dataset. The published sugar-neuron benchmark does not reveal it because that stimulus is small.",
- "walltime_s": 277.3,
+ "finding": "Olfactory input ignites EVERY network tested, at every rate, including the FlyWire v630 and v783 datasets that Shiu et al. published on. The runaway is a property of the model, not of the male CNS connectome. The gustatory pathway behaves completely differently with the same code and parameters: it never ignites the male CNS at any rate tested, and ignites the FlyWire networks only at the highest rate (150 Hz) when all 122 labellar neurons are driven at once. The 21-neuron stimulus the paper actually used stays well below that (stage 0). So the instability is specific to the olfactory pathway, and the published benchmark was never in a position to reveal it. Without the 0.581 FlyWire-equivalence scaling the male CNS ignites on everything, including the gustatory pathway, which is independent evidence that the scaling belongs there.",
+ "pathway_control": "Ignition probability by pathway: olfactory 100% of conditions, gustatory 42%. Same code, same parameters, same networks, same rates.",
+ "walltime_s": 3.7,
  "provenance": {
   "config": "configs/stage3b_odor.yaml",
   "results_dir": "results/stage3c_control",
   "files": [
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_10Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_10Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_10Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_50Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_50Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_50Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_150Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_150Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_150Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_10Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_10Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_10Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_50Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_50Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_50Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_150Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_150Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_150Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_10Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_10Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_10Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_50Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_50Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_50Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_150Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_150Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_150Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_10Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_10Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_10Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_50Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_50Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_50Hz_seed2",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_150Hz_seed0",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_150Hz_seed1",
-   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_630_150Hz_seed2"
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_10Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_10Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_10Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_50Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_50Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_50Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_150Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_150Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_olfactory_150Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_10Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_10Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_10Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_50Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_50Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_50Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_150Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_150Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_scaled_gustatory_150Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_10Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_10Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_10Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_50Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_50Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_50Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_150Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_150Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_olfactory_150Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_10Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_10Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_10Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_50Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_50Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_50Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_150Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_150Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/malecns_unscaled_gustatory_150Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_olfactory_10Hz_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_olfactory_10Hz_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_olfactory_10Hz_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3c_control/flywire_783_olfactory_50Hz_seed0"
   ]
  }
 }

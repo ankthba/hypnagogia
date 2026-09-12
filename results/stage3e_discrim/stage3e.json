@@ -1,0 +1,179 @@
+{
+ "status": "passed",
+ "question": "Do two different odours leave two different Kenyon-cell ensembles, or the same attractor?",
+ "criterion": "the two ensembles overlap less than 90% (Jaccard) and each covers less than half of all Kenyon cells",
+ "note": "Overlap is reported against the chance overlap of two random ensembles of the same sizes. When both ensembles contain most of the Kenyon cells, a high raw overlap is arithmetic, not odour specificity.",
+ "odors": {
+  "A": [
+   "ORN_DM1",
+   "ORN_DM4",
+   "ORN_VA2",
+   "ORN_DM2"
+  ],
+  "B": [
+   "ORN_DL5",
+   "ORN_DM3",
+   "ORN_VM7d",
+   "ORN_DC2"
+  ]
+ },
+ "rate_hz": 150.0,
+ "gains": [
+  1.0,
+  0.8,
+  0.6,
+  0.5,
+  0.4
+ ],
+ "n_kc": 4064,
+ "grid": [
+  {
+   "gain": 1.0,
+   "epoch": "odor",
+   "n_seeds": 3,
+   "frac_kc_A": 0.6824967191601049,
+   "frac_kc_B": 0.6480479002624672,
+   "jaccard_observed": 0.9430389609627644,
+   "jaccard_chance": 0.49862637252743003,
+   "excess_over_chance": 0.4444125884353344,
+   "discriminable": false
+  },
+  {
+   "gain": 1.0,
+   "epoch": "post",
+   "n_seeds": 3,
+   "frac_kc_A": 0.610482283464567,
+   "frac_kc_B": 0.5931758530183727,
+   "jaccard_observed": 0.9412207630120477,
+   "jaccard_chance": 0.4297561689041875,
+   "excess_over_chance": 0.5114645941078602,
+   "discriminable": false
+  },
+  {
+   "gain": 0.8,
+   "epoch": "odor",
+   "n_seeds": 3,
+   "frac_kc_A": 0.343503937007874,
+   "frac_kc_B": 0.2103018372703412,
+   "jaccard_observed": 0.5820414729469686,
+   "jaccard_chance": 0.14979451224471718,
+   "excess_over_chance": 0.43224696070225144,
+   "discriminable": true
+  },
+  {
+   "gain": 0.8,
+   "epoch": "post",
+   "n_seeds": 3,
+   "frac_kc_A": 0.19972112860892388,
+   "frac_kc_B": 0.1760990813648294,
+   "jaccard_observed": 0.8270876165087645,
+   "jaccard_chance": 0.10247154861649195,
+   "excess_over_chance": 0.7246160678922725,
+   "discriminable": true
+  },
+  {
+   "gain": 0.6,
+   "epoch": "odor",
+   "n_seeds": 3,
+   "frac_kc_A": 0.07833005249343832,
+   "frac_kc_B": 0.050032808398950135,
+   "jaccard_observed": 0.49616818286179204,
+   "jaccard_chance": 0.032122263858941576,
+   "excess_over_chance": 0.46404591900285047,
+   "discriminable": true
+  },
+  {
+   "gain": 0.6,
+   "epoch": "post",
+   "n_seeds": 3,
+   "frac_kc_A": 0.048556430446194225,
+   "frac_kc_B": 0.04576771653543307,
+   "jaccard_observed": 0.8790991024949367,
+   "jaccard_chance": 0.023352549696378122,
+   "excess_over_chance": 0.8557465527985586,
+   "discriminable": true
+  },
+  {
+   "gain": 0.5,
+   "epoch": "odor",
+   "n_seeds": 3,
+   "frac_kc_A": 0.027723097112860893,
+   "frac_kc_B": 0.015994094488188976,
+   "jaccard_observed": 0.3427561150939364,
+   "jaccard_chance": 0.009673843310728663,
+   "excess_over_chance": 0.3330822717832077,
+   "discriminable": true
+  },
+  {
+   "gain": 0.5,
+   "epoch": "post",
+   "n_seeds": 3,
+   "frac_kc_A": 0.015091863517060369,
+   "frac_kc_B": 0.014107611548556429,
+   "jaccard_observed": 0.8553250028659866,
+   "jaccard_chance": 0.009464727204123334,
+   "excess_over_chance": 0.8458602756618633,
+   "discriminable": true
+  },
+  {
+   "gain": 0.4,
+   "epoch": "odor",
+   "n_seeds": 3,
+   "frac_kc_A": 0.004101049868766404,
+   "frac_kc_B": 0.0008202099737532808,
+   "jaccard_observed": 0.11134044260979244,
+   "jaccard_chance": 0.0008333333333333334,
+   "excess_over_chance": 0.1105071092764591,
+   "discriminable": true
+  },
+  {
+   "gain": 0.4,
+   "epoch": "post",
+   "n_seeds": 3,
+   "frac_kc_A": 0.0009022309711286089,
+   "frac_kc_B": 0.0006561679790026247,
+   "jaccard_observed": 0.6055555555555555,
+   "jaccard_chance": 0.0,
+   "excess_over_chance": 0.6055555555555555,
+   "discriminable": true
+  }
+ ],
+ "finding": "The two odours remain discriminable at gain(s) [0.4, 0.5, 0.6, 0.8] in the self-sustaining state after the stimulus.",
+ "walltime_s": 191.2,
+ "provenance": {
+  "config": "configs/stage3d_gain.yaml",
+  "results_dir": "results/stage3e_discrim",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain1.0_A_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain1.0_A_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain1.0_A_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain1.0_B_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain1.0_B_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain1.0_B_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.8_A_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.8_A_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.8_A_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.8_B_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.8_B_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.8_B_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.6_A_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.6_A_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.6_A_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.6_B_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.6_B_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.6_B_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.5_A_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.5_A_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.5_A_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.5_B_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.5_B_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.5_B_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.4_A_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.4_A_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.4_A_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.4_B_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.4_B_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3e_discrim/gain0.4_B_seed2"
+  ]
+ }
+}
