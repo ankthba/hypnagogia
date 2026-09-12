@@ -234,20 +234,6 @@ def main():
     all_survive = len(core) == 4 and all(c["survives"] for c in core)
     shuffled_c = next((c for c in comparisons if c["name"] == "real_vs_shuffled"), None)
     others_pos = [c for c in core if c["name"] != "real_vs_shuffled" and c["survives"]]
-    memory_note = ""
-    if naive_c and naive_c.get("available"):
-        memory_note = (" The memory itself contributed nothing measurable: the identical sleep run with unlearned weights "
-                       "gave the same reactivation (learned minus unlearned = "
-                       f"{naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]). That is "
-                       "expected in this model, because the learned synapses lie downstream of the Kenyon cells being "
-                       "measured and cannot change which of them switch on."
-                       if not naive_c["survives"] else
-                       " The learned weights did increase reactivation relative to the identical run with unlearned "
-                       f"weights (difference {naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]).")
-    # A hard guard from stage 5. If the offline Kenyon-cell spike train is identical, spike for spike, with the
-    # learned weights and without them, the memory had no causal effect on the state being measured, and no
-    # comparison computed on that state can be evidence of replay however it comes out. That is checked before
-    # the comparisons are read, not after, because it does not depend on them.
     causal, manip = None, None
     try:
         s5f = RESULTS / "stage5_sleep" / ("real" + ("" if a.gain == 1.0 else f"_gain{a.gain}")) / "stage5.json"
@@ -271,6 +257,28 @@ def main():
                      f"have: stage 5 measured clamping the {nd} dorsal fan-shaped body neurons as changing the rest of "
                      f"the brain by {100 * pr:.1f} per cent in population rate and {100 * kr:.1f} per cent in "
                      f"Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.")
+
+    memory_note = ""
+    if naive_c and naive_c.get("available"):
+        reaches = bool((causal or {}).get("engram_reaches_the_kenyon_cells"))
+        memory_note = (" On this measure the memory contributed nothing: the identical sleep run with unlearned "
+                       "weights gave the same reactivation (learned minus unlearned = "
+                       f"{naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]). "
+                       + ("That is not because the memory does nothing offline: stage 5 compared the two runs spike "
+                          "for spike and found the Kenyon-cell activity differs in every seed. It is that the "
+                          "difference is not an increase in how much the trained ensemble reactivates."
+                          if reaches else
+                          "The learned synapses lie downstream of the Kenyon cells being measured, and stage 5 found "
+                          "the offline Kenyon-cell activity identical with and without them, so there was no route "
+                          "by which they could have contributed.")
+                       if not naive_c["survives"] else
+                       " The learned weights did increase reactivation relative to the identical run with unlearned "
+                       f"weights (difference {naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, "
+                       f"{naive_c['ci95'][1]:+.5f}]).")
+    # A hard guard from stage 5. If the offline Kenyon-cell spike train is identical, spike for spike, with the
+    # learned weights and without them, the memory had no causal effect on the state being measured, and no
+    # comparison computed on that state can be evidence of replay however it comes out. That is checked before
+    # the comparisons are read, not after, because it does not depend on them.
     disconnected = bool(causal and causal.get("engram_reaches_the_kenyon_cells") is False)
     causal_note = (" " + causal["note"] if disconnected and causal.get("note") else "")
 
