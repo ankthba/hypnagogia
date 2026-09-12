@@ -127,9 +127,20 @@ Every figure in the viewer shows a footer link "config: <config> · data: <files
                 "w_kc_mbon_A_mean_before": 0, "w_kc_mbon_A_mean_after": 0}],
   "effect": {"delta_A_mean": 0, "delta_B_mean": 0, "diff_of_deltas": 0, "ci95": [0,0], "hedges_g": 0, "p_paired": 0, "n_seeds": 0},
   "learning_verified": false,
+  "learning_verified_spike_level": false, "learning_verified_synapse_level": false,
+  "learning_evidence": "spike|synapse|none",
+  "synaptic_effect": {"A_only_retained_mean": 0, "B_only_retained_mean": 0, "diff": 0, "ci95": [0,0],
+                      "hedges_g": 0, "p_permutation": 0, "n_seeds": 0},
+  "synaptic_specificity_mean": {"A_only": {"weight_retained_mean": 0, "n_synapses_mean": 0},
+                                "B_only": {...}, "both_odours": {...}, "neither_odour": {...}},
+  "ensembles_are_disjoint": true,
   "kc_ensemble_summary": {"A_size_mean": 0, "B_size_mean": 0, "overlap_mean": 0, "frac_kc_active_A": 0},
   "provenance": {...} }
 ```
+`learning_evidence` says which test carried the verdict. The spike-level test is the primary one; when the
+readout MBON does not spike at all, which is what modelling APL as non-spiking produces, the same conditioning
+is read at the synapse instead (weight retained on odour-A-only against odour-B-only synapses onto the same
+readout, paired across seeds) and `learning_evidence` is `"synapse"`.
 
 ## `stage5_sleep.json`
 ```json
@@ -138,8 +149,23 @@ Every figure in the viewer shows a footer link "config: <config> · data: <files
   "conditions": {"sleep": {"description": ".."}, "wake": {"description": ".."}},
   "per_seed": [{"seed": 0, "condition": "sleep", "pop_rate_hz": 0, "kc_rate_hz": 0, "mbon_rate_hz": 0, "dfb_rate_hz": 0, "frac_active": 0}],
   "summary": [{"condition": "sleep", "pop_rate_hz_mean": 0, "kc_rate_hz_mean": 0, "dfb_rate_hz_mean": 0}],
+  "engram_reaches_the_kenyon_cells": {
+    "engram_reaches_the_kenyon_cells": false, "n_seeds": 0, "n_seeds_identical": 0, "note": "...",
+    "anatomical_path": {"conditioning_dan": "PPL101", "n_mbons_gated": 0,
+                        "n_gated_that_fire_and_reach_kenyon_cells": 0, "note": "...",
+                        "per_mbon": [{"mbon": "MBON11", "transmitter": "gaba", "gating_synapses_from_dan": 0,
+                                      "fires_offline": false, "synapses_back_onto_kenyon_cells": 0,
+                                      "n_kenyon_cells_contacted": 0}]},
+    "per_seed": [{"seed": 0, "n_kc_spikes_trained": 0, "n_kc_spikes_naive": 0,
+                  "spike_trains_identical": true, "first_divergence_s": null, "jaccard_active_kcs": null}]},
   "provenance": {...} }
 ```
+`engram_reaches_the_kenyon_cells` decides whether the replay question can have an answer. The memory is a
+depression of Kenyon-cell to MBON synapses, downstream of the Kenyon cells; its only route back is through an
+MBON that carries some of it, fires offline, and projects onto Kenyon cells. `sleep` and `sleep_naive` are the
+same run at the same seed differing only in the learned weights, so their Kenyon-cell spikes are compared
+spike for spike. Identical trains mean the memory had no causal effect offline, and stage 6 then refuses a
+positive verdict whatever its own comparisons say.
 
 ## `stage6_replay.json`
 ```json
@@ -147,6 +173,12 @@ Every figure in the viewer shows a footer link "config: <config> · data: <files
   "headline": "one plain-language sentence",
   "metrics": {"template_correlation": "definition", "coactivation": "definition", "sequence": "definition"},
   "window_ms": 0, "n_seeds": 0,
+  "required_four": ["A_vs_B_sleep", "sleep_vs_wake_A", "real_vs_shuffled", "A_vs_random_ensembles"],
+  "additional_comparisons": ["trained_vs_naive_weights", "trained_vs_naive_spike_share"],
+  "fifth_comparison_note": "why the additional comparisons are additional and cannot change the verdict",
+  "ensemble_sizes": {"real": {"sleep": 0, "wake": 0, "sleep_naive": 0}, "shuffled": {...}},
+  "engram_reaches_the_kenyon_cells": {"...": "stage 5's block, copied so the verdict carries its own guard"},
+  "engram_guard": {"applied": false, "rule": "..."},
   "comparisons": [
     {"name": "A_vs_B_sleep", "label": "trained (A) vs unpaired (B), sleep", "metric": "template_correlation",
      "x_mean": 0, "y_mean": 0, "diff": 0, "ci95": [0,0], "hedges_g": 0, "g_ci95": [0,0], "p": 0, "n": 0, "survives": true},
