@@ -16,8 +16,8 @@
    "frac_kc_active": 0.57373687664042,
    "n_kc_active": 2331.6666666666665,
    "spikes_per_active_kc": 53.55331085819582,
-   "pop_rate_hz_odor": 1.315692270708948,
-   "pop_rate_hz_post": 1.3653967505495495,
+   "pop_rate_hz_odor": 2.7318706414532614,
+   "pop_rate_hz_post": 2.8781779685502755,
    "kc_rate_hz_odor": 30.725311679790025,
    "mbon_rate_hz_odor": 93.12714776632303,
    "apl_rate_hz_odor": 342.6666666666667,
@@ -33,8 +33,8 @@
    "frac_kc_active": 0.5852198162729659,
    "n_kc_active": 2378.3333333333335,
    "spikes_per_active_kc": 53.80224045295234,
-   "pop_rate_hz_odor": 1.3474632882367492,
-   "pop_rate_hz_post": 1.3662254089550583,
+   "pop_rate_hz_odor": 2.7972433528189415,
+   "pop_rate_hz_post": 2.8805911327771963,
    "kc_rate_hz_odor": 31.485564304461942,
    "mbon_rate_hz_odor": 94.78350515463917,
    "apl_rate_hz_odor": 345.6666666666667,
@@ -50,8 +50,8 @@
    "frac_kc_active": 0.5934219160104987,
    "n_kc_active": 2411.6666666666665,
    "spikes_per_active_kc": 54.15974246594801,
-   "pop_rate_hz_odor": 1.383947372679005,
-   "pop_rate_hz_post": 1.3691112667494167,
+   "pop_rate_hz_odor": 2.8500971968924733,
+   "pop_rate_hz_post": 2.883976265928849,
    "kc_rate_hz_odor": 32.13869750656168,
    "mbon_rate_hz_odor": 95.85910652920963,
    "apl_rate_hz_odor": 347.1666666666667,
@@ -67,8 +67,8 @@
    "frac_kc_active": 0.6017880577427821,
    "n_kc_active": 2445.6666666666665,
    "spikes_per_active_kc": 55.26202791472113,
-   "pop_rate_hz_odor": 1.4467220030187669,
-   "pop_rate_hz_post": 1.3686270158820415,
+   "pop_rate_hz_odor": 2.921426540645868,
+   "pop_rate_hz_post": 2.8813689390629804,
    "kc_rate_hz_odor": 33.254921259842526,
    "mbon_rate_hz_odor": 97.7422680412371,
    "apl_rate_hz_odor": 347.5,
@@ -84,8 +84,8 @@
    "frac_kc_active": 0.6113024934383202,
    "n_kc_active": 2484.3333333333335,
    "spikes_per_active_kc": 55.537763519850785,
-   "pop_rate_hz_odor": 1.4959838382717676,
-   "pop_rate_hz_post": 1.3634713043799855,
+   "pop_rate_hz_odor": 2.987037332390258,
+   "pop_rate_hz_post": 2.873828956583847,
    "kc_rate_hz_odor": 33.9498031496063,
    "mbon_rate_hz_odor": 98.87285223367697,
    "apl_rate_hz_odor": 347.8333333333333,
@@ -101,8 +101,8 @@
    "frac_kc_active": 0.5789041994750656,
    "n_kc_active": 2352.6666666666665,
    "spikes_per_active_kc": 53.530044109925484,
-   "pop_rate_hz_odor": 1.3278043210433006,
-   "pop_rate_hz_post": 1.3664854482036486,
+   "pop_rate_hz_odor": 2.765745087569661,
+   "pop_rate_hz_post": 2.8816451585314833,
    "kc_rate_hz_odor": 30.987614829396325,
    "mbon_rate_hz_odor": 93.87628865979381,
    "apl_rate_hz_odor": 344.1666666666667,
@@ -118,8 +118,8 @@
    "frac_kc_active": 0.5853838582677166,
    "n_kc_active": 2379.0,
    "spikes_per_active_kc": 53.971910511059036,
-   "pop_rate_hz_odor": 1.3539561793415575,
-   "pop_rate_hz_post": 1.368844293120864,
+   "pop_rate_hz_odor": 2.808040182420422,
+   "pop_rate_hz_post": 2.8872030640713593,
    "kc_rate_hz_odor": 31.592191601049866,
    "mbon_rate_hz_odor": 94.9106529209622,
    "apl_rate_hz_odor": 345.8333333333333,
@@ -135,8 +135,8 @@
    "frac_kc_active": 0.6026082677165354,
    "n_kc_active": 2449.0,
    "spikes_per_active_kc": 54.91862349762528,
-   "pop_rate_hz_odor": 1.4241205472612666,
-   "pop_rate_hz_post": 1.3658879357968872,
+   "pop_rate_hz_odor": 2.8904899601735443,
+   "pop_rate_hz_post": 2.8759485653923584,
    "kc_rate_hz_odor": 33.094242125984245,
    "mbon_rate_hz_odor": 97.48797250859106,
    "apl_rate_hz_odor": 347.5,
@@ -152,8 +152,8 @@
    "frac_kc_active": 0.6233595800524934,
    "n_kc_active": 2533.3333333333335,
    "spikes_per_active_kc": 55.586483660701965,
-   "pop_rate_hz_odor": 1.5125570063819411,
-   "pop_rate_hz_post": 1.3685507377024553,
+   "pop_rate_hz_odor": 2.9967732018574895,
+   "pop_rate_hz_post": 2.877968781421409,
    "kc_rate_hz_odor": 34.6502624671916,
    "mbon_rate_hz_odor": 100.07216494845362,
    "apl_rate_hz_odor": 349.1666666666667,
@@ -169,8 +169,8 @@
    "frac_kc_active": 0.6322178477690289,
    "n_kc_active": 2569.3333333333335,
    "spikes_per_active_kc": 56.16077515669496,
-   "pop_rate_hz_odor": 1.5782070929461176,
-   "pop_rate_hz_post": 1.3661618438054026,
+   "pop_rate_hz_odor": 3.0894650588150996,
+   "pop_rate_hz_post": 2.880176225709445,
    "kc_rate_hz_odor": 35.50582349081365,
    "mbon_rate_hz_odor": 101.21649484536083,
    "apl_rate_hz_odor": 350.1666666666667,
@@ -186,8 +186,8 @@
    "frac_kc_active": 0.588500656167979,
    "n_kc_active": 2391.6666666666665,
    "spikes_per_active_kc": 53.820918868070656,
-   "pop_rate_hz_odor": 1.3587247212957119,
-   "pop_rate_hz_post": 1.3683900912333258,
+   "pop_rate_hz_odor": 2.807718889482164,
+   "pop_rate_hz_post": 2.8829430433144485,
    "kc_rate_hz_odor": 31.672736220472444,
    "mbon_rate_hz_odor": 95.05498281786942,
    "apl_rate_hz_odor": 346.1666666666667,
@@ -203,8 +203,8 @@
    "frac_kc_active": 0.6119586614173228,
    "n_kc_active": 2487.0,
    "spikes_per_active_kc": 53.85765710393718,
-   "pop_rate_hz_odor": 1.4167562357411814,
-   "pop_rate_hz_post": 1.3633372397007122,
+   "pop_rate_hz_odor": 2.8895977366183803,
+   "pop_rate_hz_post": 2.8761600639812124,
    "kc_rate_hz_odor": 32.95751312335958,
    "mbon_rate_hz_odor": 97.32646048109966,
    "apl_rate_hz_odor": 347.8333333333333,
@@ -220,8 +220,8 @@
    "frac_kc_active": 0.6336942257217847,
    "n_kc_active": 2575.3333333333335,
    "spikes_per_active_kc": 55.59804719876058,
-   "pop_rate_hz_odor": 1.538003869384019,
-   "pop_rate_hz_post": 1.3664600221437866,
+   "pop_rate_hz_odor": 3.042207259371237,
+   "pop_rate_hz_post": 2.8819005748600985,
    "kc_rate_hz_odor": 35.231791338582674,
    "mbon_rate_hz_odor": 100.7766323024055,
    "apl_rate_hz_odor": 349.6666666666667,
@@ -237,8 +237,8 @@
    "frac_kc_active": 0.6652723097112861,
    "n_kc_active": 2703.6666666666665,
    "spikes_per_active_kc": 57.61339771817092,
-   "pop_rate_hz_odor": 1.7220769854863427,
-   "pop_rate_hz_post": 1.3631268968418524,
+   "pop_rate_hz_odor": 3.275613865986173,
+   "pop_rate_hz_post": 2.8758457054229165,
    "kc_rate_hz_odor": 38.32833005249344,
    "mbon_rate_hz_odor": 104.63573883161513,
    "apl_rate_hz_odor": 352.6666666666667,
@@ -254,8 +254,8 @@
    "frac_kc_active": 0.6770013123359581,
    "n_kc_active": 2751.3333333333335,
    "spikes_per_active_kc": 59.09752741749159,
-   "pop_rate_hz_odor": 1.8600503435985274,
-   "pop_rate_hz_post": 1.3675383182279424,
+   "pop_rate_hz_odor": 3.4440846271730616,
+   "pop_rate_hz_post": 2.883789037669864,
    "kc_rate_hz_odor": 40.00902230971129,
    "mbon_rate_hz_odor": 106.69415807560136,
    "apl_rate_hz_odor": 354.0,
@@ -283,7 +283,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3182117620952922,
+    "pop_rate_hz": 2.7581218925309794,
     "kc_rate_hz": 30.77755905511811,
     "n_kc_active": 2330,
     "frac_kc": 0.5733267716535433,
@@ -292,7 +292,7 @@
     "apl_rate_hz": 343.5
    },
    "post": {
-    "pop_rate_hz": 1.3619885027980223,
+    "pop_rate_hz": 2.870178005533635,
     "kc_rate_hz": 32.09251968503937,
     "n_kc_active": 2348,
     "frac_kc": 0.577755905511811,
@@ -321,7 +321,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.319390606688903,
+    "pop_rate_hz": 2.698971631451574,
     "kc_rate_hz": 30.79847440944882,
     "n_kc_active": 2344,
     "frac_kc": 0.5767716535433071,
@@ -330,7 +330,7 @@
     "apl_rate_hz": 344.0
    },
    "post": {
-    "pop_rate_hz": 1.368208641624309,
+    "pop_rate_hz": 2.8872539161910837,
     "kc_rate_hz": 32.28567913385827,
     "n_kc_active": 2340,
     "frac_kc": 0.5757874015748031,
@@ -359,7 +359,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3094744433426486,
+    "pop_rate_hz": 2.7385184003772305,
     "kc_rate_hz": 30.599901574803148,
     "n_kc_active": 2321,
     "frac_kc": 0.5711122047244095,
@@ -368,7 +368,7 @@
     "apl_rate_hz": 340.5
    },
    "post": {
-    "pop_rate_hz": 1.3659931072263174,
+    "pop_rate_hz": 2.8771019839261074,
     "kc_rate_hz": 32.217888779527556,
     "n_kc_active": 2319,
     "frac_kc": 0.5706200787401575,
@@ -397,7 +397,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3521971582910914,
+    "pop_rate_hz": 2.808514031717854,
     "kc_rate_hz": 31.627706692913385,
     "n_kc_active": 2382,
     "frac_kc": 0.5861220472440944,
@@ -406,7 +406,7 @@
     "apl_rate_hz": 345.5
    },
    "post": {
-    "pop_rate_hz": 1.358895769334785,
+    "pop_rate_hz": 2.8705801995714553,
     "kc_rate_hz": 32.01439468503937,
     "n_kc_active": 2317,
     "frac_kc": 0.5701279527559056,
@@ -435,7 +435,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3454361378277362,
+    "pop_rate_hz": 2.7856028403220328,
     "kc_rate_hz": 31.433070866141733,
     "n_kc_active": 2364,
     "frac_kc": 0.5816929133858267,
@@ -444,7 +444,7 @@
     "apl_rate_hz": 345.5
    },
    "post": {
-    "pop_rate_hz": 1.3759023361926093,
+    "pop_rate_hz": 2.894382458792447,
     "kc_rate_hz": 32.51980807086614,
     "n_kc_active": 2355,
     "frac_kc": 0.5794783464566929,
@@ -473,7 +473,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3447565685914193,
+    "pop_rate_hz": 2.7976131864169367,
     "kc_rate_hz": 31.395915354330707,
     "n_kc_active": 2389,
     "frac_kc": 0.5878444881889764,
@@ -482,7 +482,7 @@
     "apl_rate_hz": 346.0
    },
    "post": {
-    "pop_rate_hz": 1.3638781213377806,
+    "pop_rate_hz": 2.8768107399676857,
     "kc_rate_hz": 32.15575787401575,
     "n_kc_active": 2325,
     "frac_kc": 0.5720964566929134,
@@ -511,7 +511,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3782288206699997,
+    "pop_rate_hz": 2.8226879043610316,
     "kc_rate_hz": 31.93996062992126,
     "n_kc_active": 2392,
     "frac_kc": 0.5885826771653543,
@@ -520,7 +520,7 @@
     "apl_rate_hz": 347.0
    },
    "post": {
-    "pop_rate_hz": 1.364921745522124,
+    "pop_rate_hz": 2.8826876269858333,
     "kc_rate_hz": 32.181102362204726,
     "n_kc_active": 2327,
     "frac_kc": 0.5725885826771654,
@@ -549,7 +549,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3889493720918944,
+    "pop_rate_hz": 2.8674770645382743,
     "kc_rate_hz": 32.28198818897638,
     "n_kc_active": 2410,
     "frac_kc": 0.593011811023622,
@@ -558,7 +558,7 @@
     "apl_rate_hz": 347.0
    },
    "post": {
-    "pop_rate_hz": 1.3714365954968137,
+    "pop_rate_hz": 2.883620301090778,
     "kc_rate_hz": 32.3726624015748,
     "n_kc_active": 2329,
     "frac_kc": 0.5730807086614174,
@@ -587,7 +587,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3846639252751216,
+    "pop_rate_hz": 2.8601266217781136,
     "kc_rate_hz": 32.1941437007874,
     "n_kc_active": 2433,
     "frac_kc": 0.5986712598425197,
@@ -596,7 +596,7 @@
     "apl_rate_hz": 347.5
    },
    "post": {
-    "pop_rate_hz": 1.370975459229313,
+    "pop_rate_hz": 2.885620869709935,
     "kc_rate_hz": 32.38115157480315,
     "n_kc_active": 2339,
     "frac_kc": 0.5755413385826772,
@@ -625,7 +625,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4515113481128086,
+    "pop_rate_hz": 2.939657025567059,
     "kc_rate_hz": 33.3683562992126,
     "n_kc_active": 2431,
     "frac_kc": 0.5981791338582677,
@@ -634,7 +634,7 @@
     "apl_rate_hz": 348.0
    },
    "post": {
-    "pop_rate_hz": 1.3609587473736036,
+    "pop_rate_hz": 2.8730523060280566,
     "kc_rate_hz": 32.05807086614173,
     "n_kc_active": 2323,
     "frac_kc": 0.5716043307086615,
@@ -663,7 +663,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4452842749065593,
+    "pop_rate_hz": 2.9057548419308086,
     "kc_rate_hz": 33.21924212598425,
     "n_kc_active": 2447,
     "frac_kc": 0.6021161417322834,
@@ -672,7 +672,7 @@
     "apl_rate_hz": 346.5
    },
    "post": {
-    "pop_rate_hz": 1.3744877226802765,
+    "pop_rate_hz": 2.889029117461462,
     "kc_rate_hz": 32.464936023622045,
     "n_kc_active": 2354,
     "frac_kc": 0.5792322834645669,
@@ -701,7 +701,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4433703860369325,
+    "pop_rate_hz": 2.9188677544397366,
     "kc_rate_hz": 33.17716535433071,
     "n_kc_active": 2459,
     "frac_kc": 0.6050688976377953,
@@ -710,7 +710,7 @@
     "apl_rate_hz": 348.0
    },
    "post": {
-    "pop_rate_hz": 1.3704345775922446,
+    "pop_rate_hz": 2.8820253936994225,
     "kc_rate_hz": 32.34682578740158,
     "n_kc_active": 2319,
     "frac_kc": 0.5706200787401575,
@@ -739,7 +739,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.501099099224043,
+    "pop_rate_hz": 2.986672121712237,
     "kc_rate_hz": 34.070127952755904,
     "n_kc_active": 2503,
     "frac_kc": 0.6158956692913385,
@@ -748,7 +748,7 @@
     "apl_rate_hz": 348.5
    },
    "post": {
-    "pop_rate_hz": 1.3621722638670264,
+    "pop_rate_hz": 2.861468424300841,
     "kc_rate_hz": 32.11011318897638,
     "n_kc_active": 2350,
     "frac_kc": 0.578248031496063,
@@ -777,7 +777,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.492042798993128,
+    "pop_rate_hz": 3.001047091374325,
     "kc_rate_hz": 33.84965551181102,
     "n_kc_active": 2478,
     "frac_kc": 0.609744094488189,
@@ -786,7 +786,7 @@
     "apl_rate_hz": 347.0
    },
    "post": {
-    "pop_rate_hz": 1.3702473493332594,
+    "pop_rate_hz": 2.8858393026787508,
     "kc_rate_hz": 32.34067421259842,
     "n_kc_active": 2364,
     "frac_kc": 0.5816929133858267,
@@ -815,7 +815,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.494809616598132,
+    "pop_rate_hz": 2.973392784084211,
     "kc_rate_hz": 33.92962598425197,
     "n_kc_active": 2472,
     "frac_kc": 0.6082677165354331,
@@ -824,7 +824,7 @@
     "apl_rate_hz": 348.0
    },
    "post": {
-    "pop_rate_hz": 1.3579942999396708,
+    "pop_rate_hz": 2.874179142771949,
     "kc_rate_hz": 31.975516732283463,
     "n_kc_active": 2339,
     "frac_kc": 0.5755413385826772,
@@ -854,7 +854,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3274899624850045,
+    "pop_rate_hz": 2.776851652809464,
     "kc_rate_hz": 30.96456692913386,
     "n_kc_active": 2358,
     "frac_kc": 0.5802165354330708,
@@ -863,7 +863,7 @@
     "apl_rate_hz": 345.0
    },
    "post": {
-    "pop_rate_hz": 1.3553037605142537,
+    "pop_rate_hz": 2.8676538912273157,
     "kc_rate_hz": 31.900590551181104,
     "n_kc_active": 2324,
     "frac_kc": 0.5718503937007874,
@@ -893,7 +893,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.324965848178685,
+    "pop_rate_hz": 2.7574908639543994,
     "kc_rate_hz": 30.89763779527559,
     "n_kc_active": 2329,
     "frac_kc": 0.5730807086614174,
@@ -902,7 +902,7 @@
     "apl_rate_hz": 344.0
    },
    "post": {
-    "pop_rate_hz": 1.3714331283068324,
+    "pop_rate_hz": 2.8909326047611454,
     "kc_rate_hz": 32.37795275590551,
     "n_kc_active": 2348,
     "frac_kc": 0.577755905511811,
@@ -932,7 +932,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3309571524662123,
+    "pop_rate_hz": 2.762892745945121,
     "kc_rate_hz": 31.100639763779526,
     "n_kc_active": 2371,
     "frac_kc": 0.5834153543307087,
@@ -941,7 +941,7 @@
     "apl_rate_hz": 343.5
    },
    "post": {
-    "pop_rate_hz": 1.3727194557898605,
+    "pop_rate_hz": 2.8863489796059887,
     "kc_rate_hz": 32.43159448818898,
     "n_kc_active": 2344,
     "frac_kc": 0.5767716535433071,
@@ -971,7 +971,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3529876776068068,
+    "pop_rate_hz": 2.8119465497992495,
     "kc_rate_hz": 31.514517716535433,
     "n_kc_active": 2371,
     "frac_kc": 0.5834153543307087,
@@ -980,7 +980,7 @@
     "apl_rate_hz": 346.5
    },
    "post": {
-    "pop_rate_hz": 1.3640341448869349,
+    "pop_rate_hz": 2.8820288608894034,
     "kc_rate_hz": 32.16031003937008,
     "n_kc_active": 2335,
     "frac_kc": 0.5745570866141733,
@@ -1010,7 +1010,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3603311859870049,
+    "pop_rate_hz": 2.804166175481419,
     "kc_rate_hz": 31.79896653543307,
     "n_kc_active": 2365,
     "frac_kc": 0.5819389763779528,
@@ -1019,7 +1019,7 @@
     "apl_rate_hz": 346.0
    },
    "post": {
-    "pop_rate_hz": 1.3690789063095923,
+    "pop_rate_hz": 2.885010644273242,
     "kc_rate_hz": 32.30880905511811,
     "n_kc_active": 2341,
     "frac_kc": 0.5760334645669292,
@@ -1049,7 +1049,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3485496744308607,
+    "pop_rate_hz": 2.8080078219805977,
     "kc_rate_hz": 31.463090551181104,
     "n_kc_active": 2401,
     "frac_kc": 0.5907972440944882,
@@ -1058,7 +1058,7 @@
     "apl_rate_hz": 345.0
    },
    "post": {
-    "pop_rate_hz": 1.3734198281660646,
+    "pop_rate_hz": 2.8945696870514324,
     "kc_rate_hz": 32.446727362204726,
     "n_kc_active": 2353,
     "frac_kc": 0.578986220472441,
@@ -1088,7 +1088,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.426180058110104,
+    "pop_rate_hz": 2.895817875444667,
     "kc_rate_hz": 33.15157480314961,
     "n_kc_active": 2447,
     "frac_kc": 0.6021161417322834,
@@ -1097,7 +1097,7 @@
     "apl_rate_hz": 347.5
    },
    "post": {
-    "pop_rate_hz": 1.3709719920393317,
+    "pop_rate_hz": 2.879598360712577,
     "kc_rate_hz": 32.37672244094488,
     "n_kc_active": 2330,
     "frac_kc": 0.5733267716535433,
@@ -1127,7 +1127,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4234964530646492,
+    "pop_rate_hz": 2.8825801440964156,
     "kc_rate_hz": 33.07037401574803,
     "n_kc_active": 2444,
     "frac_kc": 0.6013779527559056,
@@ -1136,7 +1136,7 @@
     "apl_rate_hz": 348.0
    },
    "post": {
-    "pop_rate_hz": 1.3660139103662046,
+    "pop_rate_hz": 2.8732811405668164,
     "kc_rate_hz": 32.228715551181104,
     "n_kc_active": 2355,
     "frac_kc": 0.5794783464566929,
@@ -1166,7 +1166,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4226851306090467,
+    "pop_rate_hz": 2.8930718609795507,
     "kc_rate_hz": 33.06077755905512,
     "n_kc_active": 2456,
     "frac_kc": 0.6043307086614174,
@@ -1175,7 +1175,7 @@
     "apl_rate_hz": 347.0
    },
    "post": {
-    "pop_rate_hz": 1.3606779049851259,
+    "pop_rate_hz": 2.874966194897683,
     "kc_rate_hz": 32.04502952755905,
     "n_kc_active": 2343,
     "frac_kc": 0.5765255905511811,
@@ -1205,7 +1205,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5135601800165037,
+    "pop_rate_hz": 3.009340609809374,
     "kc_rate_hz": 34.65575787401575,
     "n_kc_active": 2542,
     "frac_kc": 0.625492125984252,
@@ -1214,7 +1214,7 @@
     "apl_rate_hz": 349.0
    },
    "post": {
-    "pop_rate_hz": 1.3748309744884162,
+    "pop_rate_hz": 2.8881796559160664,
     "kc_rate_hz": 32.476254921259844,
     "n_kc_active": 2366,
     "frac_kc": 0.5821850393700787,
@@ -1244,7 +1244,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5179912488124874,
+    "pop_rate_hz": 3.0069551831023027,
     "kc_rate_hz": 34.800196850393704,
     "n_kc_active": 2532,
     "frac_kc": 0.6230314960629921,
@@ -1253,7 +1253,7 @@
     "apl_rate_hz": 349.0
    },
    "post": {
-    "pop_rate_hz": 1.3657469367376516,
+    "pop_rate_hz": 2.8743906413608027,
     "kc_rate_hz": 32.19574311023622,
     "n_kc_active": 2332,
     "frac_kc": 0.5738188976377953,
@@ -1283,7 +1283,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5061195903168318,
+    "pop_rate_hz": 2.974023812660791,
     "kc_rate_hz": 34.494832677165356,
     "n_kc_active": 2526,
     "frac_kc": 0.6215551181102362,
@@ -1292,7 +1292,7 @@
     "apl_rate_hz": 349.5
    },
    "post": {
-    "pop_rate_hz": 1.3650743018812972,
+    "pop_rate_hz": 2.871336046987359,
     "kc_rate_hz": 32.18811515748032,
     "n_kc_active": 2362,
     "frac_kc": 0.5812007874015748,
@@ -1322,7 +1322,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5889646277278118,
+    "pop_rate_hz": 3.1273152161099516,
     "kc_rate_hz": 35.781003937007874,
     "n_kc_active": 2590,
     "frac_kc": 0.6373031496062992,
@@ -1331,7 +1331,7 @@
     "apl_rate_hz": 350.5
    },
    "post": {
-    "pop_rate_hz": 1.368742588881415,
+    "pop_rate_hz": 2.8880964433565173,
     "kc_rate_hz": 32.294783464566926,
     "n_kc_active": 2364,
     "frac_kc": 0.5816929133858267,
@@ -1361,7 +1361,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5763163186763656,
+    "pop_rate_hz": 3.0635813298753893,
     "kc_rate_hz": 35.44340551181102,
     "n_kc_active": 2563,
     "frac_kc": 0.6306594488188977,
@@ -1370,7 +1370,7 @@
     "apl_rate_hz": 350.5
    },
    "post": {
-    "pop_rate_hz": 1.360917141093829,
+    "pop_rate_hz": 2.875229701336255,
     "kc_rate_hz": 32.07443405511811,
     "n_kc_active": 2427,
     "frac_kc": 0.5971948818897638,
@@ -1400,7 +1400,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5693403324341755,
+    "pop_rate_hz": 3.0774986304599574,
     "kc_rate_hz": 35.293061023622045,
     "n_kc_active": 2555,
     "frac_kc": 0.6286909448818898,
@@ -1409,7 +1409,7 @@
     "apl_rate_hz": 349.5
    },
    "post": {
-    "pop_rate_hz": 1.3688258014409642,
+    "pop_rate_hz": 2.8772025324355623,
     "kc_rate_hz": 32.29392224409449,
     "n_kc_active": 2349,
     "frac_kc": 0.578001968503937,
@@ -1441,7 +1441,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3732915421367597,
+    "pop_rate_hz": 2.8418683993370735,
     "kc_rate_hz": 32.105561023622045,
     "n_kc_active": 2432,
     "frac_kc": 0.5984251968503937,
@@ -1450,7 +1450,7 @@
     "apl_rate_hz": 346.5
    },
    "post": {
-    "pop_rate_hz": 1.3642733809956382,
+    "pop_rate_hz": 2.8745397305299947,
     "kc_rate_hz": 32.13447342519685,
     "n_kc_active": 2317,
     "frac_kc": 0.5701279527559056,
@@ -1482,7 +1482,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3557891671116227,
+    "pop_rate_hz": 2.787565269851396,
     "kc_rate_hz": 31.574557086614174,
     "n_kc_active": 2382,
     "frac_kc": 0.5861220472440944,
@@ -1491,7 +1491,7 @@
     "apl_rate_hz": 346.5
    },
    "post": {
-    "pop_rate_hz": 1.3688812764806635,
+    "pop_rate_hz": 2.8816474699914707,
     "kc_rate_hz": 32.297121062992126,
     "n_kc_active": 2331,
     "frac_kc": 0.5735728346456693,
@@ -1523,7 +1523,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.3470934546387534,
+    "pop_rate_hz": 2.7937229992580215,
     "kc_rate_hz": 31.338090551181104,
     "n_kc_active": 2361,
     "frac_kc": 0.5809547244094488,
@@ -1532,7 +1532,7 @@
     "apl_rate_hz": 345.5
    },
    "post": {
-    "pop_rate_hz": 1.3720156162236754,
+    "pop_rate_hz": 2.8926419294218806,
     "kc_rate_hz": 32.40218996062992,
     "n_kc_active": 2346,
     "frac_kc": 0.577263779527559,
@@ -1564,7 +1564,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.418822680969981,
+    "pop_rate_hz": 2.888155385586198,
     "kc_rate_hz": 33.00959645669291,
     "n_kc_active": 2481,
     "frac_kc": 0.6104822834645669,
@@ -1573,7 +1573,7 @@
     "apl_rate_hz": 348.0
    },
    "post": {
-    "pop_rate_hz": 1.358361822077679,
+    "pop_rate_hz": 2.8682953213738394,
     "kc_rate_hz": 31.985851377952756,
     "n_kc_active": 2349,
     "frac_kc": 0.578001968503937,
@@ -1605,7 +1605,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4129215236219654,
+    "pop_rate_hz": 2.8751672919165934,
     "kc_rate_hz": 32.85162401574803,
     "n_kc_active": 2470,
     "frac_kc": 0.6077755905511811,
@@ -1614,7 +1614,7 @@
     "apl_rate_hz": 347.5
    },
    "post": {
-    "pop_rate_hz": 1.3652129894805456,
+    "pop_rate_hz": 2.878821710156786,
     "kc_rate_hz": 32.1941437007874,
     "n_kc_active": 2349,
     "frac_kc": 0.578001968503937,
@@ -1646,7 +1646,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.4185245026315971,
+    "pop_rate_hz": 2.9054705323523495,
     "kc_rate_hz": 33.01131889763779,
     "n_kc_active": 2510,
     "frac_kc": 0.6176181102362205,
@@ -1655,7 +1655,7 @@
     "apl_rate_hz": 348.0
    },
    "post": {
-    "pop_rate_hz": 1.366436907543912,
+    "pop_rate_hz": 2.8813631604130117,
     "kc_rate_hz": 32.22576279527559,
     "n_kc_active": 2342,
     "frac_kc": 0.5762795275590551,
@@ -1687,7 +1687,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5405210493103758,
+    "pop_rate_hz": 3.0474658308427354,
     "kc_rate_hz": 35.26082677165354,
     "n_kc_active": 2584,
     "frac_kc": 0.6358267716535433,
@@ -1696,7 +1696,7 @@
     "apl_rate_hz": 350.0
    },
    "post": {
-    "pop_rate_hz": 1.3622554764265753,
+    "pop_rate_hz": 2.8803958144082547,
     "kc_rate_hz": 32.089812992125985,
     "n_kc_active": 2347,
     "frac_kc": 0.5775098425196851,
@@ -1728,7 +1728,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5367972872705586,
+    "pop_rate_hz": 3.0520841278977042,
     "kc_rate_hz": 35.24655511811024,
     "n_kc_active": 2580,
     "frac_kc": 0.6348425196850394,
@@ -1737,7 +1737,7 @@
     "apl_rate_hz": 349.0
    },
    "post": {
-    "pop_rate_hz": 1.364751853213045,
+    "pop_rate_hz": 2.8781976159601688,
     "kc_rate_hz": 32.16067913385827,
     "n_kc_active": 2342,
     "frac_kc": 0.5762795275590551,
@@ -1769,7 +1769,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.5366932715711226,
+    "pop_rate_hz": 3.027071819373271,
     "kc_rate_hz": 35.18799212598425,
     "n_kc_active": 2562,
     "frac_kc": 0.6304133858267716,
@@ -1778,7 +1778,7 @@
     "apl_rate_hz": 350.0
    },
    "post": {
-    "pop_rate_hz": 1.3723727367917398,
+    "pop_rate_hz": 2.887108294211873,
     "kc_rate_hz": 32.432332677165356,
     "n_kc_active": 2391,
     "frac_kc": 0.5883366141732284,
@@ -1810,7 +1810,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.7227218828228474,
+    "pop_rate_hz": 3.2718693008064683,
     "kc_rate_hz": 38.34965551181102,
     "n_kc_active": 2699,
     "frac_kc": 0.6641240157480315,
@@ -1819,7 +1819,7 @@
     "apl_rate_hz": 353.0
    },
    "post": {
-    "pop_rate_hz": 1.3583860924075475,
+    "pop_rate_hz": 2.8683507964135386,
     "kc_rate_hz": 31.971579724409448,
     "n_kc_active": 2527,
     "frac_kc": 0.6218011811023622,
@@ -1851,7 +1851,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.7201700309966785,
+    "pop_rate_hz": 3.2809117322774584,
     "kc_rate_hz": 38.30216535433071,
     "n_kc_active": 2698,
     "frac_kc": 0.6638779527559056,
@@ -1860,7 +1860,7 @@
     "apl_rate_hz": 352.5
    },
    "post": {
-    "pop_rate_hz": 1.3681809041044595,
+    "pop_rate_hz": 2.8789812008959217,
     "kc_rate_hz": 32.30007381889764,
     "n_kc_active": 2407,
     "frac_kc": 0.5922736220472441,
@@ -1892,7 +1892,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.7233390426395023,
+    "pop_rate_hz": 3.2740605648745915,
     "kc_rate_hz": 38.333169291338585,
     "n_kc_active": 2714,
     "frac_kc": 0.6678149606299213,
@@ -1901,7 +1901,7 @@
     "apl_rate_hz": 352.5
    },
    "post": {
-    "pop_rate_hz": 1.3628136940135498,
+    "pop_rate_hz": 2.8802051189592883,
     "kc_rate_hz": 32.102485236220474,
     "n_kc_active": 2398,
     "frac_kc": 0.5900590551181102,
@@ -1933,7 +1933,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.8665755951431602,
+    "pop_rate_hz": 3.4638892163457204,
     "kc_rate_hz": 40.20423228346457,
     "n_kc_active": 2757,
     "frac_kc": 0.6783956692913385,
@@ -1942,7 +1942,7 @@
     "apl_rate_hz": 354.5
    },
    "post": {
-    "pop_rate_hz": 1.3642317747158639,
+    "pop_rate_hz": 2.8781109362106387,
     "kc_rate_hz": 32.16843011811024,
     "n_kc_active": 2536,
     "frac_kc": 0.6240157480314961,
@@ -1974,7 +1974,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.8566871693167555,
+    "pop_rate_hz": 3.4231636028264534,
     "kc_rate_hz": 39.93922244094488,
     "n_kc_active": 2757,
     "frac_kc": 0.6783956692913385,
@@ -1983,7 +1983,7 @@
     "apl_rate_hz": 354.0
    },
    "post": {
-    "pop_rate_hz": 1.365920296236712,
+    "pop_rate_hz": 2.8802328564791377,
     "kc_rate_hz": 32.21333661417323,
     "n_kc_active": 2461,
     "frac_kc": 0.6055610236220472,
@@ -2015,7 +2015,7 @@
     "apl_rate_hz": 0.0
    },
    "odor": {
-    "pop_rate_hz": 1.8568882663356656,
+    "pop_rate_hz": 3.44520106234701,
     "kc_rate_hz": 39.88361220472441,
     "n_kc_active": 2740,
     "frac_kc": 0.6742125984251969,
@@ -2024,7 +2024,7 @@
     "apl_rate_hz": 353.5
    },
    "post": {
-    "pop_rate_hz": 1.3724628837312511,
+    "pop_rate_hz": 2.8930233203198137,
     "kc_rate_hz": 32.40661909448819,
     "n_kc_active": 2510,
     "frac_kc": 0.6176181102362205,
@@ -2038,7 +2038,7 @@
  ],
  "chosen": null,
  "finding": "NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. This is a property of the published model at this scale, not a tuning failure: no parameter was changed to obtain it.",
- "walltime_s": 163.4,
+ "walltime_s": 307.8,
  "provenance": {
   "config": "configs/stage3b_odor.yaml",
   "results_dir": "results/stage3b_odor",

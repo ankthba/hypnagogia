@@ -610,7 +610,8 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
       {emptyGroups.length > 0 && (
         <>
           {' '}
-          The groups {emptyGroups.join(', ')} have a count of 0 in this export, so they appear in the legend with no dots on the map.
+          {emptyGroups.length === 1 ? `The group ${emptyGroups[0]} has` : `The groups ${emptyGroups.join(', ')} have`} a count of 0 in this
+          export, so {emptyGroups.length === 1 ? 'it appears' : 'they appear'} in the legend with no dots on the map.
         </>
       )}
       {uncounted.length > 0 && (

@@ -179,8 +179,16 @@ The anatomical map of the simulated neurons, written by `scripts/export_web.py` 
  "groups": [{"code": 0, "label": "other"}, {"code": 1, "label": "KC"}, ...],
  "group_counts": {...}, "n_neurons_in_map": 60000, "n_neurons_simulated": 144209,
  "n_without_soma_position": 18100, "n_without_soma_position_by_group": {...}, "subsampled": true,
+ "n_with_soma_position": 126109, "n_atlas_rows": 60000,
+ "atlas_fingerprint": "sha256:<hex of neuron_atlas_index.bin>",
  "soma_outside_brain_note": "...", "source": "..."}
 ```
+`subsampled` is true only when rows were actually dropped, i.e. when more neurons HAVE a soma position
+(`n_with_soma_position`) than the export keeps. `atlas_fingerprint` is the sha256 of
+`neuron_atlas_index.bin`'s exact bytes: it identifies this row numbering, which changes whenever the
+filtering, the scope or the row cap changes. Every file that indexes atlas rows carries it back.
+`group_counts` is a statement by the export; the viewer counts the same groups from the binary and shows
+both when they disagree. A group ABSENT from `group_counts` is not a zero and is never reported as one.
 `neuron_atlas_index.bin` is `uint32[n]`: the simulation index of each atlas row (not needed by the viewer).
 Default projection: x (horizontal) vs y (vertical), y increasing downward, which gives the frontal view of
 the brain. The map must state that it shows soma positions, not neurites or morphology.
@@ -189,11 +197,18 @@ the brain. The map must state that it shows soma positions, not neurites or morp
 Whole-brain spikes for the map animation, for the same window as the raster and trace of that seed.
 ```json
 {"bin": "activity_sleep_seed0.bin", "dtype": "uint32", "shape": [n_spikes, 2], "columns": ["t_ms", "atlas_row"],
+ "n_atlas_rows": 126109, "atlas_fingerprint": "sha256:<hex>",
  "duration_s": 60.0, "n_spikes_total": 812344, "n_spikes_exported": 400000, "downsampled": true,
  "downsample_note": "..."}
 ```
-`atlas_row` indexes `neuron_atlas.bin`. When `downsampled` is true the viewer must say so, because the map
-then shows a uniform random sample of the spikes, not all of them.
+`atlas_row` indexes `neuron_atlas.bin`. `n_atlas_rows` and `atlas_fingerprint` are the identity of the atlas
+it was exported against, copied from that atlas's sidecar. A row number from a different atlas is still in
+range and still lands on a real soma, so this is the only thing that distinguishes a current pairing from a
+stale one: **the viewer must refuse to animate a file whose fingerprint or row count disagrees with the
+loaded `neuron_atlas.json`**, and must say so where the spike counts would have been. A file carrying
+neither field cannot be checked and the viewer says that too, rather than implying it was verified.
+When `downsampled` is true the viewer must say so *at the counts themselves*, not only in the caption,
+because every neuron and spike count it prints is then a count within a uniform random sample.
 
 ## `reference_clips.json` + `clips/<name>.json` + `clips/<name>.bin`
 Real simulations of this model, exported so the neuron map has something true to show before the replay

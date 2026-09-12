@@ -299,7 +299,8 @@ export default function Replay() {
               produced no results yet. Nothing is lit: lighting the neurons needs the per-seed activity sidecar named below.
             </p>
           </div>
-          <BrainMapBlock activity={null} activityPath={`replay/activity_${cond}_seed<k>.json`} timeMs={null} decayMs={DECAY_MS} height={520} />
+          {/* no seed is identified yet, so no concrete file is named: the panel shows the convention as one */}
+          <BrainMapBlock activity={null} activityPath={null} timeMs={null} decayMs={DECAY_MS} height={520} />
         </section>
       )}
 

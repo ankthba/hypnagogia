@@ -25,6 +25,49 @@
   "scale": 65535,
   "formula": "um = lo + q / 65535 * (hi - lo)"
  },
+ "view_boxes": {
+  "brain": {
+   "lo_um": [
+    19.744,
+    38.064,
+    81.232
+   ],
+   "hi_um": [
+    749.344,
+    428.208,
+    353.28
+   ],
+   "n_neurons": 124289,
+   "description": "The default view. Frames the somata above the brain / ventral-nerve-cord plane at z = 400.0 um, the same cut the male CNS release uses to subset its brain NBLASTs."
+  },
+  "all": {
+   "lo_um": [
+    19.744,
+    38.064,
+    81.232
+   ],
+   "hi_um": [
+    749.344,
+    551.232,
+    1072.704
+   ],
+   "n_neurons": 126109,
+   "description": "Every mapped soma, including the ascending neurons whose cell bodies sit in the ventral nerve cord. They are part of the simulated network; only their somata are outside the brain."
+  }
+ },
+ "n_somata_below_brain_plane": 1820,
+ "brain_z_max_um": 400.0,
+ "group_counts_in_brain_view": {
+  "other": 25374,
+  "KC": 4050,
+  "MBON": 96,
+  "DAN": 340,
+  "dFB": 32,
+  "ORN": 0,
+  "ALPN": 680,
+  "CX": 2912,
+  "optic": 90805
+ },
  "axes": {
   "x": "medial-lateral (image x)",
   "y": "dorsal-ventral (image y)",

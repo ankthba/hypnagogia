@@ -19,6 +19,13 @@ import pandas as pd
 from .connectome import Connectome, MALECNS_DIR, MALECNS_FILES
 
 VOXEL_NM = 8.0
+# Ascending neurons belong to the brain-scope network because they carry input into the brain, but their cell
+# bodies sit in the ventral nerve cord, so a bounding box over every soma squashes the brain into the top third
+# of the frame. The soma-z histogram separates the two completely: the brain ends at 353 um and the next soma
+# is at 412 um, with nothing in between. The cut is placed in that empty gap. (The male CNS release quotes
+# z = 281 um for its own brain subset, but that is in the coordinate frame of its NBLAST skeletons, and in the
+# soma coordinates used here it would slice through the brain.)
+BRAIN_Z_MAX_UM = 400.0
 
 # group code -> (label, selector). The code is the value written into the binary's `group` column and
 # the code the sidecar's groups[] publishes; it is NOT the precedence. Precedence is PAINT_ORDER below,
@@ -100,7 +107,10 @@ def build_atlas(conn: Connectome, out_dir: Path, max_neurons: int | None = None,
         take = max(max_neurons - len(named), 0)
         idx = np.sort(np.concatenate([named, rng.choice(rest, size=min(take, len(rest)), replace=False)]))
     P = pos_um[idx]
+    in_brain = P[:, 2] < BRAIN_Z_MAX_UM
     lo, hi = P.min(axis=0), P.max(axis=0)
+    blo = P[in_brain].min(axis=0) if in_brain.any() else lo
+    bhi = P[in_brain].max(axis=0) if in_brain.any() else hi
     q = np.clip(np.round((P - lo) / np.maximum(hi - lo, 1e-9) * 65535.0), 0, 65535).astype(np.uint16)
     buf = np.concatenate([q, grp[idx].astype(np.uint16)[:, None]], axis=1)     # [n, 4] uint16: x, y, z, group
     buf.tofile(out_dir / "neuron_atlas.bin")
@@ -109,6 +119,18 @@ def build_atlas(conn: Connectome, out_dir: Path, max_neurons: int | None = None,
         "columns": ["x_q", "y_q", "z_q", "group"],
         "quantisation": {"lo_um": [float(x) for x in lo], "hi_um": [float(x) for x in hi], "scale": 65535,
                          "formula": "um = lo + q / 65535 * (hi - lo)"},
+        "view_boxes": {
+            "brain": {"lo_um": [float(x) for x in blo], "hi_um": [float(x) for x in bhi],
+                      "n_neurons": int(in_brain.sum()),
+                      "description": ("The default view. Frames the somata above the brain / ventral-nerve-cord plane at "
+                                      f"z = {BRAIN_Z_MAX_UM} um, the same cut the male CNS release uses to subset its brain "
+                                      "NBLASTs.")},
+            "all": {"lo_um": [float(x) for x in lo], "hi_um": [float(x) for x in hi], "n_neurons": int(len(idx)),
+                    "description": ("Every mapped soma, including the ascending neurons whose cell bodies sit in the ventral "
+                                    "nerve cord. They are part of the simulated network; only their somata are outside the brain.")}},
+        "n_somata_below_brain_plane": int((~in_brain).sum()),
+        "brain_z_max_um": BRAIN_Z_MAX_UM,
+        "group_counts_in_brain_view": {GROUPS[c][0]: int(((grp[idx] == c) & in_brain).sum()) for c in range(len(GROUPS))},
         "axes": {"x": "medial-lateral (image x)", "y": "dorsal-ventral (image y)", "z": "anterior-posterior (image z)",
                  "note": "male CNS v1.0 image coordinates, 8 nm voxels, converted to micrometres; not registered to a standard template"},
         "groups": [{"code": c, "label": GROUPS[c][0]} for c in range(len(GROUPS))],
