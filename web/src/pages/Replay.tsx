@@ -12,6 +12,7 @@ import ProvenanceFooter from '../components/ProvenanceFooter';
 import ForestPlot, { preregistered } from '../components/charts/ForestPlot';
 import RasterViewer from '../components/charts/RasterViewer';
 import NotRunPanel from '../components/NotRunPanel';
+import Callout from '../components/Callout';
 import BrainMap, { AtlasCaption, atlasProvenance, useActivity, useAtlas, type Loadable, type TimeSource } from '../components/BrainMap';
 import type { AtlasData } from '../lib/binary';
 import { fmtNum, fmtInt, fmtP, fmtCI, fmtPct, isNum, NOT_MEASURED } from '../lib/format';
@@ -836,9 +837,59 @@ function ReplayWindow({
 }
 
 function Stage5View({ d }: { d: Stage5 }) {
+  const reach = d.engram_reaches_the_kenyon_cells;
+  const path = reach?.anatomical_path;
   return (
     <div className="space-y-4">
       <StatusBanner status={d.status} title="Sleep-state induction" criterion={d.criterion} reasons={d.reasons} />
+
+      {reach && (
+        <Callout
+          tone={reach.engram_reaches_the_kenyon_cells ? 'positive' : 'negative'}
+          title={
+            reach.engram_reaches_the_kenyon_cells
+              ? 'The memory changes the offline state'
+              : 'The memory does not change the offline state'
+          }
+        >
+          <p>{reach.note}</p>
+          {typeof reach.n_seeds === 'number' && (
+            <p className="smaller muted">
+              Sleep and sleep_naive are the same run at the same seed and differ only in the learned weights. Their
+              Kenyon-cell spikes were compared spike for spike: identical in {fmtInt(reach.n_seeds_identical)} of{' '}
+              {fmtInt(reach.n_seeds)} seeds.
+            </p>
+          )}
+          {path?.note && <p className="smaller muted">{path.note}</p>}
+        </Callout>
+      )}
+
+      {path?.per_mbon && path.per_mbon.length > 0 && (
+        <div className="card">
+          <div className="label label--ink mb-2">Can the engram reach the Kenyon cells?</div>
+          <p className="smaller muted measure">
+            The memory is a depression of Kenyon-cell to MBON synapses, which sits downstream of the Kenyon cells. It can
+            only change which Kenyon cells reactivate through an MBON that both carries some of it, meaning the
+            conditioning dopaminergic neuron gates that MBON's compartment, and fires during the offline period, and
+            projects back onto Kenyon cells.
+          </p>
+          <DataTable
+            columns={[
+              { key: 'm', header: 'MBON', render: (r) => r.mbon },
+              { key: 'nt', header: 'transmitter', render: (r) => r.transmitter },
+              { key: 'g', header: `synapses from ${path.conditioning_dan ?? 'the DAN'}`, render: (r) => fmtInt(r.gating_synapses_from_dan) },
+              { key: 'f', header: 'fires offline', render: (r) => (r.fires_offline ? 'yes' : 'no') },
+              { key: 'b', header: 'synapses back onto KCs', render: (r) => fmtInt(r.synapses_back_onto_kenyon_cells) },
+              { key: 'n', header: 'KCs contacted', render: (r) => fmtInt(r.n_kenyon_cells_contacted) },
+            ]}
+            rows={path.per_mbon}
+            rowKey={(r, i) => `${r.mbon}-${i}`}
+            rowClass={(r) => (r.fires_offline && r.synapses_back_onto_kenyon_cells > 0 ? 'row--emph' : '')}
+            pageSize={12}
+          />
+          <ProvenanceFooter provenance={d.provenance} />
+        </div>
+      )}
       <div className="cols-2">
         <div className="card">
           <div className="label label--ink mb-2">Dorsal fan-shaped body clamp</div>

@@ -271,6 +271,46 @@ export interface Stage4 extends StageBase {
 
 // stage5
 export interface Stage5 extends StageBase {
+  /**
+   * Whether the learned weights change the offline Kenyon-cell activity at all, and the anatomy that
+   * decides it. Written by scripts/05_sleep.py; absent from a stage file written before that check existed.
+   */
+  engram_reaches_the_kenyon_cells?: {
+    engram_reaches_the_kenyon_cells?: boolean;
+    n_seeds?: number;
+    n_seeds_identical?: number;
+    mean_jaccard_active_kcs?: number | null;
+    note?: string;
+    anatomical_path?: {
+      conditioning_dan?: string;
+      dan_mbon_min_synapses?: number;
+      n_mbons_gated?: number;
+      n_gated_that_fire_offline?: number;
+      n_gated_that_fire_and_reach_kenyon_cells?: number;
+      synapses_back_onto_kenyon_cells_from_those?: number;
+      note?: string;
+      per_mbon?: Array<{
+        mbon: string;
+        transmitter: string;
+        gating_synapses_from_dan: number;
+        fires_offline: boolean;
+        synapses_back_onto_kenyon_cells: number;
+        n_kenyon_cells_contacted: number;
+      }>;
+      error?: string;
+    } | null;
+    per_seed?: Array<{
+      seed: number;
+      n_kc_spikes_trained: number;
+      n_kc_spikes_naive: number;
+      spike_trains_identical: boolean;
+      first_divergence_s: number | null;
+      n_kc_active_trained: number;
+      n_kc_active_naive: number;
+      jaccard_active_kcs: number | null;
+    }>;
+  } | null;
+
   dfb: {
     cell_types: string[];
     n_neurons: number;

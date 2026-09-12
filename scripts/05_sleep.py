@@ -189,11 +189,59 @@ def main():
                           "first_divergence_s": first_div,
                           "n_kc_active_trained": len(s1), "n_kc_active_naive": len(s2),
                           "jaccard_active_kcs": (len(s1 & s2) / union if union else None)})
+        # The anatomy behind the answer: which MBONs the conditioning dopaminergic neuron gates (so carry any of
+        # the engram at all), which of those actually fire offline, and how many synapses each of those makes back
+        # onto Kenyon cells. A memory written only onto cells that never fire, or onto cells with no return path,
+        # cannot change the offline state whatever the statistics say.
+        try:
+            dan_sel = conn.select(cell_type=s4["dan_type"])
+            thr = int(cfg["plasticity"]["dan_mbon_min_synapses"])
+            gm = np.isin(conn.pre, dan_sel) & np.isin(conn.post, mbon)
+            gated = {}
+            for q, n in zip(conn.post[gm], conn.count[gm]):
+                gated[int(q)] = gated.get(int(q), 0) + int(n)
+            gated = {q: n for q, n in gated.items() if n >= thr}
+            sleep_rows = [r for r in ok if r["condition"] == "sleep" and r["dfb_rate_clamp_hz"] == s5["dfb_clamp_rate_hz"]]
+            fired = set()
+            for r in sleep_rows[:5]:
+                z = np.load(r["file"])
+                fired |= set(np.unique(z["i"]).tolist())
+            ctv = conn.ann.cell_type.astype(str).values
+            ntv = conn.ann.nt.astype(str).values
+            path = []
+            for q, n in sorted(gated.items(), key=lambda kv: -kv[1]):
+                bk = np.isin(conn.pre, [q]) & np.isin(conn.post, kc)
+                path.append({"mbon": ctv[q], "gating_synapses_from_dan": int(n), "transmitter": ntv[q],
+                             "fires_offline": bool(q in fired),
+                             "synapses_back_onto_kenyon_cells": int(conn.count[bk].sum()),
+                             "n_kenyon_cells_contacted": int(len(np.unique(conn.post[bk])))})
+            live = [x for x in path if x["fires_offline"] and x["synapses_back_onto_kenyon_cells"] > 0]
+            engram_path = {
+                "conditioning_dan": s4["dan_type"], "dan_mbon_min_synapses": thr,
+                "n_mbons_gated": len(path), "n_gated_that_fire_offline": sum(1 for x in path if x["fires_offline"]),
+                "n_gated_that_fire_and_reach_kenyon_cells": len(live),
+                "synapses_back_onto_kenyon_cells_from_those": int(sum(x["synapses_back_onto_kenyon_cells"] for x in live)),
+                "per_mbon": path,
+                "note": ((f"{len(live)} of the {len(path)} MBONs the conditioning dopaminergic neuron gates both fire "
+                          f"during the offline period and project back onto Kenyon cells, with "
+                          f"{sum(x['synapses_back_onto_kenyon_cells'] for x in live):,} synapses between them. A path from "
+                          f"the engram to the Kenyon cells therefore exists, and whether it carries anything is what the "
+                          f"spike-level comparison below measures.")
+                         if live else
+                         (f"None of the {len(path)} MBONs the conditioning dopaminergic neuron gates both fires during the "
+                          f"offline period and projects back onto Kenyon cells. The engram is written onto synapses whose "
+                          f"postsynaptic cells are silent, so it cannot change the offline state by any route, and the "
+                          f"replay test cannot return a real positive.")),
+            }
+        except Exception as e:
+            engram_path = {"error": str(e)}
+
         good = [x for x in pairs if "error" not in x]
         if good:
             n_same = sum(1 for x in good if x["spike_trains_identical"])
             disconnected = n_same == len(good)
             reaches_kc = {
+                "anatomical_path": engram_path,
                 "n_seeds": len(good), "n_seeds_identical": n_same,
                 "engram_reaches_the_kenyon_cells": bool(not disconnected),
                 "per_seed": good,
