@@ -1,6 +1,7 @@
-import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { checkAtlasIdentity, loadActivity, loadAtlas, type ActivityData, type AtlasData, type BinLoad, type Loadable } from '../lib/binary';
-import { CHART_FONT, SERIES, resolveColors, useThemeVersion } from '../lib/colors';
+import { CHART_FONT, resolveColors, useThemeVersion } from '../lib/colors';
+import { useCanvasPixelRatio } from '../lib/media';
 import { fmtInt, fmtNum, fmtPct } from '../lib/format';
 import type { AtlasViewBox, Manifest, Provenance } from '../types';
 
@@ -64,17 +65,19 @@ const specRadius = (s: GroupSpec, dark: boolean) => (dark ? s.r : s.rLight ?? s.
 
 /** The accent a spiking neuron is drawn in (`--color-link`), per MAP_SPEC.md. */
 const ACCENT = { dark: '#8fb3d4', light: '#2f5575' };
-/** Ink for the source stamp burned into the canvas (`--color-fg` / `--color-failed`, both themes). */
-const STAMP_INK = { dark: '#e8e6df', light: '#262624' };
-const STAMP_FAILED = { dark: '#d98b82', light: '#9a3f35' };
 /** Point radii are quoted at this canvas width and scale linearly with it. */
 const REF_W = 400;
 /** Fraction of the view box padded onto each side, so an edge soma is not clipped by the frame. */
 const BOX_PAD = 0.015;
-/** A spiking neuron is drawn at this multiple of its group radius, decaying back to 1x. */
+/**
+ * A spiking neuron is drawn at this multiple of its group radius, decaying back to 1x.
+ *
+ * There is no floor under it. A floor was here, and it lied: at the rail's scale an optic-lobe
+ * point is 0.27px and the spec's lit radius is 0.60px, but a 1.15px floor drew it at 2.53px - four
+ * times the radius, eight times the area - and optic is 90,805 of the 124,289 somata in the brain
+ * view, so the animation systematically exaggerated how much of the brain was firing.
+ */
 const LIT_GAIN = 2.2;
-/** A lit point never draws smaller than this, so a spiking optic-lobe cell is still visible. */
-const LIT_MIN_R = 1.15;
 const TAU = Math.PI * 2;
 
 /** Height reserved under the plot for the axis note and the scale bar. */
@@ -102,55 +105,6 @@ function parseRgb(css: string): [number, number, number] {
   const m = css.match(/-?[\d.]+/g);
   if (!m || m.length < 3) return [128, 128, 128];
   return [Number(m[0]), Number(m[1]), Number(m[2])];
-}
-
-/** Type size of the stamp burned into the canvas, in CSS pixels. */
-const STAMP_SIZE = 10;
-
-/**
- * Burns the source identity into the canvas bitmap, top-left, over a wash of the background so it
- * stays legible against whatever is lit underneath it.
- *
- * The point is the crop: the badge in the DOM tells a reader looking at the page what the picture
- * is, but a screenshot taken of the picture alone would carry nothing, and an animating brain next
- * to a verdict is exactly the image a reader would crop. This is the same text, in the image.
- */
-function drawSourceStamp(
-  ctx: CanvasRenderingContext2D,
-  source: MapSourceLabel,
-  C: { bg: string; ink: string; failed: string },
-  canvasW: number,
-): void {
-  const text = source.text.trim();
-  if (!text) return;
-  ctx.save();
-  ctx.font = `${STAMP_SIZE}px ${CHART_FONT}`;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  const padX = 4;
-  const padY = 3;
-  const inset = 2;
-  const maxW = Math.max(60, canvasW - 2 * inset - 2 * padX);
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/)) {
-    const next = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(next).width > maxW) {
-      lines.push(line);
-      line = word;
-    } else line = next;
-  }
-  if (line) lines.push(line);
-  const lh = STAMP_SIZE + 3;
-  const boxW = Math.min(maxW, Math.max(...lines.map((l) => ctx.measureText(l).width))) + 2 * padX;
-  const boxH = lines.length * lh + 2 * padY;
-  ctx.globalAlpha = 0.88;
-  ctx.fillStyle = C.bg;
-  ctx.fillRect(inset, inset, boxW, boxH);
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = source.reference ? C.failed : C.ink;
-  lines.forEach((l, i) => ctx.fillText(l, inset + padX, inset + padY + i * lh + STAMP_SIZE));
-  ctx.restore();
 }
 
 // ---------------------------------------------------------------- loading hooks
@@ -272,36 +226,6 @@ export function atlasProvenance(atlas: AtlasData | null, m: Manifest | null, ext
 
 // ---------------------------------------------------------------- the map
 
-/**
- * The current device pixel ratio, as state.
- *
- * It changes when the window is dragged to a display of a different density, or when the browser is
- * zoomed. Sampling it only at draw time is not enough: the visible canvas would be resized to the
- * new backing-store size while the cached offscreen background is still at the old one. There is no
- * `resize`-style event for it, so the idiom is a `(resolution: Ndppx)` media query re-subscribed at
- * each change.
- */
-function useDevicePixelRatio(): number {
-  const [dpr, setDpr] = useState(() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    let mq: MediaQueryList | null = null;
-    const onChange = () => {
-      setDpr(window.devicePixelRatio || 1);
-      resub();
-    };
-    const resub = () => {
-      mq?.removeEventListener('change', onChange);
-      mq = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
-      mq.addEventListener('change', onChange);
-    };
-    setDpr(window.devicePixelRatio || 1);
-    resub();
-    return () => mq?.removeEventListener('change', onChange);
-  }, []);
-  return dpr;
-}
-
 /** A framing box the map can be fitted to, and where the sidecar states it came from. */
 type Frame = { lo: [number, number, number]; hi: [number, number, number]; from: 'view_box' | 'quantisation'; box: AtlasViewBox | null };
 
@@ -314,13 +238,14 @@ function frameFor(atlas: AtlasData, key: 'brain' | 'all'): Frame {
 }
 
 /**
- * What the map is showing, stated on the map itself.
+ * What the map is showing.
  *
- * It is a required prop, and it is plain text rather than a node, because it is stamped into the
- * canvas bitmap as well as rendered over it: a screenshot cropped to the picture then still carries
- * the identity of what it is a picture of. `reference` marks the case the contract cares about most
- * - a real reference simulation standing in for a result that does not exist yet - and draws the
- * stamp in the failed tone.
+ * It is a required prop, and it is plain text rather than a node, because it is the canvas's
+ * `aria-label` as well as the words the panel prints above and below the picture. It is NOT drawn
+ * into the bitmap: MAP_SPEC.md:54-57 keeps the canvas to the scale bar and the axis note, and a
+ * caption burned into the image washed out the small populations the draw order exists to protect.
+ * `reference` marks the case the contract cares about most - a real reference simulation standing
+ * in for a result that does not exist yet - and the panel renders that line in the failed tone.
  */
 export interface MapSourceLabel {
   text: string;
@@ -340,7 +265,7 @@ function BrainMapInner({
   showVnc: showVncProp,
   onShowVncChange,
   variant = 'figure',
-  background = 'mat',
+  background = 'page',
   showProjectionControl = true,
   showVncControl = true,
   showLegend = true,
@@ -349,7 +274,7 @@ function BrainMapInner({
   atlas: AtlasData;
   /** spikes to light up; null renders the populations only (no activity) */
   activity?: ActivityData | null;
-  /** required: what this map is showing, drawn onto the canvas as well as over it */
+  /** required: what this map is showing; carried to a screen reader as the canvas's aria-label */
   source: MapSourceLabel;
   /** current scrub time in milliseconds; null means no activity is shown */
   timeMs?: number | null;

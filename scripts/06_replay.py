@@ -137,8 +137,7 @@ def main():
                                                                    "n_spikes_exported": side["n_spikes_exported"], "downsampled": side["downsampled"]})
     # ---- the four comparisons ----
     def pick(net, cond, ens, metric="template_corr_mean"):
-        d = {r["seed"]: r.get(metric) for r in rows if r["network"] == net and r["condition"] == cond and r["ensemble"] == ens}
-        return d
+        return {r["seed"]: r.get(metric) for r in rows if r["network"] == net and r["condition"] == cond and r["ensemble"] == ens}
 
     def paired(dx, dy, name, label, direction, metric):
         common = sorted(set(dx) & set(dy))
@@ -154,20 +153,29 @@ def main():
 
     comparisons = []
     REAL, SHUF = f"real{suffix}", f"shuffled{suffix}"
-    A_sleep = pick(REAL, "sleep", "A"); B_sleep = pick(REAL, "sleep", "B")
-    A_wake = pick(REAL, "wake", "A"); A_sleep_sh = pick(SHUF, "sleep", "A")
-    A_naive = pick(REAL, "sleep_naive", "A")
+    # Ensemble sizes differ between odours (about 326 vs 205 Kenyon cells) and between the real and shuffled
+    # networks (about 326 vs 152), and the raw template correlation depends on template size. Comparisons that
+    # cross those boundaries therefore use z_vs_random_ensembles, which standardises each measurement against
+    # size-matched random ensembles drawn from that same run. The raw correlation is reported alongside.
+    Z = "z_vs_random_ensembles"
+    A_sleep_z, B_sleep_z = pick(REAL, "sleep", "A", Z), pick(REAL, "sleep", "B", Z)
+    A_wake_z, A_sh_z, A_naive_z = pick(REAL, "wake", "A", Z), pick(SHUF, "sleep", "A", Z), pick(REAL, "sleep_naive", "A", Z)
+    A_sleep = pick(REAL, "sleep", "A")
     A_rand = {r["seed"]: r.get("null_corr_mean") for r in rows if r["network"] == REAL and r["condition"] == "sleep" and r["ensemble"] == "A"}
-    comparisons.append(paired(A_sleep, B_sleep, "A_vs_B_sleep", "trained (A) vs unpaired (B) ensemble, during sleep", "greater", "template_corr_mean"))
-    comparisons.append(paired(A_sleep, A_wake, "sleep_vs_wake_A", "sleep vs wake, odour-A ensemble", "greater", "template_corr_mean"))
-    comparisons.append(paired(A_sleep, A_sleep_sh, "real_vs_shuffled", "real vs degree-preserving shuffled connectome, odour-A ensemble in sleep", "greater", "template_corr_mean"))
+    comparisons.append(paired(A_sleep_z, B_sleep_z, "A_vs_B_sleep", "trained (A) vs unpaired (B) ensemble, during sleep", "greater", Z))
+    comparisons.append(paired(A_sleep_z, A_wake_z, "sleep_vs_wake_A", "sleep vs wake, odour-A ensemble", "greater", Z))
+    comparisons.append(paired(A_sleep_z, A_sh_z, "real_vs_shuffled", "real vs degree-preserving shuffled connectome, odour-A ensemble in sleep", "greater", Z))
     comparisons.append(paired(A_sleep, A_rand, "A_vs_random_ensembles", "odour-A ensemble vs size-matched random KC ensembles, during sleep", "greater", "template_corr_mean"))
     # Fifth comparison, not in the original four but necessary here: does the MEMORY contribute anything? The
     # learned weights sit on Kenyon-cell -> output-neuron synapses, which are downstream of the Kenyon cells being
     # measured, so learning may be unable to change which cells reactivate. This compares the identical sleep run
     # with learned versus unlearned weights.
-    comparisons.append(paired(A_sleep, A_naive, "trained_vs_naive_weights",
-                              "learned vs unlearned synaptic weights, odour-A ensemble in sleep", "greater", "template_corr_mean"))
+    comparisons.append(paired(A_sleep_z, A_naive_z, "trained_vs_naive_weights",
+                              "learned vs unlearned synaptic weights, odour-A ensemble in sleep", "greater", Z))
+    # the same three comparisons on the raw correlation, reported so the size-normalisation can be checked
+    secondary = [paired(pick(REAL, "sleep", "A"), pick(REAL, "sleep", "B"), "A_vs_B_sleep_raw", "same, raw template correlation", "greater", "template_corr_mean"),
+                 paired(pick(REAL, "sleep", "A"), pick(REAL, "wake", "A"), "sleep_vs_wake_A_raw", "same, raw template correlation", "greater", "template_corr_mean"),
+                 paired(pick(REAL, "sleep", "A"), pick(SHUF, "sleep", "A"), "real_vs_shuffled_raw", "same, raw template correlation", "greater", "template_corr_mean")]
     # sequence-order preservation, reported when the reactivation events contain enough ordered members to score
     seq = [r for r in rows if r["network"] == REAL and r["condition"] == "sleep" and r["ensemble"] == "A"
            and isinstance(r.get("sequence"), dict) and r["sequence"].get("rho_mean") is not None]
@@ -227,7 +235,16 @@ def main():
                            f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
                            f"published value the network has neither a sparse odour code nor a quiet background (stages 2 "
                            f"and 3b). This is an uncited free parameter introduced by this project."),
-             "comparisons": comparisons, "sequence": sequence_summary, "per_seed": rows, "traces": exports["traces"], "rasters": exports["rasters"],
+             "comparisons": comparisons, "comparisons_raw_metric": secondary, "sequence": sequence_summary, "per_seed": rows,
+             "ensemble_sizes": {n: {c: float(np.mean([r["size"] for r in rows if r["network"] == n and r["condition"] == c and r["ensemble"] == "A" and r.get("size")]))
+                                    for c in ("sleep", "wake", "sleep_naive")
+                                    if [r for r in rows if r["network"] == n and r["condition"] == c and r["ensemble"] == "A"]}
+                                for n in sorted(set(r["network"] for r in rows))},
+             "metric_note": ("The four required comparisons use z_vs_random_ensembles, each run standardised against "
+                             "size-matched random Kenyon-cell ensembles drawn from that same run, because ensemble sizes "
+                             "differ between odours and between the real and shuffled networks and the raw template "
+                             "correlation depends on template size. comparisons_raw_metric repeats three of them on the "
+                             "raw correlation so the effect of that choice can be seen."), "traces": exports["traces"], "rasters": exports["rasters"],
              "activity": exports.get("activity", []),
              "networks_analysed": sorted(set(r["network"] for r in rows)),
              "walltime_s": round(time.time() - t0, 1),
