@@ -888,6 +888,19 @@ function Stage5View({ d }: { d: Stage5 }) {
     <div className="space-y-4">
       <StatusBanner status={d.status} title="Sleep-state induction" criterion={d.criterion} reasons={d.reasons} />
 
+      {d.manipulation_strength && (
+        <Callout
+          tone={d.manipulation_strength.state_is_distinguishable ? 'positive' : 'negative'}
+          title={
+            d.manipulation_strength.state_is_distinguishable
+              ? 'The sleep state differs from wake'
+              : 'The sleep state does not differ from wake'
+          }
+        >
+          <p>{d.manipulation_strength.note}</p>
+        </Callout>
+      )}
+
       {reach && (
         <Callout
           tone={reach.engram_reaches_the_kenyon_cells ? 'positive' : 'negative'}

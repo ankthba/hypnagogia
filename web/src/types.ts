@@ -272,6 +272,23 @@ export interface Stage4 extends StageBase {
 // stage5
 export interface Stage5 extends StageBase {
   /**
+   * How much clamping the dorsal fan-shaped body actually changes the rest of the brain. If it changes
+   * nothing outside the clamped cells, the sleep and wake conditions are the same state and the
+   * sleep-versus-wake comparison in stage 6 is unanswerable. Written by scripts/05_sleep.py.
+   */
+  manipulation_strength?: {
+    pop_rate_relative_change?: number | null;
+    kc_rate_relative_change?: number | null;
+    frac_kc_active_relative_change?: number | null;
+    n_dfb_clamped?: number;
+    n_neurons?: number;
+    dfb_fraction_of_brain?: number;
+    state_is_distinguishable?: boolean;
+    note?: string;
+  } | null;
+  /** Whether the learned weights are visible offline in the output-neuron rate. Written by scripts/05_sleep.py. */
+  memory_visible_offline?: { mbon_rate_trained?: number; mbon_rate_naive?: number; relative_reduction?: number | null; note?: string } | null;
+  /**
    * Whether the learned weights change the offline Kenyon-cell activity at all, and the anatomy that
    * decides it. Written by scripts/05_sleep.py; absent from a stage file written before that check existed.
    */
