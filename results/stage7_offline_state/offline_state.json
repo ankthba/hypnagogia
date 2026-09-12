@@ -1,0 +1,891 @@
+{
+ "status": "passed",
+ "gain": 1.0,
+ "operating_sigma_mV": 1.55,
+ "question": "What is the offline state actually made of, and which cells carry it?",
+ "refractory_ceiling_hz": 454.5454545454545,
+ "by_run": {
+  "stage 2 operating point": {
+   "run": "results/stage2_criticality/full/sigma1.55_seed0",
+   "epoch": "noise",
+   "duration_s": 5.0,
+   "whole_brain_rate_hz_per_neuron": 1.7970473410120036,
+   "by_population": [
+    {
+     "population": "cb_intrinsic",
+     "n_neurons": 23538,
+     "mean_rate_hz": 4.685623247514657,
+     "frac_active": 0.2885546775426969,
+     "share_of_all_spikes": 0.42558375368125995,
+     "max_rate_hz": 255.2,
+     "frac_of_refractory_ceiling": 0.56144
+    },
+    {
+     "population": "ALPN",
+     "n_neurons": 686,
+     "mean_rate_hz": 75.2606413994169,
+     "frac_active": 0.9256559766763849,
+     "share_of_all_spikes": 0.19922330816390788,
+     "max_rate_hz": 241.2,
+     "frac_of_refractory_ceiling": 0.53064
+    },
+    {
+     "population": "ALLN",
+     "n_neurons": 420,
+     "mean_rate_hz": 121.55857142857144,
+     "frac_active": 0.9595238095238096,
+     "share_of_all_spikes": 0.1970076063938161,
+     "max_rate_hz": 299.2,
+     "frac_of_refractory_ceiling": 0.65824
+    },
+    {
+     "population": "CX",
+     "n_neurons": 2950,
+     "mean_rate_hz": 6.485288135593221,
+     "frac_active": 0.37898305084745765,
+     "share_of_all_spikes": 0.07382431205971514,
+     "max_rate_hz": 171.6,
+     "frac_of_refractory_ceiling": 0.37752
+    },
+    {
+     "population": "descending_neuron",
+     "n_neurons": 1314,
+     "mean_rate_hz": 4.540334855403348,
+     "frac_active": 0.3242009132420091,
+     "share_of_all_spikes": 0.02302138063456587,
+     "max_rate_hz": 224.6,
+     "frac_of_refractory_ceiling": 0.49412000000000006
+    },
+    {
+     "population": "ascending_neuron",
+     "n_neurons": 1846,
+     "mean_rate_hz": 2.1990249187432287,
+     "frac_active": 0.1722643553629469,
+     "share_of_all_spikes": 0.015664262914508332,
+     "max_rate_hz": 115.0,
+     "frac_of_refractory_ceiling": 0.253
+    },
+    {
+     "population": "ol_intrinsic",
+     "n_neurons": 89274,
+     "mean_rate_hz": 0.03449828617514618,
+     "frac_active": 0.025449739005757557,
+     "share_of_all_spikes": 0.011884218585037876,
+     "max_rate_hz": 84.2,
+     "frac_of_refractory_ceiling": 0.18524000000000002
+    },
+    {
+     "population": "visual_centrifugal",
+     "n_neurons": 563,
+     "mean_rate_hz": 5.1495559502664285,
+     "frac_active": 0.29307282415630553,
+     "share_of_all_spikes": 0.011187325969784338,
+     "max_rate_hz": 83.2,
+     "frac_of_refractory_ceiling": 0.18304000000000004
+    },
+    {
+     "population": "hygrosensory",
+     "n_neurons": 66,
+     "mean_rate_hz": 26.3,
+     "frac_active": 0.5757575757575758,
+     "share_of_all_spikes": 0.006698040983151096,
+     "max_rate_hz": 120.0,
+     "frac_of_refractory_ceiling": 0.264
+    },
+    {
+     "population": "Kenyon_Cell",
+     "n_neurons": 4064,
+     "mean_rate_hz": 0.4166830708661417,
+     "frac_active": 0.08882874015748031,
+     "share_of_all_spikes": 0.006534429427853477,
+     "max_rate_hz": 41.2,
+     "frac_of_refractory_ceiling": 0.09064000000000001
+    },
+    {
+     "population": "visual_projection",
+     "n_neurons": 9201,
+     "mean_rate_hz": 0.13607216606890554,
+     "frac_active": 0.03271383545266819,
+     "share_of_all_spikes": 0.004831171396995721,
+     "max_rate_hz": 68.0,
+     "frac_of_refractory_ceiling": 0.1496
+    },
+    {
+     "population": "ALON",
+     "n_neurons": 14,
+     "mean_rate_hz": 84.98571428571428,
+     "frac_active": 0.7857142857142857,
+     "share_of_all_spikes": 0.004591156332384592,
+     "max_rate_hz": 180.0,
+     "frac_of_refractory_ceiling": 0.396
+    },
+    {
+     "population": "thermosensory",
+     "n_neurons": 25,
+     "mean_rate_hz": 44.048,
+     "frac_active": 0.64,
+     "share_of_all_spikes": 0.004249269922022115,
+     "max_rate_hz": 144.4,
+     "frac_of_refractory_ceiling": 0.31768
+    },
+    {
+     "population": "ALIN",
+     "n_neurons": 24,
+     "mean_rate_hz": 45.50833333333333,
+     "frac_active": 0.7083333333333334,
+     "share_of_all_spikes": 0.004214541054152338,
+     "max_rate_hz": 175.6,
+     "frac_of_refractory_ceiling": 0.38632
+    },
+    {
+     "population": "olfactory",
+     "n_neurons": 2639,
+     "mean_rate_hz": 0.33247442212959455,
+     "frac_active": 0.07199696854869268,
+     "share_of_all_spikes": 0.0033856787409936467,
+     "max_rate_hz": 108.0,
+     "frac_of_refractory_ceiling": 0.23760000000000003
+    },
+    {
+     "population": "MBON",
+     "n_neurons": 97,
+     "mean_rate_hz": 6.424742268041237,
+     "frac_active": 0.25773195876288657,
+     "share_of_all_spikes": 0.0024047811618272633,
+     "max_rate_hz": 82.8,
+     "frac_of_refractory_ceiling": 0.18216000000000002
+    },
+    {
+     "population": "DAN",
+     "n_neurons": 340,
+     "mean_rate_hz": 1.8305882352941176,
+     "frac_active": 0.11764705882352941,
+     "share_of_all_spikes": 0.0024016941513499493,
+     "max_rate_hz": 95.6,
+     "frac_of_refractory_ceiling": 0.21032
+    },
+    {
+     "population": "cb_motor",
+     "n_neurons": 107,
+     "mean_rate_hz": 4.9476635514018685,
+     "frac_active": 0.4205607476635514,
+     "share_of_all_spikes": 0.002042829183362248,
+     "max_rate_hz": 52.6,
+     "frac_of_refractory_ceiling": 0.11572000000000002
+    },
+    {
+     "population": "efferent_ascending",
+     "n_neurons": 8,
+     "mean_rate_hz": 23.224999999999998,
+     "frac_active": 0.75,
+     "share_of_all_spikes": 0.0007169581833560742,
+     "max_rate_hz": 88.2,
+     "frac_of_refractory_ceiling": 0.19404000000000002
+    },
+    {
+     "population": "ol_bilateral",
+     "n_neurons": 116,
+     "mean_rate_hz": 0.5431034482758621,
+     "frac_active": 0.13793103448275862,
+     "share_of_all_spikes": 0.00024310207508844282,
+     "max_rate_hz": 30.6,
+     "frac_of_refractory_ceiling": 0.06732
+    },
+    {
+     "population": "SEZPN",
+     "n_neurons": 27,
+     "mean_rate_hz": 1.7851851851851852,
+     "frac_active": 0.3333333333333333,
+     "share_of_all_spikes": 0.00018599238125814198,
+     "max_rate_hz": 26.0,
+     "frac_of_refractory_ceiling": 0.05720000000000001
+    },
+    {
+     "population": "visual",
+     "n_neurons": 4107,
+     "mean_rate_hz": 0.002678354029705381,
+     "frac_active": 0.013148283418553688,
+     "share_of_all_spikes": 4.2446394063061445e-05,
+     "max_rate_hz": 0.4,
+     "frac_of_refractory_ceiling": 0.0008800000000000001
+    },
+    {
+     "population": "cb_endocrine",
+     "n_neurons": 72,
+     "mean_rate_hz": 0.1222222222222222,
+     "frac_active": 0.125,
+     "share_of_all_spikes": 3.395711525044915e-05,
+     "max_rate_hz": 4.8,
+     "frac_of_refractory_ceiling": 0.01056
+    },
+    {
+     "population": "mechanosensory",
+     "n_neurons": 1733,
+     "mean_rate_hz": 0.0018465089440276978,
+     "frac_active": 0.009232544720138488,
+     "share_of_all_spikes": 1.2348041909254239e-05,
+     "max_rate_hz": 0.2,
+     "frac_of_refractory_ceiling": 0.00044000000000000007
+    },
+    {
+     "population": "mechanosensory_proprioceptive",
+     "n_neurons": 424,
+     "mean_rate_hz": 0.0047169811320754715,
+     "frac_active": 0.018867924528301886,
+     "share_of_all_spikes": 7.717526193283899e-06,
+     "max_rate_hz": 0.4,
+     "frac_of_refractory_ceiling": 0.0008800000000000001
+    },
+    {
+     "population": "gustatory",
+     "n_neurons": 355,
+     "mean_rate_hz": 0.0033802816901408457,
+     "frac_active": 0.016901408450704224,
+     "share_of_all_spikes": 4.63051571597034e-06,
+     "max_rate_hz": 0.2,
+     "frac_of_refractory_ceiling": 0.00044000000000000007
+    },
+    {
+     "population": "unknown_sensory",
+     "n_neurons": 143,
+     "mean_rate_hz": 0.002797202797202797,
+     "frac_active": 0.013986013986013986,
+     "share_of_all_spikes": 1.5435052386567799e-06,
+     "max_rate_hz": 0.2,
+     "frac_of_refractory_ceiling": 0.00044000000000000007
+    },
+    {
+     "population": "cb_efferent",
+     "n_neurons": 4,
+     "mean_rate_hz": 0.05,
+     "frac_active": 0.25,
+     "share_of_all_spikes": 7.717526193283899e-07,
+     "max_rate_hz": 0.2,
+     "frac_of_refractory_ceiling": 0.00044000000000000007
+    },
+    {
+     "population": "cb_sensory",
+     "n_neurons": 20,
+     "mean_rate_hz": 0.01,
+     "frac_active": 0.05,
+     "share_of_all_spikes": 7.717526193283899e-07,
+     "max_rate_hz": 0.2,
+     "frac_of_refractory_ceiling": 0.00044000000000000007
+    },
+    {
+     "population": "cb_sensory_tbc",
+     "n_neurons": 5,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "chemosensory",
+     "n_neurons": 1,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "efferent_descending",
+     "n_neurons": 4,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "mechanosensory_tbc",
+     "n_neurons": 11,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "ol_sensory",
+     "n_neurons": 7,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "sensory_ascending",
+     "n_neurons": 1,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "sensory_ascending_tbc",
+     "n_neurons": 1,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "visual_projection_tbc",
+     "n_neurons": 2,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    }
+   ],
+   "hottest_cells": [
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 299.2,
+     "frac_of_refractory_ceiling": 0.65824
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 296.0,
+     "frac_of_refractory_ceiling": 0.6512000000000001
+    },
+    {
+     "cell_type": "v2LN30",
+     "rate_hz": 294.2,
+     "frac_of_refractory_ceiling": 0.64724
+    },
+    {
+     "cell_type": "lLN2T_a",
+     "rate_hz": 294.0,
+     "frac_of_refractory_ceiling": 0.6468
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 293.8,
+     "frac_of_refractory_ceiling": 0.64636
+    },
+    {
+     "cell_type": "lLN2T_a",
+     "rate_hz": 293.6,
+     "frac_of_refractory_ceiling": 0.6459200000000002
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 293.0,
+     "frac_of_refractory_ceiling": 0.6446000000000001
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 291.8,
+     "frac_of_refractory_ceiling": 0.6419600000000001
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 291.2,
+     "frac_of_refractory_ceiling": 0.64064
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 291.0,
+     "frac_of_refractory_ceiling": 0.6402000000000001
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 290.8,
+     "frac_of_refractory_ceiling": 0.6397600000000001
+    },
+    {
+     "cell_type": "v2LN30",
+     "rate_hz": 290.6,
+     "frac_of_refractory_ceiling": 0.6393200000000001
+    }
+   ],
+   "share_of_spikes_in_top_population": 0.42558375368125995,
+   "top_population": "cb_intrinsic",
+   "antennal_lobe": {
+    "n_neurons": 3779,
+    "frac_of_brain": 0.026205021877968783,
+    "share_of_all_spikes": 0.4084215189326352,
+    "mean_rate_hz": 28.008097380259326,
+    "frac_active": 0.3320984387404075
+   }
+  },
+  "stage 5 offline period": {
+   "run": "results/stage5_sleep/real/sleep_seed0",
+   "epoch": "sleep",
+   "duration_s": 40.0,
+   "whole_brain_rate_hz_per_neuron": 1.8830617367848055,
+   "by_population": [
+    {
+     "population": "cb_intrinsic",
+     "n_neurons": 23538,
+     "mean_rate_hz": 4.902327088112839,
+     "frac_active": 0.40466479734896765,
+     "share_of_all_spikes": 0.42492757898093736,
+     "max_rate_hz": 266.1,
+     "frac_of_refractory_ceiling": 0.58542
+    },
+    {
+     "population": "ALPN",
+     "n_neurons": 686,
+     "mean_rate_hz": 78.59635568513119,
+     "frac_active": 0.9431486880466472,
+     "share_of_all_spikes": 0.19854986725498328,
+     "max_rate_hz": 251.25,
+     "frac_of_refractory_ceiling": 0.5527500000000001
+    },
+    {
+     "population": "ALLN",
+     "n_neurons": 420,
+     "mean_rate_hz": 126.83238095238097,
+     "frac_active": 0.9714285714285714,
+     "share_of_all_spikes": 0.19616544674557904,
+     "max_rate_hz": 312.025,
+     "frac_of_refractory_ceiling": 0.686455
+    },
+    {
+     "population": "CX",
+     "n_neurons": 2950,
+     "mean_rate_hz": 6.987923728813559,
+     "frac_active": 0.5162711864406779,
+     "share_of_all_spikes": 0.07591249195142999,
+     "max_rate_hz": 185.425,
+     "frac_of_refractory_ceiling": 0.40793500000000005
+    },
+    {
+     "population": "descending_neuron",
+     "n_neurons": 1314,
+     "mean_rate_hz": 4.7753044140030445,
+     "frac_active": 0.4337899543378995,
+     "share_of_all_spikes": 0.023106783924918186,
+     "max_rate_hz": 234.0,
+     "frac_of_refractory_ceiling": 0.5148
+    },
+    {
+     "population": "ascending_neuron",
+     "n_neurons": 1846,
+     "mean_rate_hz": 2.3171045503791983,
+     "frac_active": 0.2930660888407367,
+     "share_of_all_spikes": 0.015751445060097524,
+     "max_rate_hz": 122.4,
+     "frac_of_refractory_ceiling": 0.26928
+    },
+    {
+     "population": "ol_intrinsic",
+     "n_neurons": 89274,
+     "mean_rate_hz": 0.03648682707171181,
+     "frac_active": 0.1230257409772162,
+     "share_of_all_spikes": 0.011995108163390436,
+     "max_rate_hz": 88.075,
+     "frac_of_refractory_ceiling": 0.19376500000000002
+    },
+    {
+     "population": "visual_centrifugal",
+     "n_neurons": 563,
+     "mean_rate_hz": 5.408925399644759,
+     "frac_active": 0.4369449378330373,
+     "share_of_all_spikes": 0.011214049337066653,
+     "max_rate_hz": 88.125,
+     "frac_of_refractory_ceiling": 0.19387500000000002
+    },
+    {
+     "population": "hygrosensory",
+     "n_neurons": 66,
+     "mean_rate_hz": 27.36969696969697,
+     "frac_active": 0.6060606060606061,
+     "share_of_all_spikes": 0.006652072908398298,
+     "max_rate_hz": 125.05,
+     "frac_of_refractory_ceiling": 0.27511
+    },
+    {
+     "population": "Kenyon_Cell",
+     "n_neurons": 4064,
+     "mean_rate_hz": 0.4364972933070866,
+     "frac_active": 0.1186023622047244,
+     "share_of_all_spikes": 0.00653248363265636,
+     "max_rate_hz": 43.775,
+     "frac_of_refractory_ceiling": 0.096305
+    },
+    {
+     "population": "visual_projection",
+     "n_neurons": 9201,
+     "mean_rate_hz": 0.14170742310618412,
+     "frac_active": 0.09661993261602,
+     "share_of_all_spikes": 0.0048014311678560235,
+     "max_rate_hz": 71.85,
+     "frac_of_refractory_ceiling": 0.15807
+    },
+    {
+     "population": "ALON",
+     "n_neurons": 14,
+     "mean_rate_hz": 89.16785714285713,
+     "frac_active": 0.7857142857142857,
+     "share_of_all_spikes": 0.004597052267049941,
+     "max_rate_hz": 186.65,
+     "frac_of_refractory_ceiling": 0.41063000000000005
+    },
+    {
+     "population": "thermosensory",
+     "n_neurons": 25,
+     "mean_rate_hz": 46.185999999999986,
+     "frac_active": 0.64,
+     "share_of_all_spikes": 0.004252001762445799,
+     "max_rate_hz": 151.225,
+     "frac_of_refractory_ceiling": 0.332695
+    },
+    {
+     "population": "ALIN",
+     "n_neurons": 24,
+     "mean_rate_hz": 47.38333333333333,
+     "frac_active": 0.7083333333333334,
+     "share_of_all_spikes": 0.004187742090030195,
+     "max_rate_hz": 182.375,
+     "frac_of_refractory_ceiling": 0.40122500000000005
+    },
+    {
+     "population": "olfactory",
+     "n_neurons": 2639,
+     "mean_rate_hz": 0.34859795377036756,
+     "frac_active": 0.13338385752178855,
+     "share_of_all_spikes": 0.003387718374712696,
+     "max_rate_hz": 112.75,
+     "frac_of_refractory_ceiling": 0.24805000000000002
+    },
+    {
+     "population": "DAN",
+     "n_neurons": 340,
+     "mean_rate_hz": 1.898676470588235,
+     "frac_active": 0.25588235294117645,
+     "share_of_all_spikes": 0.002377239629105691,
+     "max_rate_hz": 99.125,
+     "frac_of_refractory_ceiling": 0.21807500000000002
+    },
+    {
+     "population": "MBON",
+     "n_neurons": 97,
+     "mean_rate_hz": 6.48118556701031,
+     "frac_active": 0.29896907216494845,
+     "share_of_all_spikes": 0.002315097395752491,
+     "max_rate_hz": 84.7,
+     "frac_of_refractory_ceiling": 0.18634000000000003
+    },
+    {
+     "population": "cb_motor",
+     "n_neurons": 107,
+     "mean_rate_hz": 5.186214953271028,
+     "frac_active": 0.5420560747663551,
+     "share_of_all_spikes": 0.0020435128203570223,
+     "max_rate_hz": 53.85,
+     "frac_of_refractory_ceiling": 0.11847000000000002
+    },
+    {
+     "population": "efferent_ascending",
+     "n_neurons": 8,
+     "mean_rate_hz": 24.546875,
+     "frac_active": 1.0,
+     "share_of_all_spikes": 0.0007231514710953918,
+     "max_rate_hz": 93.95,
+     "frac_of_refractory_ceiling": 0.20669
+    },
+    {
+     "population": "ol_bilateral",
+     "n_neurons": 116,
+     "mean_rate_hz": 0.5351293103448276,
+     "frac_active": 0.3275862068965517,
+     "share_of_all_spikes": 0.00022859135617184692,
+     "max_rate_hz": 31.75,
+     "frac_of_refractory_ceiling": 0.06985000000000001
+    },
+    {
+     "population": "SEZPN",
+     "n_neurons": 27,
+     "mean_rate_hz": 1.8175925925925924,
+     "frac_active": 0.37037037037037035,
+     "share_of_all_spikes": 0.00018071882084789992,
+     "max_rate_hz": 27.6,
+     "frac_of_refractory_ceiling": 0.06072000000000001
+    },
+    {
+     "population": "visual",
+     "n_neurons": 4107,
+     "mean_rate_hz": 0.0027453128804480155,
+     "frac_active": 0.10226442658875091,
+     "share_of_all_spikes": 4.152021813673096e-05,
+     "max_rate_hz": 0.05,
+     "frac_of_refractory_ceiling": 0.00011000000000000002
+    },
+    {
+     "population": "cb_endocrine",
+     "n_neurons": 72,
+     "mean_rate_hz": 0.12708333333333333,
+     "frac_active": 0.3055555555555556,
+     "share_of_all_spikes": 3.3694899862624234e-05,
+     "max_rate_hz": 5.5,
+     "frac_of_refractory_ceiling": 0.012100000000000001
+    },
+    {
+     "population": "mechanosensory",
+     "n_neurons": 1733,
+     "mean_rate_hz": 0.002221581073283324,
+     "frac_active": 0.08540103866128101,
+     "share_of_all_spikes": 1.4177635461322768e-05,
+     "max_rate_hz": 0.05,
+     "frac_of_refractory_ceiling": 0.00011000000000000002
+    },
+    {
+     "population": "mechanosensory_proprioceptive",
+     "n_neurons": 424,
+     "mean_rate_hz": 0.0025353773584905663,
+     "frac_active": 0.10141509433962265,
+     "share_of_all_spikes": 3.958690421018695e-06,
+     "max_rate_hz": 0.025,
+     "frac_of_refractory_ceiling": 5.500000000000001e-05
+    },
+    {
+     "population": "gustatory",
+     "n_neurons": 355,
+     "mean_rate_hz": 0.0026760563380281693,
+     "frac_active": 0.10422535211267606,
+     "share_of_all_spikes": 3.498377581365358e-06,
+     "max_rate_hz": 0.05,
+     "frac_of_refractory_ceiling": 0.00011000000000000002
+    },
+    {
+     "population": "unknown_sensory",
+     "n_neurons": 143,
+     "mean_rate_hz": 0.0013986013986013986,
+     "frac_active": 0.04895104895104895,
+     "share_of_all_spikes": 7.365005434453385e-07,
+     "max_rate_hz": 0.05,
+     "frac_of_refractory_ceiling": 0.00011000000000000002
+    },
+    {
+     "population": "cb_sensory",
+     "n_neurons": 20,
+     "mean_rate_hz": 0.0037500000000000007,
+     "frac_active": 0.1,
+     "share_of_all_spikes": 2.76187703792002e-07,
+     "max_rate_hz": 0.05,
+     "frac_of_refractory_ceiling": 0.00011000000000000002
+    },
+    {
+     "population": "ol_sensory",
+     "n_neurons": 7,
+     "mean_rate_hz": 0.0071428571428571435,
+     "frac_active": 0.14285714285714285,
+     "share_of_all_spikes": 1.8412513586133462e-07,
+     "max_rate_hz": 0.05,
+     "frac_of_refractory_ceiling": 0.00011000000000000002
+    },
+    {
+     "population": "cb_efferent",
+     "n_neurons": 4,
+     "mean_rate_hz": 0.00625,
+     "frac_active": 0.25,
+     "share_of_all_spikes": 9.206256793066731e-08,
+     "max_rate_hz": 0.025,
+     "frac_of_refractory_ceiling": 5.500000000000001e-05
+    },
+    {
+     "population": "efferent_descending",
+     "n_neurons": 4,
+     "mean_rate_hz": 0.00625,
+     "frac_active": 0.25,
+     "share_of_all_spikes": 9.206256793066731e-08,
+     "max_rate_hz": 0.025,
+     "frac_of_refractory_ceiling": 5.500000000000001e-05
+    },
+    {
+     "population": "sensory_ascending",
+     "n_neurons": 1,
+     "mean_rate_hz": 0.025,
+     "frac_active": 1.0,
+     "share_of_all_spikes": 9.206256793066731e-08,
+     "max_rate_hz": 0.025,
+     "frac_of_refractory_ceiling": 5.500000000000001e-05
+    },
+    {
+     "population": "visual_projection_tbc",
+     "n_neurons": 2,
+     "mean_rate_hz": 0.0125,
+     "frac_active": 0.5,
+     "share_of_all_spikes": 9.206256793066731e-08,
+     "max_rate_hz": 0.025,
+     "frac_of_refractory_ceiling": 5.500000000000001e-05
+    },
+    {
+     "population": "cb_sensory_tbc",
+     "n_neurons": 5,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "chemosensory",
+     "n_neurons": 1,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "mechanosensory_tbc",
+     "n_neurons": 11,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    },
+    {
+     "population": "sensory_ascending_tbc",
+     "n_neurons": 1,
+     "mean_rate_hz": 0.0,
+     "frac_active": 0.0,
+     "share_of_all_spikes": 0.0,
+     "max_rate_hz": 0.0,
+     "frac_of_refractory_ceiling": 0.0
+    }
+   ],
+   "hottest_cells": [
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 312.025,
+     "frac_of_refractory_ceiling": 0.686455
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 308.8,
+     "frac_of_refractory_ceiling": 0.6793600000000001
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 306.875,
+     "frac_of_refractory_ceiling": 0.6751250000000001
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 306.35,
+     "frac_of_refractory_ceiling": 0.6739700000000001
+    },
+    {
+     "cell_type": "lLN2T_a",
+     "rate_hz": 306.275,
+     "frac_of_refractory_ceiling": 0.673805
+    },
+    {
+     "cell_type": "lLN2T_a",
+     "rate_hz": 306.05,
+     "frac_of_refractory_ceiling": 0.6733100000000001
+    },
+    {
+     "cell_type": "v2LN30",
+     "rate_hz": 305.775,
+     "frac_of_refractory_ceiling": 0.672705
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 305.025,
+     "frac_of_refractory_ceiling": 0.671055
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 304.375,
+     "frac_of_refractory_ceiling": 0.669625
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 303.8,
+     "frac_of_refractory_ceiling": 0.6683600000000001
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 303.75,
+     "frac_of_refractory_ceiling": 0.66825
+    },
+    {
+     "cell_type": "lLN1_bc",
+     "rate_hz": 303.2,
+     "frac_of_refractory_ceiling": 0.6670400000000001
+    }
+   ],
+   "share_of_spikes_in_top_population": 0.42492757898093736,
+   "top_population": "cb_intrinsic",
+   "antennal_lobe": {
+    "n_neurons": 3779,
+    "frac_of_brain": 0.026205021877968783,
+    "share_of_all_spikes": 0.40688589341842857,
+    "mean_rate_hz": 29.238336861603596,
+    "frac_active": 0.3794654670547764
+   }
+  }
+ },
+ "recurrent_budget_in_top_population": [
+  {
+   "from": "ALLN",
+   "to": "ALLN",
+   "excitatory_synapses": 470727,
+   "inhibitory_synapses": 177214,
+   "fraction_excitatory": 0.7264967026318754,
+   "net_mV_if_every_source_spiked_once": 46896.039575
+  },
+  {
+   "from": "ALLN",
+   "to": "ALPN",
+   "excitatory_synapses": 279867,
+   "inhibitory_synapses": 176102,
+   "fraction_excitatory": 0.613785147674513,
+   "net_mV_if_every_source_spiked_once": 16579.052875
+  },
+  {
+   "from": "ALPN",
+   "to": "ALLN",
+   "excitatory_synapses": 402003,
+   "inhibitory_synapses": 4486,
+   "fraction_excitatory": 0.9889640310069892,
+   "net_mV_if_every_source_spiked_once": 63513.278675
+  },
+  {
+   "from": "ORN",
+   "to": "ALLN",
+   "excitatory_synapses": 632862,
+   "inhibitory_synapses": 0,
+   "fraction_excitatory": 1.0,
+   "net_mV_if_every_source_spiked_once": 101115.52605
+  },
+  {
+   "from": "ALPN",
+   "to": "ALPN",
+   "excitatory_synapses": 130323,
+   "inhibitory_synapses": 9962,
+   "fraction_excitatory": 0.9289874184695441,
+   "net_mV_if_every_source_spiked_once": 19230.678775
+  }
+ ],
+ "transmitter_mix_in_top_population": {
+  "acetylcholine": 144,
+  "gaba": 120,
+  "glutamate": 108,
+  "unknown": 46,
+  "octopamine": 2
+ },
+ "finding": "The offline state is not a brain-wide background, it is the antennal lobe running away. The whole brain averages 1.80 Hz per neuron at the operating point, and 41% of every spike comes from the 3,779 antennal-lobe neurons, 2.6% of the brain. Its local interneurons run at 122 Hz with 96% of them active and the fastest at 66% of the maximum rate the refractory period allows; its projection neurons at 75 Hz with 93% active. The Kenyon cells whose reactivation the replay test measures idle at 0.42 Hz, which reads as biological, but they sit downstream of that rather than in a background: they contribute 0.7% of the brain's spikes while being driven by a pathway two synapses upstream that never stops. Under the model's sign rule the local interneurons' connections onto each other are 73% excitatory by synapse count, so the population that damps this pathway in the fly amplifies it here. Whether that is the connectome's transmitter prediction being wrong for these cells, or the model representing as chemical excitation something those cells do by another route, is a literature question and is the one to settle next. It is not a tuning question, and nothing downstream of stage 2 can be read as being about the brain until it is answered.",
+ "provenance": {
+  "config": "configs/base.yaml",
+  "results_dir": "results/stage7_offline_state",
+  "files": [
+   "results/stage2_criticality/full/sigma1.55_seed0",
+   "results/stage5_sleep/real/sleep_seed0"
+  ]
+ }
+}
