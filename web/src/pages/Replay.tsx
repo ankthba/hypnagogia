@@ -527,6 +527,108 @@ function Stage6View({ d }: { d: Stage6 }) {
         </div>
       )}
 
+      {/* What it would take. Stage 11 says the model cannot have an episode; these two stages add the
+          missing ingredient and report what each does. Placed under the control that raises the question,
+          above the comparisons that depend on the answer. Both are labelled deviations and each carries
+          its own banner: nothing here is a property of the published model. */}
+      {d.slow_variable && (d.slow_variable.adaptation || d.slow_variable.depression) && (
+        <div className="card">
+          <div className="label label--ink mb-2">What it would take for this model to have an episode at all</div>
+          <p className="measure">{d.slow_variable.why}</p>
+
+          {d.slow_variable.adaptation?.runs && d.slow_variable.adaptation.runs.length > 0 && (
+            <>
+              <div className="label mt-4 mb-1">
+                One: a slow variable in every neuron{' '}
+                <span className="tone-failed">
+                  ({d.slow_variable.adaptation.constants_are === 'sourced' ? 'measured constants' : 'both constants unsourced, scanned'})
+                </span>
+              </div>
+              <p className="measure small">{d.slow_variable.adaptation.finding}</p>
+              <DataTable
+                columns={[
+                  { key: 'tau', header: 'tau (ms)', render: (r) => fmtNum(r.tau_ms, 0) },
+                  { key: 'b', header: 'b (mV)', render: (r) => fmtNum(r.b_mV, 2) },
+                  { key: 'brain', header: 'brain (Hz)', render: (r) => fmtNum(r.brain_rate_hz, 3) },
+                  { key: 'alln', header: 'antennal lobe (Hz)', render: (r) => fmtNum(r.alln_rate_hz, 1) },
+                  { key: 'kc', header: 'Kenyon cells (Hz)', render: (r) => fmtNum(r.kc_rate_hz, 3) },
+                  { key: 'ens', header: 'ensemble (Hz)', render: (r) => fmtNum(r.ensemble_rate_hz, 3) },
+                  { key: 'eps', header: 'ensemble episodes', render: (r) => fmtInt(r.ensemble_episodes) },
+                  {
+                    key: 'v',
+                    header: 'brain',
+                    render: (r) => {
+                      const ep = !r.brain_one_way && (r.brain_episodes ?? 0) >= 3;
+                      return <span className={ep ? 'tone-passed' : ''}>{ep ? 'episodic' : r.brain_one_way ? 'one-way' : 'continuous'}</span>;
+                    },
+                  },
+                ]}
+                rows={d.slow_variable.adaptation.runs}
+                rowKey={(r) => `${r.tau_ms}-${r.b_mV}`}
+              />
+              <p className="smaller muted mt-1">{d.slow_variable.adaptation.constants_note}</p>
+            </>
+          )}
+
+          {d.slow_variable.depression?.runs && d.slow_variable.depression.runs.length > 0 && (
+            <>
+              <div className="label mt-4 mb-1">
+                Two: synapses that depress with use <span className="tone-passed">(both constants measured, three times, in two laboratories)</span>
+              </div>
+              <p className="measure small">{d.slow_variable.depression.why_this_mechanism}</p>
+              {d.slow_variable.depression.measurement && (
+                <DataTable
+                  columns={[
+                    { key: 's', header: 'synapse', render: (r) => r.synapse },
+                    { key: 'f', header: 'f', render: (r) => fmtNum(r.f, 2) },
+                    { key: 't', header: 'tau (ms)', render: (r) => fmtInt(r.tau_ms) },
+                    { key: 'n', header: 'n', render: (r) => r.n },
+                    { key: 'src', header: 'measured by', render: (r) => <span className="smaller">{r.source}</span> },
+                  ]}
+                  rows={d.slow_variable.depression.measurement}
+                  rowKey={(r) => `${r.f}-${r.tau_ms}`}
+                />
+              )}
+              <p className="measure small mt-2">{d.slow_variable.depression.finding}</p>
+              <DataTable
+                columns={[
+                  {
+                    key: 'scope',
+                    header: 'scope arm',
+                    render: (r) => (
+                      <span title={d.slow_variable?.depression?.scope_definitions?.[r.scope ?? ''] ?? ''}>
+                        {r.scope}
+                        {r.scope === 'orn_only' && <span className="smaller muted"> (as measured)</span>}
+                      </span>
+                    ),
+                  },
+                  { key: 'ft', header: 'f, tau', render: (r) => `${fmtNum(r.f, 2)}, ${fmtInt(r.tau_ms)} ms` },
+                  { key: 'syn', header: 'synapses depressing', render: (r) => fmtInt(r.n_depressing_synapses) },
+                  { key: 'alln', header: 'antennal lobe (Hz)', render: (r) => fmtNum(r.alln_rate_hz, 2) },
+                  { key: 'kc', header: 'Kenyon cells (Hz)', render: (r) => fmtNum(r.kc_rate_hz, 3) },
+                  { key: 'ens', header: 'ensemble (Hz)', render: (r) => fmtNum(r.ensemble_rate_hz, 3) },
+                  {
+                    key: 'v',
+                    header: 'brain',
+                    render: (r) => (r.brain_one_way ? 'one-way' : (r.brain_frac_on ?? 0) > 0.95 ? 'continuous' : 'episodic'),
+                  },
+                ]}
+                rows={d.slow_variable.depression.runs}
+                rowKey={(r) => `${r.scope}-${r.f}-${r.tau_ms}`}
+              />
+              {d.slow_variable.depression.measured_target && (
+                <p className="smaller muted mt-2 measure">
+                  For comparison, what a sleeping fly actually does: {d.slow_variable.depression.measured_target.what} at{' '}
+                  {(d.slow_variable.depression.measured_target.frequency_hz ?? []).map((x) => fmtNum(x, 1)).join(' to ')} Hz.{' '}
+                  {d.slow_variable.depression.measured_target.source}
+                </p>
+              )}
+            </>
+          )}
+          <ProvenanceFooter provenance={d.provenance} />
+        </div>
+      )}
+
       {/* This block sits above the comparisons on purpose. A detector that has never been shown to find
           replay when replay is present cannot certify that replay is absent, so the reader needs to know
           the control failed before reading a single effect size. Every number in it is injected by hand

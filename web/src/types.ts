@@ -451,6 +451,38 @@ export interface Stage6 extends StageBase {
       source_file?: string;
     }>;
   } | null;
+  /**
+   * Stages 12 and 13: what it would take for this model to have an episode at all. Both are labelled
+   * deviations and neither is a property of the published model; the banner travels with each.
+   */
+  slow_variable?: {
+    why?: string;
+    adaptation?: {
+      IS_A_LABELLED_DEVIATION?: string; constants_are?: string; constants_note?: string; finding?: string;
+      duration_s?: number; tau_ms_scanned?: number[]; b_mV_scanned?: number[];
+      any_brain_episodes?: boolean; any_ensemble_episodes?: boolean;
+      runs?: Array<{ tau_ms?: number; b_mV?: number; brain_rate_hz?: number; brain_frac_on?: number;
+                     brain_episodes?: number; brain_mean_episode_s?: number; brain_one_way?: boolean;
+                     kc_rate_hz?: number; alln_rate_hz?: number; ensemble_rate_hz?: number;
+                     ensemble_frac_on?: number; ensemble_episodes?: number;
+                     ensemble_ratio_to_other_kcs?: number }>;
+      source_file?: string;
+    };
+    depression?: {
+      IS_A_LABELLED_DEVIATION?: string; finding?: string; duration_s?: number; why_this_mechanism?: string;
+      measurement?: Array<{ synapse?: string; f?: number; tau_ms?: number; n?: string; source?: string }>;
+      scope_definitions?: Record<string, string>;
+      predicted_steady_state_scaling?: Record<string, Record<string, number>>;
+      measured_target?: { what?: string; frequency_hz?: number[]; period_s?: number[]; period_is_derived?: string;
+                          up_down_amplitude_mV?: string; sleep_dependence?: string; source?: string } | null;
+      n_runs_with_brain_episodes?: number; n_runs_with_ensemble_episodes?: number;
+      runs?: Array<{ scope?: string; f?: number; tau_ms?: number; n_depressing_synapses?: number;
+                     brain_rate_hz?: number; brain_frac_on?: number; brain_episodes?: number;
+                     brain_one_way?: boolean; alln_rate_hz?: number; alpn_rate_hz?: number;
+                     kc_rate_hz?: number; ensemble_rate_hz?: number; ensemble_too_sparse?: boolean }>;
+      source_file?: string;
+    };
+  } | null;
   return_path?: { finding?: string } | null;
   readout_gate?: { finding?: string } | null;
   recurrence_census?: { finding?: string } | null;

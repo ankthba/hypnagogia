@@ -82,6 +82,9 @@ def episodes(rate, bin_s, floor_hz, rel=0.25):
             "max_s": float(durs.max()) if len(durs) else 0.0,
             # off, on once, still on at the end: an ignition, which stage 11 showed is all this model had
             "one_way": bool(len(durs) == 1 and on[-1] and not on[0]),
+            # Below one spike per cell per run there is nothing to call an episode, whatever shape the
+            # threshold crossings make: a relative threshold on almost nothing is crossed by single spikes.
+            "too_sparse": bool(rate.mean() < 0.02),
             "cv": float(rate.std() / rate.mean()) if rate.mean() > 0 else 0.0,
             "rate_hz": float(rate.mean())}
 
@@ -175,7 +178,8 @@ def main():
     # A brain that has up and down states: on for some of the time, off for some of the time, more than once.
     def episodic(r, pop="brain"):
         p = r["pop"].get(pop, {})
-        return bool(0.02 <= p.get("frac_on", 0) <= 0.95 and p.get("n_episodes", 0) >= 3 and not p.get("one_way"))
+        return bool(0.02 <= p.get("frac_on", 0) <= 0.95 and p.get("n_episodes", 0) >= 3
+                    and not p.get("one_way") and not p.get("too_sparse"))
     dreaming = [r for r in ok if episodic(r, "brain")]
     ens_dreaming = [r for r in ok if episodic(r, "ensemble")]
 

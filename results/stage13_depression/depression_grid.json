@@ -771,5 +771,20 @@
    "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_all_0.75_1566_seed0",
    "/Users/ankthba/Developer/fly/results/stage13_depression/grid_al_all_0.72_2400_seed0"
   ]
+ },
+ "measured_target": {
+  "what": "Network-generated slow-wave activity, up states and down states, in the R5 ellipsoid-body ring neurons that carry the sleep homeostat. About 10 cells per hemisphere.",
+  "frequency_hz": [
+   0.5,
+   1.5
+  ],
+  "period_s": [
+   0.67,
+   2.0
+  ],
+  "period_is_derived": "The paper prints the frequency band, not a period and not an episode duration. 0.67 to 2.0 s is 1/f of the printed band and is arithmetic, not a measurement.",
+  "up_down_amplitude_mV": "about 26 +/- 7",
+  "sleep_dependence": "Frequency is unchanged by sleep deprivation; up and down state POWER increases significantly with it.",
+  "source": "Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, DOI 10.1016/j.cub.2019.08.070, PMID 31630950. In vivo, with simultaneous patch clamp."
  }
 }

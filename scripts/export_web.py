@@ -262,6 +262,66 @@ def main():
                                             "episode_duration_s_mean": r.get("episode_duration_s_mean"),
                                             "verdict": _verdict(r)} for r in runs],
                                   "source_file": str(cand.relative_to(RESULTS.parent))})
+                # Stages 12 and 13: what it would take for this model to have an episode at all, and what
+                # happened when the two candidate mechanisms were actually added. Both are labelled
+                # deviations and the banner travels with each; they sit with the replay verdict because
+                # they are the answer to the question the verdict raises.
+                a12 = load_json(RESULTS / "stage12_adaptation/adaptation_grid.json")
+                a13 = load_json(RESULTS / "stage13_depression/depression_grid.json")
+                if a12 or a13:
+                    sv = {"why": ("Stage 11 established that this model class cannot represent an episode. "
+                                  "These two stages add the missing ingredient, in two different ways, and "
+                                  "report what each does. Both are labelled deviations: no run below is a "
+                                  "property of the published model.")}
+                    if a12:
+                        def row12(r):
+                            pop = r.get("pop") or {}
+                            g = lambda k, f: (pop.get(k) or {}).get(f)
+                            return {"tau_ms": r.get("tau_ms"), "b_mV": r.get("b_mV"),
+                                    "brain_rate_hz": g("brain", "rate_hz"), "brain_frac_on": g("brain", "frac_on"),
+                                    "brain_episodes": g("brain", "n_episodes"),
+                                    "brain_mean_episode_s": g("brain", "mean_s"),
+                                    "brain_one_way": g("brain", "one_way"),
+                                    "kc_rate_hz": g("KC", "rate_hz"), "alln_rate_hz": g("ALLN", "rate_hz"),
+                                    "ensemble_rate_hz": g("ensemble", "rate_hz"),
+                                    "ensemble_frac_on": g("ensemble", "frac_on"),
+                                    "ensemble_episodes": g("ensemble", "n_episodes"),
+                                    "ensemble_ratio_to_other_kcs": g("ensemble", "ratio_to_other_kcs")}
+                        sv["adaptation"] = {
+                            "IS_A_LABELLED_DEVIATION": a12.get("IS_A_LABELLED_DEVIATION"),
+                            "constants_are": a12.get("constants_are"),
+                            "constants_note": a12.get("constants_note"),
+                            "finding": a12.get("finding"), "duration_s": a12.get("duration_s"),
+                            "tau_ms_scanned": a12.get("tau_ms_scanned"), "b_mV_scanned": a12.get("b_mV_scanned"),
+                            "any_brain_episodes": a12.get("any_setting_gave_brain_episodes"),
+                            "any_ensemble_episodes": a12.get("any_setting_gave_ensemble_episodes"),
+                            "runs": [row12(r) for r in (a12.get("per_run") or []) if "error" not in r],
+                            "source_file": "results/stage12_adaptation/adaptation_grid.json"}
+                    if a13:
+                        def row13(r):
+                            pop = r.get("pop") or {}
+                            g = lambda k, f: (pop.get(k) or {}).get(f)
+                            return {"scope": r.get("scope"), "f": r.get("f"), "tau_ms": r.get("tau_ms"),
+                                    "n_depressing_synapses": r.get("n_depressing_synapses"),
+                                    "brain_rate_hz": g("brain", "rate_hz"), "brain_frac_on": g("brain", "frac_on"),
+                                    "brain_episodes": g("brain", "n_episodes"), "brain_one_way": g("brain", "one_way"),
+                                    "alln_rate_hz": g("ALLN", "rate_hz"), "alpn_rate_hz": g("ALPN", "rate_hz"),
+                                    "kc_rate_hz": g("KC", "rate_hz"),
+                                    "ensemble_rate_hz": g("ensemble", "rate_hz"),
+                                    "ensemble_too_sparse": g("ensemble", "too_sparse")}
+                        sv["depression"] = {
+                            "IS_A_LABELLED_DEVIATION": a13.get("IS_A_LABELLED_DEVIATION"),
+                            "finding": a13.get("finding"), "duration_s": a13.get("duration_s"),
+                            "measurement": (a13.get("deviation") or {}).get("measurement"),
+                            "why_this_mechanism": (a13.get("deviation") or {}).get("why_this_mechanism_for_this_failure"),
+                            "scope_definitions": a13.get("scope_definitions"),
+                            "predicted_steady_state_scaling": a13.get("predicted_steady_state_scaling"),
+                            "measured_target": a13.get("measured_target"),
+                            "n_runs_with_brain_episodes": a13.get("n_runs_with_brain_episodes"),
+                            "n_runs_with_ensemble_episodes": a13.get("n_runs_with_ensemble_episodes"),
+                            "runs": [row13(r) for r in (a13.get("per_run") or []) if "error" not in r],
+                            "source_file": "results/stage13_depression/depression_grid.json"}
+                    d["slow_variable"] = sv
                 if scans:
                     d["detector_control"] = {
                         "IS_NOT_A_RESULT": banner,

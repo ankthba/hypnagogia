@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T20:28:43+00:00",
- "git_commit": "24042e5",
+ "generated_at": "2026-09-12T21:25:44+00:00",
+ "git_commit": "6bb2700",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",

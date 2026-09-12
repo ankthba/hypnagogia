@@ -7827,8 +7827,8 @@
    "results/stage5_sleep/real/sleep_seed8/spikes.npz",
    "results/stage5_sleep/real/sleep_seed9/spikes.npz"
   ],
-  "git_commit": "24042e5",
-  "generated_at": "2026-09-12T20:28:43+00:00"
+  "git_commit": "6bb2700",
+  "generated_at": "2026-09-12T21:25:44+00:00"
  },
  "source_file": "results/stage6_replay/stage6.json",
  "structure_confound": {
@@ -8875,6 +8875,422 @@
    "source_file": "results/stage6_replay_bin10/stage6.json"
   }
  ],
+ "slow_variable": {
+  "why": "Stage 11 established that this model class cannot represent an episode. These two stages add the missing ingredient, in two different ways, and report what each does. Both are labelled deviations: no run below is a property of the published model.",
+  "adaptation": {
+   "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term the Shiu et al. 2024 model does not have. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model.",
+   "constants_are": "unsourced",
+   "constants_note": "Neither adaptation constant has a measurement behind it, so both are SCANNED and the range is reported instead of a value. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be.",
+   "finding": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term the Shiu et al. 2024 model does not have. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model. Neither adaptation constant has a measurement behind it, so both are SCANNED and the range is reported instead of a value. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be. With adaptation the brain does have up and down states: 1 of 12 scanned settings produce repeated global episodes, and 4 produce repeated episodes in the trained Kenyon-cell ensemble. This is the first configuration in the project in which an episode exists at all, which is the precondition for asking whether a memory reappears in one. A run whose population fires below one spike per cell per run is marked sparse and cannot count as episodic, whatever shape its threshold crossings make.",
+   "duration_s": 20.0,
+   "tau_ms_scanned": [
+    200.0,
+    600.0,
+    2000.0
+   ],
+   "b_mV_scanned": [
+    0.05,
+    0.15,
+    0.5,
+    1.5
+   ],
+   "any_brain_episodes": true,
+   "any_ensemble_episodes": true,
+   "runs": [
+    {
+     "tau_ms": 200.0,
+     "b_mV": 0.05,
+     "brain_rate_hz": 1.4861891421478548,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.28681102362204725,
+     "alln_rate_hz": 103.1442857142857,
+     "ensemble_rate_hz": 5.4335227272727264,
+     "ensemble_frac_on": 0.835,
+     "ensemble_episodes": 1,
+     "ensemble_ratio_to_other_kcs": 100.9342396733701
+    },
+    {
+     "tau_ms": 200.0,
+     "b_mV": 0.15,
+     "brain_rate_hz": 1.3324355622741992,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.1792076771653543,
+     "alln_rate_hz": 97.53238095238095,
+     "ensemble_rate_hz": 3.6650568181818177,
+     "ensemble_frac_on": 0.835,
+     "ensemble_episodes": 1,
+     "ensemble_ratio_to_other_kcs": 171.168058968059
+    },
+    {
+     "tau_ms": 200.0,
+     "b_mV": 0.5,
+     "brain_rate_hz": 0.9353438412304362,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.04313484251968504,
+     "alln_rate_hz": 82.6463095238095,
+     "ensemble_rate_hz": 0.9647727272727272,
+     "ensemble_frac_on": 0.39,
+     "ensemble_episodes": 42,
+     "ensemble_ratio_to_other_kcs": 682.0066115702479
+    },
+    {
+     "tau_ms": 200.0,
+     "b_mV": 1.5,
+     "brain_rate_hz": 0.5156484685421853,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.0030511811023622047,
+     "alln_rate_hz": 57.924047619047606,
+     "ensemble_rate_hz": 0.06704545454545455,
+     "ensemble_frac_on": 0.01,
+     "ensemble_episodes": 1,
+     "ensemble_ratio_to_other_kcs": 434.4545454545455
+    },
+    {
+     "tau_ms": 600.0,
+     "b_mV": 0.05,
+     "brain_rate_hz": 1.3388287138805484,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.18499015748031497,
+     "alln_rate_hz": 97.84785714285714,
+     "ensemble_rate_hz": 3.76590909090909,
+     "ensemble_frac_on": 0.835,
+     "ensemble_episodes": 1,
+     "ensemble_ratio_to_other_kcs": 164.51521961184883
+    },
+    {
+     "tau_ms": 600.0,
+     "b_mV": 0.15,
+     "brain_rate_hz": 0.9956587314245298,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.05682824803149607,
+     "alln_rate_hz": 85.13797619047618,
+     "ensemble_rate_hz": 1.2477272727272726,
+     "ensemble_frac_on": 0.125,
+     "ensemble_episodes": 12,
+     "ensemble_ratio_to_other_kcs": 427.41529835802964
+    },
+    {
+     "tau_ms": 600.0,
+     "b_mV": 0.5,
+     "brain_rate_hz": 0.5288362723547074,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.004539862204724409,
+     "alln_rate_hz": 58.710357142857134,
+     "ensemble_rate_hz": 0.09801136363636362,
+     "ensemble_frac_on": 0.02,
+     "ensemble_episodes": 1,
+     "ensemble_ratio_to_other_kcs": 317.55681818181813
+    },
+    {
+     "tau_ms": 600.0,
+     "b_mV": 1.5,
+     "brain_rate_hz": 0.0748642595122357,
+     "brain_frac_on": 0.085,
+     "brain_episodes": 4,
+     "brain_mean_episode_s": 0.42500000000000004,
+     "brain_one_way": false,
+     "kc_rate_hz": 0.003026574803149606,
+     "alln_rate_hz": 8.170119047619048,
+     "ensemble_rate_hz": 0.055397727272727265,
+     "ensemble_frac_on": 0.03,
+     "ensemble_episodes": 4,
+     "ensemble_ratio_to_other_kcs": 84.46524064171123
+    },
+    {
+     "tau_ms": 2000.0,
+     "b_mV": 0.05,
+     "brain_rate_hz": 1.0014974793528837,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.0655265748031496,
+     "alln_rate_hz": 85.70797619047619,
+     "ensemble_rate_hz": 1.4022727272727271,
+     "ensemble_frac_on": 0.16,
+     "ensemble_episodes": 7,
+     "ensemble_ratio_to_other_kcs": 279.59160839160836
+    },
+    {
+     "tau_ms": 2000.0,
+     "b_mV": 0.15,
+     "brain_rate_hz": 0.5772600877892503,
+     "brain_frac_on": 0.84,
+     "brain_episodes": 1,
+     "brain_mean_episode_s": 16.8,
+     "brain_one_way": true,
+     "kc_rate_hz": 0.011122047244094485,
+     "alln_rate_hz": 61.77107142857143,
+     "ensemble_rate_hz": 0.23380681818181814,
+     "ensemble_frac_on": 0.035,
+     "ensemble_episodes": 1,
+     "ensemble_ratio_to_other_kcs": 224.4545454545454
+    },
+    {
+     "tau_ms": 2000.0,
+     "b_mV": 0.5,
+     "brain_rate_hz": 0.10248978912550534,
+     "brain_frac_on": 0.095,
+     "brain_episodes": 2,
+     "brain_mean_episode_s": 0.95,
+     "brain_one_way": false,
+     "kc_rate_hz": 0.004625984251968504,
+     "alln_rate_hz": 11.124642857142856,
+     "ensemble_rate_hz": 0.0911931818181818,
+     "ensemble_frac_on": 0.025,
+     "ensemble_episodes": 2,
+     "ensemble_ratio_to_other_kcs": 128.9305785123967
+    },
+    {
+     "tau_ms": 2000.0,
+     "b_mV": 1.5,
+     "brain_rate_hz": 0.032622790533184474,
+     "brain_frac_on": 0.035,
+     "brain_episodes": 2,
+     "brain_mean_episode_s": 0.35000000000000003,
+     "brain_one_way": false,
+     "kc_rate_hz": 0.001636318897637795,
+     "alln_rate_hz": 3.0576190476190472,
+     "ensemble_rate_hz": 0.025852272727272724,
+     "ensemble_frac_on": 0.015,
+     "ensemble_episodes": 2,
+     "ensemble_ratio_to_other_kcs": 47.86363636363636
+    }
+   ],
+   "source_file": "results/stage12_adaptation/adaptation_grid.json"
+  },
+  "depression": {
+   "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Excitatory synapses depress with use. The two constants are measured (ORN->PN, glomeruli DM6 and VM2: f=0.78, tau=893 ms; ORN->LN (GABAergic antennal-lobe local neurons): f=0.75, tau=1566 ms; ORN->PN, glomerulus DM4: f=0.72, tau=2400 ms). The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding depression changes what a synapse is, so no run with it switched on is a property of the published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. Applying the same two constants to any other synapse is an extrapolation the measurements do not license, which is why the scope is an arm of the experiment and not a setting.",
+   "finding": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Excitatory synapses depress with use. The two constants are measured (ORN->PN, glomeruli DM6 and VM2: f=0.78, tau=893 ms; ORN->LN (GABAergic antennal-lobe local neurons): f=0.75, tau=1566 ms; ORN->PN, glomerulus DM4: f=0.72, tau=2400 ms). The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding depression changes what a synapse is, so no run with it switched on is a property of the published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. Applying the same two constants to any other synapse is an extrapolation the measurements do not license, which is why the scope is an arm of the experiment and not a setting. The brain has up and down states in 0 of 9 runs and the trained Kenyon-cell ensemble in 6. Every constant behind the mechanism is measured; the scope is an arm and the arms are reported separately, because the recordings are at ORN to PN and ORN to LN synapses and say nothing about any other synapse.",
+   "duration_s": 20.0,
+   "measurement": [
+    {
+     "synapse": "ORN->PN, glomeruli DM6 and VM2",
+     "f": 0.78,
+     "tau_ms": 893,
+     "n": "19 PNs from 19 flies",
+     "source": "Nagel KI, Hong EJ, Wilson RI (2015) Nature Neuroscience 18:56-65, DOI 10.1038/nn.3895, PMID 25485755. Fit to mean normalised EPSC amplitudes during a 10 Hz train."
+    },
+    {
+     "synapse": "ORN->LN (GABAergic antennal-lobe local neurons)",
+     "f": 0.75,
+     "tau_ms": 1566,
+     "n": "9 LNs",
+     "source": "Nagel KI, Wilson RI (2016) Journal of Neuroscience 36:4325-4338, DOI 10.1523/JNEUROSCI.3887-15.2016. Fit to mean normalised EPSC amplitudes during a 10 Hz train."
+    },
+    {
+     "synapse": "ORN->PN, glomerulus DM4",
+     "f": 0.72,
+     "tau_ms": 2400,
+     "n": "not stated in the entry",
+     "source": "Kazama H, Wilson RI (2009) Nature Neuroscience 12:1136-1144, DOI 10.1038/nn.2376, PMID 19684589."
+    }
+   ],
+   "why_this_mechanism": "Depression is rate-selective, and the offline state's problem is a rate. At the measured constants the steady-state weight scaling A* = (1 - exp(-1/(r*tau))) / (1 - f*exp(-1/(r*tau))) removes 94 to 99 per cent of the excitatory drive from the antennal-lobe populations that run away at 122 and 75 Hz, and 2 to 14 per cent from the Kenyon cells at 0.42 Hz whose reactivation is the thing being measured. Nothing was chosen to make that happen: it follows from the measured constants and the model's own measured rates. Depression also acts on the recurrent excitatory loop that carries the runaway, which is where a slow negative feedback has to act to turn a bistable switch into a relaxation oscillator.",
+   "scope_definitions": {
+    "orn_only": "exactly the synapses the constants were measured at: ORN onto antennal-lobe cells",
+    "al_local": "every excitatory synapse inside the antennal lobe, which is the loop that runs away",
+    "al_all": "every excitatory synapse onto an antennal-lobe cell, whatever the source",
+    "brain": "every excitatory synapse in the brain"
+   },
+   "predicted_steady_state_scaling": {
+    "0.78_893": {
+     "ALLN": 0.04022803134240016,
+     "ALPN": 0.06400092680320364,
+     "KC": 0.9838303989193462,
+     "optic": 0.9999999999999999
+    },
+    "0.75_1566": {
+     "ALLN": 0.020560009828270727,
+     "ALPN": 0.03307132315175051,
+     "KC": 0.9346246605206303,
+     "optic": 0.9999999998575383
+    },
+    "0.72_2400": {
+     "ALLN": 0.012070868597224858,
+     "ALPN": 0.019508339273166406,
+     "KC": 0.8583564781266843,
+     "optic": 0.99999973981005
+    }
+   },
+   "measured_target": {
+    "what": "Network-generated slow-wave activity, up states and down states, in the R5 ellipsoid-body ring neurons that carry the sleep homeostat. About 10 cells per hemisphere.",
+    "frequency_hz": [
+     0.5,
+     1.5
+    ],
+    "period_s": [
+     0.67,
+     2.0
+    ],
+    "period_is_derived": "The paper prints the frequency band, not a period and not an episode duration. 0.67 to 2.0 s is 1/f of the printed band and is arithmetic, not a measurement.",
+    "up_down_amplitude_mV": "about 26 +/- 7",
+    "sleep_dependence": "Frequency is unchanged by sleep deprivation; up and down state POWER increases significantly with it.",
+    "source": "Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, DOI 10.1016/j.cub.2019.08.070, PMID 31630950. In vivo, with simultaneous patch clamp."
+   },
+   "n_runs_with_brain_episodes": 0,
+   "n_runs_with_ensemble_episodes": 0,
+   "runs": [
+    {
+     "scope": "orn_only",
+     "f": 0.78,
+     "tau_ms": 893,
+     "n_depressing_synapses": 156820,
+     "brain_rate_hz": 1.8807494677863377,
+     "brain_frac_on": 1.0,
+     "brain_episodes": 1,
+     "brain_one_way": false,
+     "alln_rate_hz": 126.62416666666664,
+     "alpn_rate_hz": 78.45349854227405,
+     "kc_rate_hz": 0.4274975393700787,
+     "ensemble_rate_hz": 7.73153409090909,
+     "ensemble_too_sparse": false
+    },
+    {
+     "scope": "orn_only",
+     "f": 0.75,
+     "tau_ms": 1566,
+     "n_depressing_synapses": 156820,
+     "brain_rate_hz": 1.8822635896511315,
+     "brain_frac_on": 1.0,
+     "brain_episodes": 1,
+     "brain_one_way": false,
+     "alln_rate_hz": 126.55845238095236,
+     "alpn_rate_hz": 78.45109329446063,
+     "kc_rate_hz": 0.42883858267716535,
+     "ensemble_rate_hz": 7.767613636363636,
+     "ensemble_too_sparse": false
+    },
+    {
+     "scope": "orn_only",
+     "f": 0.72,
+     "tau_ms": 2400,
+     "n_depressing_synapses": 156820,
+     "brain_rate_hz": 1.8796635438842235,
+     "brain_frac_on": 1.0,
+     "brain_episodes": 1,
+     "brain_one_way": false,
+     "alln_rate_hz": 126.61619047619045,
+     "alpn_rate_hz": 78.42937317784258,
+     "kc_rate_hz": 0.4275221456692913,
+     "ensemble_rate_hz": 7.7460227272727264,
+     "ensemble_too_sparse": false
+    },
+    {
+     "scope": "al_local",
+     "f": 0.78,
+     "tau_ms": 893,
+     "n_depressing_synapses": 104163,
+     "brain_rate_hz": 0.30309412033922983,
+     "brain_frac_on": 0.895,
+     "brain_episodes": 1,
+     "brain_one_way": true,
+     "alln_rate_hz": 3.7977380952380946,
+     "alpn_rate_hz": 2.3392128279883377,
+     "kc_rate_hz": 0.0027928149606299213,
+     "ensemble_rate_hz": 0.003409090909090909,
+     "ensemble_too_sparse": true
+    },
+    {
+     "scope": "al_local",
+     "f": 0.75,
+     "tau_ms": 1566,
+     "n_depressing_synapses": 104163,
+     "brain_rate_hz": 0.29948026822181695,
+     "brain_frac_on": 0.895,
+     "brain_episodes": 1,
+     "brain_one_way": true,
+     "alln_rate_hz": 3.7644047619047614,
+     "alpn_rate_hz": 2.290087463556851,
+     "kc_rate_hz": 0.002731299212598425,
+     "ensemble_rate_hz": 0.002556818181818182,
+     "ensemble_too_sparse": true
+    },
+    {
+     "scope": "al_local",
+     "f": 0.72,
+     "tau_ms": 2400,
+     "n_depressing_synapses": 104163,
+     "brain_rate_hz": 0.31585892697404455,
+     "brain_frac_on": 0.895,
+     "brain_episodes": 1,
+     "brain_one_way": true,
+     "alln_rate_hz": 0.7619047619047618,
+     "alpn_rate_hz": 0.3935131195335277,
+     "kc_rate_hz": 0.0027928149606299213,
+     "ensemble_rate_hz": 0.003125,
+     "ensemble_too_sparse": true
+    },
+    {
+     "scope": "al_all",
+     "f": 0.78,
+     "tau_ms": 893,
+     "n_depressing_synapses": 298181,
+     "brain_rate_hz": 0.3014530993211242,
+     "brain_frac_on": 0.895,
+     "brain_episodes": 1,
+     "brain_one_way": true,
+     "alln_rate_hz": 0.5263095238095238,
+     "alpn_rate_hz": 0.16909620991253643,
+     "kc_rate_hz": 0.002768208661417323,
+     "ensemble_rate_hz": 0.003977272727272727,
+     "ensemble_too_sparse": true
+    },
+    {
+     "scope": "al_all",
+     "f": 0.75,
+     "tau_ms": 1566,
+     "n_depressing_synapses": 298181,
+     "brain_rate_hz": 0.27670845786324016,
+     "brain_frac_on": 0.895,
+     "brain_episodes": 1,
+     "brain_one_way": true,
+     "alln_rate_hz": 0.2421428571428571,
+     "alpn_rate_hz": 0.07806122448979591,
+     "kc_rate_hz": 0.002768208661417323,
+     "ensemble_rate_hz": 0.003409090909090909,
+     "ensemble_too_sparse": true
+    },
+    {
+     "scope": "al_all",
+     "f": 0.72,
+     "tau_ms": 2400,
+     "n_depressing_synapses": 298181,
+     "brain_rate_hz": 0.2699727478867477,
+     "brain_frac_on": 0.895,
+     "brain_episodes": 1,
+     "brain_one_way": true,
+     "alln_rate_hz": 0.21154761904761904,
+     "alpn_rate_hz": 0.07106413994169096,
+     "kc_rate_hz": 0.0026451771653543303,
+     "ensemble_rate_hz": 0.003409090909090909,
+     "ensemble_too_sparse": true
+    }
+   ],
+   "source_file": "results/stage13_depression/depression_grid.json"
+  }
+ },
  "detector_control": {
   "IS_NOT_A_RESULT": "INJECTED POSITIVE CONTROL, NOT A RESULT. The recurrent connections among the trained ensemble were multiplied by a factor chosen by the experimenter. Nothing here is learned, measured, or a property of the connectome, and no output derived from it may be reported as evidence about the fly or about the published model. Its only purpose is to test whether the stage-6 detector can find replay when replay is present.",
   "question": "Could the stage-6 detector find replay if replay were present?",

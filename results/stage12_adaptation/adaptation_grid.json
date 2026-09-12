@@ -52,6 +52,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43807726513453593,
      "rate_hz": 1.4861891421478548
     },
@@ -61,6 +62,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44966162974883717,
      "rate_hz": 0.28681102362204725
     },
@@ -70,6 +72,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43869895040425566,
      "rate_hz": 103.1442857142857
     },
@@ -79,6 +82,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4388497864239281,
      "rate_hz": 63.37667638483965
     },
@@ -88,6 +92,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44911442028212994,
      "rate_hz": 5.068556701030928
     },
@@ -97,6 +102,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44846297393449547,
      "rate_hz": 5.4335227272727264,
      "ratio_to_other_kcs": 100.9342396733701,
@@ -115,6 +121,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4376825464214826,
      "rate_hz": 1.3324355622741992
     },
@@ -124,6 +131,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.45850172093459257,
      "rate_hz": 0.1792076771653543
     },
@@ -133,6 +141,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43854458741087804,
      "rate_hz": 97.53238095238095
     },
@@ -142,6 +151,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4387048335758846,
      "rate_hz": 59.01690962099124
     },
@@ -151,6 +161,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.45168700330084194,
      "rate_hz": 4.274226804123711
     },
@@ -160,6 +171,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4555465433234955,
      "rate_hz": 3.6650568181818177,
      "ratio_to_other_kcs": 171.168058968059,
@@ -178,6 +190,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4409427806938739,
      "rate_hz": 0.9353438412304362
     },
@@ -187,6 +200,7 @@
      "mean_s": 0.15588235294117647,
      "max_s": 0.8,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.5694203473732496,
      "rate_hz": 0.04313484251968504
     },
@@ -196,6 +210,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43839055962217394,
      "rate_hz": 82.6463095238095
     },
@@ -205,6 +220,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4385766029065616,
      "rate_hz": 47.56282798833819
     },
@@ -214,6 +230,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4955283655252203,
      "rate_hz": 2.1438144329896907
     },
@@ -223,6 +240,7 @@
      "mean_s": 0.18571428571428572,
      "max_s": 0.8,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.5518341622928921,
      "rate_hz": 0.9647727272727272,
      "ratio_to_other_kcs": 682.0066115702479,
@@ -241,6 +259,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44019831108482954,
      "rate_hz": 0.5156484685421853
     },
@@ -250,6 +269,7 @@
      "mean_s": 0.2,
      "max_s": 0.2,
      "one_way": false,
+     "too_sparse": true,
      "cv": 2.0405616333246255,
      "rate_hz": 0.0030511811023622047
     },
@@ -259,6 +279,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4395263093220177,
      "rate_hz": 57.924047619047606
     },
@@ -268,6 +289,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44126724658523503,
      "rate_hz": 29.60466472303207
     },
@@ -277,6 +299,7 @@
      "mean_s": 2.716666666666667,
      "max_s": 8.5,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.5569234542204982,
      "rate_hz": 0.8082474226804124
     },
@@ -286,6 +309,7 @@
      "mean_s": 0.2,
      "max_s": 0.2,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.0995067887731556,
      "rate_hz": 0.06704545454545455,
      "ratio_to_other_kcs": 434.4545454545455,
@@ -304,6 +328,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43818636635794894,
      "rate_hz": 1.3388287138805484
     },
@@ -313,6 +338,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4722164642375263,
      "rate_hz": 0.18499015748031497
     },
@@ -322,6 +348,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4387345622315987,
      "rate_hz": 97.84785714285714
     },
@@ -331,6 +358,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43892809031786323,
      "rate_hz": 59.24919825072886
     },
@@ -340,6 +368,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.45498977846327254,
      "rate_hz": 4.306185567010309
     },
@@ -349,6 +378,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.46463683806504985,
      "rate_hz": 3.76590909090909,
      "ratio_to_other_kcs": 164.51521961184883,
@@ -367,6 +397,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4455614879020274,
      "rate_hz": 0.9956587314245298
     },
@@ -376,6 +407,7 @@
      "mean_s": 0.7000000000000001,
      "max_s": 1.3,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.7534048209004567,
      "rate_hz": 0.05682824803149607
     },
@@ -385,6 +417,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.43958427482444046,
      "rate_hz": 85.13797619047618
     },
@@ -394,6 +427,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44046108138057855,
      "rate_hz": 49.38731778425656
     },
@@ -403,6 +437,7 @@
      "mean_s": 16.7,
      "max_s": 16.7,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.5203868878349377,
      "rate_hz": 2.4195876288659792
     },
@@ -412,6 +447,7 @@
      "mean_s": 0.20833333333333337,
      "max_s": 1.4000000000000001,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.6843618440121446,
      "rate_hz": 1.2477272727272726,
      "ratio_to_other_kcs": 427.41529835802964,
@@ -430,6 +466,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.47184024055913937,
      "rate_hz": 0.5288362723547074
     },
@@ -439,6 +476,7 @@
      "mean_s": 0.30000000000000004,
      "max_s": 0.30000000000000004,
      "one_way": false,
+     "too_sparse": true,
      "cv": 3.5126373554766457,
      "rate_hz": 0.004539862204724409
     },
@@ -448,6 +486,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4472531251230963,
      "rate_hz": 58.710357142857134
     },
@@ -457,6 +496,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4555316177743606,
      "rate_hz": 30.09963556851312
     },
@@ -466,6 +506,7 @@
      "mean_s": 0.19444444444444445,
      "max_s": 0.8,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.6937795293339147,
      "rate_hz": 0.8530927835051546
     },
@@ -475,6 +516,7 @@
      "mean_s": 0.4,
      "max_s": 0.4,
      "one_way": false,
+     "too_sparse": false,
      "cv": 3.406968654497487,
      "rate_hz": 0.09801136363636362,
      "ratio_to_other_kcs": 317.55681818181813,
@@ -493,6 +535,7 @@
      "mean_s": 0.42500000000000004,
      "max_s": 0.5,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.7757176725418105,
      "rate_hz": 0.0748642595122357
     },
@@ -502,6 +545,7 @@
      "mean_s": 0.15000000000000002,
      "max_s": 0.2,
      "one_way": false,
+     "too_sparse": true,
      "cv": 4.376453801303307,
      "rate_hz": 0.003026574803149606
     },
@@ -511,6 +555,7 @@
      "mean_s": 0.6250000000000001,
      "max_s": 0.7000000000000001,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.6970174296470506,
      "rate_hz": 8.170119047619048
     },
@@ -520,6 +565,7 @@
      "mean_s": 0.525,
      "max_s": 0.6000000000000001,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.882969151835693,
      "rate_hz": 3.9123906705539353
     },
@@ -529,6 +575,7 @@
      "mean_s": 0.22499999999999998,
      "max_s": 0.30000000000000004,
      "one_way": false,
+     "too_sparse": false,
      "cv": 3.9278925192843936,
      "rate_hz": 0.11082474226804123
     },
@@ -538,6 +585,7 @@
      "mean_s": 0.15000000000000002,
      "max_s": 0.2,
      "one_way": false,
+     "too_sparse": false,
      "cv": 5.109131194710119,
      "rate_hz": 0.055397727272727265,
      "ratio_to_other_kcs": 84.46524064171123,
@@ -556,6 +604,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.45922227272730254,
      "rate_hz": 1.0014974793528837
     },
@@ -565,6 +614,7 @@
      "mean_s": 1.1,
      "max_s": 1.7000000000000002,
      "one_way": false,
+     "too_sparse": false,
      "cv": 1.0243911485685846,
      "rate_hz": 0.0655265748031496
     },
@@ -574,6 +624,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44290294916618517,
      "rate_hz": 85.70797619047619
     },
@@ -583,6 +634,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.44610040023661907,
      "rate_hz": 49.62514577259475
     },
@@ -592,6 +644,7 @@
      "mean_s": 1.7555555555555555,
      "max_s": 4.0,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.5688086503456818,
      "rate_hz": 2.4577319587628863
     },
@@ -601,6 +654,7 @@
      "mean_s": 0.45714285714285724,
      "max_s": 2.5,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.9185474380297938,
      "rate_hz": 1.4022727272727271,
      "ratio_to_other_kcs": 279.59160839160836,
@@ -619,6 +673,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.533044808285565,
      "rate_hz": 0.5772600877892503
     },
@@ -628,6 +683,7 @@
      "mean_s": 0.7000000000000001,
      "max_s": 0.7000000000000001,
      "one_way": false,
+     "too_sparse": true,
      "cv": 3.541962848803474,
      "rate_hz": 0.011122047244094485
     },
@@ -637,6 +693,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.4663276364988683,
      "rate_hz": 61.77107142857143
     },
@@ -646,6 +703,7 @@
      "mean_s": 16.8,
      "max_s": 16.8,
      "one_way": true,
+     "too_sparse": false,
      "cv": 0.48961332747234293,
      "rate_hz": 31.993658892128277
     },
@@ -655,6 +713,7 @@
      "mean_s": 0.3166666666666667,
      "max_s": 1.5,
      "one_way": false,
+     "too_sparse": false,
      "cv": 0.8904650467075316,
      "rate_hz": 0.9953608247422678
     },
@@ -664,6 +723,7 @@
      "mean_s": 0.7000000000000001,
      "max_s": 0.7000000000000001,
      "one_way": false,
+     "too_sparse": false,
      "cv": 3.3893332516902324,
      "rate_hz": 0.23380681818181814,
      "ratio_to_other_kcs": 224.4545454545454,
@@ -682,6 +742,7 @@
      "mean_s": 0.95,
      "max_s": 1.0,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.562796343357366,
      "rate_hz": 0.10248978912550534
     },
@@ -691,6 +752,7 @@
      "mean_s": 0.25,
      "max_s": 0.30000000000000004,
      "one_way": false,
+     "too_sparse": true,
      "cv": 5.125893577765239,
      "rate_hz": 0.004625984251968504
     },
@@ -700,6 +762,7 @@
      "mean_s": 1.6,
      "max_s": 1.7000000000000002,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.3752726856466033,
      "rate_hz": 11.124642857142856
     },
@@ -709,6 +772,7 @@
      "mean_s": 1.25,
      "max_s": 1.3,
      "one_way": false,
+     "too_sparse": false,
      "cv": 2.557771680654529,
      "rate_hz": 5.408746355685131
     },
@@ -718,6 +782,7 @@
      "mean_s": 0.4,
      "max_s": 0.4,
      "one_way": false,
+     "too_sparse": false,
      "cv": 3.7732800440349594,
      "rate_hz": 0.16030927835051545
     },
@@ -727,6 +792,7 @@
      "mean_s": 0.25,
      "max_s": 0.30000000000000004,
      "one_way": false,
+     "too_sparse": false,
      "cv": 5.606402631657864,
      "rate_hz": 0.0911931818181818,
      "ratio_to_other_kcs": 128.9305785123967,
@@ -745,6 +811,7 @@
      "mean_s": 0.35000000000000003,
      "max_s": 0.4,
      "one_way": false,
+     "too_sparse": false,
      "cv": 4.115405110948783,
      "rate_hz": 0.032622790533184474
     },
@@ -754,6 +821,7 @@
      "mean_s": 0.15000000000000002,
      "max_s": 0.2,
      "one_way": false,
+     "too_sparse": true,
      "cv": 5.315055622474548,
      "rate_hz": 0.001636318897637795
     },
@@ -763,6 +831,7 @@
      "mean_s": 0.5,
      "max_s": 0.5,
      "one_way": false,
+     "too_sparse": false,
      "cv": 4.700024577900949,
      "rate_hz": 3.0576190476190472
     },
@@ -772,6 +841,7 @@
      "mean_s": 0.4,
      "max_s": 0.4,
      "one_way": false,
+     "too_sparse": false,
      "cv": 4.9443308739323,
      "rate_hz": 1.4999271137026238
     },
@@ -781,6 +851,7 @@
      "mean_s": 0.25,
      "max_s": 0.30000000000000004,
      "one_way": false,
+     "too_sparse": false,
      "cv": 5.76812129572639,
      "rate_hz": 0.046907216494845354
     },
@@ -790,6 +861,7 @@
      "mean_s": 0.15000000000000002,
      "max_s": 0.2,
      "one_way": false,
+     "too_sparse": false,
      "cv": 7.445969288162614,
      "rate_hz": 0.025852272727272724,
      "ratio_to_other_kcs": 47.86363636363636,
@@ -798,7 +870,7 @@
    }
   }
  ],
- "finding": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term the Shiu et al. 2024 model does not have. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model. Neither adaptation constant has a measurement behind it, so both are SCANNED and the range is reported instead of a value. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be. With adaptation the brain does have up and down states: 1 of 12 scanned settings produce repeated global episodes, and 4 produce repeated episodes in the trained Kenyon-cell ensemble. This is the first configuration in the project in which an episode exists at all, which is the precondition for asking whether a memory reappears in one.",
+ "finding": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Every neuron carries a spike-triggered adaptation term the Shiu et al. 2024 model does not have. A correction replaces a predicted value with a measured one and changes nothing else. This adds a mechanism, and the published model's authors did not omit adaptation by oversight: a plain LIF is the model they validated. Adding adaptation makes the network something other than the model in the paper, whatever the constants are, so no result from a run with it switched on may be presented as a property of the published model. Neither adaptation constant has a measurement behind it, so both are SCANNED and the range is reported instead of a value. Wherever a number from an adapted run appears, the deviation is named alongside it, and while the constants are unsourced the range scanned is given rather than a single value. A scan that is reported as a scan is not an invented parameter; a single chosen value with no citation would be. With adaptation the brain does have up and down states: 1 of 12 scanned settings produce repeated global episodes, and 4 produce repeated episodes in the trained Kenyon-cell ensemble. This is the first configuration in the project in which an episode exists at all, which is the precondition for asking whether a memory reappears in one. A run whose population fires below one spike per cell per run is marked sparse and cannot count as episodic, whatever shape its threshold crossings make.",
  "provenance": {
   "config": "configs/stage5_sleep.yaml",
   "results_dir": "results/stage12_adaptation",
@@ -816,5 +888,7 @@
    "/Users/ankthba/Developer/fly/results/stage12_adaptation/grid_t2000_b0.5_seed0",
    "/Users/ankthba/Developer/fly/results/stage12_adaptation/grid_t2000_b1.5_seed0"
   ]
- }
+ },
+ "n_settings_with_brain_episodes": 1,
+ "n_settings_with_ensemble_episodes": 4
 }
