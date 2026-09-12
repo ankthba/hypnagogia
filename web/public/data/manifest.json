@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T01:31:59+00:00",
- "git_commit": "351d0f3",
+ "generated_at": "2026-09-12T02:05:59+00:00",
+ "git_commit": "726c759",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -217,10 +217,13 @@
    "summary": "NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. Th"
   },
   "stage3_plasticity": {
-   "status": "not_run",
+   "status": "passed",
    "file": "stage3_plasticity.json",
    "title": "Stage 3 - Plasticity",
-   "summary": "not run"
+   "summary": "unit test passes (depression only with KC-then-DAN); MBON11 responds to the calibration odor pre-pairing (> 5 spikes/s mean); some eta in the grid brings the si",
+   "gain": 1.0,
+   "gain_note": null,
+   "source_file": "results/stage3_plasticity_gain0.6/stage3.json"
   },
   "stage4_learning": {
    "status": "not_run",

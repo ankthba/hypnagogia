@@ -146,12 +146,27 @@ def main():
         stages["stage3b_feasibility"] = {"status": "not_run", "file": "stage3b_feasibility.json",
                                          "title": "Stage 3b - Is there a sparse odour code to encode a memory in?", "summary": "not run"}
 
-    # ---- stages 3-6: copy through when present ----
+    # ---- stages 3-6 ----
+    # Each stage is exported from the published-parameter run when it exists, and otherwise from the labelled
+    # reduced-gain variant. Whichever is used, the file carries its own `gain` and `gain_note`, and the viewer
+    # renders that note wherever the numbers appear, so a deviation can never be read as the published result.
+    def pick_stage(sub_dir, fname):
+        direct = RESULTS / sub_dir / fname
+        if direct.exists():
+            return load_json(direct), str(direct.relative_to(RESULTS.parent))
+        variants = sorted(RESULTS.glob(f"{sub_dir}_gain*/{fname}")) + sorted(RESULTS.glob(f"{sub_dir}/real_gain*/{fname}"))
+        if variants:
+            return load_json(variants[-1]), str(variants[-1].relative_to(RESULTS.parent))
+        return None, None
+
     for key, sub_dir, fname, title in [("stage3_plasticity", "stage3_plasticity", "stage3.json", "Stage 3 - Plasticity"),
                                        ("stage4_learning", "stage4_learning", "stage4.json", "Stage 4 - Learning"),
                                        ("stage5_sleep", "stage5_sleep", "stage5.json", "Stage 5 - Sleep"),
                                        ("stage6_replay", "stage6_replay", "stage6.json", "Stage 6 - Replay")]:
-        d = load_json(RESULTS / sub_dir / fname)
+        d, src = pick_stage(sub_dir, fname)
+        if d is not None:
+            d["source_file"] = src
+            sub_dir = str(Path(src).parent.relative_to("results")) if src else sub_dir
         if d:
             d.setdefault("provenance", {}); d["provenance"].update({"git_commit": commit, "generated_at": now})
             json.dump(d, open(WEB_DATA / f"{key}.json", "w"), indent=1, default=str)
@@ -162,7 +177,9 @@ def main():
                         dst = WEB_DATA / t["file"]; dst.parent.mkdir(parents=True, exist_ok=True); shutil.copy(src, dst)
                         side = json.load(open(src)); b = src.parent / side["bin"]
                         if b.exists(): shutil.copy(b, dst.parent / side["bin"])
-            stages[key] = {"status": d["status"], "file": f"{key}.json", "title": title, "summary": d.get("headline") or d.get("criterion", "")[:160]}
+            stages[key] = {"status": d["status"], "file": f"{key}.json", "title": title,
+                           "summary": d.get("headline") or d.get("criterion", "")[:160],
+                           "gain": d.get("gain", 1.0), "gain_note": d.get("gain_note"), "source_file": src}
         else:
             stages[key] = {"status": "not_run", "file": f"{key}.json", "title": title, "summary": "not run"}
 
