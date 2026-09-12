@@ -3,6 +3,8 @@
  "criterion": "MBON11 response to odour A must fall relative to odour B from before to after conditioning: the paired difference of deltas (deltaA - deltaB) must be negative with a 95% CI excluding 0 across >= 20 seeds",
  "learning_verified": true,
  "network": "real_gain0.6",
+ "gain": 0.6,
+ "gain_note": "DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value there is no sparse odour code to store a memory in (stage 3b) and two odours leave indistinguishable ensembles (stage 3e).",
  "reset_between_presentations": true,
  "reset_note": "Membrane potentials and synaptic conductances are reset to rest before every odour presentation; learned weights are not. The model never returns to baseline on its own (stage 3b), so without this the second odour would be delivered into the first odour's ongoing activity and every later measurement would be contaminated.",
  "protocol": {
@@ -96,6 +98,24 @@
    "frac_kc_active_B": 0.05093503937007874,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3503.89013671875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.12352977693080902,
+     "n_synapses": 193
+    },
+    "B_only": {
+     "weight_retained": 0.28189292550086975,
+     "n_synapses": 31
+    },
+    "both_odours": {
+     "weight_retained": 9.209351992467418e-05,
+     "n_synapses": 196
+    },
+    "neither_odour": {
+     "weight_retained": 0.9967835545539856,
+     "n_synapses": 3764
+    }
+   },
    "w_A_ensemble_ratio": 0.0432451032102108,
    "w_B_ensemble_ratio": 0.03621625900268555,
    "per_mbon": [
@@ -991,6 +1011,24 @@
    "frac_kc_active_B": 0.05241141732283464,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3500.1611328125,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.11231821030378342,
+     "n_synapses": 194
+    },
+    "B_only": {
+     "weight_retained": 0.2516205906867981,
+     "n_synapses": 42
+    },
+    "both_odours": {
+     "weight_retained": 0.0027835655491799116,
+     "n_synapses": 192
+    },
+    "neither_odour": {
+     "weight_retained": 0.9975593090057373,
+     "n_synapses": 3756
+    }
+   },
    "w_A_ensemble_ratio": 0.04180602729320526,
    "w_B_ensemble_ratio": 0.04538356885313988,
    "per_mbon": [
@@ -1886,6 +1924,24 @@
    "frac_kc_active_B": 0.05290354330708662,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3506.13037109375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.11386357992887497,
+     "n_synapses": 186
+    },
+    "B_only": {
+     "weight_retained": 0.2636381983757019,
+     "n_synapses": 40
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 195
+    },
+    "neither_odour": {
+     "weight_retained": 0.9987917542457581,
+     "n_synapses": 3763
+    }
+   },
    "w_A_ensemble_ratio": 0.03915692865848541,
    "w_B_ensemble_ratio": 0.044146787375211716,
    "per_mbon": [
@@ -2781,6 +2837,24 @@
    "frac_kc_active_B": 0.04921259842519685,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3505.64599609375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.06259942054748535,
+     "n_synapses": 189
+    },
+    "B_only": {
+     "weight_retained": 0.2641535699367523,
+     "n_synapses": 32
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 187
+    },
+    "neither_odour": {
+     "weight_retained": 0.995083212852478,
+     "n_synapses": 3776
+    }
+   },
    "w_A_ensemble_ratio": 0.022016074508428574,
    "w_B_ensemble_ratio": 0.03857455775141716,
    "per_mbon": [
@@ -3676,6 +3750,24 @@
    "frac_kc_active_B": 0.051181102362204724,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3504.0830078125,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.14296820759773254,
+     "n_synapses": 195
+    },
+    "B_only": {
+     "weight_retained": 0.25032031536102295,
+     "n_synapses": 31
+    },
+    "both_odours": {
+     "weight_retained": 0.0025042868219316006,
+     "n_synapses": 196
+    },
+    "neither_odour": {
+     "weight_retained": 0.9973078966140747,
+     "n_synapses": 3762
+    }
+   },
    "w_A_ensemble_ratio": 0.05221787840127945,
    "w_B_ensemble_ratio": 0.03371180221438408,
    "per_mbon": [
@@ -4571,6 +4663,24 @@
    "frac_kc_active_B": 0.048474409448818895,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3502.52490234375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.13427914679050446,
+     "n_synapses": 202
+    },
+    "B_only": {
+     "weight_retained": 0.1800076812505722,
+     "n_synapses": 27
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 188
+    },
+    "neither_odour": {
+     "weight_retained": 0.9962134957313538,
+     "n_synapses": 3767
+    }
+   },
    "w_A_ensemble_ratio": 0.05054166167974472,
    "w_B_ensemble_ratio": 0.02326153591275215,
    "per_mbon": [
@@ -5466,6 +5576,24 @@
    "frac_kc_active_B": 0.05044291338582677,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3507.1396484375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.0932483896613121,
+     "n_synapses": 189
+    },
+    "B_only": {
+     "weight_retained": 0.2768891751766205,
+     "n_synapses": 36
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 187
+    },
+    "neither_odour": {
+     "weight_retained": 0.9962197542190552,
+     "n_synapses": 3772
+    }
+   },
    "w_A_ensemble_ratio": 0.03262762725353241,
    "w_B_ensemble_ratio": 0.04193832352757454,
    "per_mbon": [
@@ -6361,6 +6489,24 @@
    "frac_kc_active_B": 0.05019685039370079,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3505.5029296875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.1306452453136444,
+     "n_synapses": 203
+    },
+    "B_only": {
+     "weight_retained": 0.20769089460372925,
+     "n_synapses": 34
+    },
+    "both_odours": {
+     "weight_retained": 6.657621270278469e-05,
+     "n_synapses": 188
+    },
+    "neither_odour": {
+     "weight_retained": 0.9971796870231628,
+     "n_synapses": 3759
+    }
+   },
    "w_A_ensemble_ratio": 0.048029616475105286,
    "w_B_ensemble_ratio": 0.031431227922439575,
    "per_mbon": [
@@ -7256,6 +7402,24 @@
    "frac_kc_active_B": 0.049950787401574805,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3500.972900390625,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.09911750257015228,
+     "n_synapses": 196
+    },
+    "B_only": {
+     "weight_retained": 0.25910553336143494,
+     "n_synapses": 29
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 193
+    },
+    "neither_odour": {
+     "weight_retained": 0.9965512156486511,
+     "n_synapses": 3766
+    }
+   },
    "w_A_ensemble_ratio": 0.03529312089085579,
    "w_B_ensemble_ratio": 0.03105328045785427,
    "per_mbon": [
@@ -8151,6 +8315,24 @@
    "frac_kc_active_B": 0.05019685039370079,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3500.166748046875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.07262115925550461,
+     "n_synapses": 192
+    },
+    "B_only": {
+     "weight_retained": 0.16433300077915192,
+     "n_synapses": 36
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 186
+    },
+    "neither_odour": {
+     "weight_retained": 0.9975732564926147,
+     "n_synapses": 3770
+    }
+   },
    "w_A_ensemble_ratio": 0.026128167286515236,
    "w_B_ensemble_ratio": 0.026649881154298782,
    "per_mbon": [
@@ -9046,6 +9228,24 @@
    "frac_kc_active_B": 0.04749015748031496,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3506.5107421875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.10602809488773346,
+     "n_synapses": 207
+    },
+    "B_only": {
+     "weight_retained": 0.2528410851955414,
+     "n_synapses": 26
+    },
+    "both_odours": {
+     "weight_retained": 0.0006033427198417485,
+     "n_synapses": 184
+    },
+    "neither_odour": {
+     "weight_retained": 0.9953977465629578,
+     "n_synapses": 3767
+    }
+   },
    "w_A_ensemble_ratio": 0.03938867524266243,
    "w_B_ensemble_ratio": 0.029904840514063835,
    "per_mbon": [
@@ -9941,6 +10141,24 @@
    "frac_kc_active_B": 0.051919291338582675,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3501.07861328125,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.06866978853940964,
+     "n_synapses": 187
+    },
+    "B_only": {
+     "weight_retained": 0.25867870450019836,
+     "n_synapses": 38
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 192
+    },
+    "neither_odour": {
+     "weight_retained": 0.9972330331802368,
+     "n_synapses": 3767
+    }
+   },
    "w_A_ensemble_ratio": 0.023835668340325356,
    "w_B_ensemble_ratio": 0.04164418578147888,
    "per_mbon": [
@@ -10836,6 +11054,24 @@
    "frac_kc_active_B": 0.05093503937007874,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3500.18603515625,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.1356341540813446,
+     "n_synapses": 200
+    },
+    "B_only": {
+     "weight_retained": 0.2788580656051636,
+     "n_synapses": 31
+    },
+    "both_odours": {
+     "weight_retained": 0.004181348253041506,
+     "n_synapses": 195
+    },
+    "neither_odour": {
+     "weight_retained": 0.9974070191383362,
+     "n_synapses": 3758
+    }
+   },
    "w_A_ensemble_ratio": 0.05247519165277481,
    "w_B_ensemble_ratio": 0.040125522762537,
    "per_mbon": [
@@ -11731,6 +11967,24 @@
    "frac_kc_active_B": 0.05019685039370079,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3505.099609375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.08845975995063782,
+     "n_synapses": 192
+    },
+    "B_only": {
+     "weight_retained": 0.2258935421705246,
+     "n_synapses": 32
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 190
+    },
+    "neither_odour": {
+     "weight_retained": 0.9967933297157288,
+     "n_synapses": 3770
+    }
+   },
    "w_A_ensemble_ratio": 0.031121110543608665,
    "w_B_ensemble_ratio": 0.03332963585853577,
    "per_mbon": [
@@ -12626,6 +12880,24 @@
    "frac_kc_active_B": 0.04822834645669291,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3507.42919921875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.11624035239219666,
+     "n_synapses": 200
+    },
+    "B_only": {
+     "weight_retained": 0.2517012357711792,
+     "n_synapses": 30
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 184
+    },
+    "neither_odour": {
+     "weight_retained": 0.9960938096046448,
+     "n_synapses": 3770
+    }
+   },
    "w_A_ensemble_ratio": 0.042909037321805954,
    "w_B_ensemble_ratio": 0.032302286475896835,
    "per_mbon": [
@@ -13521,6 +13793,24 @@
    "frac_kc_active_B": 0.050688976377952756,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3505.694091796875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.1119215339422226,
+     "n_synapses": 194
+    },
+    "B_only": {
+     "weight_retained": 0.200905904173851,
+     "n_synapses": 37
+    },
+    "both_odours": {
+     "weight_retained": 0.0004163353587500751,
+     "n_synapses": 188
+    },
+    "neither_odour": {
+     "weight_retained": 0.9983897805213928,
+     "n_synapses": 3765
+    }
+   },
    "w_A_ensemble_ratio": 0.040810760110616684,
    "w_B_ensemble_ratio": 0.032561611384153366,
    "per_mbon": [
@@ -14416,6 +14706,24 @@
    "frac_kc_active_B": 0.04945866141732284,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3499.943115234375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.17847853899002075,
+     "n_synapses": 213
+    },
+    "B_only": {
+     "weight_retained": 0.2573782801628113,
+     "n_synapses": 29
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 190
+    },
+    "neither_odour": {
+     "weight_retained": 0.9959471821784973,
+     "n_synapses": 3752
+    }
+   },
    "w_A_ensemble_ratio": 0.06945770233869553,
    "w_B_ensemble_ratio": 0.032944418489933014,
    "per_mbon": [
@@ -15311,6 +15619,24 @@
    "frac_kc_active_B": 0.04970472440944882,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3506.7841796875,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.0681026503443718,
+     "n_synapses": 186
+    },
+    "B_only": {
+     "weight_retained": 0.22247223556041718,
+     "n_synapses": 35
+    },
+    "both_odours": {
+     "weight_retained": 6.862197915324941e-05,
+     "n_synapses": 186
+    },
+    "neither_odour": {
+     "weight_retained": 0.9961690902709961,
+     "n_synapses": 3777
+    }
+   },
    "w_A_ensemble_ratio": 0.02386445179581642,
    "w_B_ensemble_ratio": 0.03388284146785736,
    "per_mbon": [
@@ -16206,6 +16532,24 @@
    "frac_kc_active_B": 0.05093503937007874,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3504.25146484375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.16625672578811646,
+     "n_synapses": 205
+    },
+    "B_only": {
+     "weight_retained": 0.2681753635406494,
+     "n_synapses": 31
+    },
+    "both_odours": {
+     "weight_retained": 0.0003498611622489989,
+     "n_synapses": 195
+    },
+    "neither_odour": {
+     "weight_retained": 0.9988945722579956,
+     "n_synapses": 3753
+    }
+   },
    "w_A_ensemble_ratio": 0.062448687851428986,
    "w_B_ensemble_ratio": 0.03701097145676613,
    "per_mbon": [
@@ -17101,6 +17445,24 @@
    "frac_kc_active_B": 0.051919291338582675,
    "w_kc_mbon_readout_before": 3974.56298828125,
    "w_kc_mbon_readout_after": 3507.71484375,
+   "synaptic_specificity": {
+    "A_only": {
+     "weight_retained": 0.1336190551519394,
+     "n_synapses": 193
+    },
+    "B_only": {
+     "weight_retained": 0.2591003477573395,
+     "n_synapses": 37
+    },
+    "both_odours": {
+     "weight_retained": 0.0,
+     "n_synapses": 193
+    },
+    "neither_odour": {
+     "weight_retained": 0.9986321330070496,
+     "n_synapses": 3761
+    }
+   },
    "w_A_ensemble_ratio": 0.04806815832853317,
    "w_B_ensemble_ratio": 0.04186145216226578,
    "per_mbon": [
@@ -18005,7 +18367,36 @@
   "B_post_mean": 0.0,
   "n_seeds": 20
  },
- "notes": [],
+ "notes": [
+  "The control odour never drove the readout MBON before conditioning (mean 0.00 Hz), so 'no change in the control' is a floor effect and carries no information. The specificity of the plasticity is therefore established synaptically instead: see synaptic_specificity, which splits the weight change by which odour drove the presynaptic Kenyon cell."
+ ],
+ "synaptic_specificity_mean": {
+  "A_only": {
+   "weight_retained_mean": 0.11293006464838981,
+   "weight_retained_sd": 0.031815553965244665,
+   "n_synapses_mean": 195.8,
+   "n_seeds": 20
+  },
+  "B_only": {
+   "weight_retained_mean": 0.24378283247351645,
+   "weight_retained_sd": 0.03292951713345619,
+   "n_synapses_mean": 33.2,
+   "n_seeds": 20
+  },
+  "both_odours": {
+   "weight_retained_mean": 0.0005533015788387275,
+   "weight_retained_sd": 0.001171096946620671,
+   "n_synapses_mean": 190.25,
+   "n_seeds": 20
+  },
+  "neither_odour": {
+   "weight_retained_mean": 0.9970110416412353,
+   "weight_retained_sd": 0.0010945042345833164,
+   "n_synapses_mean": 3764.75,
+   "n_seeds": 20
+  }
+ },
+ "control_response_is_floor": true,
  "kc_ensemble_summary": {
   "A_size_mean": 326.3,
   "B_size_mean": 204.7,
@@ -18013,7 +18404,7 @@
   "frac_kc_active_A": 0.08029035433070866,
   "n_kc": 4064
  },
- "walltime_s": 942.6,
+ "walltime_s": 1.3,
  "provenance": {
   "config": "configs/stage4_encode.yaml",
   "results_dir": "results/stage4_learning/real_gain0.6",

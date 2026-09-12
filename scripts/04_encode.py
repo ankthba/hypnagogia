@@ -148,6 +148,17 @@ def main():
         z = np.load(sp["out_dir"] + "/plastic_w.npz")
         ro_mask = np.isin(z["post"], ro)
         inA = np.isin(z["pre"], ens["A_pre"]); inB = np.isin(z["pre"], ens["B_pre"])
+        # Synaptic specificity: the readout MBON's response is all-or-none, so the MBON-level A-vs-B comparison
+        # can be uninformative when the control odour never drove it. The direct test is which synapses lost
+        # weight, split by which odour drove the presynaptic Kenyon cell.
+        def retained(mask):
+            w0 = z["w0_mV"][mask].sum()
+            return (float(z["w_final_mV"][mask].sum() / w0) if abs(w0) > 1e-9 else None), int(mask.sum())
+        spec = {}
+        for nm, m_ in (("A_only", ro_mask & inA & ~inB), ("B_only", ro_mask & inB & ~inA),
+                       ("both_odours", ro_mask & inA & inB), ("neither_odour", ro_mask & ~inA & ~inB)):
+            r_, n_ = retained(m_)
+            spec[nm] = {"weight_retained": r_, "n_synapses": n_}
         per_mbon = []
         for m_i in mbon:
             per_mbon.append({"id": int(conn.ids[m_i]), "type": str(conn.ann.cell_type.iloc[m_i]), "side": str(conn.ann.side.iloc[m_i]),
@@ -160,6 +171,7 @@ def main():
                      "kc_overlap": int(len(np.intersect1d(ens["A_pre"], ens["B_pre"]))),
                      "frac_kc_active_A": float(len(ens["A_pre"]) / len(kc)), "frac_kc_active_B": float(len(ens["B_pre"]) / len(kc)),
                      "w_kc_mbon_readout_before": float(z["w0_mV"][ro_mask].sum()), "w_kc_mbon_readout_after": float(z["w_final_mV"][ro_mask].sum()),
+                     "synaptic_specificity": spec,
                      "w_A_ensemble_ratio": float(z["w_final_mV"][ro_mask & inA].sum() / max(abs(z["w0_mV"][ro_mask & inA].sum()), 1e-9)),
                      "w_B_ensemble_ratio": float(z["w_final_mV"][ro_mask & inB].sum() / max(abs(z["w0_mV"][ro_mask & inB].sum()), 1e-9)),
                      "per_mbon": per_mbon})
@@ -180,9 +192,24 @@ def main():
         eff["B_pre_mean"] = float(np.mean([r["B_pre"] for r in ok])); eff["B_post_mean"] = float(np.mean([r["B_post"] for r in ok]))
         eff["n_seeds"] = len(ok)
     learned = bool(eff and eff["diff"] < 0 and eff["ci95"][1] < 0)
+    # aggregate synaptic specificity across seeds
+    spec_mean = {}
+    for nm in ("A_only", "B_only", "both_odours", "neither_odour"):
+        vals = [r["synaptic_specificity"][nm]["weight_retained"] for r in ok
+                if r.get("synaptic_specificity", {}).get(nm, {}).get("weight_retained") is not None]
+        ns = [r["synaptic_specificity"][nm]["n_synapses"] for r in ok if r.get("synaptic_specificity")]
+        if vals:
+            spec_mean[nm] = {"weight_retained_mean": float(np.mean(vals)), "weight_retained_sd": float(np.std(vals, ddof=1)) if len(vals) > 1 else 0.0,
+                             "n_synapses_mean": float(np.mean(ns)) if ns else None, "n_seeds": len(vals)}
     responds = bool(ok and np.mean([r["A_pre"] for r in ok]) > 1.0)
     status = "passed" if learned and responds else "failed"
     note = []
+    control_flat = bool(ok and np.mean([r["B_pre"] for r in ok]) < 1.0)
+    if control_flat:
+        note.append("The control odour never drove the readout MBON before conditioning (mean %.2f Hz), so 'no change in "
+                    "the control' is a floor effect and carries no information. The specificity of the plasticity is "
+                    "therefore established synaptically instead: see synaptic_specificity, which splits the weight change "
+                    "by which odour drove the presynaptic Kenyon cell." % (np.mean([r["B_pre"] for r in ok]) if ok else 0.0))
     if not responds: note.append(f"the readout MBON ({s4['readout_mbon_type']}) does not respond to odour A before conditioning (mean {np.mean([r['A_pre'] for r in ok]) if ok else 0:.2f} Hz): no learning can be measured")
     if ok and not learned: note.append("conditioning did not shift the odour-A response relative to odour B (the 95% CI of the difference of deltas includes or exceeds 0)")
     out_d = {"status": status, "criterion": s4["criterion"], "learning_verified": learned, "network": tag,
@@ -205,6 +232,7 @@ def main():
                           "total_duration_s": sum(e["duration_s"] for e in build_epochs(s4))},
              "readout_mbons": [{"root_id": str(conn.ids[x]), "type": s4["readout_mbon_type"], "side": str(conn.ann.side.iloc[x])} for x in ro],
              "seeds": seeds, "per_seed": rows, "effect": eff, "notes": note,
+             "synaptic_specificity_mean": spec_mean, "control_response_is_floor": control_flat,
              "kc_ensemble_summary": ({"A_size_mean": float(np.mean([r["kc_ensemble_A_size"] for r in ok])),
                                       "B_size_mean": float(np.mean([r["kc_ensemble_B_size"] for r in ok])),
                                       "overlap_mean": float(np.mean([r["kc_overlap"] for r in ok])),

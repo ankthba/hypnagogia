@@ -30,7 +30,7 @@ noise:
     n_inputs: 1
     weight_mV: 0.275
 run:
-  n_parallel: 8
+  n_parallel: 14
   openmp_threads: 0
   delete_standalone: true
   extra_compile_args:
