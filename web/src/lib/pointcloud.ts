@@ -154,16 +154,19 @@ export const FOV_Y = (32 * Math.PI) / 180;
 
 // ---------------------------------------------------------------- WebGL back end
 
+/** floats per vertex in the interleaved lit attribute buffer: age, radius, r, g, b, alpha */
+const LIT_STRIDE = 6;
+
 const VERT = `
 precision highp float;
 attribute vec3 aPos;
 attribute float aAge;      // 0 for a static point; 0..1 decay for a lit one
 attribute float aRadius;   // CSS-pixel radius at the reference width
 attribute vec3 aColor;
+attribute float aAlpha;    // the point's own group alpha; a generic attribute for the static pass
 uniform mat4 uProj;
 uniform mat4 uView;
 uniform float uPointScale; // 2 * radiusScale * dpr * fitDist
-uniform float uAlpha;      // the group's own alpha
 uniform vec3 uAccent;
 uniform float uLitGain;
 uniform vec2 uFog;         // near, far distance for the depth cue
@@ -182,7 +185,7 @@ void main() {
   gl_PointSize = clamp(size, 1.0, uMaxSize);
   float fog = clamp((uFog.y - dist) / max(1.0, uFog.y - uFog.x), 0.30, 1.0);
   vec3 rgb = mix(aColor, uAccent, aAge);
-  float a = uAlpha + (1.0 - uAlpha) * aAge;
+  float a = aAlpha + (1.0 - aAlpha) * aAge;
   vColor = vec4(rgb, a * fog * shrink * shrink);
 }
 `;
@@ -234,10 +237,10 @@ class WebGLCloud implements CloudRenderer {
   constructor(gl: WebGLRenderingContext, prog: WebGLProgram) {
     this.gl = gl;
     this.prog = prog;
-    for (const u of ['uProj', 'uView', 'uPointScale', 'uAlpha', 'uAccent', 'uLitGain', 'uFog', 'uMaxSize']) {
+    for (const u of ['uProj', 'uView', 'uPointScale', 'uAccent', 'uLitGain', 'uFog', 'uMaxSize']) {
       this.loc[u] = gl.getUniformLocation(prog, u);
     }
-    for (const a of ['aPos', 'aAge', 'aRadius', 'aColor']) this.att[a] = gl.getAttribLocation(prog, a);
+    for (const a of ['aPos', 'aAge', 'aRadius', 'aColor', 'aAlpha']) this.att[a] = gl.getAttribLocation(prog, a);
     const range = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE) as Float32Array | null;
     if (range && range.length === 2 && Number.isFinite(range[1])) this.maxPointSize = Math.min(96, Math.max(2, range[1]));
   }
@@ -335,7 +338,9 @@ class WebGLCloud implements CloudRenderer {
       this.bindStatic();
       for (const g of this.groups) {
         if (g.count === 0) continue;
-        gl.uniform1f(this.loc.uAlpha, g.alpha);
+        // the group's alpha as a constant vertex attribute: the same shader then serves the lit
+        // pass, whose points come from every group at once and carry an alpha each
+        gl.vertexAttrib1f(this.att.aAlpha, g.alpha);
         gl.drawArrays(gl.POINTS, g.start, g.count);
       }
     }
@@ -358,6 +363,7 @@ class WebGLCloud implements CloudRenderer {
     gl.vertexAttribPointer(this.att.aRadius, 1, gl.FLOAT, false, S, 4);
     gl.enableVertexAttribArray(this.att.aColor);
     gl.vertexAttribPointer(this.att.aColor, 3, gl.FLOAT, false, S, 8);
+    if (this.att.aAlpha >= 0) gl.disableVertexAttribArray(this.att.aAlpha);
   }
 
   private drawLit(lit: LitPoints) {
@@ -366,35 +372,41 @@ class WebGLCloud implements CloudRenderer {
     if (!this.litAttr) this.litAttr = gl.createBuffer();
     if (lit.n > this.litCap) {
       this.litCap = Math.ceil(lit.n * 1.5);
-      this.litScratch = new Float32Array(this.litCap * 5);
+      this.litScratch = new Float32Array(this.litCap * LIT_STRIDE);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.litPos);
       gl.bufferData(gl.ARRAY_BUFFER, this.litCap * 3 * 4, gl.DYNAMIC_DRAW);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.litAttr);
-      gl.bufferData(gl.ARRAY_BUFFER, this.litCap * 5 * 4, gl.DYNAMIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, this.litCap * LIT_STRIDE * 4, gl.DYNAMIC_DRAW);
     }
     const a = this.litScratch;
     for (let i = 0; i < lit.n; i++) {
-      const b = i * 5;
+      const b = i * LIT_STRIDE;
       a[b] = lit.age[i];
       a[b + 1] = lit.radius[i];
       a[b + 2] = lit.color[i * 3];
       a[b + 3] = lit.color[i * 3 + 1];
       a[b + 4] = lit.color[i * 3 + 2];
+      a[b + 5] = lit.alpha[i];
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.litPos);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, lit.pos.subarray(0, lit.n * 3));
     gl.enableVertexAttribArray(this.att.aPos);
     gl.vertexAttribPointer(this.att.aPos, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.litAttr);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, a.subarray(0, lit.n * 5));
-    const S = 5 * 4;
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, a.subarray(0, lit.n * LIT_STRIDE));
+    const S = LIT_STRIDE * 4;
     gl.enableVertexAttribArray(this.att.aAge);
     gl.vertexAttribPointer(this.att.aAge, 1, gl.FLOAT, false, S, 0);
     gl.enableVertexAttribArray(this.att.aRadius);
     gl.vertexAttribPointer(this.att.aRadius, 1, gl.FLOAT, false, S, 4);
     gl.enableVertexAttribArray(this.att.aColor);
     gl.vertexAttribPointer(this.att.aColor, 3, gl.FLOAT, false, S, 8);
-    gl.uniform1f(this.loc.uAlpha, 1);
+    // the group alpha travels with each lit vertex, so the shader's `a = base + (1 - base) * age`
+    // ramp actually ramps: full opacity at the spike, the group's own alpha when the tail is spent
+    if (this.att.aAlpha >= 0) {
+      gl.enableVertexAttribArray(this.att.aAlpha);
+      gl.vertexAttribPointer(this.att.aAlpha, 1, gl.FLOAT, false, S, 20);
+    }
     gl.drawArrays(gl.POINTS, 0, lit.n);
   }
 
@@ -430,18 +442,30 @@ class Canvas2DCloud implements CloudRenderer {
   private h = 1;
   private dpr = 1;
   private drawn = 0;
-  private bucketX: Float32Array[] = [];
-  private bucketY: Float32Array[] = [];
-  private bucketS: Float32Array[] = [];
+  /**
+   * Scratch for the painter's algorithm, sized to the largest group the renderer will draw.
+   *
+   * This used to be `DEPTH_BUCKETS` fixed-capacity arrays of `n / DEPTH_BUCKETS * 4` points each,
+   * and points that overflowed a bucket were dropped in silence while `drawnPoints()` went on
+   * reporting the stride-derived total, so the panel's "draws X of the Y somata" overstated what
+   * was painted. Occupancy is nowhere near uniform - at the default framing the somata occupy
+   * about a third of the fog span, so the densest bucket holds well over four times the average
+   * and the overflow was reached on the first frame. It is now a two-pass counting sort into one
+   * flat run per group: every projected point is drawn, in exact far-to-near bucket order, and
+   * `drawnPoints()` is true again.
+   */
+  private tmpX = new Float32Array(0);
+  private tmpY = new Float32Array(0);
+  private tmpS = new Float32Array(0);
+  private tmpB = new Int32Array(0);
+  private outX = new Float32Array(0);
+  private outY = new Float32Array(0);
+  private outS = new Float32Array(0);
   private bucketN = new Int32Array(DEPTH_BUCKETS);
+  private bucketAt = new Int32Array(DEPTH_BUCKETS + 1);
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
-    for (let i = 0; i < DEPTH_BUCKETS; i++) {
-      this.bucketX.push(new Float32Array(0));
-      this.bucketY.push(new Float32Array(0));
-      this.bucketS.push(new Float32Array(0));
-    }
   }
 
   static create(canvas: HTMLCanvasElement): Canvas2DCloud | null {
@@ -471,14 +495,17 @@ class Canvas2DCloud implements CloudRenderer {
     if (cv.height !== ph) cv.height = ph;
   }
 
-  private ensureBuckets(n: number) {
-    const per = Math.max(64, Math.ceil((n / DEPTH_BUCKETS) * 4));
-    if (this.bucketX[0].length >= per) return;
-    for (let i = 0; i < DEPTH_BUCKETS; i++) {
-      this.bucketX[i] = new Float32Array(per);
-      this.bucketY[i] = new Float32Array(per);
-      this.bucketS[i] = new Float32Array(per);
-    }
+  /** Room for every point of the biggest group, so nothing can ever be dropped for want of space. */
+  private ensureScratch(n: number) {
+    if (this.tmpX.length >= n) return;
+    const cap = Math.max(1024, n);
+    this.tmpX = new Float32Array(cap);
+    this.tmpY = new Float32Array(cap);
+    this.tmpS = new Float32Array(cap);
+    this.tmpB = new Int32Array(cap);
+    this.outX = new Float32Array(cap);
+    this.outY = new Float32Array(cap);
+    this.outS = new Float32Array(cap);
   }
 
   draw(cam: Camera, lit: LitPoints | null, o: DrawOpts) {
@@ -500,13 +527,15 @@ class Canvas2DCloud implements CloudRenderer {
 
     let maxCount = 0;
     for (let gi = 0; gi < this.groups.length; gi++) maxCount = Math.max(maxCount, Math.ceil(this.groups[gi].count / this.stride[gi]));
-    this.ensureBuckets(maxCount);
+    this.ensureScratch(maxCount);
 
     for (let gi = 0; gi < this.groups.length; gi++) {
       const g = this.groups[gi];
       if (g.count === 0) continue;
       const step = this.stride[gi];
       this.bucketN.fill(0);
+      // pass 1: project, cull, and count how many points land in each depth bucket
+      let m = 0;
       for (let i = g.start; i < g.start + g.count; i += step) {
         const b = i * 3;
         const x = this.pos[b];
@@ -520,35 +549,47 @@ class Canvas2DCloud implements CloudRenderer {
         const sx = halfW + (vx * focal) / d;
         const sy = halfH - (vy * focal) / d;
         if (sx < -4 || sy < -4 || sx > this.w + 4 || sy > this.h + 4) continue;
-        const size = (g.radius * sizeScale) / d;
         let bi = Math.floor(((fogFar - d) / fogSpan) * DEPTH_BUCKETS);
         bi = bi < 0 ? 0 : bi >= DEPTH_BUCKETS ? DEPTH_BUCKETS - 1 : bi;
-        const k = this.bucketN[bi];
-        if (k >= this.bucketX[bi].length) continue;
-        this.bucketX[bi][k] = sx;
-        this.bucketY[bi][k] = sy;
-        this.bucketS[bi][k] = size;
-        this.bucketN[bi] = k + 1;
+        this.tmpX[m] = sx;
+        this.tmpY[m] = sy;
+        this.tmpS[m] = (g.radius * sizeScale) / d;
+        this.tmpB[m] = bi;
+        this.bucketN[bi]++;
+        m++;
+      }
+      if (m === 0) continue;
+      // pass 2: prefix sums, then scatter into one flat run ordered far bucket first
+      let acc = 0;
+      for (let bi = 0; bi < DEPTH_BUCKETS; bi++) {
+        this.bucketAt[bi] = acc;
+        acc += this.bucketN[bi];
+      }
+      this.bucketAt[DEPTH_BUCKETS] = acc;
+      const cursor = this.bucketN; // reused as the write cursor, rebuilt from bucketAt below
+      for (let bi = 0; bi < DEPTH_BUCKETS; bi++) cursor[bi] = this.bucketAt[bi];
+      for (let k = 0; k < m; k++) {
+        const p = cursor[this.tmpB[k]]++;
+        this.outX[p] = this.tmpX[k];
+        this.outY[p] = this.tmpY[k];
+        this.outS[p] = this.tmpS[k];
       }
       // far bucket first, near bucket last: a painter's algorithm inside the group
-      const rgb = `rgb(${Math.round(g.color[0] * 255)}, ${Math.round(g.color[1] * 255)}, ${Math.round(g.color[2] * 255)})`;
-      ctx.fillStyle = rgb;
+      ctx.fillStyle = `rgb(${Math.round(g.color[0] * 255)}, ${Math.round(g.color[1] * 255)}, ${Math.round(g.color[2] * 255)})`;
       for (let bi = 0; bi < DEPTH_BUCKETS; bi++) {
-        const n = this.bucketN[bi];
-        if (n === 0) continue;
+        const from = this.bucketAt[bi];
+        const to = this.bucketAt[bi + 1];
+        if (to === from) continue;
         const fog = 0.3 + 0.7 * (bi / (DEPTH_BUCKETS - 1));
         ctx.globalAlpha = Math.min(1, g.alpha * fog);
-        const X = this.bucketX[bi];
-        const Y = this.bucketY[bi];
-        const S = this.bucketS[bi];
-        for (let k = 0; k < n; k++) {
-          const s = S[k];
+        for (let k = from; k < to; k++) {
+          const s = this.outS[k];
           if (s >= 1.4) {
             ctx.beginPath();
-            ctx.arc(X[k], Y[k], s / 2, 0, Math.PI * 2);
+            ctx.arc(this.outX[k], this.outY[k], s / 2, 0, Math.PI * 2);
             ctx.fill();
           } else {
-            ctx.fillRect(X[k] - s / 2, Y[k] - s / 2, s, s);
+            ctx.fillRect(this.outX[k] - s / 2, this.outY[k] - s / 2, s, s);
           }
         }
       }
@@ -573,13 +614,22 @@ class Canvas2DCloud implements CloudRenderer {
         const age = lit.age[i];
         const size = (lit.radius[i] * (1 + (o.litGain - 1) * age) * sizeScale) / d;
         const fog = Math.max(0.3, Math.min(1, (fogFar - d) / fogSpan));
-        ctx.globalAlpha = Math.min(1, fog);
+        // Exactly what the vertex shader does, so the two back ends agree. The old 0.4 CSS-px
+        // radius floor reintroduced the very exaggeration the WebGL path exists to avoid: at rail
+        // width an optic soma is ~0.30 px, so the floor bit for the last quarter of every 150 ms
+        // tail and painted those cells at 1.3x the radius and 1.7x the area they should have.
+        // A point under one pixel is drawn at one pixel with its alpha scaled by the area it
+        // should have covered, and the alpha ramps from the group's own alpha up to 1 with age.
+        const shrink = Math.min(1, size);
+        const base = lit.alpha[i];
+        const a = base + (1 - base) * age;
+        ctx.globalAlpha = Math.min(1, a * fog * shrink * shrink);
         const cr = lit.color[b] * 255;
         const cg = lit.color[b + 1] * 255;
         const cb = lit.color[b + 2] * 255;
         ctx.fillStyle = `rgb(${Math.round(cr + (ar - cr) * age)}, ${Math.round(cg + (ag - cg) * age)}, ${Math.round(cb + (ab - cb) * age)})`;
         ctx.beginPath();
-        ctx.arc(sx, sy, Math.max(0.4, size / 2), 0, Math.PI * 2);
+        ctx.arc(sx, sy, Math.max(0.5, size / 2), 0, Math.PI * 2);
         ctx.fill();
       }
     }

@@ -69,8 +69,17 @@ const BOX_PAD = 0.015;
 const LIT_GAIN = 2.2;
 /** Time bucket for the spike index; a scrub window is then a range of buckets, not a rescan. */
 const BIN_MS = 16;
-/** Pitch is clamped short of the poles: at a pole the up vector and the view direction coincide. */
-const MAX_PITCH = 1.45;
+/**
+ * Pitch is clamped just short of the poles: exactly at a pole the fixed up vector (0, 1, 0) and the
+ * view direction coincide and the view basis is undefined.
+ *
+ * 1.5697 rad is 89.95 degrees, which is the dorsal (x, z) view MAP_SPEC.md promises the orbit
+ * reaches, to within a twentieth of a degree. The old 1.45 was 83.1 degrees and stopped the camera
+ * seven degrees short of ever looking down the atlas y axis, so one of the three named projections
+ * was not actually reachable. At 89.95 degrees the cross product still has a length of 8.7e-4 of a
+ * unit vector, which is thousands of times the resolution of the doubles it is computed in.
+ */
+const MAX_PITCH = 1.5697;
 /** Zoom range, as a multiple of the framing distance. */
 const MIN_ZOOM = 0.55;
 const MAX_ZOOM = 14;
@@ -140,15 +149,37 @@ export function useAtlas(): Loadable<AtlasData> {
  * a file that 404s now may exist after the pipeline is re-run, and a network error must be retryable.
  */
 const activityCache = new Map<string, Promise<BinLoad<ActivityData>>>();
+/**
+ * How many parsed runs the cache keeps.
+ *
+ * Two, because there are at most two askers for the same instant: the Replay page and the rail
+ * panel, and they share one selection, so they ask for the same path. It used to be unbounded, and
+ * each entry holds two Uint32Arrays of about 400,000 spikes: clicking through the three conditions
+ * and three seeds fetched all nine binaries (27.5 MB) and left every one of them resident, so the
+ * heap climbed from 15 MB to 40 MB and never came back down. Only the current run is ever animated;
+ * everything else is a page the reader has left.
+ */
+const ACTIVITY_CACHE_MAX = 2;
 
 export function loadActivityCached(path: string): Promise<BinLoad<ActivityData>> {
-  let p = activityCache.get(path);
-  if (!p) {
-    p = loadActivity(path);
-    activityCache.set(path, p);
-    p.then((r) => {
-      if (!r.ok) activityCache.delete(path);
-    }).catch(() => activityCache.delete(path));
+  const hit = activityCache.get(path);
+  if (hit) {
+    // re-insert so the Map's insertion order is least-recently-used first
+    activityCache.delete(path);
+    activityCache.set(path, hit);
+    return hit;
+  }
+  const p = loadActivity(path);
+  activityCache.set(path, p);
+  // A failure is not cached: a file that 404s now may exist after the pipeline is re-run, and a
+  // network error must be retryable.
+  p.then((r) => {
+    if (!r.ok) activityCache.delete(path);
+  }).catch(() => activityCache.delete(path));
+  while (activityCache.size > ACTIVITY_CACHE_MAX) {
+    const oldest = activityCache.keys().next();
+    if (oldest.done || oldest.value === path) break;
+    activityCache.delete(oldest.value);
   }
   return p;
 }
@@ -574,6 +605,9 @@ function BrainMapInner({
     const nCodes = Math.max(1, labels.length);
     const colorByCode = new Float32Array(nCodes * 3);
     const radiusByCode = new Float32Array(nCodes);
+    // A lit point fades back to its group's own alpha, not to full opacity, so the lit pass needs
+    // the group alpha per point exactly as it needs the group colour and radius.
+    const alphaByCode = new Float32Array(nCodes);
     for (let code = 0; code < nCodes; code++) {
       const spec = specFor(labels[code] ?? '');
       const [r, g, b] = parseRgb01(specColor(spec, C.dark));
@@ -581,13 +615,16 @@ function BrainMapInner({
       colorByCode[code * 3 + 1] = g;
       colorByCode[code * 3 + 2] = b;
       radiusByCode[code] = specRadius(spec, C.dark);
+      alphaByCode[code] = spec.alpha;
     }
     return {
       list,
       colorByCode,
       radiusByCode,
+      alphaByCode,
       fallbackColor: parseRgb01(specColor(GROUP_FALLBACK, C.dark)),
       fallbackRadius: specRadius(GROUP_FALLBACK, C.dark),
+      fallbackAlpha: GROUP_FALLBACK.alpha,
     };
   }, [C, geometry, atlas.groupLabels]);
 
@@ -632,7 +669,14 @@ function BrainMapInner({
   };
 
   /** Scratch buffers for the lit pass, grown rather than reallocated on every frame. */
-  const litBuf = useRef<LitPoints>({ pos: new Float32Array(0), age: new Float32Array(0), radius: new Float32Array(0), color: new Float32Array(0), n: 0 });
+  const litBuf = useRef<LitPoints>({
+    pos: new Float32Array(0),
+    age: new Float32Array(0),
+    radius: new Float32Array(0),
+    color: new Float32Array(0),
+    alpha: new Float32Array(0),
+    n: 0,
+  });
   /** Dedupe stamps: one array write per spike instead of a Set lookup. */
   const stampRef = useRef<{ gen: Int32Array; pos: Int32Array; n: number; counter: number } | null>(null);
 
@@ -891,7 +935,9 @@ function BrainMapInner({
       lastPageScroll = performance.now();
     };
     const onWheel = (e: WheelEvent) => {
-      const pinch = e.ctrlKey || e.metaKey;
+      // A trackpad pinch arrives as ctrl+wheel on every platform. Cmd+wheel is the browser's own
+      // page zoom on macOS, and treating it as a pinch here called preventDefault and swallowed it.
+      const pinch = e.ctrlKey;
       if (!pinch && performance.now() - lastPageScroll < 260) return; // the page is mid-scroll
       const before = c.zoomTarget;
       const factor = Math.exp(-(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) * (pinch ? 0.01 : 0.0016));
@@ -1106,7 +1152,14 @@ interface LiveState {
   loopMs?: number;
   inBox: Uint8Array;
   atlas: AtlasData;
-  draws: { colorByCode: Float32Array; radiusByCode: Float32Array; fallbackColor: [number, number, number]; fallbackRadius: number } | null;
+  draws: {
+    colorByCode: Float32Array;
+    radiusByCode: Float32Array;
+    alphaByCode: Float32Array;
+    fallbackColor: [number, number, number];
+    fallbackRadius: number;
+    fallbackAlpha: number;
+  } | null;
   geometry: { centre: [number, number, number] };
   stale: boolean;
 }
@@ -1155,11 +1208,19 @@ function buildLit(
   const ensure = (need: number) => {
     if (out.age.length >= need) return;
     const cap = Math.max(1024, Math.ceil(need * 1.6));
-    const grown: LitPoints = { pos: new Float32Array(cap * 3), age: new Float32Array(cap), radius: new Float32Array(cap), color: new Float32Array(cap * 3), n: 0 };
+    const grown: LitPoints = {
+      pos: new Float32Array(cap * 3),
+      age: new Float32Array(cap),
+      radius: new Float32Array(cap),
+      color: new Float32Array(cap * 3),
+      alpha: new Float32Array(cap),
+      n: 0,
+    };
     grown.pos.set(out.pos.subarray(0, n * 3));
     grown.age.set(out.age.subarray(0, n));
     grown.radius.set(out.radius.subarray(0, n));
     grown.color.set(out.color.subarray(0, n * 3));
+    grown.alpha.set(out.alpha.subarray(0, n));
     buf.current = grown;
     out = grown;
   };
@@ -1209,11 +1270,13 @@ function buildLit(
         out.color[b3] = draws.colorByCode[code * 3];
         out.color[b3 + 1] = draws.colorByCode[code * 3 + 1];
         out.color[b3 + 2] = draws.colorByCode[code * 3 + 2];
+        out.alpha[n] = draws.alphaByCode[code];
       } else {
         out.radius[n] = draws.fallbackRadius;
         out.color[b3] = draws.fallbackColor[0];
         out.color[b3 + 1] = draws.fallbackColor[1];
         out.color[b3 + 2] = draws.fallbackColor[2];
+        out.alpha[n] = draws.fallbackAlpha;
       }
       n++;
     }
@@ -1281,6 +1344,20 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
   // the count the map is actually drawn from is the binary's row count
   const rowsDisagree = atlas.n !== sc.n_neurons_in_map;
   const brainBox = sc.view_boxes?.brain;
+  /**
+   * The two populations the paint order exists to keep apart, as the sidecar counts them.
+   *
+   * These were written into the prose as "32 dFB cells" and "90,805 optic-lobe cells". They are
+   * the right numbers for this export and the wrong kind of number to hard-code: every other
+   * figure in this caption is the sidecar's own, and the next export would have left these two
+   * silently stale. A group the sidecar states nothing about is not a zero, so when either count
+   * is absent the sentence is written without the numbers rather than with an invented one.
+   */
+  const inBrain = sc.group_counts_in_brain_view ?? sc.group_counts;
+  const stated = (label: string): number | null =>
+    inBrain && Object.prototype.hasOwnProperty.call(inBrain, label) && typeof inBrain[label] === 'number' ? (inBrain[label] as number) : null;
+  const nSmallest = stated('dFB');
+  const nLargest = stated('optic');
   return (
     <>
       Each dot is one neuron's <em>soma position</em>, the cell body and not the neurites: this is not a morphology rendering, and a neuron's
@@ -1288,8 +1365,15 @@ export function AtlasCaption({ atlas, activity }: { atlas: AtlasData; activity?:
       {fmtNum(atlas.hi[0], 1)} µm in x, {fmtNum(atlas.lo[1], 1)} to {fmtNum(atlas.hi[1], 1)} µm in y, {fmtNum(atlas.lo[2], 1)} to{' '}
       {fmtNum(atlas.hi[2], 1)} µm in z); {sc.axes?.note}. The view is a 3D orbit: at azimuth 0° and elevation 0° it is the frontal view, with the
       atlas x axis horizontal and the atlas y axis increasing downward. Depth is carried by point size and fading, and the small named
-      populations are painted over the two large background populations whatever their depth, so 32 dFB cells are not lost among 90,805
-      optic-lobe cells.{' '}
+      populations are painted over the two large background populations whatever their depth
+      {nSmallest !== null && nLargest !== null ? (
+        <>
+          , so {fmtInt(nSmallest)} dFB cells are not lost among {fmtInt(nLargest)} optic-lobe cells
+        </>
+      ) : (
+        <>, so the smallest named populations are not lost behind the two large background ones</>
+      )}
+      .{' '}
       {brainBox && typeof brainBox.n_neurons === 'number' && (
         <>
           The default framing is the sidecar's <span className="mono">view_boxes.brain</span>, which holds {fmtInt(brainBox.n_neurons)} somata

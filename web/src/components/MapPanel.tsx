@@ -6,7 +6,7 @@ import { useDataFile } from '../lib/data';
 import { useMediaQuery, useViewportHeight } from '../lib/media';
 import { activityPath, activityRefs, useMapSelection, type ActivityRef } from '../lib/mapSource';
 import { fmtInt, fmtNum } from '../lib/format';
-import type { ActivityData, AtlasData } from '../lib/binary';
+import { checkAtlasIdentity, type ActivityData, type AtlasData, type IdentityCheck } from '../lib/binary';
 import type { Manifest } from '../types';
 
 /**
@@ -103,16 +103,41 @@ function useClockTime(clock: Clock): number {
   return useSyncExternalStore(clock.subscribe, clock.get, clock.get);
 }
 
+/**
+ * True once `ready` is true and the browser has had an idle moment since.
+ *
+ * It is how the panel keeps a three-megabyte fetch off the critical path without giving up
+ * MAP_SPEC.md's rule that the map plays on every route: the request is made, just not while the
+ * page is still laying itself out and parsing the atlas. The timeout is the ceiling, so a browser
+ * that is never idle still gets there.
+ */
+function useIdleAfter(ready: boolean): boolean {
+  const [go, setGo] = useState(false);
+  useEffect(() => {
+    if (!ready || go) return;
+    const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    if (typeof w.requestIdleCallback === 'function') {
+      const id = w.requestIdleCallback(() => setGo(true), { timeout: 1500 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const t = window.setTimeout(() => setGo(true), 300);
+    return () => window.clearTimeout(t);
+  }, [ready, go]);
+  return go;
+}
+
 // ---------------------------------------------------------------- the panel
 
 export default function MapPanel() {
-  const wrapRef = useRef<HTMLDivElement>(null);
+  // The wrapper is state rather than a ref: the panel returns a different tree while the atlas is
+  // still loading, so the node the observers below are attached to is replaced on the way to the
+  // map, and an effect that only ran on mount would be left watching a detached element.
+  const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(380);
   // Coalesced to one update per frame, like the map's own observer: dragging a window edge
   // otherwise re-renders the whole panel once per observed pixel.
   useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
+    if (!wrap) return;
     let raf = 0;
     let pending = 0;
     const ro = new ResizeObserver((e) => {
@@ -123,12 +148,38 @@ export default function MapPanel() {
         setWidth((w) => (Math.abs(w - pending) < 2 ? w : pending));
       });
     });
-    ro.observe(el);
+    ro.observe(wrap);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, []);
+  }, [wrap]);
+
+  /**
+   * Whether the panel has come within reach of the viewport.
+   *
+   * The activity binary is 3 MB, and this panel is mounted by the Layout on every route. On a
+   * phone the map sits inside the page, often well below the fold, and on a short window the rail
+   * can start off screen too; fetching three megabytes of spikes for a picture nobody has scrolled
+   * to is the reader's bandwidth spent on nothing. Once the panel has been near the viewport the
+   * flag stays set: scrolling past the map must not cancel a run that is already playing.
+   */
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    if (!wrap || near) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setNear(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (es) => {
+        if (es.some((e) => e.isIntersecting)) setNear(true);
+      },
+      { rootMargin: '600px' },
+    );
+    io.observe(wrap);
+    return () => io.disconnect();
+  }, [wrap, near]);
   const narrow = useMediaQuery('(max-width: 699px)');
   const railed = useMediaQuery('(min-width: 1100px)');
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
@@ -187,9 +238,37 @@ export default function MapPanel() {
   const setSeed = (s: number) => {
     if (selection) setSelection({ condition: selection.condition, seed: s });
   };
-  const load = useActivity(path);
+  /**
+   * When the run is actually fetched.
+   *
+   * MAP_SPEC.md requires the map to be live on every route, so the run is still loaded everywhere
+   * and still starts playing by itself; what changed is that its three megabytes are no longer on
+   * the critical path of the first paint. Two gates: the panel has to be within reach of the
+   * viewport, and the atlas (985 kB, and the thing that draws the picture) has to be parsed and the
+   * browser idle. Before the pipeline of the first paint has drained, nothing asks for the spikes.
+   */
+  const idle = useIdleAfter(atlas.state !== 'loading');
+  const wantRun = near && idle;
+  const load = useActivity(wantRun ? path : null);
   const activity: ActivityData | null = load?.state === 'ready' ? load.data : null;
   const sourceKey = path ?? 'none';
+  /** the run is selected but its bytes are not here yet: queued behind the gates, or on the wire */
+  const pending = path !== null && (load === null || load.state === 'loading');
+
+  /**
+   * Whether the loaded spike file belongs to the loaded atlas.
+   *
+   * `atlas_row` values from a different atlas are all in range and all land on real somata, so
+   * nothing but the identity the exporter stamps into both sidecars can tell a current pairing from
+   * a stale one. BrainMap refuses to light anything on a mismatch; this panel has to stop saying
+   * that the spikes on the map are this run's, and stop printing a "neurons lit" count for neurons
+   * that are not lit.
+   */
+  const identity: IdentityCheck | null = useMemo(
+    () => (activity && atlasData ? checkAtlasIdentity(activity.sidecar, atlasData) : null),
+    [activity, atlasData],
+  );
+  const mismatched = identity?.state === 'mismatch';
 
   // The loop length: the sidecar's own duration, never shorter than the last spike it holds.
   const durationMs = activity ? Math.max(Math.round((activity.sidecar.duration_s ?? 0) * 1000), activity.maxTMs + 1) : 0;
@@ -230,16 +309,17 @@ export default function MapPanel() {
   const source: MapSourceLabel = useMemo(() => {
     if (!selection) return { text: 'atlas only · no run selected' };
     const head = `replay activity · ${selection.condition}, seed ${selection.seed}`;
-    if (activity) return { text: head };
+    if (activity) return { text: mismatched ? `${head} · exported against a different atlas, nothing is lit` : head };
     if (load?.state === 'failed') return { text: `${head} · could not be loaded, nothing is lit` };
+    if (!wantRun) return { text: `${head} · the atlas is drawn; the run loads next` };
     return { text: `${head} · loading the run …` };
-  }, [selection, activity, load]);
+  }, [selection, activity, load, mismatched, wantRun]);
 
   const prov = useMemo(() => atlasProvenance(atlasData, manifest, path ? [`web/public/data/${path}`] : []), [atlasData, manifest, path]);
 
   if (atlas.state === 'loading') {
     return (
-      <div ref={wrapRef} className="map-panel">
+      <div ref={setWrap} className="map-panel">
         <PanelHead source={source} />
         <div className="small muted py-6">loading neuron_atlas.json …</div>
       </div>
@@ -248,7 +328,7 @@ export default function MapPanel() {
 
   if (atlas.state === 'failed') {
     return (
-      <div ref={wrapRef} className="map-panel">
+      <div ref={setWrap} className="map-panel">
         <PanelHead source={source} />
         <NotRunPanel
           file={atlas.path}
@@ -263,13 +343,13 @@ export default function MapPanel() {
   }
 
   return (
-    <div ref={wrapRef} className="map-panel">
+    <div ref={setWrap} className="map-panel">
       <PanelHead source={source} />
 
       <BrainMap
         atlas={atlas.data}
         activity={activity}
-        activityLoading={load?.state === 'loading'}
+        activityLoading={pending}
         source={source}
         time={time}
         decayMs={DECAY_MS}
@@ -303,6 +383,8 @@ export default function MapPanel() {
         path={path}
         listed={listed}
         load={load}
+        requested={wantRun}
+        identity={identity}
         s6State={s6.state}
         nRuns={refs.length}
         activeCounted={activeCounted}
@@ -468,6 +550,8 @@ const SourceLine = memo(function SourceLine({
   path,
   listed,
   load,
+  requested,
+  identity,
   s6State,
   nRuns,
   activeCounted,
@@ -481,6 +565,10 @@ const SourceLine = memo(function SourceLine({
   /** false when the selection names a run stage6_replay.json does not list */
   listed: boolean;
   load: ReturnType<typeof useActivity>;
+  /** false while the fetch is still held behind the viewport and idle gates */
+  requested: boolean;
+  /** whether the loaded spike file's sidecar names the atlas that is loaded; null before it is */
+  identity: IdentityCheck | null;
   s6State: 'loading' | 'missing' | 'error' | 'ready';
   nRuns: number;
   activeCounted: number | null;
@@ -489,6 +577,20 @@ const SourceLine = memo(function SourceLine({
   playing: boolean;
   reduceMotion: boolean;
 }) {
+  /**
+   * stage6_replay.json is fetched when the browser is idle, so for the first moments of every page
+   * there is no selection and no path yet. Printing "no replay activity has been exported" there
+   * asserts a not-run state about a file nobody has read: the same claim the whole panel exists to
+   * make only when it is true. While the stage file is in flight, the panel says exactly that.
+   */
+  if (!path && s6State === 'loading') {
+    return (
+      <div className="map-panel__source">
+        <p className="smaller muted">reading stage6_replay.json to find the runs that exist …</p>
+      </div>
+    );
+  }
+
   if (!path || condition === null || seed === null) {
     return (
       <div className="map-panel__source">
@@ -517,14 +619,32 @@ const SourceLine = memo(function SourceLine({
         </p>
       )}
       {load === null || load.state === 'loading' ? (
-        <p className="smaller muted">loading the activity binary for this run …</p>
+        <p className="smaller muted">
+          {requested ? 'loading the activity binary for this run …' : 'the atlas is drawn; the activity binary for this run is requested next.'}
+        </p>
       ) : load.state === 'ready' ? (
         <>
-          <p className="smaller">
-            The spikes on the map are the whole-brain activity of this run, over the same window as its raster and its correlation trace, as
-            stage 6 exported it. It is the experiment's own output; nothing else is ever animated here.
-          </p>
-          <SpikeFacts sc={load.data.sidecar} counted={activeCounted} />
+          {identity?.state === 'mismatch' ? (
+            <p className="smaller tone-failed">
+              Nothing is lit: this file was exported against a different atlas, so its <span className="mono">atlas_row</span> values would land on
+              the wrong neurons. {identity.message}. Re-run <span className="mono">python {REPLAY_SCRIPT}</span> and then{' '}
+              <span className="mono">python scripts/export_web.py</span> so the spikes and the atlas are exported together.
+            </p>
+          ) : (
+            <p className="smaller">
+              The spikes on the map are the whole-brain activity of this run, over the same window as its raster and its correlation trace, as
+              stage 6 exported it. It is the experiment's own output; nothing else is ever animated here.
+            </p>
+          )}
+          {identity?.state === 'unverified' && (
+            <p className="smaller tone-failed">
+              The pairing of this file with the loaded atlas could not be checked: {identity.message}. What is drawn is drawn on that
+              unverified basis.
+            </p>
+          )}
+          {/* on a mismatch nothing is lit, so there is no neuron count to print: the facts that
+              remain are facts about the file itself, which are true whatever atlas it belongs to */}
+          <SpikeFacts sc={load.data.sidecar} counted={identity?.state === 'mismatch' ? null : activeCounted} />
         </>
       ) : (
         <p className="smaller tone-failed">
