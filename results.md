@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T11:32:03+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T19:03:20+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -8,7 +8,7 @@
 
 **Before anything else: the published model treats APL as a spiking neuron, and it is not one.** APL is the mushroom body's feedback inhibitory neuron and it releases transmitter in proportion to its membrane potential rather than in spikes (Amin et al. 2020 eLife 9:e56954). Modelling it with a threshold turns the one graded control of Kenyon-cell sparseness into a switch. At the published parameters, with that threshold in place, an odour drives 52.6% of Kenyon cells at 23.0 Hz and they idle afterwards at 18.1 Hz. Without it, at the same parameters, 4.54% respond at 0.79 Hz and idle at 0.134 Hz. Real Kenyon cells respond at 6 plus or minus 5 per cent and idle near 0.1 Hz. Nothing was tuned to get there: the only difference between the two is whether APL is allowed to fire. A second correction, DPM's transmitter, is reported alongside it in *Stage 3f*.
 
-**Stage 6 (artifact).** A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.
+**Stage 6 (failed).** No evidence of memory replay, and no basis for calling what was measured an artifact either. The odour-A ensemble does score above size-matched random ensembles, but the comparison that would say whether that is structure rather than memory, the degree-preserving shuffled connectome, cannot answer it here. The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.
 
 ## What was simulated
 
@@ -120,13 +120,14 @@ Why the substitution is not neutral, measured in this connectome:
 | quantity | value |
 |---|---|
 | threshold gap | 7.0 mV |
-| one Kenyon-cell spike delivers to APL | 7.16 mV |
-| Kenyon-cell spikes needed to fire APL | 0.98 |
-| one APL spike delivers to each Kenyon cell | 6.77 mV, 97% of a full threshold gap |
+| one Kenyon-cell spike delivers to APL | 1.13 mV of membrane potential (7.16 mV of conductance), 16% of a threshold gap |
+| Kenyon-cell spikes needed to fire APL | 6.2 |
+| one APL spike delivers to each Kenyon cell | 1.07 mV, 15% of a full threshold gap |
+| conductance-to-potential factor for these time constants | 0.157 |
 | APL's maximum rate, set by the refractory period | 455 Hz |
 | APL's share of all inhibition onto Kenyon cells | 79.8% |
 
-A single Kenyon-cell spike already carries APL most of the way to threshold, and a single APL spike removes more than a full threshold gap from every Kenyon cell it touches, while APL's output rate is capped by the refractory period. A graded controller has become a saturated switch, and it is the only feedback that keeps the odour code sparse.
+Six Kenyon-cell spikes carry APL to threshold and a single APL spike removes about a sixth of a threshold gap from every Kenyon cell it touches, so a per-spike account does not by itself make APL a switch. What does is the standing input: APL collects from 4,063 Kenyon cells, so at any Kenyon-cell rate above a fraction of a hertz its membrane sits far past threshold and its release, capped by the refractory period, is pinned at the ceiling. A graded controller has become a saturated one, and it is the only feedback that keeps the odour code sparse. An earlier version of this note said one Kenyon-cell spike suffices, which confused the conductance a synapse delivers with the potential it produces, a factor of 6.3.
 
 | APL | Kenyon cells responding | rate during odour | rate after odour | APL rate |
 |---|---|---|---|---|
@@ -379,9 +380,9 @@ The memory is a depression of Kenyon-cell to MBON synapses, downstream of the Ke
 
 ## Stage 6 - the replay test
 
-**artifact.** Criterion: a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such.
+**failed.** Criterion: a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such.
 
-**A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.**
+**No evidence of memory replay, and no basis for calling what was measured an artifact either. The odour-A ensemble does score above size-matched random ensembles, but the comparison that would say whether that is structure rather than memory, the degree-preserving shuffled connectome, cannot answer it here. The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.**
 
 *The four required comparisons use z_vs_random_ensembles, each run standardised against size-matched random Kenyon-cell ensembles drawn from that same run, because ensemble sizes differ between odours and between the real and shuffled networks and the raw template correlation depends on template size. comparisons_raw_metric repeats three of them on the raw correlation so the effect of that choice can be seen.*
 
@@ -414,6 +415,23 @@ Ensemble sizes actually used (Kenyon cells), which is why the size-normalised st
 | bin | events are discrete | verdict | comparisons that showed the predicted effect |
 |---|---|---|---|
 | 10 ms | no | artifact | A_vs_random_ensembles, trained_vs_naive_spike_share |
+
+### Is the memory legible offline, even though the ensemble does not reactivate?
+
+**The memory is legible in the offline activity, and it is tonic rather than episodic. Drive through the learned synapses during the offline period is 18,664 mV/s in the trained network against 27,659 in the identical run with unlearned weights, a change of -32.5 per cent, paired t = -111.7, p = 3.1e-28 over 20 seeds. That is not the weight change itself, which is only -1.23 per cent of the total plastic weight: the offline activity falls disproportionately on the synapses the conditioning depressed, so the engram is amplified about 26 times in what the mushroom body actually sends. Decomposing it, the learned weights acting on UNCHANGED activity account for -32.8 per cent and the changed activity acting on unlearned weights for +0.4 per cent, so the trace is a read-out of the weights through activity that did not itself change. Across 39 one-second bins the trained-to-unlearned ratio has a coefficient of variation of 0.23, so the trace is flat: the memory is expressed continuously, not in episodes, so it is an offline memory trace and not replay.**
+
+| quantity | value |
+|---|---|
+| drive through the learned synapses, trained | 18,664 mV/s |
+| the same run with unlearned weights | 27,659 mV/s |
+| change | -32.5% +/- 1.3, paired t = -111.7, p = 3.1e-28 |
+| of which, learned weights on unchanged activity | -32.8% |
+| of which, changed activity on unlearned weights | +0.4% |
+| total plastic weight actually moved | -1.23% |
+| amplification of the engram in the output | 26x |
+| episodic? | no (bin-to-bin coefficient of variation 0.23) |
+
+*Where the Kenyon cells' recurrent synapses are: The Kenyon cells' recurrent input is overwhelmingly axonal. Of 1,153,845 Kenyon-cell-to-Kenyon-cell synapses, 33,915 (2.9%) are in the calyx where the dendrites are, and 1,038,569 (90.0%) are in the lobes and pedunculus where the axons are (955,703 lobe, 82,866 pedunculus), with 81,361 (7.1%) elsewhere. The measurement that says this interaction is metabotropic rather than nicotinic is about the axons, so it applies to 90% of the recurrent synapses the model currently makes fast and excitatory.*
 
 **Sequence order.** Spearman rank correlation between within-event first-spike order and the order of the odour response, against a cell-identity shuffle (Foster & Wilson 2006). Reported only where events contained at least four ensemble members with distinct template ranks. Scored on 20 seeds over 3999 reactivation events: mean absolute rank correlation 0.122 against a cell-identity shuffle mean of 0.087.
 

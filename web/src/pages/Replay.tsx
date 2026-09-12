@@ -571,6 +571,35 @@ function Stage6View({ d }: { d: Stage6 }) {
         <ForestPlot comparisons={comparisons} required={d.required_four} note={d.fifth_comparison_note} />
       </Figure>
 
+      {d.offline_memory_trace?.summary && (
+        <div className="card">
+          <div className="label label--ink mb-2">Is the memory legible offline, even though the ensemble does not reactivate?</div>
+          <p className="measure">{d.offline_memory_trace.finding}</p>
+          <DataTable
+            columns={[
+              { key: 'k', header: 'quantity', render: (r) => r.k },
+              { key: 'v', header: 'value', render: (r) => r.v },
+            ]}
+            rows={(() => {
+              const m = d.offline_memory_trace!.summary!;
+              const n = (x: number | null | undefined, dp = 1) => (isNum(x) ? fmtNum(x, dp) : NOT_MEASURED);
+              return [
+                { k: 'drive through the learned synapses, trained', v: `${n(m.drive_trained_mV_per_s, 0)} mV/s` },
+                { k: 'the same run with unlearned weights', v: `${n(m.drive_naive_mV_per_s, 0)} mV/s` },
+                { k: 'change', v: `${n(m.total_change_pct_mean)}% , paired t = ${n(m.paired_t)}, p = ${isNum(m.p_value) ? m.p_value.toExponential(1) : NOT_MEASURED}` },
+                { k: 'of which, learned weights on unchanged activity', v: `${n(m.weight_term_pct_mean)}%` },
+                { k: 'of which, changed activity on unlearned weights', v: `${n(m.activity_term_pct_mean)}%` },
+                { k: 'total plastic weight actually moved', v: `${n(m.plastic_weight_change_pct_mean, 2)}%` },
+                { k: 'amplification of the engram in the output', v: `${n(m.amplification_over_weight_change, 0)}x` },
+                { k: 'episodic, as replay would be?', v: m.is_episodic ? 'yes' : `no (bin-to-bin variation ${n(m.per_bin_ratio_cv_mean, 2)})` },
+              ];
+            })()}
+            rowKey={(r) => r.k}
+          />
+          <ProvenanceFooter provenance={d.provenance} />
+        </div>
+      )}
+
       {d.bin_robustness && d.bin_robustness.length > 0 && (
         <div className="card">
           <div className="label label--ink mb-2">Does the verdict depend on the time bin?</div>

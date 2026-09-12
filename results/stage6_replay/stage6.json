@@ -1,7 +1,7 @@
 {
- "status": "artifact",
+ "status": "failed",
  "criterion": "a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such.",
- "headline": "A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
+ "headline": "No evidence of memory replay, and no basis for calling what was measured an artifact either. The odour-A ensemble does score above size-matched random ensembles, but the comparison that would say whether that is structure rather than memory, the degree-preserving shuffled connectome, cannot answer it here. The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
  "engram_reaches_the_kenyon_cells": {
   "anatomical_path": {
    "conditioning_dan": "PPL101",
@@ -358,6 +358,176 @@
   "mean_jaccard_active_kcs": 0.9085875208340586,
   "note": "The learned weights change the offline Kenyon-cell activity in 20 of 20 seeds, so the engram does reach the Kenyon cells and a reactivation difference measured downstream can in principle be real."
  },
+ "arm_matching": [
+  {
+   "comparison": "A_vs_B_sleep",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "real",
+     "sleep",
+     "B"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 61.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "ensemble_size_ratio": 2.907090464547677,
+   "kc_rate_ratio": 1.0,
+   "tolerance": 1.5,
+   "arms_are_matched": false,
+   "note": "The two arms differ by 2.9 times in ensemble size and 1.0 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
+  },
+  {
+   "comparison": "sleep_vs_wake_A",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "real",
+     "wake",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4318005621433258,
+    "n_spikes_total_kc_mean": 70193.5
+   },
+   "ensemble_size_ratio": 1.0,
+   "kc_rate_ratio": 1.0016988785548386,
+   "tolerance": 1.5,
+   "arms_are_matched": true,
+   "note": "The two arms are within tolerance on ensemble size and Kenyon-cell rate."
+  },
+  {
+   "comparison": "real_vs_shuffled",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "shuffled",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 669.75,
+    "kc_rate_hz_mean": 4.615783411264419,
+    "n_spikes_total_kc_mean": 750341.75
+   },
+   "ensemble_size_ratio": 3.7552565180824224,
+   "kc_rate_ratio": 10.671489245791935,
+   "tolerance": 1.5,
+   "arms_are_matched": false,
+   "note": "The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
+  },
+  {
+   "comparison": "trained_vs_naive_weights",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "real",
+     "sleep_naive",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.43088951855897906,
+    "n_spikes_total_kc_mean": 70045.4
+   },
+   "ensemble_size_ratio": 1.0,
+   "kc_rate_ratio": 1.0038168027499006,
+   "tolerance": 1.5,
+   "arms_are_matched": true,
+   "note": "The two arms are within tolerance on ensemble size and Kenyon-cell rate."
+  }
+ ],
+ "comparisons_with_unmatched_arms": [
+  "A_vs_B_sleep",
+  "real_vs_shuffled"
+ ],
+ "z_decomposition": [
+  {
+   "comparison": "trained_vs_naive_weights",
+   "observed_minus_null": {
+    "trained": 0.5628820499841125,
+    "naive": 0.5614811477253034,
+    "difference": 0.001400902258809067,
+    "relative": 0.002495012102337652
+   },
+   "null_sd": {
+    "trained": 0.013730315860085648,
+    "naive": 0.013702231067684253,
+    "difference": 2.8084792401395636e-05,
+    "relative": 0.0020496510577486643
+   },
+   "trained_numerator_mean": 0.5628820499841125,
+   "trained_null_sd_mean": 0.013730315860085648,
+   "naive_numerator_mean": 0.5614811477253034,
+   "naive_null_sd_mean": 0.013702231067684253,
+   "carried_by": "the numerator",
+   "note": "A z-score rises when the effect grows OR when the null's spread shrinks. Here it is carried by the numerator."
+  },
+  {
+   "comparison": "trained_vs_naive_spike_share",
+   "observed_minus_null": {
+    "trained": 0.7376626513573574,
+    "naive": 0.7377610039899591,
+    "difference": -9.8352632601717e-05,
+    "relative": -0.00013331232210676125
+   },
+   "null_sd": {
+    "trained": 0.01803077067341575,
+    "naive": 0.018049288198571867,
+    "difference": -1.8517525156119125e-05,
+    "relative": -0.0010259421287086715
+   },
+   "trained_numerator_mean": 0.7376626513573574,
+   "trained_null_sd_mean": 0.01803077067341575,
+   "naive_numerator_mean": 0.7377610039899591,
+   "naive_null_sd_mean": 0.018049288198571867,
+   "carried_by": "the null's spread",
+   "note": "A z-score rises when the effect grows OR when the null's spread shrinks. Here it is carried by the null's spread. A difference carried by the null's spread is not evidence that the memory changed the offline activity; it is evidence that the random ensembles became more alike."
+  }
+ ],
  "sleep_state_is_distinguishable": false,
  "sleep_vs_wake_arm_note": "One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
  "engram_guard": {
@@ -445,7 +615,9 @@
     17,
     18,
     19
-   ]
+   ],
+   "arms_are_matched": false,
+   "arms_note": "The two arms differ by 2.9 times in ensemble size and 1.0 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
   },
   {
    "name": "sleep_vs_wake_A",
@@ -490,7 +662,8 @@
     17,
     18,
     19
-   ]
+   ],
+   "arms_are_matched": true
   },
   {
    "name": "real_vs_shuffled",
@@ -535,7 +708,9 @@
     17,
     18,
     19
-   ]
+   ],
+   "arms_are_matched": false,
+   "arms_note": "The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
   },
   {
    "name": "A_vs_random_ensembles",
@@ -625,7 +800,9 @@
     17,
     18,
     19
-   ]
+   ],
+   "arms_are_matched": true,
+   "z_carried_by": "the numerator"
   },
   {
    "name": "trained_vs_naive_spike_share",
@@ -670,7 +847,9 @@
     17,
     18,
     19
-   ]
+   ],
+   "z_carried_by": "the null's spread",
+   "survives_note": "This comparison clears its criterion on a shrinking null rather than a moving effect, so it should not be read as the memory having changed the offline activity. See z_decomposition."
   }
  ],
  "comparisons_raw_metric": [
@@ -7593,7 +7772,7 @@
   "real",
   "shuffled"
  ],
- "walltime_s": 685.1,
+ "walltime_s": 628.2,
  "provenance": {
   "config": "configs/stage6_replay.yaml",
   "results_dir": "results/stage6_replay",

@@ -18462,8 +18462,8 @@
    "results/stage4_learning/real/seed18/plastic_w.npz",
    "results/stage4_learning/real/seed19/plastic_w.npz"
   ],
-  "git_commit": "0f93eee",
-  "generated_at": "2026-09-12T11:31:06+00:00"
+  "git_commit": "da5ef99",
+  "generated_at": "2026-09-12T19:02:50+00:00"
  },
  "source_file": "results/stage4_learning/stage4.json"
 }

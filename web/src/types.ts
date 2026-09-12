@@ -419,6 +419,27 @@ export interface Stage6 extends StageBase {
   gain_note?: string;
   metric_note?: string;
   /**
+   * Side analyses of the same offline period, attached by scripts/export_web.py from their own result
+   * directories. None of them is replay; the first is the largest memory-specific effect in the project.
+   */
+  offline_memory_trace?: {
+    finding?: string;
+    summary?: {
+      drive_trained_mV_per_s?: number; drive_naive_mV_per_s?: number;
+      total_change_pct_mean?: number; total_change_pct_sd?: number;
+      weight_term_pct_mean?: number; activity_term_pct_mean?: number;
+      plastic_weight_change_pct_mean?: number; amplification_over_weight_change?: number;
+      paired_t?: number; p_value?: number; per_bin_ratio_cv_mean?: number | null; is_episodic?: boolean;
+    };
+  } | null;
+  return_path?: { finding?: string } | null;
+  readout_gate?: { finding?: string } | null;
+  recurrence_census?: { finding?: string } | null;
+  /** whether each comparison's two arms are in the same state, and which half of a z-score moved */
+  arm_matching?: Array<{ comparison: string; arms_are_matched: boolean; ensemble_size_ratio?: number | null; kc_rate_ratio?: number | null; note?: string }>;
+  comparisons_with_unmatched_arms?: string[];
+  z_decomposition?: Array<{ comparison: string; carried_by: string; note?: string }>;
+  /**
    * The same runs re-analysed at shorter time bins. The primary bin is the cited one; these say whether
    * the verdict depends on that choice. Written by scripts/export_web.py from the stage6_replay_bin<n> result directories.
    */

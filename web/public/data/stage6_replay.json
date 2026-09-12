@@ -1,7 +1,7 @@
 {
- "status": "artifact",
+ "status": "failed",
  "criterion": "a positive replay claim requires ALL FOUR: (1) odour-A ensemble reactivation above the odour-B ensemble, (2) sleep above wake, (3) the real connectome above the degree-preserving shuffled connectome, and (4) the odour-A ensemble above size-matched random KC ensembles - each as a paired effect across seeds whose 95% CI excludes zero in the predicted direction. A positive result that does not survive the shuffled-connectome null is an artifact of network structure, not replay, and is reported as such.",
- "headline": "A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
+ "headline": "No evidence of memory replay, and no basis for calling what was measured an artifact either. The odour-A ensemble does score above size-matched random ensembles, but the comparison that would say whether that is structure rather than memory, the degree-preserving shuffled connectome, cannot answer it here. The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
  "engram_reaches_the_kenyon_cells": {
   "anatomical_path": {
    "conditioning_dan": "PPL101",
@@ -358,6 +358,176 @@
   "mean_jaccard_active_kcs": 0.9085875208340586,
   "note": "The learned weights change the offline Kenyon-cell activity in 20 of 20 seeds, so the engram does reach the Kenyon cells and a reactivation difference measured downstream can in principle be real."
  },
+ "arm_matching": [
+  {
+   "comparison": "A_vs_B_sleep",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "real",
+     "sleep",
+     "B"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 61.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "ensemble_size_ratio": 2.907090464547677,
+   "kc_rate_ratio": 1.0,
+   "tolerance": 1.5,
+   "arms_are_matched": false,
+   "note": "The two arms differ by 2.9 times in ensemble size and 1.0 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
+  },
+  {
+   "comparison": "sleep_vs_wake_A",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "real",
+     "wake",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4318005621433258,
+    "n_spikes_total_kc_mean": 70193.5
+   },
+   "ensemble_size_ratio": 1.0,
+   "kc_rate_ratio": 1.0016988785548386,
+   "tolerance": 1.5,
+   "arms_are_matched": true,
+   "note": "The two arms are within tolerance on ensemble size and Kenyon-cell rate."
+  },
+  {
+   "comparison": "real_vs_shuffled",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "shuffled",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 669.75,
+    "kc_rate_hz_mean": 4.615783411264419,
+    "n_spikes_total_kc_mean": 750341.75
+   },
+   "ensemble_size_ratio": 3.7552565180824224,
+   "kc_rate_ratio": 10.671489245791935,
+   "tolerance": 1.5,
+   "arms_are_matched": false,
+   "note": "The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction."
+  },
+  {
+   "comparison": "trained_vs_naive_weights",
+   "arm_a": {
+    "arm": [
+     "real",
+     "sleep",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.4325341388583183,
+    "n_spikes_total_kc_mean": 70312.75
+   },
+   "arm_b": {
+    "arm": [
+     "real",
+     "sleep_naive",
+     "A"
+    ],
+    "n_seeds": 20,
+    "ensemble_size_mean": 178.35,
+    "kc_rate_hz_mean": 0.43088951855897906,
+    "n_spikes_total_kc_mean": 70045.4
+   },
+   "ensemble_size_ratio": 1.0,
+   "kc_rate_ratio": 1.0038168027499006,
+   "tolerance": 1.5,
+   "arms_are_matched": true,
+   "note": "The two arms are within tolerance on ensemble size and Kenyon-cell rate."
+  }
+ ],
+ "comparisons_with_unmatched_arms": [
+  "A_vs_B_sleep",
+  "real_vs_shuffled"
+ ],
+ "z_decomposition": [
+  {
+   "comparison": "trained_vs_naive_weights",
+   "observed_minus_null": {
+    "trained": 0.5628820499841125,
+    "naive": 0.5614811477253034,
+    "difference": 0.001400902258809067,
+    "relative": 0.002495012102337652
+   },
+   "null_sd": {
+    "trained": 0.013730315860085648,
+    "naive": 0.013702231067684253,
+    "difference": 2.8084792401395636e-05,
+    "relative": 0.0020496510577486643
+   },
+   "trained_numerator_mean": 0.5628820499841125,
+   "trained_null_sd_mean": 0.013730315860085648,
+   "naive_numerator_mean": 0.5614811477253034,
+   "naive_null_sd_mean": 0.013702231067684253,
+   "carried_by": "the numerator",
+   "note": "A z-score rises when the effect grows OR when the null's spread shrinks. Here it is carried by the numerator."
+  },
+  {
+   "comparison": "trained_vs_naive_spike_share",
+   "observed_minus_null": {
+    "trained": 0.7376626513573574,
+    "naive": 0.7377610039899591,
+    "difference": -9.8352632601717e-05,
+    "relative": -0.00013331232210676125
+   },
+   "null_sd": {
+    "trained": 0.01803077067341575,
+    "naive": 0.018049288198571867,
+    "difference": -1.8517525156119125e-05,
+    "relative": -0.0010259421287086715
+   },
+   "trained_numerator_mean": 0.7376626513573574,
+   "trained_null_sd_mean": 0.01803077067341575,
+   "naive_numerator_mean": 0.7377610039899591,
+   "naive_null_sd_mean": 0.018049288198571867,
+   "carried_by": "the null's spread",
+   "note": "A z-score rises when the effect grows OR when the null's spread shrinks. Here it is carried by the null's spread. A difference carried by the null's spread is not evidence that the memory changed the offline activity; it is evidence that the random ensembles became more alike."
+  }
+ ],
  "sleep_state_is_distinguishable": false,
  "sleep_vs_wake_arm_note": "One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
  "engram_guard": {
@@ -446,6 +616,8 @@
     18,
     19
    ],
+   "arms_are_matched": false,
+   "arms_note": "The two arms differ by 2.9 times in ensemble size and 1.0 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction.",
    "p": 0.0
   },
   {
@@ -492,6 +664,7 @@
     18,
     19
    ],
+   "arms_are_matched": true,
    "p": 0.0253
   },
   {
@@ -538,6 +711,8 @@
     18,
     19
    ],
+   "arms_are_matched": false,
+   "arms_note": "The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction.",
    "p": 0.0
   },
   {
@@ -630,6 +805,8 @@
     18,
     19
    ],
+   "arms_are_matched": true,
+   "z_carried_by": "the numerator",
    "p": 0.2879
   },
   {
@@ -676,6 +853,8 @@
     18,
     19
    ],
+   "z_carried_by": "the null's spread",
+   "survives_note": "This comparison clears its criterion on a shrinking null rather than a moving effect, so it should not be read as the memory having changed the offline activity. See z_decomposition.",
    "p": 0.0108
   }
  ],
@@ -7602,7 +7781,7 @@
   "real",
   "shuffled"
  ],
- "walltime_s": 685.1,
+ "walltime_s": 628.2,
  "provenance": {
   "config": "configs/stage6_replay.yaml",
   "results_dir": "results/stage6_replay",
@@ -7648,8 +7827,8 @@
    "results/stage5_sleep/real/sleep_seed8/spikes.npz",
    "results/stage5_sleep/real/sleep_seed9/spikes.npz"
   ],
-  "git_commit": "0f93eee",
-  "generated_at": "2026-09-12T11:31:06+00:00"
+  "git_commit": "da5ef99",
+  "generated_at": "2026-09-12T19:02:50+00:00"
  },
  "source_file": "results/stage6_replay/stage6.json",
  "structure_confound": {
@@ -7949,6 +8128,647 @@
    "x": "within-ensemble wiring, z against size-matched random ensembles",
    "y": "reactivation, z against size-matched random ensembles, sleep condition",
    "interpretation": "Within-ensemble wiring does NOT predict reactivation across ensembles and seeds (Pearson r = -0.866, p = 5.6e-13, n = 40), so the difference between the trained and untrained ensembles is not explained by their wiring."
+  }
+ },
+ "offline_memory_trace": {
+  "status": "passed",
+  "gain": 1.0,
+  "n_seeds": 20,
+  "bin_s": 1.0,
+  "question": "Is the engram visible in what the mushroom body sends during the offline period?",
+  "method": "Drive is the sum over plastic Kenyon-cell to MBON synapses of weight times presynaptic offline spikes. sleep and sleep_naive are the same run at the same seed differing only in the learned weights. The two cross terms separate a change in weights from a change in activity, because the cells whose synapses were depressed are also the cells that fire offline and a raw difference cannot tell those apart.",
+  "summary": {
+   "drive_trained_mV_per_s": 18664.22652509562,
+   "drive_naive_mV_per_s": 27659.116853451374,
+   "total_change_pct_mean": -32.49410747147566,
+   "total_change_pct_sd": 1.3014378060280576,
+   "weight_term_pct_mean": -32.783061101797294,
+   "activity_term_pct_mean": 0.38724979115725827,
+   "fraction_of_change_from_weights": 1.0104678521060662,
+   "plastic_weight_change_pct_mean": -1.230630874633789,
+   "amplification_over_weight_change": 26.40443055773751,
+   "paired_t": -111.65963188998818,
+   "p_value": 3.0831852590435875e-28,
+   "per_bin_ratio_cv_mean": 0.22841978184895426,
+   "is_episodic": false
+  },
+  "finding": "The memory is legible in the offline activity, and it is tonic rather than episodic. Drive through the learned synapses during the offline period is 18,664 mV/s in the trained network against 27,659 in the identical run with unlearned weights, a change of -32.5 per cent, paired t = -111.7, p = 3.1e-28 over 20 seeds. That is not the weight change itself, which is only -1.23 per cent of the total plastic weight: the offline activity falls disproportionately on the synapses the conditioning depressed, so the engram is amplified about 26 times in what the mushroom body actually sends. Decomposing it, the learned weights acting on UNCHANGED activity account for -32.8 per cent and the changed activity acting on unlearned weights for +0.4 per cent, so the trace is a read-out of the weights through activity that did not itself change. Across 39 one-second bins the trained-to-unlearned ratio has a coefficient of variation of 0.23, so the trace is flat: the memory is expressed continuously, not in episodes, so it is an offline memory trace and not replay.",
+  "provenance": {
+   "config": "configs/stage5_sleep.yaml",
+   "results_dir": "results/stage9_offline_trace",
+   "files": [
+    "results/stage5_sleep/real/sleep_seed<k>/spikes.npz",
+    "results/stage5_sleep/real/sleep_naive_seed<k>/spikes.npz",
+    "results/stage4_learning/real/seed<k>/plastic_w.npz"
+   ]
+  }
+ },
+ "return_path": {
+  "status": "passed",
+  "gain": 1.0,
+  "question": "Does the path from the engram back to the Kenyon cells prefer the ensemble that encodes the memory, or does it disinhibit the mushroom body indiscriminately?",
+  "method": "For each MBON the conditioning dopaminergic neuron gates, the Kenyon cells it contacts are compared with the odour-A ensemble stage 4 stored for each seed. Enrichment is the observed overlap divided by the overlap expected from a random Kenyon-cell set of the same size. 1.0 means the MBON is blind to the ensemble; above 1.0 is the loop replay would need.",
+  "self_reinforcing_loop_exists_and_is_active": true,
+  "loop_measured": {
+   "carrier": "MBON11",
+   "carrier_transmitter": "gaba",
+   "carrier_enrichment": 1.859421093488019,
+   "carrier_firing_threshold_hz": 0.05,
+   "seeds_with_carrier_firing": 1,
+   "seeds_with_carrier_silent": 19,
+   "when_carrier_fires": {
+    "n_seeds": 1,
+    "carrier_rate_naive_hz_mean": 0.5375,
+    "ensemble_rate_change_pct_mean": 7.645699927048716,
+    "carrier_rate_change_pct_mean": -67.44186046511628,
+    "change_pct_contacted_not_in_ensemble_mean": 7.9724032196243915,
+    "change_pct_not_contacted_mean": 7.935195900148792,
+    "change_pct_all_kenyon_cells_mean": 7.713683553196482
+   },
+   "when_carrier_silent": {
+    "n_seeds": 19,
+    "carrier_rate_naive_hz_mean": 0.0013157894736842105,
+    "ensemble_rate_change_pct_mean": 0.02280477332597244,
+    "carrier_rate_change_pct_mean": 0.0,
+    "change_pct_contacted_not_in_ensemble_mean": 0.1095528631832746,
+    "change_pct_not_contacted_mean": 0.06918836347973294,
+    "change_pct_all_kenyon_cells_mean": 0.03218338293933336,
+    "t_against_zero": 0.41297189653493727,
+    "p_against_zero": 0.6845049371581691
+   },
+   "per_seed": [
+    {
+     "seed": 0,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.847017045454546,
+     "ensemble_rate_naive_hz": 7.8481534090909095,
+     "ensemble_rate_change_pct": -0.014479375938895181,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 0.6403013182674137,
+     "change_pct_not_contacted": 0.12283126055582762,
+     "change_pct_all_kenyon_cells": 0.03524502340268752
+    },
+    {
+     "seed": 1,
+     "carrier_rate_trained_hz": 0.025,
+     "carrier_rate_naive_hz": 0.025,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.558333333333334,
+     "ensemble_rate_naive_hz": 7.563276836158193,
+     "ensemble_rate_change_pct": -0.06536191827893056,
+     "carrier_rate_change_pct": 0.0,
+     "change_pct_contacted_not_in_ensemble": -1.0970174837161457,
+     "change_pct_not_contacted": -0.5612330373596883,
+     "change_pct_all_kenyon_cells": -0.1958978407379849
+    },
+    {
+     "seed": 2,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.836049723756906,
+     "ensemble_rate_naive_hz": 7.863259668508287,
+     "ensemble_rate_change_pct": -0.34603899525733295,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.08156606851549672,
+     "change_pct_not_contacted": -0.6373266729825088,
+     "change_pct_all_kenyon_cells": -0.38454495513641834
+    },
+    {
+     "seed": 3,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.414784946236559,
+     "ensemble_rate_naive_hz": 7.401478494623656,
+     "ensemble_rate_change_pct": 0.17978099406178377,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 2.8353326063249478,
+     "change_pct_not_contacted": 1.8306057027163614,
+     "change_pct_all_kenyon_cells": 0.5655069468366171
+    },
+    {
+     "seed": 4,
+     "carrier_rate_trained_hz": 0.175,
+     "carrier_rate_naive_hz": 0.5375,
+     "carrier_is_firing": true,
+     "ensemble_rate_trained_hz": 7.4608146067415735,
+     "ensemble_rate_naive_hz": 6.930898876404495,
+     "ensemble_rate_change_pct": 7.645699927048716,
+     "carrier_rate_change_pct": -67.44186046511628,
+     "change_pct_contacted_not_in_ensemble": 7.9724032196243915,
+     "change_pct_not_contacted": 7.935195900148792,
+     "change_pct_all_kenyon_cells": 7.713683553196482
+    },
+    {
+     "seed": 5,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.840677966101695,
+     "ensemble_rate_naive_hz": 7.835169491525424,
+     "ensemble_rate_change_pct": 0.070304472446047,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -1.1768447837150133,
+     "change_pct_not_contacted": -0.3740141474916863,
+     "change_pct_all_kenyon_cells": -0.06204523661797935
+    },
+    {
+     "seed": 6,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.712083333333333,
+     "ensemble_rate_naive_hz": 7.705,
+     "ensemble_rate_change_pct": 0.09193164611723696,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 1.7877094972067178,
+     "change_pct_not_contacted": 0.21667602921114254,
+     "change_pct_all_kenyon_cells": 0.17841465832176975
+    },
+    {
+     "seed": 7,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.389511494252874,
+     "ensemble_rate_naive_hz": 7.3645114942528735,
+     "ensemble_rate_change_pct": 0.3394658290574994,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 1.0672991402312448,
+     "change_pct_not_contacted": -0.22710682131560359,
+     "change_pct_all_kenyon_cells": 0.27180812138772587
+    },
+    {
+     "seed": 8,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.753351955307262,
+     "ensemble_rate_naive_hz": 7.772905027932961,
+     "ensemble_rate_change_pct": -0.2515542458763094,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -1.0055141096334779,
+     "change_pct_not_contacted": 0.04924491135914745,
+     "change_pct_all_kenyon_cells": -0.23265323387994893
+    },
+    {
+     "seed": 9,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.9073863636363635,
+     "ensemble_rate_naive_hz": 7.8761363636363635,
+     "ensemble_rate_change_pct": 0.3967681431250902,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 1.0369014943580466,
+     "change_pct_not_contacted": 0.8081155433287296,
+     "change_pct_all_kenyon_cells": 0.49460623374408175
+    },
+    {
+     "seed": 10,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.869476744186046,
+     "ensemble_rate_naive_hz": 7.908866279069768,
+     "ensemble_rate_change_pct": -0.4980427471376473,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.22850614110254663,
+     "change_pct_not_contacted": 0.2396783670944748,
+     "change_pct_all_kenyon_cells": -0.3500451671183423
+    },
+    {
+     "seed": 11,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.61639344262295,
+     "ensemble_rate_naive_hz": 7.601229508196722,
+     "ensemble_rate_change_pct": 0.19949317948992737,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.031094527363192046,
+     "change_pct_not_contacted": 0.642706131078221,
+     "change_pct_all_kenyon_cells": 0.2631504484875989
+    },
+    {
+     "seed": 12,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.86,
+     "ensemble_rate_naive_hz": 7.859857142857142,
+     "ensemble_rate_change_pct": 0.0018175539359281843,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.7189746795873624,
+     "change_pct_not_contacted": -0.8520284530602645,
+     "change_pct_all_kenyon_cells": -0.18447846108349283
+    },
+    {
+     "seed": 13,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.515934065934067,
+     "ensemble_rate_naive_hz": 7.49217032967033,
+     "ensemble_rate_change_pct": 0.31718093980896583,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 0.28478437754270697,
+     "change_pct_not_contacted": 0.7323511879417656,
+     "change_pct_all_kenyon_cells": 0.3869428604678292
+    },
+    {
+     "seed": 14,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.8999999999999995,
+     "ensemble_rate_naive_hz": 7.91271186440678,
+     "ensemble_rate_change_pct": -0.16065117275356908,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.06293266205160064,
+     "change_pct_not_contacted": -0.11051602482358466,
+     "change_pct_all_kenyon_cells": -0.14796443216888122
+    },
+    {
+     "seed": 15,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.647939560439561,
+     "ensemble_rate_naive_hz": 7.62554945054945,
+     "ensemble_rate_change_pct": 0.2936196274813696,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.7865937072503331,
+     "change_pct_not_contacted": 0.6968076486792928,
+     "change_pct_all_kenyon_cells": 0.31929923707262586
+    },
+    {
+     "seed": 16,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.716761363636365,
+     "ensemble_rate_naive_hz": 7.7299715909090905,
+     "ensemble_rate_change_pct": -0.1708961943438697,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.5843293492696053,
+     "change_pct_not_contacted": -0.8869179600887096,
+     "change_pct_all_kenyon_cells": -0.32415138290557993
+    },
+    {
+     "seed": 17,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.754329608938548,
+     "ensemble_rate_naive_hz": 7.745251396648046,
+     "ensemble_rate_change_pct": 0.11721004039237558,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": 1.2060647829083408,
+     "change_pct_not_contacted": 0.6054734802615658,
+     "change_pct_all_kenyon_cells": 0.24736730510989652
+    },
+    {
+     "seed": 18,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.7185393258426975,
+     "ensemble_rate_naive_hz": 7.723033707865169,
+     "ensemble_rate_change_pct": -0.058194515166942205,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.595864002804054,
+     "change_pct_not_contacted": -0.13533834586466467,
+     "change_pct_all_kenyon_cells": -0.09417916531958563
+    },
+    {
+     "seed": 19,
+     "carrier_rate_trained_hz": 0.0,
+     "carrier_rate_naive_hz": 0.0,
+     "carrier_is_firing": false,
+     "ensemble_rate_trained_hz": 7.704888268156425,
+     "ensemble_rate_naive_hz": 7.70558659217877,
+     "ensemble_rate_change_pct": -0.009062567969251206,
+     "carrier_rate_change_pct": null,
+     "change_pct_contacted_not_in_ensemble": -0.40765130134837346,
+     "change_pct_not_contacted": -0.8454298931248921,
+     "change_pct_all_kenyon_cells": -0.17489668401528524
+    }
+   ],
+   "mV_one_carrier_spike_delivers_to_one_target": 0.22847627013630734,
+   "threshold_gap_mV": 7.0,
+   "ceiling_mV_at_observed_carrier_rate": 0.0006140299759913259,
+   "ceiling_mV_if_carrier_fired_at_50hz": 0.05711906753407684,
+   "ceiling_as_fraction_of_threshold_gap_at_50hz": 0.008159866790582405,
+   "note": "The loop is measured, not assumed. In the seeds where the carrier fires, the memory lowers its rate and the ensemble it preferentially contacts speeds up, which is the disinhibition replay would need. In the seeds where it is silent there is nothing to lower and the ensemble does not move. How many seeds fall in each group is therefore the measurement that decides whether this model can reactivate a memory at all."
+  },
+  "per_mbon": [
+   {
+    "mbon": "MBON05",
+    "transmitter": "glutamate",
+    "fires_offline": false,
+    "gating_synapses_from_dan": 11,
+    "synapses_onto_kenyon_cells": 2802,
+    "n_kenyon_cells_contacted": 1158,
+    "n_in_ensemble_mean": 32.7,
+    "enrichment_for_trained_ensemble_mean": 0.643570593790312,
+    "enrichment_for_trained_ensemble_sd": 0.03644501203616375,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON11",
+    "transmitter": "gaba",
+    "fires_offline": true,
+    "gating_synapses_from_dan": 1391,
+    "synapses_onto_kenyon_cells": 1154,
+    "n_kenyon_cells_contacted": 807,
+    "n_in_ensemble_mean": 65.85,
+    "enrichment_for_trained_ensemble_mean": 1.859421093488019,
+    "enrichment_for_trained_ensemble_sd": 0.031987293458002525,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON20",
+    "transmitter": "gaba",
+    "fires_offline": true,
+    "gating_synapses_from_dan": 62,
+    "synapses_onto_kenyon_cells": 257,
+    "n_kenyon_cells_contacted": 232,
+    "n_in_ensemble_mean": 4.15,
+    "enrichment_for_trained_ensemble_mean": 0.4076905568912349,
+    "enrichment_for_trained_ensemble_sd": 0.06573946286375612,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON30",
+    "transmitter": "glutamate",
+    "fires_offline": true,
+    "gating_synapses_from_dan": 64,
+    "synapses_onto_kenyon_cells": 221,
+    "n_kenyon_cells_contacted": 165,
+    "n_in_ensemble_mean": 4.1,
+    "enrichment_for_trained_ensemble_mean": 0.5666209521934424,
+    "enrichment_for_trained_ensemble_sd": 0.04726193441957678,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON25-like",
+    "transmitter": "glutamate",
+    "fires_offline": false,
+    "gating_synapses_from_dan": 17,
+    "synapses_onto_kenyon_cells": 83,
+    "n_kenyon_cells_contacted": 70,
+    "n_in_ensemble_mean": 2.0,
+    "enrichment_for_trained_ensemble_mean": 0.6512615601506708,
+    "enrichment_for_trained_ensemble_sd": 0.01208710149801974,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON32",
+    "transmitter": "gaba",
+    "fires_offline": true,
+    "gating_synapses_from_dan": 11,
+    "synapses_onto_kenyon_cells": 68,
+    "n_kenyon_cells_contacted": 46,
+    "n_in_ensemble_mean": 1.0,
+    "enrichment_for_trained_ensemble_mean": 0.4955251001146407,
+    "enrichment_for_trained_ensemble_sd": 0.00919670766153677,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON25",
+    "transmitter": "glutamate",
+    "fires_offline": false,
+    "gating_synapses_from_dan": 36,
+    "synapses_onto_kenyon_cells": 44,
+    "n_kenyon_cells_contacted": 39,
+    "n_in_ensemble_mean": 0.0,
+    "enrichment_for_trained_ensemble_mean": 0.0,
+    "enrichment_for_trained_ensemble_sd": 0.0,
+    "n_seeds": 20
+   },
+   {
+    "mbon": "MBON35",
+    "transmitter": "acetylcholine",
+    "fires_offline": true,
+    "gating_synapses_from_dan": 25,
+    "synapses_onto_kenyon_cells": 32,
+    "n_kenyon_cells_contacted": 21,
+    "n_in_ensemble_mean": 0.0,
+    "enrichment_for_trained_ensemble_mean": 0.0,
+    "enrichment_for_trained_ensemble_sd": 0.0,
+    "n_seeds": 20
+   }
+  ],
+  "n_seeds": 20,
+  "finding": "The loop replay would need is wired, and it is far too weak to matter. MBON11 is the only engram carrier whose Kenyon-cell targets are enriched for the trained ensemble, 1.86 times, and every other carrier that fires offline contacts the ensemble LESS than chance, so on anatomy alone it is the only candidate. But one of its spikes delivers 0.228 mV to one of its targets, so even firing flat out at 50 Hz it would supply 0.057 mV, which is 0.82% of the 7 mV threshold gap. Silencing it completely therefore cannot move its targets by anything a Kenyon cell would notice, however often it fires. That ceiling is anatomy and the model's own constants, not a measurement that might come out differently. The one seed of 20 in which the carrier fires at all looks at first like the loop working, the trained ensemble speeding up by +7.6%. It is not. In the same run the Kenyon cells the carrier does NOT touch speed up by +7.9% and the whole population by +7.7%, a difference of 0.29 percentage points. That is a global shift in the network's state, which is what a small perturbation usually produces at this operating point, and not disinhibition of the trained ensemble. An earlier version of this script reported that shift as the loop working; the contacted-versus-untouched split is here because it was not. In the 19 seeds where the carrier is silent the ensemble moves +0.02%, p = 0.68. The conclusion is about the design and not about this run. An engram held downstream of the cells whose reactivation is being measured reaches them through a return leg three orders of magnitude too weak, so Kenyon-cell ensemble replay is not a question this model can answer positively, and a positive would have to be explained by something other than the memory.",
+  "provenance": {
+   "config": "configs/base.yaml",
+   "results_dir": "results/stage6_return_path",
+   "files": [
+    "results/stage4_learning/real/kc_templates.json",
+    "results/stage5_sleep/real/stage5.json"
+   ]
+  }
+ },
+ "readout_gate": {
+  "status": "passed",
+  "gain": 1.0,
+  "seed": 0,
+  "sigma_mV": 1.55,
+  "question": "How far below threshold is the readout MBON during the offline period, and what holds it there?",
+  "threshold_mV": -45.0,
+  "rest_mV": -52.0,
+  "threshold_gap_mV": 7.0,
+  "recorded_s": 8.0,
+  "cells": [
+   {
+    "index": 654,
+    "root_id": "10704",
+    "median_v_mV": -110.1845474243164,
+    "p95_v_mV": -106.61075592041016,
+    "max_v_mV": -99.27354431152344,
+    "mV_below_threshold_median": 65.1845474243164,
+    "mV_below_threshold_p95": 61.610755920410156,
+    "threshold_gaps_below_median": 9.312078475952148
+   },
+   {
+    "index": 1304,
+    "root_id": "11402",
+    "median_v_mV": -136.68630981445312,
+    "p95_v_mV": -132.84315490722656,
+    "max_v_mV": -121.03802490234375,
+    "mV_below_threshold_median": 91.68630981445312,
+    "mV_below_threshold_p95": 87.84315490722656,
+    "threshold_gaps_below_median": 13.098044395446777
+   }
+  ],
+  "input_budget": [
+   {
+    "root_id": "10704",
+    "apl_synapses": 180,
+    "apl_steady_mV": -65.3625,
+    "apl_share_of_deficit": 1.002729980995729,
+    "other_inhibitory_synapses": 663,
+    "excitatory_synapses": 18292
+   },
+   {
+    "root_id": "11402",
+    "apl_synapses": 261,
+    "apl_steady_mV": -94.77562499999999,
+    "apl_share_of_deficit": 1.0336943998705888,
+    "other_inhibitory_synapses": 757,
+    "excitatory_synapses": 26712
+   }
+  ],
+  "finding": "The readout sits 65 to 92 mV below its firing threshold through the offline period, against a threshold gap of 7 mV. That is 9 to 13 whole threshold gaps, and at the 95th percentile of its membrane potential it is still 62 to 88 mV short, so the 1.55 mV background noise cannot reach it. APL alone accounts for 100% to 103% of that deficit, delivering 95 to 65 mV of steady hyperpolarisation through 180 to 261 synapses. APL is not one contributor among several: it is essentially the whole of the gate. Any intervention that wants this cell to fire has to give back about that many millivolts, and the only defensible way to do that is to stop treating a neuron with 234,026 input synapses as one isopotential compartment, which is what Amin et al. 2020 measured it is not.",
+  "provenance": {
+   "config": "configs/stage5_sleep.yaml",
+   "results_dir": "results/stage6_readout_gate",
+   "files": [
+    "/Users/ankthba/Developer/fly/results/stage6_readout_gate/probe_seed0/voltage.npz",
+    "/Users/ankthba/Developer/fly/results/stage6_readout_gate/probe_seed0/spikes.npz"
+   ]
+  }
+ },
+ "recurrence_census": {
+  "status": "passed",
+  "question": "Where are the Kenyon cells' recurrent synapses: on the dendrites in the calyx, or on the axons?",
+  "source": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/syn-partners-male-cns-v1.0-minconf-0.5-traced-only.feather",
+  "n_synapses_scanned": 124025046,
+  "n_kc_kc_synapses": 1153845,
+  "n_kc_kc_edges": 642933,
+  "by_region": {
+   "lobe": 955703,
+   "elsewhere": 81361,
+   "pedunculus": 82866,
+   "calyx": 33915
+  },
+  "by_neuropil": {
+   "gL(L)": 231454,
+   "gL(R)": 220080,
+   "aL(R)": 105661,
+   "aL(L)": 87779,
+   "bL(L)": 73156,
+   "b'L(L)": 66694,
+   "bL(R)": 59900,
+   "b'L(R)": 54143,
+   "CentralBrain-unspecified": 46695,
+   "PED(R)": 41658,
+   "PED(L)": 41208,
+   "a'L(R)": 29922,
+   "a'L(L)": 26914,
+   "CRE(R)": 23904,
+   "CA(R)": 20202,
+   "CA(L)": 13713,
+   "CRE(L)": 4750,
+   "SCL(R)": 2235,
+   "PLP(R)": 1283,
+   "PLP(L)": 594,
+   "SIP(L)": 385,
+   "SLP(L)": 296,
+   "SLP(R)": 274,
+   "SCL(L)": 255
+  },
+  "axonal_fraction": 0.9000940334273667,
+  "region_definitions": {
+   "calyx": [
+    "CA(R)",
+    "CA(L)"
+   ],
+   "lobe": [
+    "gL(R)",
+    "gL(L)",
+    "aL(R)",
+    "aL(L)",
+    "bL(R)",
+    "bL(L)",
+    "a'L(R)",
+    "a'L(L)",
+    "b'L(R)",
+    "b'L(L)"
+   ],
+   "pedunculus": [
+    "PED(R)",
+    "PED(L)"
+   ]
+  },
+  "finding": "The Kenyon cells' recurrent input is overwhelmingly axonal. Of 1,153,845 Kenyon-cell-to-Kenyon-cell synapses, 33,915 (2.9%) are in the calyx where the dendrites are, and 1,038,569 (90.0%) are in the lobes and pedunculus where the axons are (955,703 lobe, 82,866 pedunculus), with 81,361 (7.1%) elsewhere. The measurement that says this interaction is metabotropic rather than nicotinic is about the axons, so it applies to 90% of the recurrent synapses the model currently makes fast and excitatory.",
+  "provenance": {
+   "config": "configs/base.yaml",
+   "results_dir": "results/stage8_kc_kc",
+   "files": [
+    "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/syn-partners-male-cns-v1.0-minconf-0.5-traced-only.feather",
+    "results/stage8_kc_kc/kc_kc_edges_by_region.npz"
+   ]
+  }
+ },
+ "offline_state_audit": {
+  "status": "passed",
+  "gain": 1.0,
+  "operating_sigma_mV": 1.55,
+  "question": "What is the offline state actually made of, and which cells carry it?",
+  "refractory_ceiling_hz": 454.5454545454545,
+  "recurrent_budget_in_top_population": [
+   {
+    "from": "ALLN",
+    "to": "ALLN",
+    "excitatory_synapses": 470727,
+    "inhibitory_synapses": 177214,
+    "fraction_excitatory": 0.7264967026318754,
+    "net_mV_if_every_source_spiked_once": 46896.039575
+   },
+   {
+    "from": "ALLN",
+    "to": "ALPN",
+    "excitatory_synapses": 279867,
+    "inhibitory_synapses": 176102,
+    "fraction_excitatory": 0.613785147674513,
+    "net_mV_if_every_source_spiked_once": 16579.052875
+   },
+   {
+    "from": "ALPN",
+    "to": "ALLN",
+    "excitatory_synapses": 402003,
+    "inhibitory_synapses": 4486,
+    "fraction_excitatory": 0.9889640310069892,
+    "net_mV_if_every_source_spiked_once": 63513.278675
+   },
+   {
+    "from": "ORN",
+    "to": "ALLN",
+    "excitatory_synapses": 632862,
+    "inhibitory_synapses": 0,
+    "fraction_excitatory": 1.0,
+    "net_mV_if_every_source_spiked_once": 101115.52605
+   },
+   {
+    "from": "ALPN",
+    "to": "ALPN",
+    "excitatory_synapses": 130323,
+    "inhibitory_synapses": 9962,
+    "fraction_excitatory": 0.9289874184695441,
+    "net_mV_if_every_source_spiked_once": 19230.678775
+   }
+  ],
+  "transmitter_mix_in_top_population": {
+   "acetylcholine": 144,
+   "gaba": 120,
+   "glutamate": 108,
+   "unknown": 46,
+   "octopamine": 2
+  },
+  "finding": "The offline state is not a brain-wide background, it is the antennal lobe running away. The whole brain averages 1.80 Hz per neuron at the operating point, and 41% of every spike comes from the 3,779 antennal-lobe neurons, 2.6% of the brain. Its local interneurons run at 122 Hz with 96% of them active and the fastest at 66% of the maximum rate the refractory period allows; its projection neurons at 75 Hz with 93% active. The Kenyon cells whose reactivation the replay test measures idle at 0.42 Hz, which reads as biological, but they sit downstream of that rather than in a background: they contribute 0.7% of the brain's spikes while being driven by a pathway two synapses upstream that never stops. Under the model's sign rule the local interneurons' connections onto each other are 73% excitatory by synapse count, so the population that damps this pathway in the fly amplifies it here. Whether that is the connectome's transmitter prediction being wrong for these cells, or the model representing as chemical excitation something those cells do by another route, is a literature question and is the one to settle next. It is not a tuning question, and nothing downstream of stage 2 can be read as being about the brain until it is answered.",
+  "provenance": {
+   "config": "configs/base.yaml",
+   "results_dir": "results/stage7_offline_state",
+   "files": [
+    "results/stage2_criticality/full/sigma1.55_seed0",
+    "results/stage5_sleep/real/sleep_seed0"
+   ]
   }
  },
  "bin_robustness": [

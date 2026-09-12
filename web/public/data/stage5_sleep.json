@@ -1629,8 +1629,8 @@
    "/Users/ankthba/Developer/fly/results/stage5_sleep/real/wake_seed19/spikes.npz",
    "/Users/ankthba/Developer/fly/results/stage5_sleep/real/sleep_naive_seed19/spikes.npz"
   ],
-  "git_commit": "0f93eee",
-  "generated_at": "2026-09-12T11:31:06+00:00"
+  "git_commit": "da5ef99",
+  "generated_at": "2026-09-12T19:02:50+00:00"
  },
  "source_file": "results/stage5_sleep/stage5.json"
 }

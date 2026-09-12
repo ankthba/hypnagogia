@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-12T11:31:06+00:00",
- "git_commit": "0f93eee",
+ "generated_at": "2026-09-12T19:02:50+00:00",
+ "git_commit": "da5ef99",
  "pipeline_version": "0.1.0",
  "model": {
   "dataset": "male CNS connectome v1.0 (Janelia FlyEM / Google Research / Cambridge, Cell 2026)",
@@ -250,10 +250,10 @@
    "source_file": "results/stage5_sleep/stage5.json"
   },
   "stage6_replay": {
-   "status": "artifact",
+   "status": "failed",
    "file": "stage6_replay.json",
    "title": "Stage 6 - Replay",
-   "summary": "A positive reactivation signal was measured, but it did NOT survive the degree-preserving shuffled-connectome null: it is an artifact of network structure, not evidence of replay. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
+   "summary": "No evidence of memory replay, and no basis for calling what was measured an artifact either. The odour-A ensemble does score above size-matched random ensembles, but the comparison that would say whether that is structure rather than memory, the degree-preserving shuffled connectome, cannot answer it here. The two arms differ by 3.8 times in ensemble size and 10.7 times in Kenyon-cell rate. Standardising against size-matched random ensembles corrects the first and not the second: the arms are in different states, so this comparison does not isolate the variable its name refers to and its result should not be read as evidence about that variable in either direction. On this measure the memory contributed nothing: the identical sleep run with unlearned weights gave the same reactivation (learned minus unlearned = +0.01628, 95% CI [-0.01104, +0.04429]). That is not because the memory does nothing offline: stage 5 compared the two runs spike for spike and found the Kenyon-cell activity differs in every seed. It is that the difference is not an increase in how much the trained ensemble reactivates. One of the four, sleep against wake, is being asked to find a difference this model does not have: stage 5 measured clamping the 32 dorsal fan-shaped body neurons as changing the rest of the brain by 0.2 per cent in population rate and 0.2 per cent in Kenyon-cell rate. Its failing is a fact about the manipulation, not about replay.",
    "gain": 1.0,
    "gain_note": "published parameters",
    "source_file": "/Users/ankthba/Developer/fly/results/stage6_replay/replay/activity_sleep_naive_seed2.json"
