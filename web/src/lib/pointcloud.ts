@@ -44,6 +44,15 @@ export interface LitPoints {
   radius: Float32Array;
   /** per-lit-point base colour, 3 floats, blended toward the accent by `age` */
   color: Float32Array;
+  /**
+   * per-lit-point group alpha: what the point fades back to as its tail decays.
+   *
+   * Without it the lit pass drew every point at alpha 1, which defeated the ramp in the shader: a
+   * point whose tail had fully decayed (age 0) stayed at full opacity in its group colour instead
+   * of returning to the group's own alpha, so a decayed optic or "other" soma (spec alpha 0.55)
+   * sat about 1.8x brighter than its unlit neighbours for the whole window.
+   */
+  alpha: Float32Array;
   n: number;
 }
 

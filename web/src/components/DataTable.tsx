@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { startTransition, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { fmtInt } from '../lib/format';
 
 export interface Column<T> {
@@ -100,7 +100,11 @@ export default function DataTable<T>({
                 <button type="button" className="control" onClick={() => setPage((p) => Math.min(nPages - 1, p + 1))} disabled={page >= nPages - 1}>
                   next
                 </button>
-                <button type="button" className="control" onClick={() => setAll(true)}>
+                {/* The widest table here is 122 rows of 27 columns, and building those 3,294 cells
+                    in the click's own commit is a 260 ms freeze on a throttled CPU. As a
+                    transition the click paints immediately and the rows arrive in a later,
+                    interruptible commit, so the page never stops responding. */}
+                <button type="button" className="control" onClick={() => startTransition(() => setAll(true))}>
                   show all
                 </button>
               </span>

@@ -210,6 +210,7 @@ function Stage4View({ d }: { d: Stage4 }) {
           rows={mbonRows}
           rowKey={(r) => r.root_id}
           empty="no per-MBON rows for this seed"
+          pageSize={20}
         />
         <ProvenanceFooter provenance={d.provenance} />
       </div>

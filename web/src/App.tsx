@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+import { ROUTE_CHUNKS } from './lib/routes';
 
 /**
  * The pages are code-split.
@@ -36,16 +37,21 @@ function ScrollToTop() {
  * the browser reports a slow connection or data saver, where the extra bytes are the reader's.
  */
 function PrefetchRoutes() {
+  const { pathname } = useLocation();
+  // Only the two chart routes carry recharts. From a route that already has it, prefetching the
+  // other one costs nothing new; from a chart-free route it would add ~365 kB to a session that
+  // may never open a chart, so those two are left to the nav-link hover and the click itself.
+  const hasCharts = ROUTE_CHUNKS[pathname]?.charts ?? false;
   useEffect(() => {
     const conn = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
     if (conn?.saveData || (conn?.effectiveType && /2g/.test(conn.effectiveType))) return;
     let cancel: (() => void) | null = null;
     const load = () => {
-      void import('./pages/Criticality');
-      void import('./pages/Learning');
-      void import('./pages/Replay');
-      void import('./pages/Overview');
-      void import('./pages/Methods');
+      for (const [path, chunk] of Object.entries(ROUTE_CHUNKS)) {
+        if (path === pathname) continue;
+        if (chunk.charts && !hasCharts) continue;
+        void chunk.load();
+      }
     };
     const schedule = () => {
       const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
@@ -70,7 +76,7 @@ function PrefetchRoutes() {
       cancel = () => window.removeEventListener('load', onLoad);
     }
     return () => cancel?.();
-  }, []);
+  }, [pathname, hasCharts]);
   return null;
 }
 

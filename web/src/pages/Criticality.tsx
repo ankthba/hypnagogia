@@ -161,8 +161,12 @@ function Stage2View({ d }: { d: Stage2 }) {
         >
           <SigmaChart points={mPoints} bands={bands} yLabel="branching ratio m" refY={[{ y: 1, label: 'm = 1' }]} />
         </Figure>
-        <Figure title="Population rate vs sigma" provenance={d.provenance} caption="Mean rate over all simulated neurons after warm-up; log x axis.">
-          <SigmaChart points={ratePoints} bands={bands} yLabel="population rate (Hz)" />
+        <Figure
+          title="Population rate vs sigma"
+          provenance={d.provenance}
+          caption="Mean rate over all simulated neurons after warm-up. Both axes are logarithmic: sigma on a log axis, the rate on a symmetric log axis so the saturated runs do not crush the transition region onto the zero line, and so the silent sigmas at exactly 0 Hz can still be drawn."
+        >
+          <SigmaChart points={ratePoints} bands={bands} yLabel="population rate (Hz)" ySymlog={1} />
         </Figure>
         <Figure title="Fraction of neurons active vs sigma" provenance={d.provenance} caption="Fraction of neurons with at least one spike after warm-up.">
           <SigmaChart points={fracPoints} bands={bands} yLabel="fraction active" yDomain={[0, 'auto']} />

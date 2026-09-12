@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { RasterData, TraceData } from '../../lib/binary';
 import { SERIES, CHART_FONT, resolveColors, useThemeVersion } from '../../lib/colors';
 import { useCanvasPixelRatio } from '../../lib/media';
-import { fmtNum, fmtInt } from '../../lib/format';
+import { fmtNum, fmtInt, fmtText, isNum } from '../../lib/format';
 
 const LEFT = 56;
 const RIGHT = 12;
@@ -36,6 +36,24 @@ function lowerBound(n: number, key: (i: number) => number, target: number): numb
     else hi = mid;
   }
   return lo;
+}
+
+/**
+ * The five time labels under a plot, at the same x positions as its gridlines.
+ *
+ * The end labels are anchored to the plot edge rather than centred on it. The last gridline sits
+ * exactly at `width - RIGHT`, so a centred "39.85 s" put half its width past the right edge of the
+ * canvas and lost its last two pixels to the canvas bounds; the first was centred on x = LEFT and
+ * could reach back over the "N rows" label. Only the three middle labels are centred.
+ */
+function drawTimeTickLabels(ctx: CanvasRenderingContext2D, t0: number, windowS: number, plotW: number, y: number) {
+  for (let k = 0; k <= 4; k++) {
+    const tt = t0 + (windowS * k) / 4;
+    const cx = LEFT + (plotW * k) / 4;
+    ctx.textAlign = k === 4 ? 'right' : k === 0 ? 'left' : 'center';
+    ctx.fillText(`${fmtNum(tt, 2)} s`, cx, y);
+  }
+  ctx.textAlign = 'left';
 }
 
 /**
@@ -265,11 +283,7 @@ function RasterViewerInner({
     ctx.font = FONT_SM;
     ctx.textAlign = 'left';
     ctx.fillText(`${nRows} rows`, 2, rasterH - 6);
-    ctx.textAlign = 'center';
-    for (let k = 0; k <= 4; k++) {
-      const tt = t0 + (windowS * k) / 4;
-      ctx.fillText(`${fmtNum(tt, 2)} s`, LEFT + (plotW * k) / 4, rasterH - 6);
-    }
+    drawTimeTickLabels(ctx, t0, windowS, plotW, rasterH - 6);
     // dpr is a dependency, not a value read at draw time: moving the window to a display of a
     // different density (or zooming) changes no CSS size, so without it the backing store would
     // stay at the old ratio and both canvases would render blurry until something else redrew them.
@@ -293,11 +307,7 @@ function RasterViewerInner({
     const drawTimeTicks = () => {
       ctx.fillStyle = C.axis;
       ctx.font = FONT_SM;
-      ctx.textAlign = 'center';
-      for (let k = 0; k <= 4; k++) {
-        const tt = t0 + (windowS * k) / 4;
-        ctx.fillText(`${fmtNum(tt, 2)} s`, LEFT + (plotW * k) / 4, traceH - 6);
-      }
+      drawTimeTickLabels(ctx, t0, windowS, plotW, traceH - 6);
     };
     if (!trace || !traceRange) {
       ctx.fillStyle = C.axis;
@@ -398,10 +408,18 @@ function RasterViewerInner({
         <span>
           <i className="swatch" style={{ background: SERIES.other }} /> other KC ({fmtInt(rowOrder.counts.other_kc ?? 0)} rows)
         </span>
-        <span>
-          <i className="swatch swatch--line" style={{ background: SERIES.threshold }} /> threshold
-          {trace ? ` = ${fmtNum(trace.sidecar.threshold_corr, 3)} (${trace.sidecar.threshold_source})` : ''}
-        </span>
+        {/* The swatch and the provenance clause belong to a line that is on the chart. The draw is
+            guarded by Number.isFinite(threshold_corr) above, so when the trace file carries no
+            threshold there is no dashed line to key, and a colour key plus a description of how a
+            missing number was computed is worse than saying it is missing. */}
+        {isNum(trace?.sidecar.threshold_corr) ? (
+          <span>
+            <i className="swatch swatch--line" style={{ background: SERIES.threshold }} /> threshold = {fmtNum(trace!.sidecar.threshold_corr, 3)} (
+            {fmtText(trace!.sidecar.threshold_source)})
+          </span>
+        ) : (
+          <span className="muted">no reactivation threshold in the trace file, so none is drawn</span>
+        )}
         {raster && (
           <span>
             {fmtInt(raster.nSpikes)} spikes in file · columns <span className="mono">{rasterCols.join(', ')}</span> · {fmtInt(rowOrder.sorted.length)} neuron rows listed

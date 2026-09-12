@@ -179,7 +179,10 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
         <text x={plotX + plotW / 2} y={12} textAnchor="middle" fontSize={12} fill={MUTED}>
           Hedges g (95% CI) · dashed line = no effect
         </text>
-        <text x={plotX + plotW / 2} y={H - 2} textAnchor="middle" fontSize={11} fill={MUTED}>
+        {/* y is H - 5, not H - 2: at 11px the descenders of "logarithmic" reach ~3px below the
+            baseline, and at H - 2 they fell outside the viewBox and were shaved by the svg's own
+            overflow clip. */}
+        <text x={plotX + plotW / 2} y={H - 5} textAnchor="middle" fontSize={11} fill={MUTED}>
           symmetric log axis: linear within ±{LIN}, logarithmic beyond it
         </text>
 

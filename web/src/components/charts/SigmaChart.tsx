@@ -242,17 +242,26 @@ export default function SigmaChart({
             verticalAlign="top"
             height={narrow ? 40 : 24}
             payload={present.map((c) => ({ value: c, type: 'circle', color: classColor(c), id: c }))}
+            /* the dot keeps the marker hue; the word is painted in the axis ink, because two of the
+               marker hues are below 3:1 as 12px text even though they are right as 5px dots */
+            formatter={(v: string) => <span style={{ color: SERIES.axis }}>{v}</span>}
             wrapperStyle={{ fontSize: narrow ? LABEL_FS.sm : LABEL_FS.lg, color: SERIES.axis, lineHeight: 1.4 }}
           />
-          <Scatter data={drawable} isAnimationActive={false}>
-            {drawable.some((p) => p.err) && <ErrorBar dataKey="err" width={4} strokeWidth={1.2} stroke={SERIES.ink} direction="y" />}
-            {drawable.map((p, i) => (
+          <Scatter data={plotted} isAnimationActive={false}>
+            {plotted.some((p) => p.err) && <ErrorBar dataKey={errKey} width={4} strokeWidth={1.2} stroke={SERIES.ink} direction="y" />}
+            {plotted.map((p, i) => (
               <Cell key={i} fill={classColor(p.cls)} stroke={SERIES.mat} />
             ))}
           </Scatter>
         </ScatterChart>
       </ResponsiveContainer>
       {narrow && <div className="smaller muted">vertical axis: {yLabel}.</div>}
+      {T !== null && (
+        <div className="smaller muted">
+          Vertical axis is a symmetric log axis: linear within ±{fmtNum(T, 3)} of zero, logarithmic beyond it. The values are the file's own;
+          only their position on the axis is transformed.
+        </div>
+      )}
       {dropped > 0 && (
         <div className="smaller tone-failed">
           {dropped} point(s) not drawn: {droppedSigma0 > 0 && `${droppedSigma0} at sigma ≤ 0 (not drawable on a log axis)`}

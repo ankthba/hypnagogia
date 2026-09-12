@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { prefetchRoute } from '../lib/routes';
 import { REPO_URL, useDataFile } from '../lib/data';
 import { MapSourceProvider } from '../lib/mapSource';
 import { useMediaQuery, usePrefersReducedMotion } from '../lib/media';
@@ -51,7 +52,18 @@ export default function Layout() {
             {NAV.map((n, i) => (
               <span key={n.to}>
                 {i > 0 && ' '}
-                <NavLink to={n.to} end={n.to === '/'} className="masthead__nav-link" data-text={n.label}>
+                {/* The two chart routes are no longer prefetched on idle from a chart-free page
+                    (they drag recharts in with them), so the intent to navigate is what pulls the
+                    chunk: by the time the click lands it is usually already there. */}
+                <NavLink
+                  to={n.to}
+                  end={n.to === '/'}
+                  className="masthead__nav-link"
+                  data-text={n.label}
+                  onPointerEnter={() => prefetchRoute(n.to)}
+                  onFocus={() => prefetchRoute(n.to)}
+                  onTouchStart={() => prefetchRoute(n.to)}
+                >
                   {n.label}
                 </NavLink>
               </span>
