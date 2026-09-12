@@ -34,6 +34,7 @@ def main():
     s3b = load(RESULTS / "stage3b_odor" / "stage3b.json")
     s3bi = load(RESULTS / "stage3b_odor" / "ignition_threshold.json")
     s3c = load(RESULTS / "stage3c_control" / "stage3c.json")
+    s3d = load(RESULTS / "stage3d_gain" / "stage3d.json")
     s3 = load(RESULTS / "stage3_plasticity" / "stage3.json")
     s4 = load(RESULTS / "stage4_learning" / "stage4.json")
     s5 = load(RESULTS / "stage5_sleep" / "stage5.json")

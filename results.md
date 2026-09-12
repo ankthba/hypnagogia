@@ -1,12 +1,19 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T00:45:11+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T01:21:06+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
 ## Headline
 
-**The replay test has not been reached yet.** The most important result so far is negative and it comes from stage 2: the model has no background-activity regime that is both self-sustaining and biologically plausible. See *Stage 2* below.
+**The replay test as specified cannot be run on this model, and the reason is itself the result.**
+
+Two independent findings block it, and neither came from tuning anything:
+
+1. *There is no critical regime, because the network is bistable.* Sweeping the background noise never produces a sustained intermediate activity level. Seeds at the same noise amplitude either stay silent or ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls inside a gap of more than four orders of magnitude that the model cannot occupy.
+2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a single glomerulus driven at 10 Hz, makes more than half of all Kenyon cells fire, and the activity outlasts the stimulus because the network ignites. In a real fly about 5 to 10 per cent of Kenyon cells respond to an odour, each with a few spikes.
+
+A memory needs a sparse, odour-specific ensemble, and a replay test needs a quiet background for that ensemble to reappear against. This model, at this scale and with the published parameters, provides neither. Reporting that is the honest outcome; the alternative would have been to change parameters until the plots looked right, which this project does not do.
 
 ## What was simulated
 
@@ -35,7 +42,6 @@ One discrepancy worth recording: the example output shipped in the repository wa
 
 - Weight scaling. The male CNS release specifies that its synapse counts should be scaled by 0.581 to be comparable with FlyWire. We tested that on our own tables two ways, over 39,307 cell-type pairs present in both datasets. The **pre-registered** statistic (count-weighted median of the per-pair mean-synapse ratio) gave **0.795**, which is outside the [0.45, 0.75] window we declared in advance. The total-input statistic (ratio of total synapses over the same pairs) gave **0.547**, which matches 0.581 closely. Both are reported. Neither `W_syn` nor the scale factor was retuned. The difference between the two statistics is that the male CNS detects about 45% more connected pairs, mostly weak ones, so a per-pair average understates the difference in total synaptic input, which is what the model actually integrates.
 - Propagation. Driving the male counterparts of the published sugar neurons at 200 Hz makes MN9 fire at 80.4 Hz in 100% of trials, with 431 neurons active per trial, against 92.8 Hz and 402 neurons in FlyWire at the same drive. That is the biologically plausible range the gate asked for.
-- Propagation. Driving the male counterparts of the published sugar neurons at 200 Hz makes MN9 fire at 135.8 Hz in 100% of trials, with 11064 neurons active per trial, against 92.8 Hz and 402 neurons in FlyWire at the same drive. That is the biologically plausible range the gate asked for.
 - Without the scaling (weight_scale 1.0) the identical drive activates 11064 neurons per trial instead of a few hundred: the network runs away. The scale factor is doing real work, not cosmetic work.
 - Cell-type mapping. Of the 21 published sugar neurons, 17 have one-to-one morphological matches among male labellar LB3 neurons; 4 do not and are reported rather than forced.
 
@@ -120,6 +126,69 @@ Two methodological points, both of which changed the numbers:
 - Avalanche statistics were being computed by binning spike times in seconds. With a 0.1 ms time step that division is not exact in floating point, and it produced a deterministic repeating pattern of spuriously empty bins - identical in every run, including runs with different seeds - which fabricated avalanche boundaries. Binning is now done in integer simulation steps. Before the fix, every high-rate run reported exactly 2,529 avalanches; after it, those runs correctly report that the population never pauses.
 - When the mean interval between spikes anywhere in the brain falls below the simulation time step, the Beggs and Plenz avalanche definition has nothing to bite on. Those runs are now labelled 'avalanche analysis not applicable' instead of being binned at the time step and reported as if the numbers meant something.
 - The branching ratio is estimated by the multistep-regression method, which assumes the population autocorrelation decays exponentially. In the high-rate state it does not: it oscillates, with a negative lag-1 autocorrelation. Those runs no longer report a branching ratio from the exponential fit.
+
+## Stage 3b - is there a sparse odour code to build a memory on? No.
+
+**failed.** In a real fly about 5-10% of Kenyon cells respond to a given odour, each firing a few spikes (Honegger, Campbell & Turner 2011 J Neurosci 31:11772: mean responding fraction <= 0.10; Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734: 6 +/- 5% of KCs, 2-5 spikes per response).
+
+NO odour drive in the scan produced a sparse, transient Kenyon-cell response. Either the response fraction is far above the 5-10% measured in real flies, or the activity outlasts the odour because the network ignites. This is a property of the published model at this scale, not a tuning failure: no parameter was changed to obtain it.
+
+| glomeruli driven | receptor neurons | drive | Kenyon cells responding | spikes per responding cell | rate during | rate after |
+|---|---|---|---|---|---|---|
+| 1 glomerulus | 74 | 10 Hz | **57.4%** | 54 | 2.7319 Hz/neuron | 2.8782 Hz/neuron |
+| 1 glomerulus | 74 | 20 Hz | **58.5%** | 54 | 2.7972 Hz/neuron | 2.8806 Hz/neuron |
+| 1 glomerulus | 74 | 50 Hz | **59.3%** | 54 | 2.8501 Hz/neuron | 2.8840 Hz/neuron |
+| 1 glomerulus | 74 | 100 Hz | **60.2%** | 55 | 2.9214 Hz/neuron | 2.8814 Hz/neuron |
+| 1 glomerulus | 74 | 150 Hz | **61.1%** | 56 | 2.9870 Hz/neuron | 2.8738 Hz/neuron |
+| 2 glomeruli | 106 | 10 Hz | **57.9%** | 54 | 2.7657 Hz/neuron | 2.8816 Hz/neuron |
+| 2 glomeruli | 106 | 20 Hz | **58.5%** | 54 | 2.8080 Hz/neuron | 2.8872 Hz/neuron |
+| 2 glomeruli | 106 | 50 Hz | **60.3%** | 55 | 2.8905 Hz/neuron | 2.8759 Hz/neuron |
+| 2 glomeruli | 106 | 100 Hz | **62.3%** | 56 | 2.9968 Hz/neuron | 2.8780 Hz/neuron |
+| 2 glomeruli | 106 | 150 Hz | **63.2%** | 56 | 3.0895 Hz/neuron | 2.8802 Hz/neuron |
+| 4 glomeruli | 243 | 10 Hz | **58.9%** | 54 | 2.8077 Hz/neuron | 2.8829 Hz/neuron |
+| 4 glomeruli | 243 | 20 Hz | **61.2%** | 54 | 2.8896 Hz/neuron | 2.8762 Hz/neuron |
+| 4 glomeruli | 243 | 50 Hz | **63.4%** | 56 | 3.0422 Hz/neuron | 2.8819 Hz/neuron |
+| 4 glomeruli | 243 | 100 Hz | **66.5%** | 58 | 3.2756 Hz/neuron | 2.8758 Hz/neuron |
+| 4 glomeruli | 243 | 150 Hz | **67.7%** | 59 | 3.4441 Hz/neuron | 2.8838 Hz/neuron |
+
+The last two columns are the important ones: the population rate after the odour ends is the same as the rate during it. The stimulus does not drive a response, it triggers a transition, and the network stays in the new state afterwards. Before the odour the network is exactly silent.
+
+**How little input does it take?** As few as 1 receptor neurons driven at 50.0 Hz are enough to ignite the whole network into a self-sustaining state.
+
+| receptor neurons driven | probability of ignition | rate during stimulus | rate after |
+|---|---|---|---|
+| 1 | 100% | 2.5270 Hz/neuron | 2.8808 Hz/neuron |
+| 2 | 100% | 2.5592 Hz/neuron | 2.8793 Hz/neuron |
+| 3 | 100% | 2.7115 Hz/neuron | 2.8851 Hz/neuron |
+| 5 | 100% | 2.6749 Hz/neuron | 2.8825 Hz/neuron |
+| 8 | 100% | 2.7233 Hz/neuron | 2.8809 Hz/neuron |
+| 12 | 100% | 2.7421 Hz/neuron | 2.8788 Hz/neuron |
+| 20 | 100% | 2.7730 Hz/neuron | 2.8807 Hz/neuron |
+| 35 | 100% | 2.7956 Hz/neuron | 2.8817 Hz/neuron |
+| 74 | 100% | 2.8527 Hz/neuron | 2.8803 Hz/neuron |
+
+## Stage 3d - how far from the published model would you have to go?
+
+**Not run.**
+
+## Stage 3c - is the runaway the model, or this dataset?
+
+Olfactory input ignites BOTH the male CNS and the FlyWire networks at identical parameters. The runaway is a property of the published model when it is driven through the olfactory pathway, not of the male CNS dataset. The published sugar-neuron benchmark does not reveal it because that stimulus is small.
+
+| network | pathway | neurons driven | drive | probability of ignition | Kenyon cells responding | neurons active | rate during | rate after |
+|---|---|---|---|---|---|---|---|---|
+| malecns_scaled | olfactory | 74 | 10 Hz | 100% | 57.2% | 7905 | 2.7494 | 2.8835 |
+| malecns_scaled | olfactory | 74 | 50 Hz | 100% | 59.5% | 8038 | 2.8467 | 2.8797 |
+| malecns_scaled | olfactory | 74 | 150 Hz | 100% | 61.5% | 8171 | 2.9998 | 2.8796 |
+| malecns_unscaled | olfactory | 74 | 10 Hz | 100% | 100.0% | 14651 | 7.1775 | 7.3960 |
+| malecns_unscaled | olfactory | 74 | 50 Hz | 100% | 100.0% | 14736 | 7.2923 | 7.3947 |
+| malecns_unscaled | olfactory | 74 | 150 Hz | 100% | 100.0% | 14810 | 7.4469 | 7.3961 |
+| flywire_783 | olfactory | 68 | 10 Hz | 100% | 65.0% | 8431 | 3.3454 | 3.4361 |
+| flywire_783 | olfactory | 68 | 50 Hz | 100% | 65.2% | 8473 | 3.4094 | 3.4332 |
+| flywire_783 | olfactory | 68 | 150 Hz | 100% | 65.3% | 8513 | 3.4947 | 3.4364 |
+| flywire_630 | olfactory | 63 | 10 Hz | 100% | 64.0% | 8218 | 3.4872 | 3.5761 |
+| flywire_630 | olfactory | 63 | 50 Hz | 100% | 64.2% | 8222 | 3.5515 | 3.5807 |
+| flywire_630 | olfactory | 63 | 150 Hz | 100% | 64.6% | 8258 | 3.6447 | 3.5800 |
 
 ## Stage 3 - dopamine-gated plasticity
 

@@ -319,6 +319,14 @@ export interface TraceSidecar {
  * `neuron_atlas.json`: the anatomical map of the simulated neurons (soma positions only).
  * Every count the map states about itself comes from these fields, never from the viewer.
  */
+/** One framing box from `neuron_atlas.json`'s `view_boxes`, in micrometres. */
+export interface AtlasViewBox {
+  lo_um: [number, number, number];
+  hi_um: [number, number, number];
+  n_neurons?: number;
+  description?: string;
+}
+
 export interface AtlasSidecar {
   bin: string;
   dtype: 'uint16';
