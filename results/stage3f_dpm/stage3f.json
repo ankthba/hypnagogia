@@ -1,0 +1,235 @@
+{
+ "status": "passed",
+ "dpm_is_silent": true,
+ "gain": 1.0,
+ "gain_note": "published parameters",
+ "question": "What does the connectome's predicted transmitter for DPM do to the mushroom body?",
+ "correction": "Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.",
+ "why_it_matters": {
+  "threshold_gap_mV": 7.0,
+  "n_DPM_neurons": 2,
+  "DPM_synapses_onto_KCs": 32795,
+  "n_KCs_contacted_by_DPM": 3989,
+  "n_KCs_total": 4064,
+  "KC_synapses_onto_DPM": 95527,
+  "n_KCs_presynaptic_to_DPM": 4042,
+  "DPM_share_of_all_input_onto_KCs": 0.01574993360486901,
+  "one_DPM_spike_delivers_to_each_KC_mV": 1.3135675921283532,
+  "DPM_spike_as_fraction_of_KC_threshold_gap": 0.1876525131611933,
+  "annotated_nt": "dopamine",
+  "measured_nt": "gaba",
+  "source": "Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.",
+  "APL_graded_drive_onto_DPM_mV": -289.59218749999997,
+  "note": "With the predicted transmitter the Kenyon-cell population drives DPM and DPM drives the whole Kenyon-cell population back, so the mushroom body carries a second brain-wide POSITIVE feedback loop on top of the recurrent Kenyon-cell wiring, in parallel with the one negative loop (APL) that is supposed to keep the code sparse. With the measured transmitter it is a second negative loop, which is what the chloride measurement shows.",
+  "APL_graded_drive_onto_DPM_as_threshold_gaps": -41.3703125,
+  "APL_synapses_onto_DPM": 1595
+ },
+ "per_run": [
+  {
+   "condition": "dpm_annotated",
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 1.9963247786199196,
+    "kc_rate_hz": 0.7704232283464567,
+    "frac_kc": 0.04478346456692913,
+    "mbon_rate_hz": 6.164948453608248,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.6913230103530292,
+    "kc_rate_hz": 0.13225885826771652,
+    "frac_kc": 0.014025590551181102,
+    "mbon_rate_hz": 6.036082474226804,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   }
+  },
+  {
+   "condition": "dpm_annotated",
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 2.042688043048631,
+    "kc_rate_hz": 0.7846948818897638,
+    "frac_kc": 0.04453740157480315,
+    "mbon_rate_hz": 6.041237113402062,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.6943776047264734,
+    "kc_rate_hz": 0.13951771653543307,
+    "frac_kc": 0.014517716535433071,
+    "mbon_rate_hz": 6.072164948453608,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   }
+  },
+  {
+   "condition": "dpm_annotated",
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 2.0033423711418843,
+    "kc_rate_hz": 0.78001968503937,
+    "frac_kc": 0.04429133858267716,
+    "mbon_rate_hz": 5.896907216494846,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.69752581322941,
+    "kc_rate_hz": 0.140748031496063,
+    "frac_kc": 0.015748031496062992,
+    "mbon_rate_hz": 6.015463917525773,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   }
+  },
+  {
+   "condition": "dpm_corrected",
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 1.9963247786199196,
+    "kc_rate_hz": 0.7704232283464567,
+    "frac_kc": 0.04478346456692913,
+    "mbon_rate_hz": 6.164948453608248,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.6913230103530292,
+    "kc_rate_hz": 0.13225885826771652,
+    "frac_kc": 0.014025590551181102,
+    "mbon_rate_hz": 6.036082474226804,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   }
+  },
+  {
+   "condition": "dpm_corrected",
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 2.042688043048631,
+    "kc_rate_hz": 0.7846948818897638,
+    "frac_kc": 0.04453740157480315,
+    "mbon_rate_hz": 6.041237113402062,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.6943776047264734,
+    "kc_rate_hz": 0.13951771653543307,
+    "frac_kc": 0.014517716535433071,
+    "mbon_rate_hz": 6.072164948453608,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   }
+  },
+  {
+   "condition": "dpm_corrected",
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 2.0033423711418843,
+    "kc_rate_hz": 0.78001968503937,
+    "frac_kc": 0.04429133858267716,
+    "mbon_rate_hz": 5.896907216494846,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.69752581322941,
+    "kc_rate_hz": 0.140748031496063,
+    "frac_kc": 0.015748031496062992,
+    "mbon_rate_hz": 6.015463917525773,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0,
+    "apl_rate_hz": 0.0
+   }
+  }
+ ],
+ "summary": {
+  "dpm_annotated": {
+   "odor": {
+    "pop_rate_hz": 2.0141183976034784,
+    "kc_rate_hz": 0.7783792650918634,
+    "frac_kc": 0.04453740157480315,
+    "mbon_rate_hz": 6.034364261168385,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0.0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.6944088094363041,
+    "kc_rate_hz": 0.13750820209973755,
+    "frac_kc": 0.014763779527559055,
+    "mbon_rate_hz": 6.041237113402062,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0.0,
+    "apl_rate_hz": 0.0
+   },
+   "n_seeds": 3
+  },
+  "dpm_corrected": {
+   "odor": {
+    "pop_rate_hz": 2.0141183976034784,
+    "kc_rate_hz": 0.7783792650918634,
+    "frac_kc": 0.04453740157480315,
+    "mbon_rate_hz": 6.034364261168385,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0.0,
+    "apl_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 1.6944088094363041,
+    "kc_rate_hz": 0.13750820209973755,
+    "frac_kc": 0.014763779527559055,
+    "mbon_rate_hz": 6.041237113402062,
+    "readout_rate_hz": 0.0,
+    "dpm_rate_hz": 0.0,
+    "dpm_spikes": 0.0,
+    "apl_rate_hz": 0.0
+   },
+   "n_seeds": 3
+  }
+ },
+ "finding": "The substitution changes nothing measurable, because DPM never fires a single spike in either condition and so never releases anything for the sign to apply to. The reason is the other correction: APL modelled as non-spiking sits at its saturating release level and delivers a steady 290 mV of hyperpolarising drive to DPM through 1,595 synapses, which is 41 times DPM's threshold gap. Both runs give 4.45% of Kenyon cells at 0.778 Hz during the odour and 0.138 Hz after it. The transmitter assignment is still wrong and is still corrected everywhere, but in this model it is inert: DPM is one of the cells the corrected APL switches off. The same happens to the readout MBON. Both cells have measured odour responses in the fly, so a model in which APL silences them is not reproducing them.",
+ "walltime_s": 0.2,
+ "provenance": {
+  "config": "configs/base.yaml",
+  "results_dir": "results/stage3f_dpm",
+  "files": [
+   "/Users/ankthba/Developer/fly/results/stage3f_dpm/dpm_annotated_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3f_dpm/dpm_annotated_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3f_dpm/dpm_annotated_seed2",
+   "/Users/ankthba/Developer/fly/results/stage3f_dpm/dpm_corrected_seed0",
+   "/Users/ankthba/Developer/fly/results/stage3f_dpm/dpm_corrected_seed1",
+   "/Users/ankthba/Developer/fly/results/stage3f_dpm/dpm_corrected_seed2"
+  ]
+ }
+}

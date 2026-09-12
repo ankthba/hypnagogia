@@ -32,6 +32,17 @@ graded_release:
   # its maximum refractory-limited rate, and proportionally less below it, rectified at rest.
   populations: ["APL"]
 
+nt_corrections:
+  # Cells whose transmitter in the connectome annotation is contradicted by a direct published measurement on
+  # that identified cell. The model's transmitter-to-sign rule is NOT changed: the measured transmitter is
+  # substituted for the predicted one and the same rule is applied to it, so no free parameter is introduced.
+  # DPM is annotated 'dopamine' (sign +1) and so makes its 32,795 synapses onto 3,989 of the 4,064 Kenyon cells
+  # excitatory. Haynes, Christmann & Waddell 2015 eLife 4:e03868 show DPM is Gad1-positive, contains GABA and
+  # 5-HT, and that activating it drives a large chloride increase in mushroom-body neurons with no detectable
+  # calcium or cAMP increase. Lee et al. 2011 PNAS 108:13794 report DPM as serotonergic. See
+  # populations.NT_CORRECTIONS. Set to [] to run with the connectome's own prediction.
+  populations: ["DPM"]
+
 drive:
   f_poi: 250                    # Shiu et al. 2024 model.py: Poisson event adds w_syn*f_poi = 68.75 mV to v (guaranteed spike)
   no_refractory_when_driven: true   # Shiu et al. 2024 model.py: rfc = 0 for Poisson-driven neurons

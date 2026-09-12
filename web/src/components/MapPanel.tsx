@@ -145,9 +145,18 @@ export default function MapPanel() {
   const refs: ActivityRef[] = useMemo(() => (s6.state === 'ready' ? activityRefs(s6.data) : []), [s6]);
 
   const { selection, setSelection } = useMapSelection();
-  // The first run the stage file lists is the default, and only until something selects another.
+  /**
+   * The default run: the sleep condition at its lowest seed, which is the state this whole project
+   * is about, and the first condition the file lists at its lowest seed if this export has no
+   * sleep condition at all. It holds only until something selects another, here or on the Replay
+   * page, and nothing is ever assembled that the stage file does not list.
+   */
   useEffect(() => {
-    if (!selection && refs.length > 0) setSelection({ condition: refs[0].condition, seed: refs[0].seed });
+    if (selection || refs.length === 0) return;
+    const preferred = refs.filter((r) => r.condition === 'sleep');
+    const pool = preferred.length > 0 ? preferred : refs.filter((r) => r.condition === refs[0].condition);
+    const seed = Math.min(...pool.map((r) => r.seed));
+    setSelection({ condition: pool[0].condition, seed });
   }, [selection, refs, setSelection]);
 
   const conditions = useMemo(() => [...new Set(refs.map((r) => r.condition))], [refs]);

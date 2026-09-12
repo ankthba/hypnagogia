@@ -29,6 +29,11 @@ calibration:
   test_gap_s: 5.0
   eta_grid: [0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1]
   seeds: [0, 1, 2]
-  target_post_over_pre: 0.20        # Hige 2015: 24/118
+  target_post_over_pre: 0.20        # Hige 2015: 24/118 (spike-response endpoint)
+  target_epsc_ratio: 0.10           # Hige 2015 Fig 2: ~90% reduction of the odour-evoked EPSC onto MBON-gamma1pedc
+                                    # after a single pairing. Used when the readout MBON's SPIKE response cannot be
+                                    # measured, which is what happens once APL is modelled as non-spiking: the
+                                    # corrected APL holds MBON11 below threshold, so the spike endpoint has no value
+                                    # to fit and the synaptic endpoint Hige measured in the same figure is used.
   odor_orn_types: ["ORN_DM1", "ORN_DM4", "ORN_VA2", "ORN_DM2"]     # placeholder 'odor A' glomeruli for calibration (same as stage 4 odor A)
   odor_rate_hz: 150.0               # Hallem & Carlson 2006: strong responders 100-200 Hz

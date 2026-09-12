@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 
 from . import DATA_CACHE
-from .connectome import Connectome, load_connectome, subset_from_config
+from .connectome import Connectome, apply_nt_corrections, load_connectome, subset_from_config
 
 
 def resolve_group(conn: Connectome, spec: dict) -> np.ndarray:
@@ -87,6 +87,9 @@ def build_connectome(cspec: dict) -> Connectome:
 def run_job(spec: dict) -> dict:
     from .model import Simulation
     conn = build_connectome(spec["connectome"])
+    # Cells whose connectome transmitter is contradicted by a direct published measurement. Applied from the
+    # config so every stage gets the same network without having to ask, and recorded in the run's meta.json.
+    conn = apply_nt_corrections(conn, (spec["config"].get("nt_corrections") or {}).get("populations") or [])
     groups = {k: resolve_group(conn, v) for k, v in spec.get("drive_groups", {}).items()}
     rec = spec.get("record", "all")
     record = "all" if rec == "all" else resolve_group(conn, rec)

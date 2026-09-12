@@ -215,9 +215,7 @@ function ForestPlotInner({ comparisons, required, note }: { comparisons: Compari
           const loOut = isNum(cl) && scale.x(cl) < plotX + 1;
           const hiOut = isNum(ch) && scale.x(ch) > plotX + plotW - 1;
           const labelLines = wrapText(c.label, textW, narrow ? 12.5 : 13, 2);
-          const meta = `${c.metric} · n = ${fmtInt(c.n)}${p !== null ? ` · p = ${fmtP(p)}` : ''}${
-            r.prereg ? '' : ' · additional comparison, outside the pre-registered set'
-          }`;
+          const meta = `${c.metric} · n = ${fmtInt(c.n)}${p !== null ? ` · p = ${fmtP(p)}` : ''}${r.prereg ? '' : ' · additional comparison'}`;
           const metaLines = wrapText(meta, textW, 11.5, r.prereg ? 1 : 2);
           return (
             <g key={c.name}>

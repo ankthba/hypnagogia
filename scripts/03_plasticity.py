@@ -115,17 +115,29 @@ def main():
         kc_pre = np.unique(pre_i[np.isin(pre_i, kc)]); kc_post = np.unique(post_i[np.isin(post_i, kc)])
         z = np.load(sp["out_dir"] + "/plastic_w.npz"); ratio_w = float(z["w_final_mV"].sum() / z["w0_mV"].sum())
         ro_mask = np.isin(z["post"], ro); ratio_w_ro = float(z["w_final_mV"][ro_mask].sum() / max(z["w0_mV"][ro_mask].sum(), 1e-9))
+        # The odour-evoked EPSC onto the readout: the synapses from the Kenyon cells the odour actually drove,
+        # which is what Hige et al. measured with voltage clamp (~90% reduction after one pairing). It is defined
+        # whether or not the readout spikes, so it survives the APL correction, which holds MBON11 subthreshold.
+        odor_mask = ro_mask & np.isin(z["pre"], kc_pre)
+        n_odor_syn = int(odor_mask.sum())
+        ratio_epsc = (float(z["w_final_mV"][odor_mask].sum() / z["w0_mV"][odor_mask].sum()) if n_odor_syn else None)
         dan_i, _, _ = spikes_in_epoch(i, ts, meta, "pair_odor_dan")
         rows.append({"eta": float(sp["name"].split("_")[1]), "seed": sp["seed"], "mbon11_pre": pre_n, "mbon11_post": post_n,
                      "post_over_pre": (post_n / pre_n if pre_n else None), "all_mbon_pre": allm_pre, "all_mbon_post": allm_post,
                      "n_kc_active_pre": int(len(kc_pre)), "n_kc_active_post": int(len(kc_post)), "frac_kc_active_pre": float(len(kc_pre) / len(kc)),
-                     "w_sum_ratio_all": ratio_w, "w_sum_ratio_readout": ratio_w_ro, "dan_spikes_pairing": int(np.isin(dan_i, dsel).sum())})
+                     "w_sum_ratio_all": ratio_w, "w_sum_ratio_readout": ratio_w_ro,
+                     "epsc_ratio_odor": ratio_epsc, "n_odor_synapses_onto_readout": n_odor_syn,
+                     "dan_spikes_pairing": int(np.isin(dan_i, dsel).sum())})
     df = pd.DataFrame([r for r in rows if "error" not in r])
     grid = []
     for eta, g in df.groupby("eta"):
         vals = g["post_over_pre"].dropna()
+        ev = g["epsc_ratio_odor"].dropna()
         grid.append({"eta": float(eta), "post_over_pre_mean": (float(vals.mean()) if len(vals) else None), "post_over_pre_sd": (float(vals.std(ddof=1)) if len(vals) > 1 else None),
                      "mbon11_pre_mean": float(g["mbon11_pre"].mean()), "mbon11_post_mean": float(g["mbon11_post"].mean()), "w_ratio_readout_mean": float(g["w_sum_ratio_readout"].mean()),
+                     "epsc_ratio_odor_mean": (float(ev.mean()) if len(ev) else None),
+                     "epsc_ratio_odor_sd": (float(ev.std(ddof=1)) if len(ev) > 1 else None),
+                     "n_odor_synapses_onto_readout_mean": float(g["n_odor_synapses_onto_readout"].mean()),
                      "n_seeds": int(len(g))})
     valid = [x for x in grid if x["post_over_pre_mean"] is not None]
     # Is the readout graded at all? If every learning rate in the grid, including the smallest, drives the
@@ -134,17 +146,47 @@ def main():
     graded = bool([x for x in valid if 0.05 < x["post_over_pre_mean"] < 0.95])
     on_target = [x for x in valid if abs(x["post_over_pre_mean"] - cal["target_post_over_pre"]) < 0.15]
     depressing = [x for x in valid if x["post_over_pre_mean"] < 0.5]
+    # Hige et al. 2015 measured two endpoints after a single pairing in the same cell: an ~80% reduction of the
+    # SPIKE response and an ~90% reduction of the odour-evoked EPSC. The spike endpoint is the preferred one and
+    # is used whenever the readout responds. Once APL is modelled as non-spiking (Amin et al. 2020) the corrected
+    # APL holds MBON-gamma1pedc below threshold, so the spike endpoint has no value to fit; the EPSC endpoint,
+    # which is defined whether or not the cell spikes, is used instead and the substitution is recorded here.
+    epsc_valid = [x for x in grid if x.get("epsc_ratio_odor_mean") is not None]
+    tgt_e = float(cal.get("target_epsc_ratio", 0.10))
+    readout_spikes = bool(df["mbon11_pre"].mean() > 5) if len(df) else False
+    endpoint = "spike"
     if on_target:
         chosen = min(on_target, key=lambda x: abs(x["post_over_pre_mean"] - cal["target_post_over_pre"]))
-        chosen_rule = "learning rate whose single-pairing endpoint is closest to Hige et al. 2015's 0.20"
+        chosen_rule = "learning rate whose single-pairing spike endpoint is closest to Hige et al. 2015's 0.20"
     elif depressing:
         chosen = min(depressing, key=lambda x: x["eta"])
-        chosen_rule = ("the readout MBON is all-or-none in this model, so Hige's graded endpoint cannot be matched; "
-                       "the SMALLEST learning rate that still produces a clear depression is used instead, to keep the "
-                       "plasticity as weak as possible while remaining measurable")
+        chosen_rule = ("the readout MBON is all-or-none in this model, so Hige's graded spike endpoint cannot be "
+                       "matched; the SMALLEST learning rate that still produces a clear depression is used instead, "
+                       "to keep the plasticity as weak as possible while remaining measurable")
+    elif epsc_valid:
+        endpoint = "epsc"
+        near = [x for x in epsc_valid if abs(x["epsc_ratio_odor_mean"] - tgt_e) < 0.15]
+        depress_e = [x for x in epsc_valid if x["epsc_ratio_odor_mean"] < 0.5]
+        why_e = (f"The readout MBON does not spike in this model, because APL modelled as non-spiking holds it below "
+                 f"threshold, so Hige's spike endpoint has no value to fit. The learning rate is fitted instead to the "
+                 f"other endpoint Hige et al. measured in the same cell after the same single pairing: the odour-evoked "
+                 f"EPSC, target {tgt_e:.2f} of its pre-pairing value. The EPSC here is the summed weight of the plastic "
+                 f"synapses from the Kenyon cells the calibration odour actually drove. ")
+        if near:
+            chosen = min(near, key=lambda x: (abs(x["epsc_ratio_odor_mean"] - tgt_e), x["eta"]))
+            chosen_rule = why_e + "The chosen rate is the one whose endpoint is closest to that target."
+        elif depress_e:
+            chosen = min(depress_e, key=lambda x: x["eta"])
+            chosen_rule = (why_e + "No rate in the grid lands near the target: the synaptic endpoint is all-or-none here, "
+                           "every rate drives the paired synapses to their floor. The SMALLEST rate that still produces a "
+                           "clear depression is used, to keep the plasticity as weak as possible while remaining measurable.")
+        else:
+            chosen, chosen_rule = None, why_e + "No rate in the grid produced a measurable depression of that EPSC."
     else:
         chosen, chosen_rule = None, "no learning rate in the grid produced a measurable depression"
-    pre_ok = bool(df["mbon11_pre"].mean() > 5) if len(df) else False    # the readout MBON must respond to the odor before pairing
+    # The readout must carry a measurable odour signal, either as spikes or as an odour-driven EPSC.
+    n_odor_syn = float(df["n_odor_synapses_onto_readout"].mean()) if len(df) else 0.0
+    pre_ok = bool(readout_spikes or n_odor_syn > 0)
     status = "passed" if (ut["passed"] and chosen is not None and pre_ok) else "failed"
     out = {"status": status, "gain": a.gain,
            "gain_note": ("published parameters" if a.gain == 1.0 else
@@ -152,9 +194,10 @@ def main():
                          f"published value the network has no sparse odour code to store a memory in (stage 3b). This is "
                          f"an uncited free parameter introduced by this project; see configs/stage3d_gain.yaml."),
            "criterion": ("unit test passes (depression only when Kenyon-cell activity precedes dopamine); the readout MBON "
-                         "responds to the calibration odour before pairing (> 5 spikes/s); and some learning rate in the grid "
-                         "produces a clear depression. Whether that depression can be made GRADED, as Hige et al. measured, "
-                         "is reported separately rather than being required."),
+                         "carries a measurable odour signal before pairing, as spikes (> 5 spikes/s) or, when the corrected "
+                         "APL holds it below threshold, as an odour-evoked EPSC from the Kenyon cells the odour drove; and "
+                         "some learning rate in the grid produces a clear depression. Whether that depression can be made "
+                         "GRADED, as Hige et al. measured, is reported separately rather than being required."),
            "rule": {"equations": ["de/dt = -e/tau_e (per KC->MBON synapse); on KC spike: e += 1",
                                   "on DAN spike (DAN presynaptic to the MBON, >= dan_mbon_min_synapses): w -= eta_ltd * e * w0",
                                   "dda/dt = -da/tau_da (per MBON); on DAN spike: da += 1; on KC spike: w += eta_ltp * da * w0 (eta_ltp = 0 here)",
@@ -175,6 +218,16 @@ def main():
            "n_dan_mbon_gates": int(dm.sum()), "dan_to_mbon_map": dan_map, "unit_test": ut,
            "calibration": {"protocol": cal, "sigma_mV": sigma, "sigma_source": sigma_src, "grid": grid, "per_run": rows,
                            "chosen_eta_ltd": (chosen["eta"] if chosen else None), "chosen_rule": chosen_rule,
+                           "endpoint_fitted": endpoint,
+                           "endpoint_note": ("Hige et al. 2015 report an ~80% reduction of the MBON-gamma1pedc spike response "
+                                             "and an ~90% reduction of its odour-evoked EPSC after one pairing. Which of the "
+                                             "two this run fitted is 'endpoint_fitted'. 'spike' is the preferred endpoint; "
+                                             "'epsc' means the readout did not spike at all before pairing, which is a "
+                                             "consequence of modelling APL as non-spiking, and is reported as such rather "
+                                             "than worked around by changing the readout cell."),
+                           "readout_spikes_before_pairing": readout_spikes,
+                           "target_epsc_ratio": tgt_e,
+                           "n_odor_synapses_onto_readout": n_odor_syn,
                            "readout_is_graded": graded,
                            "graded_note": ("The readout MBON's odour response is all-or-none here: every learning rate in "
                                            "the grid, including the smallest, takes it from its full response to exactly "

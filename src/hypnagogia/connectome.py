@@ -376,3 +376,43 @@ def subset_from_config(conn: Connectome, sub_cfg: dict) -> Connectome:
     """sub_cfg: {'name': str, 'selectors': [ {cell_class: 'Kenyon_Cell'}, {cell_type: {regex: '^ORN_'}}, ... ]}"""
     idx = conn.select_union(sub_cfg["selectors"])
     return conn.subset(idx, sub_cfg.get("name", "subset"))
+
+
+def apply_nt_corrections(conn: Connectome, names: list[str]) -> Connectome:
+    """Substitute the published transmitter for the connectome's predicted one on named cell types.
+
+    The model's transmitter-to-sign rule is untouched; only the transmitter it is applied to changes, and only
+    for cells whose identity and transmitter have been measured directly in the literature (populations.py
+    NT_CORRECTIONS records the measurement for each). No parameter is introduced: the corrected sign is what
+    the model's own rule already gives for the measured transmitter.
+    """
+    from .populations import NT_CORRECTIONS
+    names = [n for n in (names or []) if n in NT_CORRECTIONS]
+    if not names:
+        return conn
+    sign = conn.sign.copy()
+    applied = []
+    for n in names:
+        e = NT_CORRECTIONS[n]
+        idx = conn.select(**e["selector"])
+        if len(idx) == 0:
+            applied.append({"population": n, "n_neurons": 0, "n_connections": 0, "n_synapses": 0,
+                            "note": "no neuron matched the selector in this network; nothing changed"})
+            continue
+        em = np.isin(conn.pre, idx)
+        applied.append({"population": n, "n_neurons": int(len(idx)), "n_connections": int(em.sum()),
+                        "n_synapses": int(conn.count[em].sum()),
+                        "annotated_nt": e["annotated_nt"], "annotated_sign": e["annotated_sign"],
+                        "measured_nt": e["measured_nt"], "corrected_sign": e["corrected_sign"],
+                        "source": e["source"]})
+        sign[em] = np.int8(e["corrected_sign"])
+    n_flipped = int((sign != conn.sign).sum())
+    return Connectome(ids=conn.ids, pre=conn.pre, post=conn.post, count=conn.count, sign=sign, ann=conn.ann,
+                      dataset=conn.dataset, version=conn.version, weight_scale=conn.weight_scale,
+                      name=conn.name, provenance=dict(conn.provenance, nt_corrections=applied),
+                      filtering_steps=list(conn.filtering_steps) + [{
+                          "step": f"published transmitter substituted for the predicted one on {', '.join(names)} "
+                                  f"({n_flipped} connections changed sign)",
+                          "n_neurons_before": conn.N, "n_neurons_after": conn.N,
+                          "n_connections_before": conn.E, "n_connections_after": conn.E,
+                          "n_synapses_before": conn.n_synapses, "n_synapses_after": conn.n_synapses}])

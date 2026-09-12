@@ -64,13 +64,7 @@ export default function Layout() {
         <main className="page">
           <Outlet />
         </main>
-        {twoColumn ? (
-          <aside className="rail" aria-label="neuron map">
-            <MapPanel />
-          </aside>
-        ) : (
-          <InlineMap />
-        )}
+        {twoColumn ? <Rail /> : <InlineMap />}
       </div>
 
       <footer className="colophon">
@@ -109,6 +103,49 @@ export default function Layout() {
 
       {fly.on && <FlyOrnament />}
     </MapSourceProvider>
+  );
+}
+
+/**
+ * The sticky right-hand rail.
+ *
+ * It has no scrollbar of its own and no height cap: it is exactly as tall as the panel inside it
+ * and it scrolls with the page. That leaves one thing to get right. A box taller than the viewport
+ * that is stuck to the *top* pins immediately and its bottom, which carries the provenance line,
+ * can then never be scrolled into view. So the offset is computed: while the panel fits, it is
+ * pinned a small margin below the top of the viewport as before; when it is taller, the offset
+ * becomes negative by exactly the overflow, so the rail travels with the page until its bottom
+ * reaches the bottom of the viewport and pins there. Everything in it is reachable, nothing scrolls
+ * inside itself, and the page's own scroll is never intercepted.
+ */
+function Rail() {
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!el) return;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const margin = 16;
+      const overflow = el.offsetHeight + 2 * margin - window.innerHeight;
+      el.style.setProperty('--rail-top', overflow > 0 ? `${margin - overflow}px` : `${margin}px`);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    apply();
+    const ro = new ResizeObserver(schedule);
+    ro.observe(el);
+    window.addEventListener('resize', schedule);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener('resize', schedule);
+    };
+  }, [el]);
+  return (
+    <aside ref={setEl} className="rail" aria-label="neuron map">
+      <MapPanel />
+    </aside>
   );
 }
 

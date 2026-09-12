@@ -61,3 +61,26 @@ SUBSET_MB_CX = {
         {"cell_class": "CX"}, {"cell_type": {"regex": r"^(FB|ER|EL|ExR|PF|hDelta|vDelta|FC|FR|FS|EPG|PEG|PEN|LNO|LCNO|SA|IbSpsP|SpsP|PFL|PFR|LPsP|OA-VPM3|OA-VPM4)"}},
     ],
 }
+
+
+# Neurons whose transmitter in the connectome's own annotation is contradicted by a direct published
+# measurement on that identified cell. The model's sign rule is not changed: the published transmitter is
+# substituted for the predicted one and the SAME rule is applied to it, so no free parameter is introduced.
+#
+# DPM (dorsal paired medial, one per hemisphere) is annotated 'dopamine' by the male CNS v1.0 consensus
+# transmitter, which the Shiu sign rule maps to +1, making its 32,795 synapses onto 3,989 of the 4,064 Kenyon
+# cells excitatory. Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868 show that DPM cell bodies stain
+# for Gad1, that DPM contains GABA and 5-HT, and that activating DPM drives a large chloride increase in
+# mushroom-body neurons with no detectable calcium or cAMP increase, i.e. its action on Kenyon cells is
+# inhibitory. Lee P-T et al. (2011) PNAS 108:13794 independently report DPM as serotonergic. Neither
+# transmitter is dopamine, and the measured postsynaptic effect is inhibition, so the rule's 'gaba' -> -1 is
+# the assignment the published measurement implies.
+NT_CORRECTIONS = {
+    "DPM": {"selector": {"cell_type": "DPM"},
+            "annotated_nt": "dopamine", "annotated_sign": +1,
+            "measured_nt": "gaba", "corrected_sign": -1,
+            "source": ("Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, "
+                       "DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body "
+                       "neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report "
+                       "DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.")},
+}

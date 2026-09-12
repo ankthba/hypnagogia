@@ -51,13 +51,40 @@ def main():
     # Analyse EVERY run present in the output directory, not only the ones requested on this invocation, so that
     # successive calls with extra --sigmas accumulate into one combined sweep. Per-run analyses are cached.
     import re as _re
+
+    def network_signature(meta: dict) -> tuple:
+        """What network a run was actually simulated on, beyond the connectome and the gain.
+
+        Runs accumulate in this directory across invocations, and a run left over from before a correction to the
+        network is not comparable with a fresh one. Mixing them silently would put two different networks in one
+        sweep and pick an operating point off the mixture, so a run whose signature does not match the current
+        one is dropped from the analysis and counted.
+        """
+        g = meta.get("graded_release") or {}
+        nt = tuple(sorted(x.get("population", "") for x in (meta.get("connectome_provenance", {}) or {}).get("nt_corrections", []) or []))
+        return (int(g.get("n_neurons") or 0), tuple(sorted(g.get("ids") or [])), nt,
+                int(meta.get("n_neurons", 0)), float(meta.get("weight_scale") or 0.0))
+
+    want_sig, dropped = None, []
     run_dirs = sorted(p for p in OUT.glob("sigma*_seed*") if (p / "spikes.npz").exists())
+    for rd in run_dirs:                                   # the signature of the runs this invocation just made
+        if not (rd / "meta.json").exists():
+            continue
+        mm0 = _re.match(r"sigma([0-9.]+)_seed(\d+)$", rd.name)
+        if mm0 and float(mm0.group(1)) in [float(x) for x in sigmas] and int(mm0.group(2)) in seeds:
+            want_sig = network_signature(json.load(open(rd / "meta.json")))
+            break
     per = []
     for rd in run_dirs:
         mm = _re.match(r"sigma([0-9.]+)_seed(\d+)$", rd.name)
         if not mm:
             continue
         sg, sd = float(mm.group(1)), int(mm.group(2))
+        if want_sig is not None and (rd / "meta.json").exists():
+            got = network_signature(json.load(open(rd / "meta.json")))
+            if got != want_sig:
+                dropped.append({"run": rd.name, "sigma_mV": sg, "seed": sd})
+                continue
         cache = rd / "analysis.json"
         if cache.exists():
             per.append(json.load(open(cache)))
@@ -138,7 +165,13 @@ def main():
         op = min(crit, key=lambda s: abs(s["m_mean"] - 1.0)); has_crit = True
         reason = f"critical regime found at sigma = {op['sigma_mV']} mV (mean m = {op['m_mean']:.3f}); operating point = critical sigma with m closest to 1"
     else:
-        cand = [s for s in summ if s["classification"] not in ("saturated",) and (s.get("kc_rate_hz_mean") or 0) > 0]
+        # A bistable sigma is excluded. At one of those the outcome depends on the seed: some runs stay silent and
+        # some ignite, so the population rate reported for it is the average of two different states rather than the
+        # rate of any state the network is ever in, and every downstream stage would inherit that mixture. Only
+        # sigmas whose outcome is the same in every seed are eligible.
+        elig = [s for s in summ if s["classification"] not in ("saturated", "bistable") and (s.get("kc_rate_hz_mean") or 0) > 0]
+        cand = elig or [s for s in summ if s["classification"] != "saturated" and (s.get("kc_rate_hz_mean") or 0) > 0]
+        mixed = not elig and bool(cand)
         has_crit = False
         if cand:
             op = min(cand, key=lambda s: abs(np.log10(max(s["kc_rate_hz_mean"], 1e-9)) - np.log10(KC_SPONTANEOUS_HZ)))
@@ -146,7 +179,12 @@ def main():
                       f"transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical "
                       f"point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of "
                       f"{KC_SPONTANEOUS_HZ} Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = {op['sigma_mV']} mV "
-                      f"(KC rate {op['kc_rate_hz_mean']:.4f} Hz, whole-brain rate {op['pop_rate_hz_mean']:.4f} Hz/neuron, m = {op['m_mean']}).")
+                      f"(KC rate {op['kc_rate_hz_mean']:.4f} Hz, whole-brain rate {op['pop_rate_hz_mean']:.4f} Hz/neuron, m = {op['m_mean']}). "
+                      f"Sigmas whose outcome depends on the seed are excluded, because the rate reported for one of those is an average of two "
+                      f"different states rather than the rate of a state.")
+            if mixed:
+                reason += (" WARNING: every active non-saturated sigma in this sweep is seed-dependent, so the operating point IS one of those "
+                           "and the downstream stages inherit a mixture of an ignited and a silent network. This is reported, not worked around.")
         else:
             op = None; reason = "NO critical regime and no active non-saturated sigma: every sigma is silent or saturated."
     out = {"status": "passed" if per and not any("error" in p for p in per) else "failed", "has_critical_regime": has_crit,
@@ -161,9 +199,15 @@ def main():
                          f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value (an uncited free "
                          f"parameter introduced by this project; see configs/stage3d_gain.yaml)"),
            "n_neurons": conn.N, "n_connections": conn.E, "duration_s": s2["duration_s"], "warmup_s": s2["warmup_s"], "seeds": seeds,
-           "criteria": CRITERIA, "sigma_values_mV": all_sigmas, "sigma_values_requested_this_run": sigmas, "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],
+           "criteria": CRITERIA, "sigma_values_mV": all_sigmas, "sigma_values_requested_this_run": sigmas,
+           "runs_dropped_wrong_network": dropped,
+           "runs_dropped_note": ("Runs left in the output directory from before a correction to the network are not "
+                                 "comparable with the current ones, so any whose network signature (non-spiking "
+                                 "populations, transmitter corrections, neuron count, weight scale) differs from this "
+                                 "invocation's is dropped rather than merged into the sweep."), "mr_bin_ms": s2["mr_bin_ms"], "mr_kmax_ms": s2["mr_kmax_ms"],
            "per_sigma": per, "summary_by_sigma": summ,
-           "transition_bracket": bracket, "operating_sigma_mV": (op["sigma_mV"] if op else None), "operating_sigma_reason": reason, "operating_rule": s2["operating_rule"],
+           "transition_bracket": bracket, "operating_sigma_mV": (op["sigma_mV"] if op else None), "operating_sigma_reason": reason,
+           "operating_sigma_is_seed_dependent": bool(op is not None and op.get("classification") == "bistable"), "operating_rule": s2["operating_rule"],
            "walltime_s": round(time.time() - t0, 1),
            "provenance": {"config": "configs/stage2_criticality.yaml", "results_dir": f"results/stage2_criticality/{tag}",
                           "files": [p.get("file") for p in per if p.get("file")]}}

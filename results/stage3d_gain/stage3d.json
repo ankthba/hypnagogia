@@ -44,12 +44,16 @@
    "gain": 1.0,
    "w_syn_effective_mV": 0.15978,
    "n_seeds": 3,
-   "frac_kc_odor": 0.67503280839895,
-   "n_kc_active": 2743.3333333333326,
-   "spikes_per_active_kc": 59.406562921047644,
-   "pop_rate_odor": 3.449236871485136,
-   "pop_rate_post": 2.8774221211343725,
-   "mbon_rate_odor": 106.66666666666667,
+   "frac_kc_odor": 0.04355314960629921,
+   "n_kc_active": 177.0,
+   "spikes_per_active_kc": 17.785361354970295,
+   "pop_rate_odor": 2.023958282770146,
+   "pop_rate_post": 1.6974807397596543,
+   "mbon_rate_odor": 6.048109965635739,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.7746062992125985,
+   "kc_rate_post": 0.1389435695538058,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -58,12 +62,16 @@
    "gain": 0.8,
    "w_syn_effective_mV": 0.12782,
    "n_seeds": 3,
-   "frac_kc_odor": 0.36786417322834647,
-   "n_kc_active": 1495.0,
-   "spikes_per_active_kc": 23.752614275836752,
-   "pop_rate_odor": 1.8183446710445719,
-   "pop_rate_post": 1.2726078122724658,
-   "mbon_rate_odor": 39.735395189003434,
+   "frac_kc_odor": 0.011729002624671915,
+   "n_kc_active": 47.666666666666664,
+   "spikes_per_active_kc": 14.402417514646933,
+   "pop_rate_odor": 1.4354189636800292,
+   "pop_rate_post": 1.0943815342084522,
+   "mbon_rate_odor": 2.457044673539519,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.1687171916010499,
+   "kc_rate_post": 0.02280183727034121,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -72,13 +80,17 @@
    "gain": 0.6,
    "w_syn_effective_mV": 0.09586,
    "n_seeds": 3,
-   "frac_kc_odor": 0.08177493438320209,
-   "n_kc_active": 332.3333333333333,
-   "spikes_per_active_kc": 16.98450403274019,
-   "pop_rate_odor": 1.1572532458676874,
-   "pop_rate_post": 0.8307329408474274,
-   "mbon_rate_odor": 2.556701030927835,
-   "sparse": true,
+   "frac_kc_odor": 0.0004921259842519685,
+   "n_kc_active": 2.0,
+   "spikes_per_active_kc": 11.666666666666666,
+   "pop_rate_odor": 1.0720967484692354,
+   "pop_rate_post": 0.7601848705697979,
+   "mbon_rate_odor": 1.2989690721649485,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.005741469816272966,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
+   "sparse": false,
    "transient": false,
    "usable": false
   },
@@ -86,12 +98,16 @@
    "gain": 0.5,
    "w_syn_effective_mV": 0.07989,
    "n_seeds": 3,
-   "frac_kc_odor": 0.028461286089238844,
-   "n_kc_active": 115.66666666666666,
-   "spikes_per_active_kc": 14.926881623119455,
-   "pop_rate_odor": 0.9515749132624641,
-   "pop_rate_post": 0.6472307553620094,
-   "mbon_rate_odor": 1.0412371134020617,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.90174908177252,
+   "pop_rate_post": 0.6001786758570316,
+   "mbon_rate_odor": 0.859106529209622,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -100,12 +116,16 @@
    "gain": 0.4,
    "w_syn_effective_mV": 0.06391,
    "n_seeds": 3,
-   "frac_kc_odor": 0.003937007874015748,
-   "n_kc_active": 16.0,
-   "spikes_per_active_kc": 10.46111111111111,
-   "pop_rate_odor": 0.7606783672771232,
-   "pop_rate_post": 0.46950259692529595,
-   "mbon_rate_odor": 0.7079037800687286,
+   "frac_kc_odor": 0.0,
+   "n_kc_active": 0.0,
+   "spikes_per_active_kc": 0.0,
+   "pop_rate_odor": 0.7299267036037973,
+   "pop_rate_post": 0.4375200808086412,
+   "mbon_rate_odor": 0.6185567010309279,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -117,9 +137,13 @@
    "frac_kc_odor": 0.0,
    "n_kc_active": 0.0,
    "spikes_per_active_kc": 0.0,
-   "pop_rate_odor": 0.6757021637576943,
-   "pop_rate_post": 0.39218657180434874,
-   "mbon_rate_odor": 0.5120274914089347,
+   "pop_rate_odor": 0.6495456825394624,
+   "pop_rate_post": 0.36352677941968486,
+   "mbon_rate_odor": 0.42611683848797255,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -131,9 +155,13 @@
    "frac_kc_odor": 0.0,
    "n_kc_active": 0.0,
    "spikes_per_active_kc": 0.0,
-   "pop_rate_odor": 0.5955037480323697,
-   "pop_rate_post": 0.316050547007006,
-   "mbon_rate_odor": 0.2268041237113402,
+   "pop_rate_odor": 0.5738083845899585,
+   "pop_rate_post": 0.2931878962709216,
+   "mbon_rate_odor": 0.18900343642611683,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -145,9 +173,13 @@
    "frac_kc_odor": 0.0,
    "n_kc_active": 0.0,
    "spikes_per_active_kc": 0.0,
-   "pop_rate_odor": 0.520129349300899,
-   "pop_rate_post": 0.24598672759675191,
+   "pop_rate_odor": 0.5029020380142709,
+   "pop_rate_post": 0.22721536103849274,
    "mbon_rate_odor": 0.0,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -159,9 +191,13 @@
    "frac_kc_odor": 0.0,
    "n_kc_active": 0.0,
    "spikes_per_active_kc": 0.0,
-   "pop_rate_odor": 0.44536517600612074,
-   "pop_rate_post": 0.17372008681843712,
+   "pop_rate_odor": 0.4321644280176688,
+   "pop_rate_post": 0.15707410771865835,
    "mbon_rate_odor": 0.0,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -173,9 +209,13 @@
    "frac_kc_odor": 0.0,
    "n_kc_active": 0.0,
    "spikes_per_active_kc": 0.0,
-   "pop_rate_odor": 0.37016644823369776,
-   "pop_rate_post": 0.0977897819599794,
+   "pop_rate_odor": 0.3611979834823069,
+   "pop_rate_post": 0.08725877025705746,
    "mbon_rate_odor": 0.0,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": false,
    "usable": false
@@ -187,9 +227,13 @@
    "frac_kc_odor": 0.0,
    "n_kc_active": 0.0,
    "spikes_per_active_kc": 0.0,
-   "pop_rate_odor": 0.266469730275734,
-   "pop_rate_post": 4.969638973064557e-05,
+   "pop_rate_odor": 0.26613225711756316,
+   "pop_rate_post": 4.50734697557018e-05,
    "mbon_rate_odor": 0.0,
+   "readout_rate_odor": 0.0,
+   "kc_rate_odor": 0.0,
+   "kc_rate_post": 0.0,
+   "readout_responds": false,
    "sparse": false,
    "transient": true,
    "usable": false
@@ -200,16 +244,20 @@
    "gain": 1.0,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 3.4582376966763517,
-    "frac_kc": 0.6729822834645669,
-    "spikes_per_active_kc": 59.32760511882998,
-    "mbon_rate_hz": 106.5360824742268
+    "pop_rate_hz": 2.013078240609116,
+    "frac_kc": 0.043061023622047244,
+    "spikes_per_active_kc": 17.85142857142857,
+    "kc_rate_hz": 0.7687007874015748,
+    "mbon_rate_hz": 6.154639175257732,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.87986533434113,
-    "frac_kc": 0.6154035433070866,
-    "spikes_per_active_kc": 104.88244702119152,
-    "mbon_rate_hz": 98.22680412371135
+    "pop_rate_hz": 1.695674333779445,
+    "frac_kc": 0.014517716535433071,
+    "spikes_per_active_kc": 18.576271186440678,
+    "kc_rate_hz": 0.13484251968503938,
+    "mbon_rate_hz": 6.025773195876289,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -217,16 +265,20 @@
    "gain": 1.0,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 3.465719892655798,
-    "frac_kc": 0.6774114173228346,
-    "spikes_per_active_kc": 59.44605884489648,
-    "mbon_rate_hz": 106.88659793814433
+    "pop_rate_hz": 2.027030213093496,
+    "frac_kc": 0.04355314960629921,
+    "spikes_per_active_kc": 17.666666666666668,
+    "kc_rate_hz": 0.7694389763779528,
+    "mbon_rate_hz": 6.061855670103093,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.8774729732540965,
-    "frac_kc": 0.6126968503937008,
-    "spikes_per_active_kc": 105.20080321285141,
-    "mbon_rate_hz": 98.0979381443299
+    "pop_rate_hz": 1.6994119645791872,
+    "frac_kc": 0.014025590551181102,
+    "spikes_per_active_kc": 20.280701754385966,
+    "kc_rate_hz": 0.1422244094488189,
+    "mbon_rate_hz": 6.051546391752577,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -234,16 +286,20 @@
    "gain": 1.0,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 3.4237530251232586,
-    "frac_kc": 0.6747047244094488,
-    "spikes_per_active_kc": 59.446024799416485,
-    "mbon_rate_hz": 106.57731958762886
+    "pop_rate_hz": 2.031766394607826,
+    "frac_kc": 0.04404527559055118,
+    "spikes_per_active_kc": 17.837988826815643,
+    "kc_rate_hz": 0.7856791338582677,
+    "mbon_rate_hz": 5.927835051546392,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 2.87492805580789,
-    "frac_kc": 0.6077755905511811,
-    "spikes_per_active_kc": 105.77368421052631,
-    "mbon_rate_hz": 97.88659793814433
+    "pop_rate_hz": 1.6973559209203308,
+    "frac_kc": 0.013779527559055118,
+    "spikes_per_active_kc": 20.285714285714285,
+    "kc_rate_hz": 0.13976377952755906,
+    "mbon_rate_hz": 6.144329896907217,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -251,16 +307,20 @@
    "gain": 0.8,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 1.812251662517596,
-    "frac_kc": 0.35482283464566927,
-    "spikes_per_active_kc": 24.407073509015255,
-    "mbon_rate_hz": 39.123711340206185
+    "pop_rate_hz": 1.4359991401368846,
+    "frac_kc": 0.011318897637795276,
+    "spikes_per_active_kc": 15.26086956521739,
+    "kc_rate_hz": 0.17273622047244094,
+    "mbon_rate_hz": 2.5051546391752577,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 1.2708187422421624,
-    "frac_kc": 0.2111220472440945,
-    "spikes_per_active_kc": 32.327505827505824,
-    "mbon_rate_hz": 12.685567010309278
+    "pop_rate_hz": 1.0939504469207886,
+    "frac_kc": 0.0024606299212598425,
+    "spikes_per_active_kc": 18.0,
+    "kc_rate_hz": 0.02214566929133858,
+    "mbon_rate_hz": 2.1443298969072164,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -268,16 +328,20 @@
    "gain": 0.8,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 1.8208156217711793,
-    "frac_kc": 0.37253937007874016,
-    "spikes_per_active_kc": 23.455085865257598,
-    "mbon_rate_hz": 39.74226804123711
+    "pop_rate_hz": 1.4351323426415827,
+    "frac_kc": 0.01156496062992126,
+    "spikes_per_active_kc": 14.106382978723405,
+    "kc_rate_hz": 0.16313976377952755,
+    "mbon_rate_hz": 2.3711340206185567,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 1.272198683854683,
-    "frac_kc": 0.21161417322834647,
-    "spikes_per_active_kc": 31.996511627906976,
-    "mbon_rate_hz": 12.350515463917526
+    "pop_rate_hz": 1.0941480767497174,
+    "frac_kc": 0.0027066929133858267,
+    "spikes_per_active_kc": 16.90909090909091,
+    "kc_rate_hz": 0.022883858267716536,
+    "mbon_rate_hz": 2.0103092783505154,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -285,16 +349,20 @@
    "gain": 0.8,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 1.8219667288449404,
-    "frac_kc": 0.3762303149606299,
-    "spikes_per_active_kc": 23.39568345323741,
-    "mbon_rate_hz": 40.34020618556701
+    "pop_rate_hz": 1.4351254082616203,
+    "frac_kc": 0.012303149606299213,
+    "spikes_per_active_kc": 13.84,
+    "kc_rate_hz": 0.1702755905511811,
+    "mbon_rate_hz": 2.4948453608247423,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 1.2748060107205514,
-    "frac_kc": 0.1889763779527559,
-    "spikes_per_active_kc": 36.518229166666664,
-    "mbon_rate_hz": 12.608247422680412
+    "pop_rate_hz": 1.0950460789548502,
+    "frac_kc": 0.0024606299212598425,
+    "spikes_per_active_kc": 19.0,
+    "kc_rate_hz": 0.023375984251968504,
+    "mbon_rate_hz": 2.1030927835051547,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -302,118 +370,146 @@
    "gain": 0.6,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 1.1538669569860411,
-    "frac_kc": 0.08021653543307086,
-    "spikes_per_active_kc": 17.26073619631902,
-    "mbon_rate_hz": 2.536082474226804
-   },
-   "post": {
-    "pop_rate_hz": 0.8313593465040323,
-    "frac_kc": 0.04896653543307087,
-    "spikes_per_active_kc": 28.889447236180903,
-    "mbon_rate_hz": 1.7628865979381443
-   },
-   "outlasts": true
-  },
-  {
-   "gain": 0.6,
-   "seed": 1,
-   "odor": {
-    "pop_rate_hz": 1.1593797890561615,
-    "frac_kc": 0.08366141732283465,
-    "spikes_per_active_kc": 16.63235294117647,
-    "mbon_rate_hz": 2.597938144329897
-   },
-   "post": {
-    "pop_rate_hz": 0.8296014811835599,
-    "frac_kc": 0.051181102362204724,
-    "spikes_per_active_kc": 26.942307692307693,
-    "mbon_rate_hz": 1.7474226804123711
-   },
-   "outlasts": true
-  },
-  {
-   "gain": 0.6,
-   "seed": 2,
-   "odor": {
-    "pop_rate_hz": 1.1585129915608596,
-    "frac_kc": 0.08144685039370078,
-    "spikes_per_active_kc": 17.060422960725077,
-    "mbon_rate_hz": 2.536082474226804
-   },
-   "post": {
-    "pop_rate_hz": 0.8312379948546901,
-    "frac_kc": 0.04749015748031496,
-    "spikes_per_active_kc": 29.82901554404145,
-    "mbon_rate_hz": 1.7989690721649485
-   },
-   "outlasts": true
-  },
-  {
-   "gain": 0.5,
-   "seed": 0,
-   "odor": {
-    "pop_rate_hz": 0.9496494670928999,
-    "frac_kc": 0.028297244094488187,
-    "spikes_per_active_kc": 14.921739130434782,
-    "mbon_rate_hz": 1.0721649484536082
-   },
-   "post": {
-    "pop_rate_hz": 0.6475844087400925,
-    "frac_kc": 0.014517716535433071,
-    "spikes_per_active_kc": 23.89830508474576,
-    "mbon_rate_hz": 0.865979381443299
-   },
-   "outlasts": true
-  },
-  {
-   "gain": 0.5,
-   "seed": 1,
-   "odor": {
-    "pop_rate_hz": 0.9510640806052327,
-    "frac_kc": 0.028051181102362203,
-    "spikes_per_active_kc": 15.087719298245615,
-    "mbon_rate_hz": 1.0309278350515463
-   },
-   "post": {
-    "pop_rate_hz": 0.6475011961805435,
-    "frac_kc": 0.014517716535433071,
-    "spikes_per_active_kc": 24.83050847457627,
-    "mbon_rate_hz": 0.8711340206185567
-   },
-   "outlasts": true
-  },
-  {
-   "gain": 0.5,
-   "seed": 2,
-   "odor": {
-    "pop_rate_hz": 0.9540111920892593,
-    "frac_kc": 0.029035433070866142,
-    "spikes_per_active_kc": 14.771186440677965,
-    "mbon_rate_hz": 1.0206185567010309
-   },
-   "post": {
-    "pop_rate_hz": 0.6466066611653919,
-    "frac_kc": 0.014763779527559055,
-    "spikes_per_active_kc": 24.1,
-    "mbon_rate_hz": 0.8711340206185567
-   },
-   "outlasts": true
-  },
-  {
-   "gain": 0.4,
-   "seed": 0,
-   "odor": {
-    "pop_rate_hz": 0.7577127641131968,
-    "frac_kc": 0.004183070866141733,
-    "spikes_per_active_kc": 10.0,
-    "mbon_rate_hz": 0.7010309278350515
-   },
-   "post": {
-    "pop_rate_hz": 0.4693119014763295,
+    "pop_rate_hz": 1.069586502922841,
     "frac_kc": 0.0004921259842519685,
-    "spikes_per_active_kc": 17.5,
-    "mbon_rate_hz": 0.6030927835051546
+    "spikes_per_active_kc": 11.5,
+    "kc_rate_hz": 0.005659448818897638,
+    "mbon_rate_hz": 1.288659793814433,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.7591031072956611,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 1.1185567010309279,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.6,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 1.0732617243029214,
+    "frac_kc": 0.0004921259842519685,
+    "spikes_per_active_kc": 11.5,
+    "kc_rate_hz": 0.005659448818897638,
+    "mbon_rate_hz": 1.2989690721649485,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.7607153506369227,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 1.1443298969072164,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.6,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 1.0734420181819442,
+    "frac_kc": 0.0004921259842519685,
+    "spikes_per_active_kc": 12.0,
+    "kc_rate_hz": 0.005905511811023622,
+    "mbon_rate_hz": 1.309278350515464,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.76073615377681,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 1.1597938144329898,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.5,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.897267160856812,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.8556701030927835,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.6004028874758164,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.7783505154639175,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.5,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.903390218363625,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.865979381443299,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.599678244769744,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.7628865979381443,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.5,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.9045898660971229,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.8556701030927835,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.6004548953255344,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.7680412371134021,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": true
+  },
+  {
+   "gain": 0.4,
+   "seed": 0,
+   "odor": {
+    "pop_rate_hz": 0.7282832555527048,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.6185567010309279,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 0.4376945960376953,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.520618556701031,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -421,16 +517,20 @@
    "gain": 0.4,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 0.7618040482910221,
-    "frac_kc": 0.0036909448818897637,
-    "spikes_per_active_kc": 11.133333333333333,
-    "mbon_rate_hz": 0.711340206185567
+    "pop_rate_hz": 0.7316672329743636,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.6185567010309279,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.47004001137238316,
-    "frac_kc": 0.0012303149606299212,
-    "spikes_per_active_kc": 7.0,
-    "mbon_rate_hz": 0.5979381443298969
+    "pop_rate_hz": 0.4371259768807772,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.5154639175257731,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -438,16 +538,20 @@
    "gain": 0.4,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 0.7625182894271508,
-    "frac_kc": 0.003937007874015748,
-    "spikes_per_active_kc": 10.25,
-    "mbon_rate_hz": 0.711340206185567
+    "pop_rate_hz": 0.7298296222843235,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.6185567010309279,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.46915587792717517,
-    "frac_kc": 0.000984251968503937,
-    "spikes_per_active_kc": 9.0,
-    "mbon_rate_hz": 0.5979381443298969
+    "pop_rate_hz": 0.43773966950745097,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.5103092783505154,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -455,16 +559,20 @@
    "gain": 0.35,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 0.672967706592515,
+    "pop_rate_hz": 0.6461385905179289,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.5154639175257731
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.422680412371134,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.3925448481024069,
+    "pop_rate_hz": 0.3634759272999605,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.4175257731958763
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.24742268041237114,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -472,16 +580,20 @@
    "gain": 0.35,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 0.6759494899763537,
+    "pop_rate_hz": 0.6500842527165434,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.5154639175257731
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.4329896907216495,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.39150122391806336,
+    "pop_rate_hz": 0.36372209778862624,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.41237113402061853
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.24742268041237114,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -489,16 +601,20 @@
    "gain": 0.35,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 0.6781892947042141,
+    "pop_rate_hz": 0.6524142043839151,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.5051546391752577
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.422680412371134,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.39251364339257605,
+    "pop_rate_hz": 0.3633823131704679,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.422680412371134
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.24742268041237114,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -506,16 +622,20 @@
    "gain": 0.3,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 0.592438752088982,
+    "pop_rate_hz": 0.5708728304058692,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.2268041237113402
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.18556701030927836,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.31584713852810853,
+    "pop_rate_hz": 0.29328960051037034,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.17010309278350516
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.07731958762886598,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -523,16 +643,20 @@
    "gain": 0.3,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 0.5964398893272957,
+    "pop_rate_hz": 0.5746104612056113,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.2268041237113402
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.1958762886597938,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.3161106449666803,
+    "pop_rate_hz": 0.2932965348903328,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.17525773195876287
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.07216494845360824,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -540,16 +664,20 @@
    "gain": 0.3,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 0.5976326026808313,
+    "pop_rate_hz": 0.5759418621583952,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.2268041237113402
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.18556701030927836,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.3161938575262293,
+    "pop_rate_hz": 0.29297755341206166,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.16494845360824742
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.07216494845360824,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -557,16 +685,20 @@
    "gain": 0.25,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 0.5172908764362835,
+    "pop_rate_hz": 0.5003917924678765,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.2457925649578043,
+    "pop_rate_hz": 0.2273297783078726,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -574,16 +706,20 @@
    "gain": 0.25,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 0.5207441976575664,
+    "pop_rate_hz": 0.503969932528483,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.24595899007690228,
+    "pop_rate_hz": 0.22738178615759072,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -591,16 +727,20 @@
    "gain": 0.25,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 0.5223529738088469,
+    "pop_rate_hz": 0.5043443890464534,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.24620862775554925,
+    "pop_rate_hz": 0.2269345186500149,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -608,16 +748,20 @@
    "gain": 0.2,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 0.44241344160211915,
+    "pop_rate_hz": 0.4297235262708985,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.17349818665963984,
+    "pop_rate_hz": 0.1570983780485268,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -625,16 +769,20 @@
    "gain": 0.2,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 0.4460262535625377,
+    "pop_rate_hz": 0.4322129686774057,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.1735813992191888,
+    "pop_rate_hz": 0.15720586093794423,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -642,16 +790,20 @@
    "gain": 0.2,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 0.44765583285370536,
+    "pop_rate_hz": 0.4345567891047022,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.17408067457648274,
+    "pop_rate_hz": 0.15691808416950398,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -659,16 +811,20 @@
    "gain": 0.15,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 0.36754294114791725,
+    "pop_rate_hz": 0.358729344215687,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.09780249498991048,
+    "pop_rate_hz": 0.08748067041585476,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -676,16 +832,20 @@
    "gain": 0.15,
    "seed": 1,
    "odor": {
-    "pop_rate_hz": 0.371058671788862,
+    "pop_rate_hz": 0.36165565255982635,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.09744190723186487,
+    "pop_rate_hz": 0.08719636083739572,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -693,16 +853,20 @@
    "gain": 0.15,
    "seed": 2,
    "odor": {
-    "pop_rate_hz": 0.3718977317643143,
+    "pop_rate_hz": 0.3632089536714075,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
-    "pop_rate_hz": 0.09812494365816281,
+    "pop_rate_hz": 0.0870992795179219,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": true
   },
@@ -710,57 +874,69 @@
    "gain": 0.1,
    "seed": 0,
    "odor": {
-    "pop_rate_hz": 0.2637699450103669,
+    "pop_rate_hz": 0.26351337295175753,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
-   },
-   "post": {
-    "pop_rate_hz": 4.1606279774493965e-05,
-    "frac_kc": 0.0,
-    "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
-   },
-   "outlasts": false
-  },
-  {
-   "gain": 0.1,
-   "seed": 1,
-   "odor": {
-    "pop_rate_hz": 0.267008300452815,
-    "frac_kc": 0.0,
-    "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
-   },
-   "post": {
-    "pop_rate_hz": 6.240941966174095e-05,
-    "frac_kc": 0.0,
-    "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
-   },
-   "outlasts": false
-  },
-  {
-   "gain": 0.1,
-   "seed": 2,
-   "odor": {
-    "pop_rate_hz": 0.26863094536402027,
-    "frac_kc": 0.0,
-    "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "post": {
     "pop_rate_hz": 4.507346975570179e-05,
     "frac_kc": 0.0,
     "spikes_per_active_kc": 0.0,
-    "mbon_rate_hz": 0.0
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": false
+  },
+  {
+   "gain": 0.1,
+   "seed": 1,
+   "odor": {
+    "pop_rate_hz": 0.266640778314807,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 5.8942229680533116e-05,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
+   },
+   "outlasts": false
+  },
+  {
+   "gain": 0.1,
+   "seed": 2,
+   "odor": {
+    "pop_rate_hz": 0.268242620086125,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
+   },
+   "post": {
+    "pop_rate_hz": 3.1204709830870475e-05,
+    "frac_kc": 0.0,
+    "spikes_per_active_kc": 0.0,
+    "kc_rate_hz": 0.0,
+    "mbon_rate_hz": 0.0,
+    "readout_rate_hz": 0.0
    },
    "outlasts": false
   }
  ],
  "chosen_gain": null,
  "finding": "No gain in the scan produced sparse, transient Kenyon-cell coding.",
- "walltime_s": 243.5,
+ "walltime_s": 181.1,
  "provenance": {
   "config": "configs/stage3d_gain.yaml",
   "results_dir": "results/stage3d_gain",

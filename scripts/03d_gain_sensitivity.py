@@ -20,6 +20,10 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     conn = load_connectome("malecns", "v1.0", "brain")
     kc = conn.select(cell_class="Kenyon_Cell"); mbon = conn.select(cell_class="MBON")
+    # The readout the learning stage calibrates on: MBON-gamma1pedc>alpha/beta, the cell Hige et al. 2015
+    # measured the ~80%% single-pairing depression in. A gain at which it does not respond to the odour is a
+    # gain at which the learning stage cannot be calibrated, so its rate is reported alongside the KC code.
+    readout = conn.select(cell_type="MBON11")
     base_scale = cfg["dataset"]["weight_scale"]
     specs, meta = [], []
     for g in gs["gains"]:
@@ -45,7 +49,9 @@ def main():
             cnt = pd.Series(k).value_counts() if len(k) else pd.Series(dtype=int)
             return {"pop_rate_hz": float(len(ii) / dur / m["n_neurons"]), "frac_kc": float(len(cnt) / len(kc)),
                     "spikes_per_active_kc": float(cnt.mean()) if len(cnt) else 0.0,
-                    "mbon_rate_hz": float(np.isin(ii, mbon).sum() / dur / len(mbon))}
+                    "kc_rate_hz": float(len(k) / dur / len(kc)),
+                    "mbon_rate_hz": float(np.isin(ii, mbon).sum() / dur / len(mbon)),
+                    "readout_rate_hz": float(np.isin(ii, readout).sum() / dur / len(readout))}
         od, po = stat("odor"), stat("post")
         rows.append({**mm, "odor": od, "post": po,
                      "outlasts": bool(od["pop_rate_hz"] > 0 and po["pop_rate_hz"] > 0.01 * od["pop_rate_hz"])})
@@ -64,6 +70,10 @@ def main():
                      "spikes_per_active_kc": float(np.mean([r["odor"]["spikes_per_active_kc"] for r in rr])),
                      "pop_rate_odor": pr, "pop_rate_post": po,
                      "mbon_rate_odor": float(np.mean([r["odor"]["mbon_rate_hz"] for r in rr])),
+                     "readout_rate_odor": float(np.mean([r["odor"]["readout_rate_hz"] for r in rr])),
+                     "kc_rate_odor": float(np.mean([r["odor"]["kc_rate_hz"] for r in rr])),
+                     "kc_rate_post": float(np.mean([r["post"]["kc_rate_hz"] for r in rr])),
+                     "readout_responds": bool(float(np.mean([r["odor"]["readout_rate_hz"] for r in rr])) > 5.0),
                      "sparse": sparse, "transient": transient, "usable": bool(sparse and transient)})
     usable = [g for g in grid if g["usable"]]
     chosen = max(usable, key=lambda g: g["gain"]) if usable else None
@@ -86,10 +96,12 @@ def main():
                           "files": [s["out_dir"] for s in specs][:40]}}
     json.dump(out, open(OUT / "stage3d.json", "w"), indent=1, default=str)
     print(out["finding"]); print()
-    print(f"{'gain':>6s} {'W_syn eff':>10s} {'fracKC':>8s} {'sp/KC':>7s} {'rateOdor':>9s} {'ratePost':>9s} {'MBON':>8s}  sparse transient")
+    print(f"{'gain':>6s} {'W_syn eff':>10s} {'fracKC':>8s} {'sp/KC':>7s} {'KCodor':>8s} {'KCpost':>8s} {'rateOdor':>9s} {'ratePost':>9s} {'MBON':>7s} {'MBON11':>7s}  sparse transient readout")
     for g in grid:
         print(f"{g['gain']:6.2f} {g['w_syn_effective_mV']:10.5f} {g['frac_kc_odor']:8.2%} {g['spikes_per_active_kc']:7.1f} "
-              f"{g['pop_rate_odor']:9.4f} {g['pop_rate_post']:9.4f} {g['mbon_rate_odor']:8.2f}  {str(g['sparse']):6s} {g['transient']}")
+              f"{g['kc_rate_odor']:8.3f} {g['kc_rate_post']:8.3f} "
+              f"{g['pop_rate_odor']:9.4f} {g['pop_rate_post']:9.4f} {g['mbon_rate_odor']:7.2f} {g['readout_rate_odor']:7.2f}  "
+              f"{str(g['sparse']):6s} {str(g['transient']):9s} {g['readout_responds']}")
 
 
 def gustatory_cost(gain: float):

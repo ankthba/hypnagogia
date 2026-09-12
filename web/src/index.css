@@ -420,7 +420,9 @@ a.masthead__name:hover {
      which is what `align-self: start` plus `position: sticky` does. */
   .rail {
     position: sticky;
-    top: var(--space-sm);
+    /* set by the Layout: a small margin while the panel fits, and minus its overflow when it does
+       not, so a tall panel travels with the page and pins by its bottom instead of its top */
+    top: var(--rail-top, var(--space-sm));
     align-self: start;
     padding: 0 0 var(--space-sm);
   }

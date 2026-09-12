@@ -79,3 +79,50 @@ any page publishing to it.
   panel says so, names the missing file and `scripts/06_replay.py`, and shows the static atlas. It must never
   fall back to another seed's data silently, and there are no reference clips any more.
 - Load lazily: fetch only the selected file, not all of them. The activity binaries total tens of megabytes.
+
+## The map is a 3D point cloud the reader can orbit
+
+Reported by the owner: "for the neuron maps screw the simulations. i want only the real thing there.
+also make it a 3d model the user can move around and zoom in and out on."
+
+This replaces the three fixed projections above: they are all still reachable, as orbit angles, and the
+projection control is gone.
+
+- **Default view = the frontal projection.** At azimuth 0 and elevation 0 the camera looks along the
+  anterior-posterior axis with atlas x horizontal and atlas y increasing downward. Orbiting from there
+  reaches the dorsal (x, z) and sagittal (z, y) views and everything between them.
+- **Controls.** Drag to orbit; scroll or pinch to zoom; `+` / `-` buttons; a reset control that returns to
+  the default view at the framing distance; arrow keys to turn, `+` / `-` to zoom and `0` to reset when the
+  canvas has focus. Orbiting has momentum and damping, and the view turns slowly by itself after a few
+  seconds of no interaction, stopping the instant the reader touches it and never running at all under
+  `prefers-reduced-motion`.
+- **Touch and wheel must never trap the page.** `touch-action: pan-y` on the canvas: a drag the browser
+  reads as a vertical pan is a page scroll and never reaches the map, a drag that starts sideways orbits in
+  both axes, and two fingers pinch to zoom. A wheel that arrives while the page is already scrolling passes
+  straight through; a trackpad pinch (ctrl+wheel) always zooms; at either end of the zoom range the wheel is
+  not swallowed at all.
+- **Renderer.** Hand-rolled WebGL, no new dependency: one vertex per soma, all 126,109 uploaded once, and a
+  frame is nine `drawArrays` calls plus one for the neurons that spiked (measured at 1.2 ms per frame with a
+  GPU sync, so the whole atlas is drawn every frame and nothing is subsampled). A browser with no WebGL falls
+  back to a JavaScript painter's renderer with depth bucketing, which caps the two *background* populations
+  (optic, other, unlisted codes) and never the named ones, and the panel then prints how many of how many
+  points it drew.
+- **Framing.** Still `view_boxes.brain` by default, with the ventral-nerve-cord toggle switching to
+  `view_boxes.all`. The canvas takes the frontal aspect of that box and the framing distance is the eye
+  distance at which the frontal face exactly fills the frame with 1.5% of the box padded on each side; zoom
+  is a multiple of that distance.
+- **Depth.** There is no depth test: the paint order in the table above stays absolute, so 32 dFB cells are
+  never lost behind 90,805 optic-lobe cells. Depth is carried by point size and by fading with distance
+  instead, for the lit neurons exactly as for the static cloud, and the caption says so. A point smaller than
+  one device pixel is drawn at one pixel with its alpha scaled by the area it should have covered rather than
+  being floored.
+- **Text stays out of the bitmap.** Only the scale bar and the orientation readout sit over the picture, and
+  both are HTML overlays. The scale bar is true at the depth of the box centre only, and says so.
+
+## The rail has no scrollbar of its own
+
+Reported by the owner: "dont have that have an individual scroll just let it use the main pages scroll."
+
+No `max-height` and no `overflow-y` on `.rail`. It is sized to its content and scrolls with the page. When
+the panel is taller than the viewport its sticky offset is set to minus its overflow, so it travels with the
+page and pins by its bottom; pinning by the top would make its own provenance line permanently unreachable.

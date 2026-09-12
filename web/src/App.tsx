@@ -27,9 +27,19 @@ function ScrollToTop() {
   return null;
 }
 
-/** Pull the other routes' chunks in once the browser has nothing better to do. */
+/**
+ * Pull the other routes' chunks in, but only well after this page has finished loading.
+ *
+ * A prefetch that races the first paint is worse than no prefetch: on a throttled connection the
+ * four other routes were competing for the same few kilobytes per second as the entry chunk and
+ * the atlas. It waits for `load`, then for the browser to be idle, and it does nothing at all when
+ * the browser reports a slow connection or data saver, where the extra bytes are the reader's.
+ */
 function PrefetchRoutes() {
   useEffect(() => {
+    const conn = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (conn?.saveData || (conn?.effectiveType && /2g/.test(conn.effectiveType))) return;
+    let cancel: (() => void) | null = null;
     const load = () => {
       void import('./pages/Criticality');
       void import('./pages/Learning');
@@ -37,14 +47,29 @@ function PrefetchRoutes() {
       void import('./pages/Overview');
       void import('./pages/Methods');
     };
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
-    if (typeof ric === 'function') {
-      const id = ric(load, { timeout: 4000 });
-      const cic = (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
-      return () => cic?.(id);
+    const schedule = () => {
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+      if (typeof ric === 'function') {
+        const id = ric(load, { timeout: 6000 });
+        const cic = (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+        cancel = () => cic?.(id);
+      } else {
+        const t = window.setTimeout(load, 3000);
+        cancel = () => window.clearTimeout(t);
+      }
+    };
+    if (document.readyState === 'complete') {
+      const t = window.setTimeout(schedule, 1200);
+      cancel = () => window.clearTimeout(t);
+    } else {
+      const onLoad = () => {
+        const t = window.setTimeout(schedule, 1200);
+        cancel = () => window.clearTimeout(t);
+      };
+      window.addEventListener('load', onLoad, { once: true });
+      cancel = () => window.removeEventListener('load', onLoad);
     }
-    const t = window.setTimeout(load, 2000);
-    return () => window.clearTimeout(t);
+    return () => cancel?.();
   }, []);
   return null;
 }
