@@ -78,6 +78,7 @@ def main():
     s11 = [c for c in (load(f) for f in sorted(RESULTS.glob("stage11_injected/injected_*.json"))) if c]
     s12 = load(RESULTS / "stage12_adaptation/adaptation_grid.json")
     s6dev = load(RESULTS / "stage6_replay_adapt/stage6.json")
+    scen = load(RESULTS / "stage12_adaptation/episode_census.json")
     s5dev = load(RESULTS / "stage5_sleep/real_adapt/stage5.json")
     s13 = load(RESULTS / "stage13_depression/depression_grid.json")
     # the labelled reduced-gain variant, if it has been run
@@ -187,6 +188,10 @@ def main():
               f"an episode did not give the memory the ability to appear in one, and the reason is the one "
               f"stages 6c and 6d measured: the only plastic synapses in the model sit downstream of the cells "
               f"whose reactivation is being scored, so learning cannot change which of them switch on.")
+            if scen:
+                w()
+                w(f"*How often the ensemble actually switches on and off, across all "
+                  f"{scen['n_seeds']} seeds.* {scen['finding']}")
 
         if s13 and s13.get("per_run"):
             w("**Stage 13 (labelled deviation, both constants measured).** The one mechanism whose magnitude "

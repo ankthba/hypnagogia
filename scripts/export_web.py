@@ -297,6 +297,18 @@ def main():
                             "any_ensemble_episodes": a12.get("any_setting_gave_ensemble_episodes"),
                             "runs": [row12(r) for r in (a12.get("per_run") or []) if "error" not in r],
                             "source_file": "results/stage12_adaptation/adaptation_grid.json"}
+                        # The across-seed census. It exists because a three-seed look at the same runs
+                        # suggested the episodes were typical and the full twenty say they are not.
+                        cen = load_json(RESULTS / "stage12_adaptation/episode_census.json")
+                        if cen:
+                            sv["adaptation"]["episode_census"] = {
+                                "finding": cen.get("finding"), "n_seeds": cen.get("n_seeds"),
+                                "n_seeds_continuously_on": cen.get("n_seeds_continuously_on"),
+                                "n_seeds_in_measured_band": cen.get("n_seeds_in_measured_band"),
+                                "episodes_min": cen.get("episodes_min"), "episodes_median": cen.get("episodes_median"),
+                                "episodes_max": cen.get("episodes_max"),
+                                "per_seed": cen.get("per_seed"),
+                                "source_file": "results/stage12_adaptation/episode_census.json"}
                     if a13:
                         def row13(r):
                             pop = r.get("pop") or {}

@@ -7827,8 +7827,8 @@
    "results/stage5_sleep/real/sleep_seed8/spikes.npz",
    "results/stage5_sleep/real/sleep_seed9/spikes.npz"
   ],
-  "git_commit": "89a062a",
-  "generated_at": "2026-09-12T23:42:17+00:00"
+  "git_commit": "556cd0c",
+  "generated_at": "2026-09-12T23:46:58+00:00"
  },
  "source_file": "results/stage6_replay/stage6.json",
  "structure_confound": {
@@ -9078,7 +9078,259 @@
      "ensemble_ratio_to_other_kcs": 47.86363636363636
     }
    ],
-   "source_file": "results/stage12_adaptation/adaptation_grid.json"
+   "source_file": "results/stage12_adaptation/adaptation_grid.json",
+   "episode_census": {
+    "finding": "Across 20 seeds the trained ensemble's episode count per 40 s run runs from 1 to 103, median 1. 13 of 20 seeds have it on continuously and 1 of 20 fall inside the 0.5 to 1.5 Hz band measured in a sleeping fly. So the episodic behaviour is real in the seeds that show it and it is NOT the typical behaviour of this configuration: a three-seed look suggested otherwise and was wrong. Reported because the difference between one seed in twenty and a phenomenon is the whole question.",
+    "n_seeds": 20,
+    "n_seeds_continuously_on": 13,
+    "n_seeds_in_measured_band": 1,
+    "episodes_min": 1,
+    "episodes_median": 1,
+    "episodes_max": 103,
+    "per_seed": [
+     {
+      "seed": 0,
+      "ensemble_size": 176,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0863636363636362,
+      "peak_rate_hz": 1.7045454545454544,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 1,
+      "ensemble_size": 177,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0827683615819208,
+      "peak_rate_hz": 5.423728813559322,
+      "frac_bins_on": 0.095,
+      "n_episodes": 32,
+      "episode_rate_hz": 0.8,
+      "mean_episode_s": 0.11875,
+      "continuously_on": false
+     },
+     {
+      "seed": 10,
+      "ensemble_size": 172,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.1228197674418603,
+      "peak_rate_hz": 1.8604651162790697,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 11,
+      "ensemble_size": 183,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.087431693989071,
+      "peak_rate_hz": 4.53551912568306,
+      "frac_bins_on": 0.365,
+      "n_episodes": 101,
+      "episode_rate_hz": 2.525,
+      "mean_episode_s": 0.14455445544554454,
+      "continuously_on": false
+     },
+     {
+      "seed": 12,
+      "ensemble_size": 175,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.1098571428571427,
+      "peak_rate_hz": 1.7714285714285711,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 13,
+      "ensemble_size": 182,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0589285714285714,
+      "peak_rate_hz": 3.901098901098901,
+      "frac_bins_on": 0.67,
+      "n_episodes": 94,
+      "episode_rate_hz": 2.35,
+      "mean_episode_s": 0.2851063829787234,
+      "continuously_on": false
+     },
+     {
+      "seed": 14,
+      "ensemble_size": 177,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0929378531073446,
+      "peak_rate_hz": 1.694915254237288,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 15,
+      "ensemble_size": 182,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.101923076923077,
+      "peak_rate_hz": 4.56043956043956,
+      "frac_bins_on": 0.41,
+      "n_episodes": 103,
+      "episode_rate_hz": 2.575,
+      "mean_episode_s": 0.1592233009708738,
+      "continuously_on": false
+     },
+     {
+      "seed": 16,
+      "ensemble_size": 176,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0875,
+      "peak_rate_hz": 1.7613636363636365,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 17,
+      "ensemble_size": 179,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0720670391061453,
+      "peak_rate_hz": 1.7318435754189945,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 18,
+      "ensemble_size": 178,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0932584269662922,
+      "peak_rate_hz": 1.797752808988764,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 19,
+      "ensemble_size": 179,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.081145251396648,
+      "peak_rate_hz": 1.7877094972067038,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 2,
+      "ensemble_size": 181,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.07085635359116,
+      "peak_rate_hz": 1.8232044198895028,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 3,
+      "ensemble_size": 186,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0658602150537635,
+      "peak_rate_hz": 4.623655913978494,
+      "frac_bins_on": 0.3025,
+      "n_episodes": 89,
+      "episode_rate_hz": 2.225,
+      "mean_episode_s": 0.13595505617977532,
+      "continuously_on": false
+     },
+     {
+      "seed": 4,
+      "ensemble_size": 178,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0071629213483146,
+      "peak_rate_hz": 4.8876404494382015,
+      "frac_bins_on": 0.26,
+      "n_episodes": 81,
+      "episode_rate_hz": 2.025,
+      "mean_episode_s": 0.12839506172839507,
+      "continuously_on": false
+     },
+     {
+      "seed": 5,
+      "ensemble_size": 177,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.109322033898305,
+      "peak_rate_hz": 1.807909604519774,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 6,
+      "ensemble_size": 180,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0923611111111111,
+      "peak_rate_hz": 1.7777777777777777,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 7,
+      "ensemble_size": 174,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0823275862068966,
+      "peak_rate_hz": 5.057471264367816,
+      "frac_bins_on": 0.22,
+      "n_episodes": 69,
+      "episode_rate_hz": 1.725,
+      "mean_episode_s": 0.12753623188405797,
+      "continuously_on": false
+     },
+     {
+      "seed": 8,
+      "ensemble_size": 179,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.0831005586592177,
+      "peak_rate_hz": 1.7318435754189945,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     },
+     {
+      "seed": 9,
+      "ensemble_size": 176,
+      "duration_s": 40.0,
+      "mean_rate_hz": 1.091193181818182,
+      "peak_rate_hz": 1.8181818181818181,
+      "frac_bins_on": 1.0,
+      "n_episodes": 1,
+      "episode_rate_hz": 0.025,
+      "mean_episode_s": 40.0,
+      "continuously_on": true
+     }
+    ],
+    "source_file": "results/stage12_adaptation/episode_census.json"
+   }
   },
   "depression": {
    "IS_A_LABELLED_DEVIATION": "LABELLED DEVIATION, NOT THE PUBLISHED MODEL. Excitatory synapses depress with use. The two constants are measured (ORN->PN, glomeruli DM6 and VM2: f=0.78, tau=893 ms; ORN->LN (GABAergic antennal-lobe local neurons): f=0.75, tau=1566 ms; ORN->PN, glomerulus DM4: f=0.72, tau=2400 ms). The published model has no synaptic dynamics beyond a 5 ms conductance decay, and adding depression changes what a synapse is, so no run with it switched on is a property of the published model. Beyond that, the measurements are at ORN to PN and ORN to LN synapses only. Applying the same two constants to any other synapse is an extrapolation the measurements do not license, which is why the scope is an arm of the experiment and not a setting.",
