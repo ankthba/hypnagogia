@@ -570,6 +570,55 @@ function Stage6View({ d }: { d: Stage6 }) {
             </>
           )}
 
+          {d.slow_variable.scored_replay_on_the_deviated_model?.comparisons && (
+            <>
+              {/* The same four pre-registered comparisons, on the deviated model. It sits inside this block
+                  and not beside the real verdict on purpose: the headline of this page is the published
+                  model's result, and a deviated run can qualify it but never stand in for it. */}
+              <div className="label mt-4 mb-1">
+                And when the pre-registered test is re-run on the model that can have episodes{' '}
+                <span className={d.slow_variable.scored_replay_on_the_deviated_model.status === 'passed' ? 'tone-passed' : 'tone-failed'}>
+                  ({d.slow_variable.scored_replay_on_the_deviated_model.status})
+                </span>
+              </div>
+              <p className="measure small">{d.slow_variable.scored_replay_on_the_deviated_model.headline}</p>
+              {d.slow_variable.scored_replay_on_the_deviated_model.deviation_settings && (
+                <p className="smaller muted">
+                  Run with adaptation at tau = {fmtNum(d.slow_variable.scored_replay_on_the_deviated_model.deviation_settings.tau_ms, 0)} ms and b ={' '}
+                  {fmtNum(d.slow_variable.scored_replay_on_the_deviated_model.deviation_settings.b_mV, 2)} mV, neither of which is measured.{' '}
+                  {d.slow_variable.scored_replay_on_the_deviated_model.encoding_note}
+                </p>
+              )}
+              <DataTable
+                columns={[
+                  { key: 'n', header: 'comparison', render: (c) => c.label ?? c.name },
+                  { key: 'd', header: 'difference', render: (c) => (isNum(c.diff) ? fmtNum(c.diff, 4) : NOT_MEASURED) },
+                  {
+                    key: 'ci',
+                    header: '95% CI',
+                    render: (c) => (c.ci95 ? `[${fmtNum(c.ci95[0], 4)}, ${fmtNum(c.ci95[1], 4)}]` : NOT_MEASURED),
+                  },
+                  { key: 'g', header: "Hedges' g", render: (c) => (isNum(c.hedges_g) ? fmtNum(c.hedges_g, 2) : NOT_MEASURED) },
+                  { key: 'p', header: 'p', render: (c) => (isNum(c.p_permutation) ? fmtNum(c.p_permutation, 4) : NOT_MEASURED) },
+                  {
+                    key: 's',
+                    header: 'survives',
+                    render: (c) => <span className={c.survives ? 'tone-passed' : 'tone-failed'}>{c.survives ? 'yes' : 'no'}</span>,
+                  },
+                ]}
+                rows={d.slow_variable.scored_replay_on_the_deviated_model.comparisons}
+                rowKey={(c) => c.name ?? String(c.label)}
+              />
+              {d.slow_variable.scored_replay_on_the_deviated_model.continuity_check && (
+                <p className="smaller muted mt-1">
+                  Events discrete on the deviated model:{' '}
+                  {d.slow_variable.scored_replay_on_the_deviated_model.continuity_check.events_are_discrete ? 'yes' : 'no'}.
+                </p>
+              )}
+              <p className="smaller mt-1 tone-failed">{d.slow_variable.scored_replay_on_the_deviated_model.IS_A_LABELLED_DEVIATION}</p>
+            </>
+          )}
+
           {d.slow_variable.depression?.runs && d.slow_variable.depression.runs.length > 0 && (
             <>
               <div className="label mt-4 mb-1">

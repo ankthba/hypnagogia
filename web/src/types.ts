@@ -468,6 +468,17 @@ export interface Stage6 extends StageBase {
                      ensemble_ratio_to_other_kcs?: number }>;
       source_file?: string;
     };
+    scored_replay_on_the_deviated_model?: {
+      IS_A_LABELLED_DEVIATION?: string;
+      deviation_settings?: { tau_ms?: number; b_mV?: number; status?: string } | null;
+      status?: string; headline?: string; criterion?: string; reasons?: string[];
+      window_ms?: number; n_seeds?: number; networks_analysed?: string[];
+      continuity_check?: { events_are_discrete?: boolean | null; fraction_of_bins_called_events?: Record<string, number> } | null;
+      arm_matching?: Array<{ comparison: string; arms_are_matched: boolean; note?: string }>;
+      comparisons?: Comparison[];
+      ensemble_sizes?: Record<string, { sleep?: number; wake?: number; sleep_naive?: number }>;
+      encoding_note?: string; source_file?: string;
+    };
     depression?: {
       IS_A_LABELLED_DEVIATION?: string; finding?: string; duration_s?: number; why_this_mechanism?: string;
       measurement?: Array<{ synapse?: string; f?: number; tau_ms?: number; n?: string; source?: string }>;

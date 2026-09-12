@@ -321,6 +321,31 @@ def main():
                             "n_runs_with_ensemble_episodes": a13.get("n_runs_with_ensemble_episodes"),
                             "runs": [row13(r) for r in (a13.get("per_run") or []) if "error" not in r],
                             "source_file": "results/stage13_depression/depression_grid.json"}
+                    # The full pre-registered replay test, re-run on the deviated model. It is attached to
+                    # the published verdict rather than replacing it: the headline on these pages is the
+                    # published model's, and a deviated run can qualify it but must never stand in for it.
+                    dv = load_json(RESULTS / "stage6_replay_adapt/stage6.json")
+                    if dv:
+                        s5dev = load_json(RESULTS / "stage5_sleep/real_adapt/stage5.json") or {}
+                        sv["scored_replay_on_the_deviated_model"] = {
+                            "IS_A_LABELLED_DEVIATION": s5dev.get("IS_A_LABELLED_DEVIATION"),
+                            "deviation_settings": s5dev.get("adaptation"),
+                            "status": dv.get("status"), "headline": dv.get("headline"),
+                            "criterion": dv.get("criterion"), "reasons": dv.get("reasons"),
+                            "window_ms": dv.get("window_ms"), "n_seeds": dv.get("n_seeds"),
+                            "networks_analysed": dv.get("networks_analysed"),
+                            "continuity_check": dv.get("continuity_check"),
+                            "arm_matching": dv.get("arm_matching"),
+                            "comparisons": [{k: c.get(k) for k in
+                                             ("name", "label", "diff", "ci95", "hedges_g", "p_permutation",
+                                              "n", "survives", "available", "note")}
+                                            for c in (dv.get("comparisons") or [])],
+                            "ensemble_sizes": dv.get("ensemble_sizes"),
+                            "encoding_note": ("The memory was encoded by stage 4 in the model as published; "
+                                              "the deviation is applied to the offline period only. If it "
+                                              "changed the odour response it would change which Kenyon cells "
+                                              "the ensemble contains, and that would have to be re-encoded."),
+                            "source_file": "results/stage6_replay_adapt/stage6.json"}
                     d["slow_variable"] = sv
                 if scans:
                     d["detector_control"] = {
