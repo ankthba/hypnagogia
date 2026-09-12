@@ -36,10 +36,18 @@ def main():
     s3c = load(RESULTS / "stage3c_control" / "stage3c.json")
     s3d = load(RESULTS / "stage3d_gain" / "stage3d.json")
     s3e = load(RESULTS / "stage3e_discrim" / "stage3e.json")
-    s3 = load(RESULTS / "stage3_plasticity" / "stage3.json")
-    s4 = load(RESULTS / "stage4_learning" / "stage4.json")
-    s5 = load(RESULTS / "stage5_sleep" / "stage5.json")
-    s6 = load(RESULTS / "stage6_replay" / "stage6.json")
+    def pick(sub_dir, fname):
+        """Prefer the published-parameter run; fall back to the labelled reduced-gain variant."""
+        direct = RESULTS / sub_dir / fname
+        if direct.exists():
+            return load(direct)
+        v = sorted(RESULTS.glob(f"{sub_dir}_gain*/{fname}")) + sorted(RESULTS.glob(f"{sub_dir}/real_gain*/{fname}"))
+        return load(v[-1]) if v else None
+
+    s3 = pick("stage3_plasticity", "stage3.json")
+    s4 = pick("stage4_learning", "stage4.json")
+    s5 = pick("stage5_sleep", "stage5.json")
+    s6 = pick("stage6_replay", "stage6.json")
     # the labelled reduced-gain variant, if it has been run
     variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
     s6v = load(variant_dirs[-1] / "stage6.json") if variant_dirs else None
@@ -387,6 +395,11 @@ def main():
             w(f"- Plastic synapses: {obj['n_plastic_synapses']:,} Kenyon-cell to output-neuron connections "
               f"({obj['n_plastic_synapse_count_sum']:,} synapses) between {obj['n_kc']:,} Kenyon cells and {obj['n_mbon']} output neurons, "
               f"gated by {obj['n_dan']} dopaminergic neurons through {obj['n_dan_mbon_gates']:,} connections.")
+            cal = obj.get("calibration", {})
+            if cal.get("readout_is_graded") is False:
+                w(f"- **The readout is all-or-none, not graded.** {cal.get('graded_note', '')}")
+            if cal.get("chosen_rule"):
+                w(f"- Learning rate chosen: {cal.get('chosen_eta_ltd')} - {cal['chosen_rule']}")
             w(f"- Unit test on an isolated three-neuron circuit: {'passed' if obj['unit_test']['passed'] else 'FAILED'}. "
               f"Pairing Kenyon-cell activity with dopaminergic activity depressed the synapse to "
               f"{obj['unit_test']['results']['kc_then_dan']['ratio']:.3f} of its starting weight; dopamine alone and "

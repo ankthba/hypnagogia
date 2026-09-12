@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T01:32:45+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T02:11:45+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -246,7 +246,32 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 
 ## Stage 3 - dopamine-gated plasticity
 
-**Not run.**
+**passed.** Criterion: unit test passes (depression only when Kenyon-cell activity precedes dopamine); the readout MBON responds to the calibration odour before pairing (> 5 spikes/s); and some learning rate in the grid produces a clear depression. Whether that depression can be made GRADED, as Hige et al. measured, is reported separately rather than being required.
+
+**Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has no sparse odour code to store a memory in (stage 3b). This is an uncited free parameter introduced by this project; see configs/stage3d_gain.yaml.
+
+- Rule: dopamine-gated anti-Hebbian two-factor LTD at KC->MBON; no MBON postsynaptic term (Hige 2015 showed LTD with MBON spikes blocked); compartment specificity from connectome DAN->MBON synapses
+  - `de/dt = -e/tau_e (per KC->MBON synapse); on KC spike: e += 1`
+  - `on DAN spike (DAN presynaptic to the MBON, >= dan_mbon_min_synapses): w -= eta_ltd * e * w0`
+  - `dda/dt = -da/tau_da (per MBON); on DAN spike: da += 1; on KC spike: w += eta_ltp * da * w0 (eta_ltp = 0 here)`
+  - `w in [w_min_frac*w0, w_max_frac*w0]; w(0) = w0 = sign*count*0.581*W_syn`
+- Plastic synapses: 61,210 Kenyon-cell to output-neuron connections (463,640 synapses) between 4,064 Kenyon cells and 97 output neurons, gated by 340 dopaminergic neurons through 1,408 connections.
+- **The readout is all-or-none, not graded.** The readout MBON's odour response is all-or-none here: every learning rate in the grid, including the smallest, takes it from its full response to exactly zero, with nothing in between. Hige et al. measured a graded 80% reduction in a real fly, so that endpoint is not reproducible in this model. The depression is still odour-specific, which is what the memory test needs, and stage 4 tests that directly.
+- Learning rate chosen: 0.0005 - the readout MBON is all-or-none in this model, so Hige's graded endpoint cannot be matched; the SMALLEST learning rate that still produces a clear depression is used instead, to keep the plasticity as weak as possible while remaining measurable
+- Unit test on an isolated three-neuron circuit: passed. Pairing Kenyon-cell activity with dopaminergic activity depressed the synapse to 0.000 of its starting weight; dopamine alone and Kenyon-cell activity alone left it unchanged.
+
+| parameter | value | source | cited |
+|---|---|---|---|
+| direction (KC+DAN -> LTD) | depression | Hige et al. 2015 Neuron 88:985 (80% spike, 90% EPSC reduction after one pairing) | yes |
+| no postsynaptic factor | MBON spiking not required | Hige et al. 2015 'Plasticity is Independent of Postsynaptic Spiking' | yes |
+| tau_e | 5.0 s | Jiang & Litwin-Kumar 2021 PLoS Comput Biol code (tau = 5); Handler 2019 window suggests 1-2 s | yes |
+| tau_da | 5.0 s | Jiang & Litwin-Kumar 2021 code | yes |
+| eta_ltd | 0.0005 (calibrated) | FREE: fit to Hige 2015 single-pairing endpoint (post/pre = 0.20) | **no** |
+| eta_ltp | 0.0 | Hige 2015: no backward-pairing potentiation in gamma1pedc (Handler 2019 finds it in gamma2/4/5) | yes |
+| w bounds | [0.0, 1.0] x w0, init at w0 | Jiang & Litwin-Kumar 2021; Eschbach 2020 (init at w_max) | yes |
+| dan_mbon_min_synapses | 5 | uncited pipeline choice (compartment gating threshold) | **no** |
+| DAN pairing rate | 20.0 Hz for 2.0 s from +0.2 s | timing from Hige 2015; rate uncited (absorbed by eta_ltd) | **no** |
+| background sigma during calibration | 0.0 mV | conditioning_sigma_mV in configs/stage4_encode.yaml (0.0 mV), matching stage 4; the offline background is 1.6 mV from stage2 operating point (NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = 1.6 mV (KC rate 1.9667 Hz, whole-brain rate 0.7866 Hz/neuron, m = 0.9999994021964815).) | **no** |
 
 ## Stage 4 - encoding a memory
 
