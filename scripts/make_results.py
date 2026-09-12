@@ -569,6 +569,13 @@ def main():
         if name == "Stage 6" and obj.get("comparisons"):
             w(f"**{obj['headline']}**")
             w()
+            eg = obj.get("engram_guard") or {}
+            if eg.get("applied"):
+                w(f"*The verdict is decided before the comparisons are read: {eg.get('rule', '')}*")
+                w()
+            if obj.get("sleep_state_is_distinguishable") is False:
+                w(f"*{obj.get('sleep_vs_wake_arm_note', '')}*")
+                w()
             if obj.get("metric_note"):
                 w(f"*{obj['metric_note']}*")
                 w()
