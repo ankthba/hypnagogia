@@ -3,16 +3,22 @@
 Validated by rendering the real atlas offline; see the reference image the owner was sent. Reproduce this.
 
 ## Framing
-- Default projection **frontal**: horizontal = atlas x, vertical = atlas y **increasing downward**.
-  Also offer **dorsal** (x, z) and **sagittal** (z, y), both with the vertical axis increasing downward.
+
+*Superseded in part: the map is now an orbitable 3D point cloud, not a set of fixed 2D projections. The
+frontal view is the camera's default orientation (azimuth 0, elevation 0) rather than a choice of projection,
+and there are no dorsal and sagittal buttons because both are orbit angles. Everything else below still
+holds. See "The map is a 3D point cloud the reader can orbit" at the end of this file.*
+
+- Default orientation **frontal**: horizontal = atlas x, vertical = atlas y **increasing downward**. Dorsal
+  (x, z) and sagittal (z, y) are reached by orbiting rather than by a control.
 - **Frame the brain, not the full soma extent.** Use `view_boxes.brain` from `neuron_atlas.json`, and draw only
   neurons inside it by default. A bounding box over every soma includes the 1,820 ascending neurons whose cell
   bodies sit in the ventral nerve cord and squashes the brain into the top third of the frame - that was the
   bug. Offer a "show ventral nerve cord somata" toggle that switches to `view_boxes.all`; when it is on, say
   that those neurons are simulated and only their somata lie outside the brain (`soma_outside_brain_note`).
 - Preserve aspect ratio, centre in the canvas, pad about 1.5% of the box on each side. Brain aspect ratios:
-  frontal 1.87:1, dorsal 2.68:1, sagittal 0.70:1. The canvas should follow the selected projection's aspect
-  rather than being a fixed box, so the brain always fills the frame.
+  frontal 1.87:1, dorsal 2.68:1, sagittal 0.70:1. The canvas takes the frontal aspect, which is the aspect at
+  the default camera; orbiting away from it does not reshape the panel.
 
 ## Colours and point sizes
 Point radius in CSS pixels at a canvas width of about 400 px, scaled linearly with canvas width.
@@ -36,13 +42,15 @@ Canvas background = the page background token, so the panel reads as part of the
 - A neuron that spikes inside the current window is drawn **on top** of the static layer, at 2.2x its group
   radius, in the accent colour (`--color-link`: `#8fb3d4` dark / `#2f5575` light), fading to its group colour
   over a 150 ms tail. Never leave a permanently lit point: the tail must decay.
-- Draw the static atlas ONCE into an offscreen canvas at device resolution and blit it each frame; only lit
-  points are drawn per frame. Redraw the static layer only on resize, projection change, or theme change.
+- *Superseded:* the offscreen-blit scheme below was for the 2D projections. In the 3D renderer every point
+  moves whenever the camera moves, so there is nothing static to cache: the whole cloud is uploaded to the GPU
+  once and redrawn each frame as nine `drawArrays` calls plus one for the lit neurons.
 - Show the count of neurons spiking in the current window, read from the data.
 
 ## Panel furniture
 Legend with a swatch, the group name and its count read from `group_counts_in_brain_view`. A one-line source
-statement naming what is playing. Controls: projection, play/pause, source (when more than one is available).
+statement naming what is playing. Controls: zoom in, zoom out, reset view, play/pause, and the condition and
+seed of the run being played. There is no projection control: orbiting replaced it.
 Caption: these are soma positions, not morphology; receptor neurons have no soma in the volume and are absent
 from the map though still simulated (use the sidecar's counts and `soma_outside_brain_note`, never hard-coded).
 
@@ -51,10 +59,11 @@ from the map though still simulated (use the sidecar's counts and `soma_outside_
 1. **Default projection is frontal**, not dorsal. Frontal is the view a reader recognises as a fly brain
    (optic lobes either side, mushroom-body calyces at the top). The panel's aspect should follow the
    projection rather than the projection being chosen to fit a fixed panel aspect.
-2. **Do not burn the clip caption into the canvas.** The source line, clip title and "not the replay result"
-   label belong in the panel's HTML below the canvas, where they are selectable and translatable. Drawing them
-   into the bitmap as well duplicates the text and clutters the image. Keep only the scale bar and the axis
-   note on the canvas itself.
+2. **Do not burn the caption into the canvas.** The source line and the run's identity belong in the panel's
+   HTML below the canvas, where they are selectable and translatable. Drawing them into the bitmap as well
+   duplicates the text and clutters the image. Keep only the scale bar and the orientation readout on the
+   canvas itself. (The reference clips this originally referred to no longer exist: the map plays the
+   experiment's own output or nothing.)
 3. **Give the main column more room.** At 1440 px the content should be roughly 780-820 px wide with the rail
    at 380-400 px, rather than leaving a wide empty margin.
 

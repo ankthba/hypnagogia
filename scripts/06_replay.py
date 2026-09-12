@@ -301,6 +301,17 @@ def main():
                            f"DEVIATION: every synaptic weight scaled to {a.gain} of its published value, because at the "
                            f"published value the network has neither a sparse odour code nor a quiet background (stages 2 "
                            f"and 3b). This is an uncited free parameter introduced by this project."),
+             "required_four": list(FOUR),
+             "additional_comparisons": list(ADDITIONAL),
+             "fifth_comparison_note": ("Beyond the four pre-registered comparisons the file carries additional ones, and they are "
+                                       "labelled as additional rather than counted towards the verdict. 'trained_vs_naive_weights' "
+                                       "repeats the sleep run with the UNLEARNED weights at the same seed and compares the two: it "
+                                       "asks whether the memory contributed anything at all, which the four required comparisons "
+                                       "cannot ask because all four are computed inside the trained network. "
+                                       "'trained_vs_naive_spike_share' is the same contrast read on the share of offline spikes the "
+                                       "ensemble accounts for rather than on the template correlation. Neither was pre-registered, "
+                                       "so neither can turn a negative verdict positive; they are reported because a reader is "
+                                       "entitled to see them."),
              "comparisons": comparisons, "comparisons_raw_metric": secondary, "sequence": sequence_summary, "per_seed": rows,
              "ensemble_sizes": {n: {c: float(np.mean([r["size"] for r in rows if r["network"] == n and r["condition"] == c and r["ensemble"] == "A" and r.get("size")]))
                                     for c in ("sleep", "wake", "sleep_naive")
