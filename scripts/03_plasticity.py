@@ -219,6 +219,20 @@ def main():
            "calibration": {"protocol": cal, "sigma_mV": sigma, "sigma_source": sigma_src, "grid": grid, "per_run": rows,
                            "chosen_eta_ltd": (chosen["eta"] if chosen else None), "chosen_rule": chosen_rule,
                            "endpoint_fitted": endpoint,
+                           "fit_is_bounded_by_the_grid": bool(
+                               chosen is not None and endpoint == "epsc" and epsc_valid
+                               and chosen["eta"] == min(x["eta"] for x in epsc_valid)
+                               and (chosen.get("epsc_ratio_odor_mean") or 0) < tgt_e),
+                           "grid_bound_note": (
+                               f"The chosen learning rate is the SMALLEST in the grid and its endpoint, "
+                               f"{(chosen.get('epsc_ratio_odor_mean') if chosen else None)}, is still below the "
+                               f"{tgt_e:.2f} target, so the fit is bounded by where the grid stops rather than by the "
+                               f"data. A smaller rate would land closer to Hige's endpoint. The depression obtained is "
+                               f"deeper than measured, not shallower, so it does not understate the memory."
+                               if (chosen is not None and endpoint == "epsc" and epsc_valid
+                                   and chosen["eta"] == min(x["eta"] for x in epsc_valid)
+                                   and (chosen.get("epsc_ratio_odor_mean") or 0) < tgt_e)
+                               else "The chosen learning rate is inside the grid, not at its edge."),
                            "endpoint_note": ("Hige et al. 2015 report an ~80% reduction of the MBON-gamma1pedc spike response "
                                              "and an ~90% reduction of its odour-evoked EPSC after one pairing. Which of the "
                                              "two this run fitted is 'endpoint_fitted'. 'spike' is the preferred endpoint; "

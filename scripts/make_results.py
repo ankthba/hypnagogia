@@ -520,6 +520,37 @@ def main():
               f"{', '.join(obj['dfb']['cell_types'])}. {obj['dfb']['selection_source']}")
             w(f"- Clamp rate: {obj['dfb']['clamp_rate_hz']} Hz. {obj['dfb']['rate_source']}")
             w()
+            rk = obj.get("engram_reaches_the_kenyon_cells")
+            if rk:
+                w("### Can the memory reach the Kenyon cells at all?")
+                w()
+                ap = rk.get("anatomical_path") or {}
+                if ap.get("per_mbon"):
+                    w(f"The memory is a depression of Kenyon-cell to MBON synapses, downstream of the Kenyon cells. "
+                      f"It can only change which Kenyon cells reactivate through an MBON that carries some of it "
+                      f"(the conditioning dopaminergic neuron {ap.get('conditioning_dan', '')} gates its compartment), "
+                      f"fires during the offline period, and projects back onto Kenyon cells.")
+                    w()
+                    w("| MBON | transmitter | gating synapses | fires offline | synapses back onto KCs | KCs contacted |")
+                    w("|---|---|---|---|---|---|")
+                    for r in ap["per_mbon"]:
+                        w(f"| {r['mbon']} | {r['transmitter']} | {r['gating_synapses_from_dan']:,} | "
+                          f"{'yes' if r['fires_offline'] else 'no'} | {r['synapses_back_onto_kenyon_cells']:,} | "
+                          f"{r['n_kenyon_cells_contacted']:,} |")
+                    w()
+                    w(ap.get("note", ""))
+                    w()
+                w(f"**{rk.get('note', '')}**")
+                w()
+                if rk.get("per_seed"):
+                    w("| seed | KC spikes, trained | KC spikes, naive | spike trains identical | active-KC overlap |")
+                    w("|---|---|---|---|---|")
+                    for r in rk["per_seed"]:
+                        j = r.get("jaccard_active_kcs")
+                        w(f"| {r['seed']} | {r['n_kc_spikes_trained']:,} | {r['n_kc_spikes_naive']:,} | "
+                          f"{'yes' if r['spike_trains_identical'] else 'no'} | "
+                          f"{('%.4f' % j) if j is not None else 'not measured'} |")
+                    w()
         if name == "Stage 6" and obj.get("comparisons"):
             w(f"**{obj['headline']}**")
             w()
