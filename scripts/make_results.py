@@ -433,17 +433,51 @@ def main():
             w(f"- Clamp rate: {obj['dfb']['clamp_rate_hz']} Hz. {obj['dfb']['rate_source']}")
             w()
         if name == "Stage 6" and obj.get("comparisons"):
-            w(f"{obj['headline']}")
+            w(f"**{obj['headline']}**")
             w()
-            w("| comparison | difference | 95% CI | Hedges' g | p | seeds | survives |")
-            w("|---|---|---|---|---|---|---|")
+            if obj.get("metric_note"):
+                w(f"*{obj['metric_note']}*")
+                w()
+            req = set(obj.get("required_four", []))
+            w("| comparison | required? | difference | 95% CI | Hedges' g | p | seeds | shows the predicted effect |")
+            w("|---|---|---|---|---|---|---|---|")
             for c in obj["comparisons"]:
+                tag = "one of the four" if c["name"] in req else "additional"
                 if c.get("available"):
-                    w(f"| {c['label']} | {c['diff']:+.5f} | [{c['ci95'][0]:+.5f}, {c['ci95'][1]:+.5f}] | "
+                    w(f"| {c['label']} | {tag} | {c['diff']:+.5f} | [{c['ci95'][0]:+.5f}, {c['ci95'][1]:+.5f}] | "
                       f"{c['hedges_g']:+.2f} | {c['p_permutation']:.4f} | {c['n']} | {'yes' if c['survives'] else '**no**'} |")
                 else:
-                    w(f"| {c['label']} | not available | | | | | {c.get('note', '')} |")
+                    w(f"| {c['label']} | {tag} | not available | | | | | {c.get('note', '')} |")
             w()
+            if obj.get("fifth_comparison_note"):
+                w(f"{obj['fifth_comparison_note']}")
+                w()
+            if obj.get("comparisons_raw_metric"):
+                w("The same comparisons on the raw template correlation, without size normalisation:")
+                w()
+                w("| comparison | difference | 95% CI | Hedges' g | p |")
+                w("|---|---|---|---|---|")
+                for c in obj["comparisons_raw_metric"]:
+                    if c.get("available"):
+                        w(f"| {c['name']} | {c['diff']:+.5f} | [{c['ci95'][0]:+.5f}, {c['ci95'][1]:+.5f}] | {c['hedges_g']:+.2f} | {c['p_permutation']:.4f} |")
+                w()
+            if obj.get("ensemble_sizes"):
+                w("Ensemble sizes actually used (Kenyon cells), which is why the size-normalised statistic is the primary one:")
+                w()
+                for net, conds in obj["ensemble_sizes"].items():
+                    w(f"- {net}: " + ", ".join(f"{c} {v:.0f}" for c, v in conds.items()))
+                w()
+            seq = obj.get("sequence")
+            if seq:
+                w(f"**Sequence order.** {seq['note']} Scored on {seq['n_seeds_scored']} seeds over "
+                  f"{seq['n_events_scored_total']} reactivation events: mean absolute rank correlation "
+                  f"{seq['rho_abs_mean']:.3f} against a cell-identity shuffle mean of "
+                  f"{seq['null_abs_mean'] if seq.get('null_abs_mean') is None else round(seq['null_abs_mean'], 3)}.")
+                w()
+            else:
+                w("**Sequence order.** Not scored: no reactivation event contained at least four ensemble members with "
+                  "distinct positions in the odour response, which is the minimum for a rank correlation to mean anything.")
+                w()
 
     w("## What this is not")
     w()
