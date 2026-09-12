@@ -29,6 +29,14 @@ PATHWAYS_FLYWIRE = {"olfactory": {"cell_type": "ORN_DM1"}, "gustatory": {"cell_t
 
 def main():
     cfg = load_config("stage3b_odor")
+    # This control asks whether the runaway is a property of the PUBLISHED model or of the male CNS dataset, and
+    # it answers that by running the published model on three connectomes. It is therefore pinned to the
+    # published model whatever the base config says: no non-spiking populations, no transmitter corrections.
+    # Corrections belong in the stages that measure them (3a and 3f) and in every stage downstream of those.
+    import json as _json
+    cfg = _json.loads(_json.dumps(cfg))
+    cfg["graded_release"] = {"populations": []}
+    cfg["nt_corrections"] = {"populations": []}
     OUT.mkdir(parents=True, exist_ok=True); dump_config(cfg, OUT / "config.resolved.yaml")
     specs, meta = [], []
     for cond in CONDITIONS:
@@ -125,7 +133,12 @@ def main():
     finding = " ".join(parts)
     pathway_note = (f"Ignition probability by pathway: olfactory {frac(olf):.0%} of conditions, gustatory {frac(gus):.0%}. "
                     f"Same code, same parameters, same networks, same rates.")
-    out = {"status": "passed", "criterion": "descriptive control, no pass/fail: the same olfactory stimulus is run on every dataset",
+    out = {"status": "passed",
+           "model_variant": "published (APL spiking, connectome transmitters as predicted)",
+           "model_variant_note": ("This control is pinned to the published model on purpose: the question it answers is "
+                                  "whether the runaway belongs to that model or to the male CNS dataset, and answering it "
+                                  "needs the model as published on all three connectomes. Every stage downstream of "
+                                  "stage 3a runs with the corrections instead."), "criterion": "descriptive control, no pass/fail: the same olfactory stimulus is run on every dataset",
            "conditions": CONDITIONS, "pathways": {k: str(v) for k, v in PATHWAYS.items()}, "rates_hz": RATES, "seeds": SEEDS,
            "grid": grid, "per_run": rows, "finding": finding, "pathway_control": pathway_note,
            "walltime_s": round(time.time() - t0, 1),

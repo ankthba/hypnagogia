@@ -12,6 +12,12 @@ python -u scripts/03a_apl_correction.py 2>&1 | tail -14
 log "stage 3f: the DPM transmitter correction"
 python -u scripts/03f_dpm_correction.py --gain 1.0 2>&1 | tail -6
 
+log "stage 3c: is the runaway the published model or the male CNS dataset? (pinned to the published model)"
+python -u scripts/03c_dataset_control.py 2>&1 | tail -8
+
+log "stage 3e: do two odours leave two ensembles, on the corrected network?"
+python -u scripts/03e_discriminability.py 2>&1 | tail -10
+
 log "stage 6b: is reactivation explained by wiring rather than by memory?"
 python -u scripts/06b_structure.py --gain 1.0 2>&1 | tail -8
 
