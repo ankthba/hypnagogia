@@ -13,11 +13,22 @@ chance overlap of an equally large random set of Kenyon cells?
 An enrichment of 1.0 means the MBON is blind to the ensemble. Above 1.0 is a self-reinforcing loop, the
 mechanism replay would need. Below 1.0 is a loop that works against it.
 
-Anatomy is necessary and not sufficient, so the script then measures the loop running. 'sleep' and
-'sleep_naive' are the same run at the same seed differing only in the learned weights, so per seed it reports
-what the memory does to each carrier MBON's offline rate and what it does to the odour-A Kenyon-cell rate,
-split by whether that MBON was firing at all. A loop through a silent cell carries nothing however it is
-wired, and that split is the whole of the answer.
+Anatomy is necessary and not sufficient, so the script then measures the loop running, and then checks
+whether what it measured is the loop at all. 'sleep' and 'sleep_naive' are the same run at the same seed
+differing only in the learned weights, so per seed it reports what the memory does to the carrier MBON's
+offline rate and to the Kenyon-cell rate.
+
+The check is the part that matters. If a change in the trained ensemble came through the carrier, it has to
+be larger in the cells that carrier contacts than in the cells it does not. Those two groups are scored
+separately. A change that is the same size in both is a global shift in the network's state, which in a
+recurrent network at this operating point is what a small perturbation usually produces, and it is not
+evidence of anything about the memory. The first version of this script reported such a shift as the loop
+working; the control is here because it was not.
+
+The ceiling is also computed directly, from the connectome and the model's constants: the millivolts one
+carrier spike delivers to one of its Kenyon-cell targets, and therefore the most the memory could ever move
+those targets by fully silencing the carrier. If that number is small against the 7 mV threshold gap, the
+loop cannot matter however often the carrier fires, and no measurement of it will say otherwise.
 
 Reads the ensembles stage 4 stored and the offline-firing MBONs stage 5 identified. Writes
 results/stage6_return_path/return_path.json. No simulation: this is connectome arithmetic plus the
@@ -28,6 +39,7 @@ from pathlib import Path
 import numpy as np
 from scipy import stats
 from hypnagogia import RESULTS
+from hypnagogia.config import load_config
 from hypnagogia.connectome import load_connectome
 
 OUT = RESULTS / "stage6_return_path"
@@ -40,6 +52,9 @@ def main():
     suffix = "" if a.gain == 1.0 else f"_gain{a.gain}"
     OUT.mkdir(parents=True, exist_ok=True)
 
+    cfg = load_config("base"); mdl = cfg["model"]
+    scale = cfg["dataset"]["weight_scale"] * a.gain
+    w_syn = mdl["w_syn_mV"]
     conn = load_connectome("malecns", "v1.0", "brain")
     ct = conn.ann.cell_type.astype(str).values
     nt = conn.ann.nt.astype(str).values
@@ -123,6 +138,37 @@ def main():
         firing = [x for x in per if x["carrier_is_firing"]]
         silent = [x for x in per if not x["carrier_is_firing"]]
 
+        # The ceiling on the return leg, from the connectome alone: what one carrier spike does to one of
+        # its Kenyon-cell targets, and the steady drive a carrier firing flat out would supply.
+        mm = np.isin(conn.pre, sel) & is_kc[conn.post]
+        per_target = {}
+        for q, cnt in zip(conn.post[mm], conn.count[mm]):
+            per_target[int(q)] = per_target.get(int(q), 0) + int(cnt)
+        mv_per_spike = float(np.mean(list(per_target.values())) * scale * w_syn) if per_target else 0.0
+        rate_seen = max((x["carrier_rate_naive_hz"] for x in per), default=0.0)
+        ceiling_at_rate = mv_per_spike * rate_seen * (mdl["tau_syn_ms"] * 1e-3)
+        ceiling_at_50 = mv_per_spike * 50.0 * (mdl["tau_syn_ms"] * 1e-3)
+
+        # Is any measured change specific to the cells the carrier touches, or is it the whole population?
+        targets = np.unique(conn.post[mm])
+        for x in per:
+            sd = str(x["seed"])
+            A = np.array([int(y) for y in tpl[sd]["_index"]["A_pre"]])
+            tr, nv = offline(f"sleep_seed{sd}"), offline(f"sleep_naive_seed{sd}")
+            if tr is None or nv is None:
+                continue
+            (it, dur), (iN, _) = tr, nv
+
+            def change(group):
+                if len(group) == 0:
+                    return None
+                a = np.isin(it, group).sum() / dur / len(group)
+                b = np.isin(iN, group).sum() / dur / len(group)
+                return float(100 * (a - b) / b) if b else None
+            x["change_pct_contacted_not_in_ensemble"] = change(np.setdiff1d(targets, A))
+            x["change_pct_not_contacted"] = change(np.setdiff1d(kc, np.union1d(targets, A)))
+            x["change_pct_all_kenyon_cells"] = change(kc)
+
         def summarise(g):
             if not g:
                 return None
@@ -132,6 +178,9 @@ def main():
                    "ensemble_rate_change_pct_mean": float(np.mean(d)) if len(d) else None}
             c = [x["carrier_rate_change_pct"] for x in g if x["carrier_rate_change_pct"] is not None]
             out["carrier_rate_change_pct_mean"] = float(np.mean(c)) if c else None
+            for k in ("change_pct_contacted_not_in_ensemble", "change_pct_not_contacted", "change_pct_all_kenyon_cells"):
+                v = [x[k] for x in g if x.get(k) is not None]
+                out[k + "_mean"] = float(np.mean(v)) if v else None
             if len(d) > 1:
                 r = stats.ttest_1samp(d, 0.0)
                 out["t_against_zero"] = float(r.statistic); out["p_against_zero"] = float(r.pvalue)
@@ -143,6 +192,11 @@ def main():
                 "seeds_with_carrier_firing": len(firing), "seeds_with_carrier_silent": len(silent),
                 "when_carrier_fires": summarise(firing), "when_carrier_silent": summarise(silent),
                 "per_seed": per,
+                "mV_one_carrier_spike_delivers_to_one_target": mv_per_spike,
+                "threshold_gap_mV": float(mdl["v_th_mV"] - mdl["v_rest_mV"]),
+                "ceiling_mV_at_observed_carrier_rate": ceiling_at_rate,
+                "ceiling_mV_if_carrier_fired_at_50hz": ceiling_at_50,
+                "ceiling_as_fraction_of_threshold_gap_at_50hz": ceiling_at_50 / float(mdl["v_th_mV"] - mdl["v_rest_mV"]),
                 "note": ("The loop is measured, not assumed. In the seeds where the carrier fires, the memory "
                          "lowers its rate and the ensemble it preferentially contacts speeds up, which is the "
                          "disinhibition replay would need. In the seeds where it is silent there is nothing to "
@@ -188,25 +242,42 @@ def main():
     }
     # The headline is the loop measurement, not the anatomy, because a loop through a silent cell is wiring
     # and not a mechanism.
-    if loop and loop.get("when_carrier_fires") and loop.get("when_carrier_silent"):
-        f_, s_ = loop["when_carrier_fires"], loop["when_carrier_silent"]
+    if loop:
+        gap_ = loop["threshold_gap_mV"]
+        f_ = loop.get("when_carrier_fires") or {}
+        s_ = loop.get("when_carrier_silent") or {}
+        spec = None
+        if f_.get("ensemble_rate_change_pct_mean") is not None and f_.get("change_pct_not_contacted_mean") is not None:
+            spec = abs(f_["ensemble_rate_change_pct_mean"] - f_["change_pct_not_contacted_mean"])
         out["finding"] = (
-            f"The mechanism replay would need is wired and it works, in the {f_['n_seeds']} of "
-            f"{f_['n_seeds'] + s_['n_seeds']} seeds where it is switched on. {loop['carrier']} is GABAergic, "
-            f"carries more of the engram than any other cell, and the Kenyon cells it contacts are "
-            f"{loop['carrier_enrichment']:.2f} times enriched for the trained ensemble, so depressing its input "
-            f"disinhibits that ensemble preferentially. Where it fires (untrained rate "
-            f"{f_['carrier_rate_naive_hz_mean']:.3f} Hz) the memory cuts its rate by "
-            f"{abs(f_['carrier_rate_change_pct_mean'] or 0):.0f}% and the odour-A Kenyon cells speed up by "
-            f"{f_['ensemble_rate_change_pct_mean']:+.1f}%. Where it does not (untrained rate "
-            f"{s_['carrier_rate_naive_hz_mean']:.3f} Hz, {s_['n_seeds']} seeds) the ensemble moves by "
-            f"{s_['ensemble_rate_change_pct_mean']:+.2f}%, indistinguishable from nothing"
-            + (f" (p = {s_['p_against_zero']:.2f})" if s_.get("p_against_zero") is not None else "") + ". "
-            f"Every other engram-carrying MBON that does fire contacts the trained ensemble LESS than chance "
-            f"({', '.join(f'{r['mbon']} {r['enrichment_for_trained_ensemble_mean']:.2f}x' for r in rows if r['fires_offline'] and r['mbon'] != loop['carrier'])}), "
-            f"so their disinhibition goes to the rest of the mushroom body and works against the trained "
-            f"ensemble standing out. What stands between this model and memory reactivation is therefore one "
-            f"number: how often {loop['carrier']} fires.")
+            f"The loop replay would need is wired, and it is far too weak to matter. {loop['carrier']} is the only "
+            f"engram carrier whose Kenyon-cell targets are enriched for the trained ensemble, "
+            f"{loop['carrier_enrichment']:.2f} times, and every other carrier that fires offline contacts the "
+            f"ensemble LESS than chance, so on anatomy alone it is the only candidate. But one of its spikes "
+            f"delivers {loop['mV_one_carrier_spike_delivers_to_one_target']:.3f} mV to one of its targets, so even "
+            f"firing flat out at 50 Hz it would supply {loop['ceiling_mV_if_carrier_fired_at_50hz']:.3f} mV, which "
+            f"is {loop['ceiling_as_fraction_of_threshold_gap_at_50hz']:.2%} of the {gap_:.0f} mV threshold gap. "
+            f"Silencing it completely therefore cannot move its targets by anything a Kenyon cell would notice, "
+            f"however often it fires. That ceiling is anatomy and the model's own constants, not a measurement "
+            f"that might come out differently."
+            + (f" The one seed of {f_.get('n_seeds', 0) + s_.get('n_seeds', 0)} in which the carrier fires at all "
+               f"looks at first like the loop working, the trained ensemble speeding up by "
+               f"{f_['ensemble_rate_change_pct_mean']:+.1f}%. It is not. In the same run the Kenyon cells the "
+               f"carrier does NOT touch speed up by {f_['change_pct_not_contacted_mean']:+.1f}% and the whole "
+               f"population by {f_['change_pct_all_kenyon_cells_mean']:+.1f}%, a difference of {spec:.2f} "
+               f"percentage points. That is a global shift in the network's state, which is what a small "
+               f"perturbation usually produces at this operating point, and not disinhibition of the trained "
+               f"ensemble. An earlier version of this script reported that shift as the loop working; the "
+               f"contacted-versus-untouched split is here because it was not."
+               if f_ and spec is not None else "")
+            + (f" In the {s_['n_seeds']} seeds where the carrier is silent the ensemble moves "
+               f"{s_['ensemble_rate_change_pct_mean']:+.2f}%"
+               + (f", p = {s_['p_against_zero']:.2f}" if s_.get("p_against_zero") is not None else "") + "."
+               if s_ else "")
+            + " The conclusion is about the design and not about this run. An engram held downstream of the cells "
+            "whose reactivation is being measured reaches them through a return leg three orders of magnitude too "
+            "weak, so Kenyon-cell ensemble replay is not a question this model can answer positively, and a "
+            "positive would have to be explained by something other than the memory.")
 
     json.dump(out, open(OUT / "return_path.json", "w"), indent=1, default=str)
     print(finding); print()

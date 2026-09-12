@@ -15,13 +15,19 @@
    "n_seeds": 1,
    "carrier_rate_naive_hz_mean": 0.5375,
    "ensemble_rate_change_pct_mean": 7.645699927048716,
-   "carrier_rate_change_pct_mean": -67.44186046511628
+   "carrier_rate_change_pct_mean": -67.44186046511628,
+   "change_pct_contacted_not_in_ensemble_mean": 7.9724032196243915,
+   "change_pct_not_contacted_mean": 7.935195900148792,
+   "change_pct_all_kenyon_cells_mean": 7.713683553196482
   },
   "when_carrier_silent": {
    "n_seeds": 19,
    "carrier_rate_naive_hz_mean": 0.0013157894736842105,
    "ensemble_rate_change_pct_mean": 0.02280477332597244,
    "carrier_rate_change_pct_mean": 0.0,
+   "change_pct_contacted_not_in_ensemble_mean": 0.1095528631832746,
+   "change_pct_not_contacted_mean": 0.06918836347973294,
+   "change_pct_all_kenyon_cells_mean": 0.03218338293933336,
    "t_against_zero": 0.41297189653493727,
    "p_against_zero": 0.6845049371581691
   },
@@ -34,7 +40,10 @@
     "ensemble_rate_trained_hz": 7.847017045454546,
     "ensemble_rate_naive_hz": 7.8481534090909095,
     "ensemble_rate_change_pct": -0.014479375938895181,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 0.6403013182674137,
+    "change_pct_not_contacted": 0.12283126055582762,
+    "change_pct_all_kenyon_cells": 0.03524502340268752
    },
    {
     "seed": 1,
@@ -44,7 +53,10 @@
     "ensemble_rate_trained_hz": 7.558333333333334,
     "ensemble_rate_naive_hz": 7.563276836158193,
     "ensemble_rate_change_pct": -0.06536191827893056,
-    "carrier_rate_change_pct": 0.0
+    "carrier_rate_change_pct": 0.0,
+    "change_pct_contacted_not_in_ensemble": -1.0970174837161457,
+    "change_pct_not_contacted": -0.5612330373596883,
+    "change_pct_all_kenyon_cells": -0.1958978407379849
    },
    {
     "seed": 2,
@@ -54,7 +66,10 @@
     "ensemble_rate_trained_hz": 7.836049723756906,
     "ensemble_rate_naive_hz": 7.863259668508287,
     "ensemble_rate_change_pct": -0.34603899525733295,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.08156606851549672,
+    "change_pct_not_contacted": -0.6373266729825088,
+    "change_pct_all_kenyon_cells": -0.38454495513641834
    },
    {
     "seed": 3,
@@ -64,7 +79,10 @@
     "ensemble_rate_trained_hz": 7.414784946236559,
     "ensemble_rate_naive_hz": 7.401478494623656,
     "ensemble_rate_change_pct": 0.17978099406178377,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 2.8353326063249478,
+    "change_pct_not_contacted": 1.8306057027163614,
+    "change_pct_all_kenyon_cells": 0.5655069468366171
    },
    {
     "seed": 4,
@@ -74,7 +92,10 @@
     "ensemble_rate_trained_hz": 7.4608146067415735,
     "ensemble_rate_naive_hz": 6.930898876404495,
     "ensemble_rate_change_pct": 7.645699927048716,
-    "carrier_rate_change_pct": -67.44186046511628
+    "carrier_rate_change_pct": -67.44186046511628,
+    "change_pct_contacted_not_in_ensemble": 7.9724032196243915,
+    "change_pct_not_contacted": 7.935195900148792,
+    "change_pct_all_kenyon_cells": 7.713683553196482
    },
    {
     "seed": 5,
@@ -84,7 +105,10 @@
     "ensemble_rate_trained_hz": 7.840677966101695,
     "ensemble_rate_naive_hz": 7.835169491525424,
     "ensemble_rate_change_pct": 0.070304472446047,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -1.1768447837150133,
+    "change_pct_not_contacted": -0.3740141474916863,
+    "change_pct_all_kenyon_cells": -0.06204523661797935
    },
    {
     "seed": 6,
@@ -94,7 +118,10 @@
     "ensemble_rate_trained_hz": 7.712083333333333,
     "ensemble_rate_naive_hz": 7.705,
     "ensemble_rate_change_pct": 0.09193164611723696,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 1.7877094972067178,
+    "change_pct_not_contacted": 0.21667602921114254,
+    "change_pct_all_kenyon_cells": 0.17841465832176975
    },
    {
     "seed": 7,
@@ -104,7 +131,10 @@
     "ensemble_rate_trained_hz": 7.389511494252874,
     "ensemble_rate_naive_hz": 7.3645114942528735,
     "ensemble_rate_change_pct": 0.3394658290574994,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 1.0672991402312448,
+    "change_pct_not_contacted": -0.22710682131560359,
+    "change_pct_all_kenyon_cells": 0.27180812138772587
    },
    {
     "seed": 8,
@@ -114,7 +144,10 @@
     "ensemble_rate_trained_hz": 7.753351955307262,
     "ensemble_rate_naive_hz": 7.772905027932961,
     "ensemble_rate_change_pct": -0.2515542458763094,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -1.0055141096334779,
+    "change_pct_not_contacted": 0.04924491135914745,
+    "change_pct_all_kenyon_cells": -0.23265323387994893
    },
    {
     "seed": 9,
@@ -124,7 +157,10 @@
     "ensemble_rate_trained_hz": 7.9073863636363635,
     "ensemble_rate_naive_hz": 7.8761363636363635,
     "ensemble_rate_change_pct": 0.3967681431250902,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 1.0369014943580466,
+    "change_pct_not_contacted": 0.8081155433287296,
+    "change_pct_all_kenyon_cells": 0.49460623374408175
    },
    {
     "seed": 10,
@@ -134,7 +170,10 @@
     "ensemble_rate_trained_hz": 7.869476744186046,
     "ensemble_rate_naive_hz": 7.908866279069768,
     "ensemble_rate_change_pct": -0.4980427471376473,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.22850614110254663,
+    "change_pct_not_contacted": 0.2396783670944748,
+    "change_pct_all_kenyon_cells": -0.3500451671183423
    },
    {
     "seed": 11,
@@ -144,7 +183,10 @@
     "ensemble_rate_trained_hz": 7.61639344262295,
     "ensemble_rate_naive_hz": 7.601229508196722,
     "ensemble_rate_change_pct": 0.19949317948992737,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.031094527363192046,
+    "change_pct_not_contacted": 0.642706131078221,
+    "change_pct_all_kenyon_cells": 0.2631504484875989
    },
    {
     "seed": 12,
@@ -154,7 +196,10 @@
     "ensemble_rate_trained_hz": 7.86,
     "ensemble_rate_naive_hz": 7.859857142857142,
     "ensemble_rate_change_pct": 0.0018175539359281843,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.7189746795873624,
+    "change_pct_not_contacted": -0.8520284530602645,
+    "change_pct_all_kenyon_cells": -0.18447846108349283
    },
    {
     "seed": 13,
@@ -164,7 +209,10 @@
     "ensemble_rate_trained_hz": 7.515934065934067,
     "ensemble_rate_naive_hz": 7.49217032967033,
     "ensemble_rate_change_pct": 0.31718093980896583,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 0.28478437754270697,
+    "change_pct_not_contacted": 0.7323511879417656,
+    "change_pct_all_kenyon_cells": 0.3869428604678292
    },
    {
     "seed": 14,
@@ -174,7 +222,10 @@
     "ensemble_rate_trained_hz": 7.8999999999999995,
     "ensemble_rate_naive_hz": 7.91271186440678,
     "ensemble_rate_change_pct": -0.16065117275356908,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.06293266205160064,
+    "change_pct_not_contacted": -0.11051602482358466,
+    "change_pct_all_kenyon_cells": -0.14796443216888122
    },
    {
     "seed": 15,
@@ -184,7 +235,10 @@
     "ensemble_rate_trained_hz": 7.647939560439561,
     "ensemble_rate_naive_hz": 7.62554945054945,
     "ensemble_rate_change_pct": 0.2936196274813696,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.7865937072503331,
+    "change_pct_not_contacted": 0.6968076486792928,
+    "change_pct_all_kenyon_cells": 0.31929923707262586
    },
    {
     "seed": 16,
@@ -194,7 +248,10 @@
     "ensemble_rate_trained_hz": 7.716761363636365,
     "ensemble_rate_naive_hz": 7.7299715909090905,
     "ensemble_rate_change_pct": -0.1708961943438697,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.5843293492696053,
+    "change_pct_not_contacted": -0.8869179600887096,
+    "change_pct_all_kenyon_cells": -0.32415138290557993
    },
    {
     "seed": 17,
@@ -204,7 +261,10 @@
     "ensemble_rate_trained_hz": 7.754329608938548,
     "ensemble_rate_naive_hz": 7.745251396648046,
     "ensemble_rate_change_pct": 0.11721004039237558,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": 1.2060647829083408,
+    "change_pct_not_contacted": 0.6054734802615658,
+    "change_pct_all_kenyon_cells": 0.24736730510989652
    },
    {
     "seed": 18,
@@ -214,7 +274,10 @@
     "ensemble_rate_trained_hz": 7.7185393258426975,
     "ensemble_rate_naive_hz": 7.723033707865169,
     "ensemble_rate_change_pct": -0.058194515166942205,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.595864002804054,
+    "change_pct_not_contacted": -0.13533834586466467,
+    "change_pct_all_kenyon_cells": -0.09417916531958563
    },
    {
     "seed": 19,
@@ -224,9 +287,17 @@
     "ensemble_rate_trained_hz": 7.704888268156425,
     "ensemble_rate_naive_hz": 7.70558659217877,
     "ensemble_rate_change_pct": -0.009062567969251206,
-    "carrier_rate_change_pct": null
+    "carrier_rate_change_pct": null,
+    "change_pct_contacted_not_in_ensemble": -0.40765130134837346,
+    "change_pct_not_contacted": -0.8454298931248921,
+    "change_pct_all_kenyon_cells": -0.17489668401528524
    }
   ],
+  "mV_one_carrier_spike_delivers_to_one_target": 0.22847627013630734,
+  "threshold_gap_mV": 7.0,
+  "ceiling_mV_at_observed_carrier_rate": 0.0006140299759913259,
+  "ceiling_mV_if_carrier_fired_at_50hz": 0.05711906753407684,
+  "ceiling_as_fraction_of_threshold_gap_at_50hz": 0.008159866790582405,
   "note": "The loop is measured, not assumed. In the seeds where the carrier fires, the memory lowers its rate and the ensemble it preferentially contacts speeds up, which is the disinhibition replay would need. In the seeds where it is silent there is nothing to lower and the ensemble does not move. How many seeds fall in each group is therefore the measurement that decides whether this model can reactivate a memory at all."
  },
  "per_mbon": [
@@ -328,7 +399,7 @@
   }
  ],
  "n_seeds": 20,
- "finding": "The mechanism replay would need is wired and it works, in the 1 of 20 seeds where it is switched on. MBON11 is GABAergic, carries more of the engram than any other cell, and the Kenyon cells it contacts are 1.86 times enriched for the trained ensemble, so depressing its input disinhibits that ensemble preferentially. Where it fires (untrained rate 0.537 Hz) the memory cuts its rate by 67% and the odour-A Kenyon cells speed up by +7.6%. Where it does not (untrained rate 0.001 Hz, 19 seeds) the ensemble moves by +0.02%, indistinguishable from nothing (p = 0.68). Every other engram-carrying MBON that does fire contacts the trained ensemble LESS than chance (MBON20 0.41x, MBON30 0.57x, MBON32 0.50x, MBON35 0.00x), so their disinhibition goes to the rest of the mushroom body and works against the trained ensemble standing out. What stands between this model and memory reactivation is therefore one number: how often MBON11 fires.",
+ "finding": "The loop replay would need is wired, and it is far too weak to matter. MBON11 is the only engram carrier whose Kenyon-cell targets are enriched for the trained ensemble, 1.86 times, and every other carrier that fires offline contacts the ensemble LESS than chance, so on anatomy alone it is the only candidate. But one of its spikes delivers 0.228 mV to one of its targets, so even firing flat out at 50 Hz it would supply 0.057 mV, which is 0.82% of the 7 mV threshold gap. Silencing it completely therefore cannot move its targets by anything a Kenyon cell would notice, however often it fires. That ceiling is anatomy and the model's own constants, not a measurement that might come out differently. The one seed of 20 in which the carrier fires at all looks at first like the loop working, the trained ensemble speeding up by +7.6%. It is not. In the same run the Kenyon cells the carrier does NOT touch speed up by +7.9% and the whole population by +7.7%, a difference of 0.29 percentage points. That is a global shift in the network's state, which is what a small perturbation usually produces at this operating point, and not disinhibition of the trained ensemble. An earlier version of this script reported that shift as the loop working; the contacted-versus-untouched split is here because it was not. In the 19 seeds where the carrier is silent the ensemble moves +0.02%, p = 0.68. The conclusion is about the design and not about this run. An engram held downstream of the cells whose reactivation is being measured reaches them through a return leg three orders of magnitude too weak, so Kenyon-cell ensemble replay is not a question this model can answer positively, and a positive would have to be explained by something other than the memory.",
  "provenance": {
   "config": "configs/base.yaml",
   "results_dir": "results/stage6_return_path",
