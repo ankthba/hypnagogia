@@ -139,7 +139,7 @@ def main():
 
     # anatomical atlas for the viewer's neuron map (soma positions of the simulated neurons)
     from hypnagogia.atlas import build_atlas
-    atlas = build_atlas(conn, WEB_DATA, max_neurons=60000)
+    atlas = build_atlas(conn, WEB_DATA, max_neurons=None)
 
     manifest = {
         "generated_at": now, "git_commit": commit, "pipeline_version": base["pipeline_version"],

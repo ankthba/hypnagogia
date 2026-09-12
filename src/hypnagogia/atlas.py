@@ -45,12 +45,18 @@ def soma_positions(conn: Connectome) -> tuple[np.ndarray, np.ndarray]:
     return pos * VOXEL_NM / 1000.0, np.isfinite(pos[:, 0])
 
 
+# Broad groups are painted first and specific ones last, so a neuron that belongs to several (a dFB tangential
+# neuron is also a central-complex neuron) ends up labelled with the most specific group.
+PAINT_ORDER = ["optic", "CX", "ALPN", "ORN", "DAN", "MBON", "KC", "dFB"]
+
+
 def group_codes(conn: Connectome) -> np.ndarray:
     g = np.zeros(conn.N, dtype=np.uint8)
-    for code, (name, sel) in enumerate(GROUPS):
-        if sel is None:
-            continue
-        g[conn.select(**sel)] = code
+    by_name = {name: (code, sel) for code, (name, sel) in enumerate(GROUPS)}
+    for name in PAINT_ORDER:
+        code, sel = by_name[name]
+        if sel is not None:
+            g[conn.select(**sel)] = code
     return g
 
 

@@ -1,0 +1,16 @@
+extends: base.yaml
+noise: {mode: none, sigma_mV: 0.0}
+odor_calibration:
+  # A memory needs a sparse, odour-specific Kenyon-cell ensemble. In a real fly about 5-10% of KCs respond to a
+  # given odour (Honegger, Campbell & Turner 2011 J Neurosci 31:11772; Turner, Bazhenov & Laurent 2008
+  # J Neurophysiol 99:734), each firing a few spikes. This scan asks whether ANY odour drive produces that here.
+  glomerulus_sets:
+    - {name: "1 glomerulus", types: ["ORN_DM1"]}
+    - {name: "2 glomeruli", types: ["ORN_DM1", "ORN_DM4"]}
+    - {name: "4 glomeruli", types: ["ORN_DM1", "ORN_DM4", "ORN_VA2", "ORN_DM2"]}
+  rates_hz: [10, 20, 50, 100, 150]
+  odor_s: 1.0
+  post_s: 2.0        # measures whether activity outlasts the stimulus (self-sustaining ignition)
+  seeds: [0, 1, 2]
+  target_frac_kc: [0.05, 0.10]
+  criterion: "at least one (glomerulus set, rate) gives a mean Kenyon-cell response fraction inside 5-10% AND activity that does not outlast the odour (post-odour population rate below 1% of the during-odour rate)"

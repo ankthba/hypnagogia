@@ -1,0 +1,154 @@
+{
+ "clips": [
+  {
+   "name": "sugar_pulses",
+   "title": "Sugar-neuron stimulation (sensory to motor propagation)",
+   "description": "The male counterparts of the sugar-sensing labellar neurons Shiu et al. used, pulsed at 200 Hz for 1 s every 2 s. This is the validated propagation benchmark from stage 0, run for longer so the cascade repeats.",
+   "file": "clips/sugar_pulses.json",
+   "duration_s": 12.0,
+   "n_spikes_total": 30326,
+   "n_spikes_exported": 30326,
+   "downsampled": false,
+   "sigma_mV": 0.0,
+   "seed": 11,
+   "n_neurons_simulated": 144209,
+   "n_active_neurons": 619,
+   "epochs": [
+    {
+     "name": "warmup",
+     "t_start_s": 0.0,
+     "t_end_s": 0.5,
+     "drives": {}
+    },
+    {
+     "name": "on",
+     "t_start_s": 0.5,
+     "t_end_s": 1.5,
+     "drives": {
+      "drive": 200.0
+     }
+    },
+    {
+     "name": "off",
+     "t_start_s": 1.5,
+     "t_end_s": 2.5,
+     "drives": {}
+    },
+    {
+     "name": "on",
+     "t_start_s": 2.5,
+     "t_end_s": 3.5,
+     "drives": {
+      "drive": 200.0
+     }
+    },
+    {
+     "name": "off",
+     "t_start_s": 3.5,
+     "t_end_s": 4.5,
+     "drives": {}
+    },
+    {
+     "name": "on",
+     "t_start_s": 4.5,
+     "t_end_s": 5.5,
+     "drives": {
+      "drive": 200.0
+     }
+    },
+    {
+     "name": "off",
+     "t_start_s": 5.5,
+     "t_end_s": 6.5,
+     "drives": {}
+    },
+    {
+     "name": "on",
+     "t_start_s": 6.5,
+     "t_end_s": 7.5,
+     "drives": {
+      "drive": 200.0
+     }
+    },
+    {
+     "name": "off",
+     "t_start_s": 7.5,
+     "t_end_s": 8.5,
+     "drives": {}
+    },
+    {
+     "name": "on",
+     "t_start_s": 8.5,
+     "t_end_s": 9.5,
+     "drives": {
+      "drive": 200.0
+     }
+    },
+    {
+     "name": "off",
+     "t_start_s": 9.5,
+     "t_end_s": 10.5,
+     "drives": {}
+    },
+    {
+     "name": "on",
+     "t_start_s": 10.5,
+     "t_end_s": 11.5,
+     "drives": {
+      "drive": 200.0
+     }
+    },
+    {
+     "name": "off",
+     "t_start_s": 11.5,
+     "t_end_s": 12.5,
+     "drives": {}
+    }
+   ],
+   "provenance": {
+    "config": "configs/reference_clips.yaml",
+    "results_dir": "results/reference_clips/sugar_pulses",
+    "files": [
+     "results/reference_clips/sugar_pulses/spikes.npz"
+    ]
+   }
+  },
+  {
+   "name": "spontaneous_ignition",
+   "title": "Spontaneous ignition (whole-brain runaway)",
+   "description": "Background membrane noise only, at the amplitude where the network ignites. This is the model's only self-sustaining spontaneous state, and the stage 2 result is that it is not biologically plausible: about three quarters of Kenyon cells end up firing above 30 Hz.",
+   "file": "clips/spontaneous_ignition.json",
+   "duration_s": 8.0,
+   "n_spikes_total": 681,
+   "n_spikes_exported": 681,
+   "downsampled": false,
+   "sigma_mV": 1.5,
+   "seed": 12,
+   "n_neurons_simulated": 144209,
+   "n_active_neurons": 1646,
+   "epochs": [
+    {
+     "name": "warmup",
+     "t_start_s": 0.0,
+     "t_end_s": 0.5,
+     "drives": {}
+    },
+    {
+     "name": "spontaneous",
+     "t_start_s": 0.5,
+     "t_end_s": 8.5,
+     "drives": {}
+    }
+   ],
+   "provenance": {
+    "config": "configs/reference_clips.yaml",
+    "results_dir": "results/reference_clips/spontaneous_ignition",
+    "files": [
+     "results/reference_clips/spontaneous_ignition/spikes.npz"
+    ]
+   }
+  }
+ ],
+ "note": "Real simulations of this model, not demonstrations. Each was run by scripts/07_reference_clips.py with configs/reference_clips.yaml and carries its own provenance. The map plays one of these only when the replay stage has no activity of its own, and always says which simulation is on screen.",
+ "walltime_s": 129.5
+}

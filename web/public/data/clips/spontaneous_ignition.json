@@ -1,0 +1,17 @@
+{
+ "bin": "spontaneous_ignition.bin",
+ "dtype": "uint32",
+ "shape": [
+  681,
+  2
+ ],
+ "columns": [
+  "t_ms",
+  "atlas_row"
+ ],
+ "duration_s": 8.0,
+ "n_spikes_total": 681,
+ "n_spikes_exported": 681,
+ "downsampled": false,
+ "downsample_note": "all spikes in the window are shown"
+}

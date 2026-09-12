@@ -1,0 +1,17 @@
+{
+ "bin": "sugar_pulses.bin",
+ "dtype": "uint32",
+ "shape": [
+  30326,
+  2
+ ],
+ "columns": [
+  "t_ms",
+  "atlas_row"
+ ],
+ "duration_s": 12.0,
+ "n_spikes_total": 30326,
+ "n_spikes_exported": 30326,
+ "downsampled": false,
+ "downsample_note": "all spikes in the window are shown"
+}

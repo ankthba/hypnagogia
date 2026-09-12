@@ -175,11 +175,11 @@ class Simulation:
             objs.append(PoissonInput(neu, "g", N=int(pz["n_inputs"]), rate=float(pz["rate_hz"]) * Hz, weight=float(pz["weight_mV"]) * mV))
 
         # ---- monitors -------------------------------------------------------------------
-        if isinstance(self.record, str) and self.record == "all":
-            spk = SpikeMonitor(neu, record=True, name="spk"); rec_idx = None
-        else:
-            rec_idx = np.unique(np.asarray(self.record, dtype=np.int64))
-            spk = SpikeMonitor(neu, record=rec_idx, name="spk")
+        # Brian2's SpikeMonitor records the whole group it is attached to (its `record` flag is a boolean, and a
+        # subset would need a contiguous subgroup). So we always record every neuron and, when a subset was asked
+        # for, filter the spikes afterwards. `record_all_spikes` in the metadata says which happened.
+        spk = SpikeMonitor(neu, record=True, name="spk")
+        rec_idx = None if (isinstance(self.record, str) and self.record == "all") else np.unique(np.asarray(self.record, dtype=np.int64))
         objs.append(spk)
         vmon = None
         if self.record_v is not None and len(self.record_v):
@@ -213,6 +213,10 @@ class Simulation:
         # ---- collect --------------------------------------------------------------------
         si = np.asarray(spk.i[:], dtype=np.int32)
         st = np.asarray(spk.t[:] / second, dtype=np.float64)
+        n_spikes_all = int(len(si))
+        if rec_idx is not None:
+            keep = np.isin(si, rec_idx)
+            si, st = si[keep], st[keep]
         t_step = np.round(st / float(m["dt_ms"] * 1e-3)).astype(np.int32)
         out = {"spikes": str(self.run_dir / "spikes.npz"), "meta": str(self.run_dir / "meta.json")}
         np.savez_compressed(self.run_dir / "spikes.npz", i=si, t_step=t_step)
@@ -222,6 +226,7 @@ class Simulation:
                 "drive_groups": {k: [int(x) for x in v] for k, v in self.drive_groups.items()},
                 "drive_group_ids": {k: [int(conn.ids[x]) for x in v] for k, v in self.drive_groups.items()},
                 "record": "all" if rec_idx is None else [int(x) for x in rec_idx],
+                "record_all_spikes": bool(rec_idx is None), "n_spikes_whole_network": n_spikes_all,
                 "n_spikes": int(len(si)), "n_active": int(len(np.unique(si))), "walltime_build_run_s": round(t_run, 1),
                 "walltime_total_s": round(time.time() - t_wall0, 1), "brian2": b2.__version__,
                 "filtering_steps": conn.filtering_steps, "connectome_provenance": {k: v for k, v in conn.provenance.items() if k != "cache"}}
