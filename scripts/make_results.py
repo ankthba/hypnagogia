@@ -40,6 +40,15 @@ def main():
     s4 = load(RESULTS / "stage4_learning" / "stage4.json")
     s5 = load(RESULTS / "stage5_sleep" / "stage5.json")
     s6 = load(RESULTS / "stage6_replay" / "stage6.json")
+    # the labelled reduced-gain variant, if it has been run
+    variant_dirs = sorted(RESULTS.glob("stage6_replay_gain*"))
+    s6v = load(variant_dirs[-1] / "stage6.json") if variant_dirs else None
+    s4v = None
+    for d in sorted(RESULTS.glob("stage4_learning/real_gain*")):
+        s4v = load(d / "stage4.json") or s4v
+    s5v = None
+    for d in sorted(RESULTS.glob("stage5_sleep/real_gain*")):
+        s5v = load(d / "stage5.json") or s5v
 
     w("# hypnagogia: results")
     w()
@@ -57,6 +66,23 @@ def main():
     w()
     if s6:
         w(f"**Stage 6 ({s6['status']}).** {s6['headline']}")
+    elif s6v:
+        w("**Two answers, and the difference between them is the result.**")
+        w()
+        w("*With the published parameters the replay test cannot be run at all.* The model has no sparse odour "
+          "code to store a memory in and no quiet background for one to reappear against: a single olfactory "
+          "receptor neuron driven at 50 Hz ignites the whole network into a state that never decays, more than "
+          "half of all Kenyon cells fire, and two different odours leave ensembles that overlap 94 per cent. The "
+          "same thing happens on the FlyWire datasets the model was published on, so this is a property of the "
+          "model rather than of the male connectome.")
+        w()
+        w(f"*With every synaptic weight scaled to {s6v.get('gain')} of its published value* - a deviation this "
+          "project introduces and flags wherever it appears - the model does support the experiment: about 8 per "
+          "cent of Kenyon cells respond to an odour, and two odours are genuinely distinguishable. Run there, the "
+          f"replay test says: **{s6v['headline']}**")
+        w()
+        w(f"The price of that deviation is measured, not hidden: it breaks the gustatory calibration that fixed "
+          f"the synaptic weight in the first place (see *Stage 3d*).")
     elif (s3e and s3e["status"] == "failed") or (s3b and s3b["status"] == "failed"):
         w("**The replay test as specified cannot be run on this model, and the reason is itself the result.**")
         w()
@@ -336,9 +362,9 @@ def main():
         w("**Not run.**")
         w()
     for name, obj, title in [("Stage 3", s3, "Stage 3 - dopamine-gated plasticity"),
-                             ("Stage 4", s4, "Stage 4 - encoding a memory"),
-                             ("Stage 5", s5, "Stage 5 - the sleep state"),
-                             ("Stage 6", s6, "Stage 6 - the replay test")]:
+                             ("Stage 4", s4 or s4v, "Stage 4 - encoding a memory"),
+                             ("Stage 5", s5 or s5v, "Stage 5 - the sleep state"),
+                             ("Stage 6", s6 or s6v, "Stage 6 - the replay test")]:
         w(f"## {title}")
         w()
         if obj is None:
@@ -347,6 +373,13 @@ def main():
             continue
         w(f"**{obj['status']}.** Criterion: {obj.get('criterion', '')}")
         w()
+        if obj.get("gain") not in (None, 1.0):
+            w(f"**Run at a synaptic gain of {obj['gain']}, a labelled deviation from the published parameters.** "
+              f"{obj.get('gain_note', '')}")
+            w()
+        if obj.get("reset_note"):
+            w(f"*{obj['reset_note']}*")
+            w()
         if name == "Stage 3":
             w(f"- Rule: {obj['rule']['description']}")
             for e in obj["rule"]["equations"]:

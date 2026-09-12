@@ -1509,26 +1509,16 @@ pre.equations {
 
 /* The scrubber has to be draggable with a thumb, not a mouse pointer. */
 input[type='range'] {
-  width: 100%;
   min-width: 0;
-  height: 1.6rem;
+  height: 1.75rem;
+  /* pan-y so a vertical swipe that starts on the scrubber still scrolls the page, while a
+     horizontal drag scrubs. The control keeps its native appearance and its native thumb. */
   touch-action: pan-y;
-  background: transparent;
 }
 
 @media (hover: none), (pointer: coarse) {
   input[type='range'] {
     height: 44px;
-  }
-
-  input[type='range']::-webkit-slider-thumb {
-    width: 26px;
-    height: 26px;
-  }
-
-  input[type='range']::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
   }
 }
 
