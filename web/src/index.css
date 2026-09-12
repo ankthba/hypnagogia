@@ -1497,8 +1497,9 @@ pre.equations {
    shadow a cut-out photograph reads as a sticker rather than as something above the paper. */
 .fly__photo {
   display: block;
-  filter: drop-shadow(1.5px 2.5px 2.5px rgba(20, 16, 12, 0.34));
+  filter: drop-shadow(1px 1.5px 1.5px rgba(20, 16, 12, 0.38));
   user-select: none;
+  transition: filter 140ms ease;
 }
 
 .fly__body {
@@ -1507,16 +1508,32 @@ pre.equations {
 }
 
 /* The shadow directly under her, on the page. Separate from the drop shadow on the photograph so it
-   stays put while she scales down into a landing. */
+   stays put while she scales down into a landing.
+
+   Standing on the glass she has a contact shadow: tight, close and fairly dark. In the air she is a
+   few millimetres off it, so the shadow moves away from her, spreads and pales. That difference is
+   what tells the eye she has left the surface, and it is the cheapest depth cue on the page. */
 .fly__shadow {
   position: absolute;
-  left: 12%;
-  top: 62%;
-  width: 74%;
-  height: 46%;
+  left: 14%;
+  top: 66%;
+  width: 70%;
+  height: 40%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(20, 16, 12, 0.22), rgba(20, 16, 12, 0) 70%);
-  transform: translate(3px, 5px);
+  background: radial-gradient(ellipse at center, rgba(20, 16, 12, 0.3), rgba(20, 16, 12, 0) 68%);
+  transform: translate(1.5px, 2px);
+  transition: transform 140ms ease, opacity 140ms ease, filter 140ms ease;
+}
+
+.fly[data-lifted='true'] .fly__shadow {
+  transform: translate(6px, 9px) scale(1.35);
+  opacity: 0.55;
+  filter: blur(1.5px);
+}
+
+/* The drop shadow on the photograph itself lifts with her too. */
+.fly[data-lifted='true'] .fly__photo {
+  filter: drop-shadow(3px 5px 5px rgba(20, 16, 12, 0.3));
 }
 
 /* The wingbeat. A Drosophila wing beats at around 200 Hz, so on any screen it is a blur and not a
@@ -1538,8 +1555,8 @@ pre.equations {
 .fly__wingblur span {
   position: absolute;
   display: block;
-  width: 34px;
-  height: 9px;
+  width: 22px;
+  height: 6px;
   border-radius: 50%;
   background: radial-gradient(ellipse at 70% 50%, rgba(226, 224, 216, 0.5), rgba(226, 224, 216, 0.06) 72%);
   filter: blur(1.1px);
@@ -1547,12 +1564,12 @@ pre.equations {
 }
 
 .fly__wingblur-a {
-  left: -31px;
-  top: -8px;
+  left: -20px;
+  top: -5px;
 }
 
 .fly__wingblur-b {
-  left: -31px;
+  left: -20px;
   top: -1px;
 }
 
