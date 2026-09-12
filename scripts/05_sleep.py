@@ -140,8 +140,9 @@ def main():
              f"state, so the sleep manipulation does not produce a distinct global state. A sleep-versus-wake "
              f"comparison downstream is therefore testing a difference the model does not have. What a distinct "
              f"sleep state would take is a global change rather than a local one: Nitz, van Swinderen, Tononi & "
-             f"Greenspan (2002) Curr Biol 12:1934 measure brain activity in the 11-80 Hz band falling by about 60 "
-             f"per cent (range 39.5 to 77.6) between waking and sleep, which is a whole-brain attenuation and not "
+             f"Greenspan (2002) Curr Biol 12:1934-1940 measure local field potential power between the mushroom "
+             f"bodies, across 3 to 50 Hz, falling by 60.5 per cent on average (range 39.5 to 77.6) during extended "
+             f"rest, which is a brain-wide attenuation and not "
              f"something 32 cells can produce here. That arm was not run: implementing it means choosing what to "
              f"attenuate and by how much, and no measurement fixes that choice, so it is named as the next "
              f"experiment rather than guessed at.")
