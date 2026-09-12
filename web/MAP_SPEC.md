@@ -45,3 +45,15 @@ Legend with a swatch, the group name and its count read from `group_counts_in_br
 statement naming what is playing. Controls: projection, play/pause, source (when more than one is available).
 Caption: these are soma positions, not morphology; receptor neurons have no soma in the volume and are absent
 from the map though still simulated (use the sidecar's counts and `soma_outside_brain_note`, never hard-coded).
+
+## Corrections from reviewing the live site
+
+1. **Default projection is frontal**, not dorsal. Frontal is the view a reader recognises as a fly brain
+   (optic lobes either side, mushroom-body calyces at the top). The panel's aspect should follow the
+   projection rather than the projection being chosen to fit a fixed panel aspect.
+2. **Do not burn the clip caption into the canvas.** The source line, clip title and "not the replay result"
+   label belong in the panel's HTML below the canvas, where they are selectable and translatable. Drawing them
+   into the bitmap as well duplicates the text and clutters the image. Keep only the scale bar and the axis
+   note on the canvas itself.
+3. **Give the main column more room.** At 1440 px the content should be roughly 780-820 px wide with the rail
+   at 380-400 px, rather than leaving a wide empty margin.

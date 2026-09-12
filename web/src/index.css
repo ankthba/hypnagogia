@@ -235,6 +235,21 @@ kbd,
   font-size: 0.85em;
 }
 
+/* A file path, a config string or a root id is one unbreakable token. Wherever one is set in
+   running text it has to be allowed to break, or it pushes its container - and on a phone the
+   page - wider than the screen. Table cells are the exception: they are nowrap by design and
+   scroll inside .table-wrap instead. */
+.mono,
+code,
+kbd {
+  overflow-wrap: anywhere;
+}
+
+.data-table .mono,
+.data-table code {
+  overflow-wrap: normal;
+}
+
 pre {
   line-height: 1.5;
 }
@@ -709,6 +724,7 @@ a.masthead__name:hover {
   border: 1px dashed var(--color-border-hover);
   border-radius: 2px;
   padding: 1.1rem 1.25rem;
+  overflow-wrap: anywhere;
 }
 
 .notrun__title {
@@ -1311,6 +1327,7 @@ pre.equations {
   margin-top: 0.7rem;
   padding-top: 0.6rem;
   border-top: 1px solid var(--color-border);
+  overflow-wrap: anywhere;
 }
 
 .map-panel__source p {
