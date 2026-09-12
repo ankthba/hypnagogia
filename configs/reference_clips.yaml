@@ -1,0 +1,19 @@
+extends: base.yaml
+clips:
+  # Real simulations, run and exported like any other result, that the viewer's neuron map can play when the
+  # replay stage has not produced its own activity yet. These are NOT demo or synthetic data: each is a normal
+  # run of this pipeline with its own config and provenance, and the map labels it as what it is.
+  - name: sugar_pulses
+    title: "Sugar-neuron stimulation (sensory to motor propagation)"
+    description: "The male counterparts of the sugar-sensing labellar neurons Shiu et al. used, pulsed at 200 Hz for 1 s every 2 s. This is the validated propagation benchmark from stage 0, run for longer so the cascade repeats."
+    drive: {population_selector: {cell_type: {regex: "^LB3[a-d]?$"}, side: "R"}, rate_hz: 200.0}
+    pattern: {on_s: 1.0, off_s: 1.0, n_cycles: 6}
+    sigma_mV: 0.0
+    seed: 11
+  - name: spontaneous_ignition
+    title: "Spontaneous ignition (whole-brain runaway)"
+    description: "Background membrane noise only, at the amplitude where the network ignites. This is the model's only self-sustaining spontaneous state, and the stage 2 result is that it is not biologically plausible: about three quarters of Kenyon cells end up firing above 30 Hz."
+    drive: null
+    sigma_mV: 1.5
+    duration_s: 8.0
+    seed: 12

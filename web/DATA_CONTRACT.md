@@ -193,3 +193,21 @@ Whole-brain spikes for the map animation, for the same window as the raster and 
 ```
 `atlas_row` indexes `neuron_atlas.bin`. When `downsampled` is true the viewer must say so, because the map
 then shows a uniform random sample of the spikes, not all of them.
+
+## `reference_clips.json` + `clips/<name>.json` + `clips/<name>.bin`
+Real simulations of this model, exported so the neuron map has something true to show before the replay
+stage produces activity of its own. They are NOT demo or synthetic data: each is a normal run of the
+pipeline (`scripts/07_reference_clips.py`, `configs/reference_clips.yaml`) with its own provenance.
+```json
+{"clips": [{"name": "sugar_pulses", "title": "...", "description": "...", "file": "clips/sugar_pulses.json",
+            "duration_s": 12.5, "n_spikes_total": 0, "n_spikes_exported": 0, "downsampled": false,
+            "sigma_mV": 0.0, "seed": 11, "n_neurons_simulated": 144209, "n_active_neurons": 0,
+            "epochs": [{"name": "on", "t_start_s": 0.5, "t_end_s": 1.5, "drives": {"drive": 200.0}}],
+            "provenance": {"config": "...", "results_dir": "...", "files": ["..."]}}],
+ "note": "..."}
+```
+Each `clips/<name>.json` has the same shape as `replay/activity_*.json` (uint32 `[n, 2]` of `t_ms`,
+`atlas_row`). **Viewer rule:** a clip may play in the neuron map only when the selected seed/condition has no
+`replay/activity_*` file. Whenever a clip is on screen the map must name it and show its title, so a reader
+can never mistake a reference simulation for the replay result. A clip is never used on the Replay page's
+result figures, only as the map's ambient state.
