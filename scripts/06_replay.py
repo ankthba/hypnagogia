@@ -241,7 +241,29 @@ def main():
                        if not naive_c["survives"] else
                        " The learned weights did increase reactivation relative to the identical run with unlearned "
                        f"weights (difference {naive_c['diff']:+.5f}, 95% CI [{naive_c['ci95'][0]:+.5f}, {naive_c['ci95'][1]:+.5f}]).")
-    if all_survive and not continuity["events_are_discrete"]:
+    # A hard guard from stage 5. If the offline Kenyon-cell spike train is identical, spike for spike, with the
+    # learned weights and without them, the memory had no causal effect on the state being measured, and no
+    # comparison computed on that state can be evidence of replay however it comes out. That is checked before
+    # the comparisons are read, not after, because it does not depend on them.
+    causal = None
+    try:
+        s5f = RESULTS / "stage5_sleep" / ("real" + ("" if a.gain == 1.0 else f"_gain{a.gain}")) / "stage5.json"
+        if s5f.exists():
+            causal = (json.load(open(s5f)) or {}).get("engram_reaches_the_kenyon_cells")
+    except Exception:
+        causal = None
+    disconnected = bool(causal and causal.get("engram_reaches_the_kenyon_cells") is False)
+    causal_note = (" " + causal["note"] if disconnected and causal.get("note") else "")
+
+    if disconnected:
+        status = "artifact" if all_survive or others_pos else "failed"
+        headline = (("All four null comparisons showed the predicted effect, but the result cannot be read as replay. "
+                     if all_survive else
+                     "Some comparisons showed the predicted effect, but none of them can be read as replay. "
+                     if others_pos else
+                     "No evidence of memory replay, and none was possible. ")
+                    + causal_note.strip() + memory_note)
+    elif all_survive and not continuity["events_are_discrete"]:
         status = "artifact"
         headline = ("All four null comparisons showed the predicted effect, but the result cannot be read as replay: "
                     + continuity["note"] + memory_note)
@@ -262,6 +284,13 @@ def main():
                                       "simulated sleep. Comparisons that did not show the predicted effect: "
                                       f"{', '.join(failed) if failed else 'none'}." + memory_note)
     out_d = {"status": status, "criterion": s6["criterion"], "headline": headline,
+             "engram_reaches_the_kenyon_cells": causal,
+             "engram_guard": {"applied": disconnected,
+                              "rule": ("If stage 5 finds the offline Kenyon-cell spike train identical with and without the "
+                                       "learned weights, the memory had no causal effect on the state being measured and no "
+                                       "comparison computed on that state can be evidence of replay, whichever way it comes "
+                                       "out. The verdict is then 'artifact' if anything looked positive and 'failed' "
+                                       "otherwise, regardless of the four comparisons.")},
              "metrics": {"template_correlation": "Pearson correlation, per time bin, between the Kenyon-cell population activity vector and the odour's KC ensemble template (Tatsuno et al. 2006 template matching; bin as stated)",
                          "coactivation": "mean zero-lag pairwise correlation among ensemble members, standardised against size-matched random KC ensembles (Wilson & McNaughton 1994)",
                          "sequence": "Spearman rank correlation between within-event first-spike order and the odour-response order, with a cell-identity shuffle null (Foster & Wilson 2006)",
