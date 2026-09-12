@@ -11,7 +11,7 @@ stage5:
   # as a sensitivity check. This rate is an approximation, not a measurement of dFB firing.
   dfb_clamp_rate_hz: 17.0
   dfb_rate_sensitivity_hz: [8.5, 34.0]
-  duration_s: 60.0                     # offline period analysed for reactivation
+  duration_s: 40.0                     # offline period analysed for reactivation (400 bins at the 100 ms analysis bin)
   warmup_s: 2.0
   carryover_s: 2.0                     # the state conditioning leaves behind, measured before the reset
   reset_at_offline_onset: true         # see reset_note in the output: without it, persistence masquerades as replay

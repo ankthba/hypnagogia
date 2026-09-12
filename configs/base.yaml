@@ -36,7 +36,7 @@ noise:                          # STAGE 1 addition (not in Shiu et al. 2024, who
     weight_mV: 0.275            # one connectome synapse worth (= w_syn)
 
 run:
-  n_parallel: 8
+  n_parallel: 14
   openmp_threads: 0             # Apple clang has no -fopenmp; parallelism is across seeds/conditions in subprocesses
   delete_standalone: true
   extra_compile_args: ["-O3", "-ffast-math", "-march=native"]
