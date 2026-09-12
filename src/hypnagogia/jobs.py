@@ -99,8 +99,15 @@ def run_job(spec: dict) -> dict:
     init_w = None
     if spec.get("init_plastic_w"):   # None means start from the connectome weights, i.e. an unlearned network
         init_w = np.load(spec["init_plastic_w"])["w_final_mV"].astype(np.float64)
-    if spec.get("graded"):
-        spec["config"] = dict(spec["config"], graded={"index": [int(x) for x in resolve_group(conn, spec["graded"])]})
+    # Non-spiking populations come from the config so every stage gets them without having to ask.
+    from .populations import NON_SPIKING
+    gr = spec.get("graded")
+    if gr is None:
+        names = (spec["config"].get("graded_release") or {}).get("populations") or []
+        sel = [NON_SPIKING[n]["selector"] for n in names if n in NON_SPIKING]
+        gr = {"selectors": sel} if sel else None
+    if gr:
+        spec["config"] = dict(spec["config"], graded={"index": [int(x) for x in resolve_group(conn, gr)]})
     rv = resolve_group(conn, spec["record_v"]) if spec.get("record_v") else None
     sim = Simulation(conn, spec["config"], spec["out_dir"], spec["seed"], groups, record=record, plasticity=pl,
                      init_plastic_w=init_w, name=spec.get("name", "sim"), record_v=rv, record_v_dt_s=spec.get("record_v_dt_s", 0.001))

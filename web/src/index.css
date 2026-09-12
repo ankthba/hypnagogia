@@ -409,14 +409,19 @@ a.masthead__name:hover {
     column-gap: var(--space-md);
   }
 
-  /* Sticky beside the text. The masthead scrolls away with the page, so the offset is a small
-     margin rather than a nav height; the rail keeps its own scrollbar when it is taller than
-     the viewport. The sticky box is exactly the panel: no padding of its own to carry around. */
+  /* Sticky beside the text, sized to its own content. The masthead scrolls away with the page, so
+     the offset is a small margin rather than a nav height.
+
+     There is deliberately no max-height and no overflow-y here. A scroll container of its own gave
+     the rail a second scrollbar that swallowed the wheel over the map, hid the provenance line
+     below the fold of a box most readers never noticed was scrollable, and made a mouse over the
+     rail behave differently from a mouse over the text. When the panel is taller than the viewport
+     it now simply scrolls with the page: the top of it is pinned until its bottom comes into view,
+     which is what `align-self: start` plus `position: sticky` does. */
   .rail {
     position: sticky;
     top: var(--space-sm);
-    max-height: calc(100dvh - 2 * var(--space-sm));
-    overflow-y: auto;
+    align-self: start;
     padding: 0 0 var(--space-sm);
   }
 
@@ -1438,91 +1443,184 @@ pre.equations {
    11. The fly (decoration)
    --------------------------------------------------------- */
 
-/* Fixed to the viewport, never interactive, and painted *behind* the page content: z-index -1
-   puts it above the page background and below everything in normal flow, so it cannot cover a
-   control or a number. */
-/* The body fills are near-black (#2b2724), which in the light theme is the ink colour: text sitting
-   over the fly dropped to almost no contrast for the second or two it was there. It is decoration,
-   so it gives way - at 0.4 it blends toward whichever background is behind it and the type always
-   wins, in both themes. */
+/* Fixed to the viewport and painted OVER the page, not behind it. It was at z-index -1, which put
+   it under every block on the page and left it visible only over the empty margins; it is meant to
+   be a fly in the room, so it is now on top of everything, with a soft drop shadow under it so it
+   reads as being above the paper rather than printed on it. `pointer-events: none` is what makes
+   that safe: it cannot take a click, a text selection or a hover from anything underneath. */
 .fly {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: -1;
+  z-index: 9999;
   pointer-events: none;
   will-change: transform;
-  opacity: 0.4;
+  /* not fully opaque: it flies over running text, and text always has to win */
+  opacity: 0.92;
 }
 
 .fly svg {
   display: block;
   overflow: visible;
+  /* the cast shadow, offset down-right from a light above and behind the reader */
+  filter: drop-shadow(1.5px 2.5px 2.5px rgba(20, 16, 12, 0.32));
 }
 
+.fly__body {
+  transform-box: view-box;
+  transform-origin: 32px 23px;
+}
+
+/* The shadow the body itself throws on the page directly under it. It sits inside the SVG rather
+   than in the filter so it stays put while the body scales into a landing. */
+.fly__shadow {
+  fill: rgba(20, 16, 12, 0.16);
+  transform: translate(3px, 5px);
+}
+
+/* Body colours: a wild-type fly is tan-brown, not black. The scutum is the darker plate over the
+   top of the thorax; the abdomen's ground is the same tan with darker tergite bands over it. */
 .fly__abdomen {
-  fill: #2b2724;
+  fill: #8a6636;
+}
+
+.fly__tergites {
+  fill: none;
+  stroke: #2f2118;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.fly__tip {
+  fill: #2a1d14;
 }
 
 .fly__thorax {
-  fill: #453d36;
+  fill: #a07a44;
+}
+
+.fly__scutum {
+  fill: #6d4f2b;
 }
 
 .fly__scutellum {
-  fill: #5a5047;
+  fill: #b98d52;
 }
 
 .fly__head {
-  fill: #3a332d;
+  fill: #8a6636;
 }
 
-.fly__bands {
-  fill: none;
-  stroke: #6d6258;
-  stroke-width: 0.7;
-  opacity: 0.55;
+.fly__face {
+  fill: #cfa96c;
 }
 
 .fly__eye {
-  fill: #a8322a;
+  fill: #a8291f;
 }
 
 .fly__glint {
-  fill: #e0857c;
-  opacity: 0.75;
+  fill: #f0b3a6;
+  opacity: 0.85;
+}
+
+.fly__bristles {
+  fill: none;
+  stroke: #241a12;
+  stroke-width: 0.85;
+  stroke-linecap: round;
 }
 
 .fly__legs {
   fill: none;
-  stroke: #2b2724;
-  stroke-width: 0.85;
+  stroke: #35271b;
+  stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transform-box: view-box;
+  transform-origin: 34px 23px;
+  transition: transform 0.22s ease;
+}
+
+/* Tucked up under the thorax in flight, splayed out on the ground. */
+.fly__legs[data-tucked='true'] {
+  transform: scale(0.62, 0.66);
+}
+
+.fly__tarsus {
+  stroke-width: 1;
+}
+
+.fly__leg--fore {
+  transform-box: view-box;
+  transform-origin: 40px 23px;
+}
+
+.fly__antenna ellipse {
+  fill: #6d4f2b;
 }
 
 .fly__arista {
   fill: none;
-  stroke: #2b2724;
-  stroke-width: 0.6;
+  stroke: #35271b;
+  stroke-width: 0.7;
   stroke-linecap: round;
 }
 
-.fly__wings ellipse {
-  fill: #e8eef2;
-  fill-opacity: 0.42;
+.fly__arista-branch {
+  fill: none;
+  stroke: #35271b;
+  stroke-width: 0.45;
+  stroke-linecap: round;
+}
+
+.fly__proboscis {
+  fill: none;
+  stroke: #6d4f2b;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.fly__halteres {
+  fill: #b98d52;
+  stroke: #b98d52;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+/* Wings: hyaline, so nearly clear with a faint warm cast and visible veins. */
+.fly__wing-blade {
+  fill: #eef2f4;
+  fill-opacity: 0.34;
+  stroke: #9aa7ae;
+  stroke-width: 0.5;
+  stroke-opacity: 0.6;
+}
+
+.fly__veins {
+  fill: none;
+  stroke: #7d8a92;
+  stroke-width: 0.45;
+  stroke-opacity: 0.75;
+}
+
+.fly__alula {
+  fill: #eef2f4;
+  fill-opacity: 0.3;
   stroke: #9aa7ae;
   stroke-width: 0.4;
-  stroke-opacity: 0.55;
+  stroke-opacity: 0.5;
 }
 
 .fly__wing {
   transform-box: view-box;
-  transform-origin: 21px 16px;
+  transform-origin: 33px 23px;
 }
 
-/* Fast flapping, hinged at the thorax. Stopped while the fly is sitting. The period is 0.12s, not
-   the 0.06s it was: 60ms is 3.6 frames at a 60Hz refresh, so it beat against the frame clock and
-   read as an irregular wobble rather than a blur, at twice the per-frame style/paint cost. */
+/* Fast flapping, hinged at the scutellum. Stopped and folded while the fly is sitting. The period
+   is 0.12s, not the 0.06s it was: 60ms is 3.6 frames at a 60Hz refresh, so it beat against the
+   frame clock and read as an irregular wobble rather than a blur, at twice the per-frame cost. */
 .fly__wings[data-flying='true'] .fly__wing--upper {
   animation: fly-wing-upper 0.12s linear infinite;
 }
@@ -1531,23 +1629,36 @@ pre.equations {
   animation: fly-wing-lower 0.12s linear infinite;
 }
 
+/* Landed: the wings swing back and lie flat over the abdomen, as a resting fly holds them. */
+.fly__wings[data-flying='false'] .fly__wing {
+  transition: transform 0.22s ease;
+}
+
+.fly__wings[data-flying='false'] .fly__wing--upper {
+  transform: rotate(9deg) scaleY(0.68);
+}
+
+.fly__wings[data-flying='false'] .fly__wing--lower {
+  transform: rotate(-9deg) scaleY(0.68);
+}
+
 @keyframes fly-wing-upper {
   0%,
   100% {
-    transform: rotate(-13deg);
+    transform: rotate(-15deg) scaleY(0.9);
   }
   50% {
-    transform: rotate(12deg);
+    transform: rotate(14deg) scaleY(1.05);
   }
 }
 
 @keyframes fly-wing-lower {
   0%,
   100% {
-    transform: rotate(13deg);
+    transform: rotate(15deg) scaleY(0.9);
   }
   50% {
-    transform: rotate(-12deg);
+    transform: rotate(-14deg) scaleY(1.05);
   }
 }
 

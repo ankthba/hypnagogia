@@ -41,6 +41,17 @@ POPULATIONS = {
     "CX": {"selector": {"cell_class": "CX"}, "flywire_selector": {"cell_class": "CX"}, "source": "class CX (central complex)"},
 }
 
+# Neurons that do not fire action potentials and release transmitter continuously in proportion to membrane
+# depolarisation. APL: Amin H, Apostolopoulou AA, Suarez-Grimalt R, Vrontou E, Lin AC (2020) "Localized
+# learning-related plasticity in the mushroom body of adult Drosophila" / Amin & Lin, eLife 9:e56954 report that
+# APL does not fire action potentials. Modelling it as a spiking neuron turns the mushroom body's graded gain
+# control into a saturated binary relay.
+NON_SPIKING = {
+    "APL": {"selector": {"cell_type": "APL"},
+            "source": "Amin et al. 2020 eLife 9:e56954: APL does not fire action potentials; release is graded"},
+}
+
+
 # 'MB + CX + olfactory pathway' subset used for fast iteration
 SUBSET_MB_CX = {
     "name": "mb_cx",
