@@ -124,7 +124,7 @@ class Simulation:
             # --- dopamine-gated, anti-Hebbian two-factor rule at KC->MBON (see configs/base.yaml 'plasticity') ---
             psyn = Synapses(neu, neu, model="""w : volt
                                               w0 : volt (constant)
-                                              delig/dt = -elig/tau_e : 1 (clock-driven)
+                                              delig/dt = -elig/tau_e : 1 (event-driven)
                                               plastic : 1 (shared)""",
                             on_pre="g_post += w; elig += 1; w = clip(w + plastic*eta_ltp*da_post*w0, w_min_frac*w0, w_max_frac*w0)",
                             delay=m["delay_ms"] * ms, namespace=ns, name="psyn")
@@ -147,7 +147,11 @@ class Simulation:
             counts = ends - starts
             li = np.repeat(d_pre, counts)
             lj = np.concatenate([order[s:e] for s, e in zip(starts, ends)]) if counts.sum() else np.array([], dtype=np.int64)
-            ltd = Synapses(neu, psyn, on_pre="w_post = clip(w_post - plastic_post*eta_ltd*elig_post*w0_post, w_min_frac*w0_post, w_max_frac*w0_post)",
+            # The eligibility trace is event-driven, so Brian2 only integrates it at this synapse's own pre-spikes.
+            # A dopaminergic spike arrives through a different pathway, so the trace has to be decayed to the
+            # present time explicitly, using the lastupdate that the event-driven machinery maintains. Doing this
+            # clock-driven instead would integrate 61,210 synapses on every 0.1 ms step, which dominated the runtime.
+            ltd = Synapses(neu, psyn, on_pre="w_post = clip(w_post - plastic_post*eta_ltd*elig_post*exp(-(t - lastupdate_post)/tau_e)*w0_post, w_min_frac*w0_post, w_max_frac*w0_post)",
                            delay=m["delay_ms"] * ms, namespace=ns, name="ltd")
             ltd.connect(i=li.astype(np.int64), j=lj.astype(np.int64))
             objs += [psyn, dsyn, ltd]

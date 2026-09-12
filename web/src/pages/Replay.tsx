@@ -186,10 +186,17 @@ function BrainMapBlockInner({
   }
 
   const atlasData: AtlasData = atlas.data;
+  const prov = atlasProvenance(
+    atlasData,
+    manifest,
+    act ? [`web/public/data/${activityPath}`, `web/public/data/replay/${act.sidecar.bin}`] : [],
+  );
   return (
     <Figure
       title="Brain map · soma positions, lit by spikes"
-      provenance={atlasProvenance(manifest, act ? [`web/public/data/${activityPath}`, `web/public/data/replay/${act.sidecar.bin}`] : [])}
+      provenance={prov.provenance}
+      provenanceCommitNote={prov.commitNote}
+      provenanceNote={prov.note}
       caption={<AtlasCaption atlas={atlasData} activity={act} />}
     >
       {activity === null && (
@@ -232,7 +239,15 @@ function BrainMapBlockInner({
           />
         </div>
       )}
-      <BrainMap atlas={atlasData} activity={act} timeMs={act ? timeMs : null} decayMs={decayMs} height={height} />
+      {/* no loopMs: this timeline runs once and stops, so 0 really is the start of the file */}
+      <BrainMap
+        atlas={atlasData}
+        activity={act}
+        source={{ text: sourceText }}
+        timeMs={act ? timeMs : null}
+        decayMs={decayMs}
+        height={height}
+      />
     </Figure>
   );
 }
@@ -305,7 +320,14 @@ export default function Replay() {
             </p>
           </div>
           {/* no seed is identified yet, so no concrete file is named: the panel shows the convention as one */}
-          <BrainMapBlock activity={null} activityPath={null} timeMs={null} decayMs={DECAY_MS} height={520} />
+          <BrainMapBlock
+            activity={null}
+            activityPath={null}
+            sourceText="atlas only · no spikes loaded"
+            timeMs={null}
+            decayMs={DECAY_MS}
+            height={520}
+          />
         </section>
       )}
 
@@ -379,13 +401,18 @@ function Stage6View({ d, cond }: { d: Stage6; cond: Cond }) {
       message: `stale pairing with neuron_atlas.bin: ${chk.message}. Re-run scripts/export_web.py so the spikes and the atlas come from one export.`,
     };
   }, [activityRaw, atlas, activityPath]);
-  const act = activity !== null && activity.state === 'ready' ? activity.data : null;
 
-  // Hand the loaded activity to the persistent map panel in the rail. The contract gives this file
-  // priority over the reference clips: while it is loaded the panel plays the replay result and
-  // stops offering clips. Publishing nothing (no file for this seed/condition) leaves the panel on
-  // a reference clip, which it labels as such.
-  usePublishReplayActivity(act && activityPath && seed !== null ? { path: activityPath, condition: cond, seed, data: act } : null);
+  // Hand the *selection* to the persistent map panel in the rail, in whatever state its file is.
+  // The contract lets a reference clip stand in only when the selected seed/condition has no
+  // activity file at all; a file that is named but absent, unreadable or stale-paired is a finding,
+  // not an absence, and the panel has to report it rather than animate a different simulation
+  // beside this page's "nothing is lit". Publishing null - no seed named by stage 6 - is the one
+  // case in which the panel may fall back to a clip, which it labels as such.
+  const selection = useMemo(
+    () => (activityPath && seed !== null ? { path: activityPath, condition: cond, seed, load: activity ?? ({ state: 'loading' } as const) } : null),
+    [activityPath, seed, cond, activity],
+  );
+  usePublishReplayActivity(selection);
 
   const perSeedRows = (d.per_seed ?? []).filter((r) => r.condition === cond);
 
@@ -624,6 +651,11 @@ function ReplayWindow({
         <BrainMapBlock
           activity={activity}
           activityPath={activityPath}
+          sourceText={
+            act
+              ? `replay result · ${cond}, seed ${seed ?? '?'}`
+              : `replay result · ${cond}, seed ${seed ?? '?'} · not loaded, nothing is lit`
+          }
           timeMs={timeline.durationKnown ? mapTimeMs : null}
           decayMs={DECAY_MS}
           height={520}

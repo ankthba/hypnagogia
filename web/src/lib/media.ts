@@ -27,6 +27,34 @@ export function useNarrowViewport(maxPx = 700): boolean {
   return useMediaQuery(`(max-width: ${maxPx}px)`);
 }
 
+/**
+ * The viewport height in CSS pixels, tracked. Used to budget a fixed-height canvas against the
+ * screen it has to fit on rather than against a constant, so a sticky panel does not end up taller
+ * than the rail that holds it and grow a scrollbar of its own.
+ */
+export function useViewportHeight(): number {
+  const [h, setH] = useState(() => (typeof window === 'undefined' ? 900 : window.innerHeight));
+  useEffect(() => {
+    let raf = 0;
+    const on = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setH(window.innerHeight);
+      });
+    };
+    on();
+    window.addEventListener('resize', on);
+    window.addEventListener('orientationchange', on);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('resize', on);
+      window.removeEventListener('orientationchange', on);
+    };
+  }, []);
+  return h;
+}
+
 /** True on a touch screen, where hover does not exist and hit targets must be finger-sized. */
 export function useCoarsePointer(): boolean {
   return useMediaQuery('(pointer: coarse)');

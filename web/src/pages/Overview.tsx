@@ -302,11 +302,14 @@ function AtlasFigure({ m }: { m: Manifest }) {
       </div>
     );
   }
+  const prov = atlasProvenance(atlas.data, m);
   return (
     <div className="mt-8">
       <Figure
         title="Where the simulated neurons are"
-        provenance={atlasProvenance(m)}
+        provenance={prov.provenance}
+        provenanceCommitNote={prov.commitNote}
+        provenanceNote={prov.note}
         caption={
           <>
             <AtlasCaption atlas={atlas.data} /> This map is static; the same map is driven by the replay spikes on the{' '}
@@ -317,7 +320,7 @@ function AtlasFigure({ m }: { m: Manifest }) {
           </>
         }
       >
-        <BrainMap atlas={atlas.data} height={560} />
+        <BrainMap atlas={atlas.data} source={{ text: 'atlas only · no spikes loaded' }} height={560} />
       </Figure>
     </div>
   );

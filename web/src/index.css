@@ -1195,13 +1195,23 @@ pre.equations {
 }
 
 .map-panel__head {
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.map-panel__head-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.6rem;
-  padding-bottom: 0.45rem;
-  border-bottom: 1px solid var(--color-border);
+}
+
+/* What the map is currently showing, on the head rule: the identity of the picture is above it as
+   well as burned into it, so no crop and no glance can take one for the other. */
+.map-panel__head-source {
+  margin-top: 0.15rem;
+  line-height: 1.35;
 }
 
 .map-panel canvas {
@@ -1234,6 +1244,53 @@ pre.equations {
   font-size: 0.85rem;
   padding: 0.1rem 0.55rem;
   font-variant-numeric: tabular-nums;
+}
+
+/* Time readout, and under it the clip's own stimulation schedule. */
+.map-panel__clock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 8rem;
+  flex: 1 1 8rem;
+}
+
+/* One bar per epoch across the loop: driven epochs in the failed tone, the current one solid, with
+   the playhead over them. A pulsing cascade must never be read as a spontaneous one. */
+.epoch-strip {
+  position: relative;
+  height: 7px;
+  width: 100%;
+  background: var(--color-bg-alt);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.epoch-strip__seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--color-border);
+}
+
+.epoch-strip__seg--on {
+  background: color-mix(in srgb, var(--color-failed) 45%, transparent);
+}
+
+.epoch-strip__seg--now {
+  background: var(--color-muted);
+}
+
+.epoch-strip__seg--on.epoch-strip__seg--now {
+  background: var(--color-failed);
+}
+
+.epoch-strip__head {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: var(--color-fg);
 }
 
 .map-panel__select {
