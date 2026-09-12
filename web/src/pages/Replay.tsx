@@ -494,8 +494,9 @@ function Stage6View({ d }: { d: Stage6 }) {
     <div className="space-y-6">
       <div className="measure" style={{ borderTop: '1px solid var(--color-fg)', paddingTop: '1rem' }}>
         <div className="banner__title" style={{ fontSize: '1.6rem' }}>
-          {d.headline}
+          {leadSentence(d.headline).lead}
         </div>
+        {leadSentence(d.headline).rest && <p className="mt-3">{leadSentence(d.headline).rest}</p>}
         <div className="mt-2 smaller muted">
           headline sentence from <span className="mono">stage6_replay.json</span> · window {fmtNum(d.window_ms)} ms · {fmtInt(d.n_seeds)} seeds
         </div>
@@ -721,6 +722,26 @@ function Stage6View({ d }: { d: Stage6 }) {
 }
 
 /** The p value the file carries for a comparison, in the order the caption states. */
+/**
+ * The verdict sentence, split from everything that qualifies it.
+ *
+ * The stage file's headline can run to several hundred characters once the continuity check, the
+ * naive-weights comparison and the causal guard have each added their clause, and setting all of that
+ * at 1.6rem gives the reader a wall. The first sentence carries the verdict and is set large; the rest
+ * is set at reading size underneath. If no clean first sentence can be found, or it is too short or too
+ * long to be the verdict on its own, the whole thing is set large, exactly as before.
+ */
+function leadSentence(text: string | undefined): { lead: string; rest: string } {
+  const t = (text ?? '').trim();
+  if (!t) return { lead: '', rest: '' };
+  // a full stop, then a space, then a capital or a quote: not "et al." or "0.14" or "e.g."
+  const m = /[.!?]\s+(?=["'‘“(]?[A-Z])/.exec(t);
+  if (!m) return { lead: t, rest: '' };
+  const cut = m.index + 1;
+  if (cut < 40 || cut > 240) return { lead: t, rest: '' };
+  return { lead: t.slice(0, cut), rest: t.slice(cut).trim() };
+}
+
 function headlineP(c: Comparison): number | null {
   return isNum(c.p) ? c.p : isNum(c.p_permutation) ? c.p_permutation : isNum(c.p_wilcoxon) ? c.p_wilcoxon : null;
 }
