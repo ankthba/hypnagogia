@@ -1,0 +1,180 @@
+{
+ "status": "passed",
+ "n_arms": 3,
+ "question": "Does removing the Kenyon cells' axonal recurrence, which the literature says is not fast excitation, give the model the pausing background every replay statistic needs?",
+ "deviation": "kc_kc_axonal_not_nicotinic",
+ "answer_is_no": true,
+ "kc_rate_change_pct": -12.50175417180159,
+ "pop_rate_change_pct": -0.20418743287270322,
+ "arms": [
+  {
+   "tag": "full",
+   "retained_fraction": 1.0,
+   "synapses_removed": 0,
+   "share_of_kc_input_removed": 0.0,
+   "has_critical_regime": false,
+   "is_bistable": true,
+   "bistable_sigmas_mV": [
+    1.45,
+    1.5
+   ],
+   "operating_sigma_mV": 1.55,
+   "operating_sigma_classification": "saturated",
+   "operating_kc_rate_hz": 0.3801878280839895,
+   "operating_pop_rate_hz": 1.6367130345540153,
+   "any_sigma_with_applicable_avalanches_and_activity": false
+  },
+  {
+   "tag": "full_kckc0.5",
+   "retained_fraction": 0.5,
+   "synapses_removed": 381917,
+   "share_of_kc_input_removed": 0.18341720971400388,
+   "has_critical_regime": false,
+   "is_bistable": true,
+   "bistable_sigmas_mV": [
+    1.5
+   ],
+   "operating_sigma_mV": 1.6,
+   "operating_sigma_classification": "saturated",
+   "operating_kc_rate_hz": 0.4386482939632546,
+   "operating_pop_rate_hz": 1.8984650749953191,
+   "any_sigma_with_applicable_avalanches_and_activity": false
+  },
+  {
+   "tag": "full_kckc0.0",
+   "retained_fraction": 0.0,
+   "synapses_removed": 763745,
+   "share_of_kc_input_removed": 0.3667916768120348,
+   "has_critical_regime": false,
+   "is_bistable": true,
+   "bistable_sigmas_mV": [
+    1.5
+   ],
+   "operating_sigma_mV": 1.6,
+   "operating_sigma_classification": "saturated",
+   "operating_kc_rate_hz": 0.42328986220472437,
+   "operating_pop_rate_hz": 1.896812381104277,
+   "any_sigma_with_applicable_avalanches_and_activity": false
+  }
+ ],
+ "matched_by_sigma": [
+  {
+   "sigma_mV": 0.5,
+   "kc_1.0": 0.0,
+   "pop_1.0": 0.0,
+   "class_1.0": "silent",
+   "kc_0.5": 0.0,
+   "pop_0.5": 0.0,
+   "class_0.5": "silent",
+   "kc_0.0": 0.0,
+   "pop_0.0": 0.0,
+   "class_0.0": "silent"
+  },
+  {
+   "sigma_mV": 1.0,
+   "kc_1.0": 0.0,
+   "pop_1.0": 0.0,
+   "class_1.0": "silent",
+   "kc_0.5": 0.0,
+   "pop_0.5": 0.0,
+   "class_0.5": "silent",
+   "kc_0.0": 0.0,
+   "pop_0.0": 0.0,
+   "class_0.0": "silent"
+  },
+  {
+   "sigma_mV": 1.4,
+   "kc_1.0": 8.202099737532808e-05,
+   "pop_1.0": 0.0002623507085780592,
+   "class_1.0": "silent",
+   "kc_0.5": 8.202099737532808e-05,
+   "pop_0.5": 0.0002623507085780592,
+   "class_0.5": "silent",
+   "kc_0.0": 8.202099737532808e-05,
+   "pop_0.0": 0.0002623507085780592,
+   "class_0.0": "silent"
+  },
+  {
+   "sigma_mV": 1.5,
+   "kc_1.0": 0.22301509186351706,
+   "pop_1.0": 1.0057081504390617,
+   "class_1.0": "bistable",
+   "kc_0.5": 0.21438238188976377,
+   "pop_0.5": 1.001917356059608,
+   "class_0.5": "bistable",
+   "kc_0.0": 0.2082923228346457,
+   "pop_0.0": 1.0028257598346844,
+   "class_0.0": "bistable"
+  },
+  {
+   "sigma_mV": 1.6,
+   "kc_1.0": 0.4556676509186352,
+   "pop_1.0": 1.9037438717417083,
+   "class_1.0": "saturated",
+   "kc_0.5": 0.4386482939632546,
+   "pop_0.5": 1.8984650749953191,
+   "class_0.5": "saturated",
+   "kc_0.0": 0.42328986220472437,
+   "pop_0.0": 1.896812381104277,
+   "class_0.0": "saturated"
+  },
+  {
+   "sigma_mV": 1.8,
+   "kc_1.0": 0.5553231627296588,
+   "pop_1.0": 1.9807784766091807,
+   "class_1.0": "saturated",
+   "kc_0.5": 0.5247703412073491,
+   "pop_0.5": 1.9791968601127532,
+   "class_0.5": "saturated",
+   "kc_0.0": 0.5032398293963255,
+   "pop_0.0": 1.9808842259036072,
+   "class_0.0": "saturated"
+  },
+  {
+   "sigma_mV": 2.0,
+   "kc_1.0": 0.6864952427821521,
+   "pop_1.0": 2.151352666384669,
+   "class_1.0": "saturated",
+   "kc_0.5": 0.6457513123359581,
+   "pop_0.5": 2.145207650007974,
+   "class_0.5": "saturated",
+   "kc_0.0": 0.6109128937007874,
+   "pop_0.0": 2.1530752819403323,
+   "class_0.0": "saturated"
+  },
+  {
+   "sigma_mV": 2.4,
+   "kc_1.0": 1.024995898950131,
+   "pop_1.0": 2.683090745607648,
+   "class_1.0": "saturated",
+   "kc_0.5": 0.9442462270341209,
+   "pop_0.5": 2.680897747944534,
+   "class_0.5": "saturated",
+   "kc_0.0": 0.8884719488188977,
+   "pop_0.0": 2.679447306802396,
+   "class_0.0": "saturated"
+  },
+  {
+   "sigma_mV": 4.0,
+   "kc_1.0": 4.363804133858268,
+   "pop_1.0": 7.506252499266111,
+   "class_1.0": "saturated",
+   "kc_0.5": 3.5992864173228347,
+   "pop_0.5": 7.479514107996034,
+   "class_0.5": "saturated",
+   "kc_0.0": 3.159612860892388,
+   "pop_0.0": 7.466916651064312,
+   "class_0.0": "saturated"
+  }
+ ],
+ "finding": "Removing the Kenyon cells' axonal recurrence does not give the network a background that pauses. Taking out 763,745 synapses, 37% of everything landing on Kenyon cells and the single largest input they have, leaves the picture as it was: still no critical regime, still bistable, still silent below the transition and continuously active above it, and still no sigma with both activity and a defined avalanche analysis. At the sigmas where both arms are active the Kenyon cells change by -12.5 per cent and the whole brain by -0.2 per cent. The operating point moves from 1.55 mV, Kenyon cells at 0.380 Hz, to 1.6 mV at 0.423 Hz. The conclusion is about where the activity comes from: the Kenyon cells are not driven by each other, they are driven from upstream, so removing their recurrence changes them barely at all. The state that never pauses is not theirs.",
+ "provenance": {
+  "config": "configs/stage2_criticality.yaml",
+  "results_dir": "results/stage10_recurrence",
+  "files": [
+   "results/stage2_criticality/full/stage2.json",
+   "results/stage2_criticality/full_kckc0.5/stage2.json",
+   "results/stage2_criticality/full_kckc0.0/stage2.json"
+  ]
+ }
+}
