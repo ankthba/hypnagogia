@@ -329,7 +329,7 @@ def main():
         w("**Not run.**")
         w()
 
-    w("## Stage 3a2 - the DPM transmitter correction")
+    w("## Stage 3f - the DPM transmitter correction")
     w()
     if s3f:
         w(f"**{s3f.get('finding', '')}**")
@@ -356,7 +356,7 @@ def main():
             w()
             w(y.get("note", ""))
             w()
-            if y.get("source"):
+            if y.get("source") and y["source"] != s3f.get("correction"):
                 w(f"Source: {y['source']}")
                 w()
         sm = s3f.get("summary", {})

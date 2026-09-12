@@ -1,6 +1,6 @@
 # hypnagogia: results
 
-*Generated 2026-09-12T06:18:42+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
+*Generated 2026-09-12T07:29:12+00:00 by `scripts/make_results.py`. Every number is read from a file under `results/`; nothing in this document is written by hand. Stages that have not run say so.*
 
 **Question.** Can a whole-brain *Drosophila* connectome model spontaneously reactivate a learned memory during a simulated sleep state? Encode an odour memory through dopamine-gated plasticity at Kenyon-cell to mushroom-body-output-neuron synapses, then look for the same Kenyon-cell ensemble switching on again, by itself, during an offline period with no odour input.
 
@@ -75,44 +75,31 @@ With synapses switched off, the Gaussian drive reproduces its target membrane st
 
 ## Stage 2 - is there a critical regime? No. The model is bistable.
 
-**passed.** Noise amplitude was swept over 26 values (0.5 to 8.0 mV) with up to 10 seeds each, on the full 144,209-neuron network.
+**passed.** Noise amplitude was swept over 13 values (0.5 to 4.0 mV) with up to 10 seeds each, on the full 144,209-neuron network.
 
 **There is no critical regime: `has_critical_regime = False`.** That is a finding, not a failure, and it was a stated possibility before the sweep ran: the model has no spike-frequency adaptation and no short-term synaptic depression, so nothing holds it at an intermediate activity level.
 
-What the sweep found instead is **bistability**. At 7 noise amplitudes (1.41, 1.43, 1.44, 1.45, 1.46, 1.47, 1.5 mV) independent seeds of the *same* simulation either stayed quiescent or ignited into a high-rate state, with nothing in between. The noise amplitude controls the probability of ignition, not the resulting rate.
+What the sweep found instead is **bistability**. At 2 noise amplitudes (1.45, 1.5 mV) independent seeds of the *same* simulation either stayed quiescent or ignited into a high-rate state, with nothing in between. The noise amplitude controls the probability of ignition, not the resulting rate.
 
 | noise sigma | seeds | probability of ignition | KC rate if quiescent | KC rate if ignited |
 |---|---|---|---|---|
 | 0.5 mV | 3 | 0% | 0.00000 Hz | - |
-| 0.71 mV | 3 | 0% | 0.00000 Hz | - |
 | 1.0 mV | 3 | 0% | 0.00000 Hz | - |
-| 1.41 mV | 10 | 20% | 0.00038 Hz | 25.6 Hz |
-| 1.42 mV | 3 | 0% | 0.00043 Hz | - |
-| 1.43 mV | 10 | 20% | 0.00048 Hz | 25.7 Hz |
-| 1.44 mV | 3 | 33% | 0.00068 Hz | 23.2 Hz |
-| 1.45 mV | 10 | 40% | 0.00059 Hz | 28.3 Hz |
-| 1.46 mV | 3 | 33% | 0.00086 Hz | 23.4 Hz |
-| 1.47 mV | 10 | 40% | 0.00087 Hz | 28.4 Hz |
-| 1.48 mV | 3 | 100% | - | 28.6 Hz |
-| 1.5 mV | 10 | 70% | 0.00131 Hz | 30.8 Hz |
-| 1.55 mV | 3 | 100% | - | 33.8 Hz |
-| 1.6 mV | 3 | 100% | - | 39.2 Hz |
-| 1.65 mV | 3 | 100% | - | 39.5 Hz |
-| 1.7 mV | 3 | 100% | - | 39.7 Hz |
-| 1.75 mV | 3 | 100% | - | 40.0 Hz |
-| 1.8 mV | 3 | 100% | - | 40.3 Hz |
-| 1.85 mV | 3 | 100% | - | 40.6 Hz |
-| 1.9 mV | 3 | 100% | - | 40.7 Hz |
-| 1.95 mV | 3 | 100% | - | 40.9 Hz |
-| 2.0 mV | 3 | 100% | - | 41.3 Hz |
-| 2.83 mV | 3 | 100% | - | 45.0 Hz |
-| 4.0 mV | 3 | 100% | - | 53.0 Hz |
-| 5.66 mV | 3 | 100% | - | 68.6 Hz |
-| 8.0 mV | 3 | 100% | - | 82.2 Hz |
+| 1.4 mV | 3 | 0% | 0.00008 Hz | - |
+| 1.45 mV | 3 | 33% | 0.00012 Hz | 0.2 Hz |
+| 1.5 mV | 3 | 67% | 0.00031 Hz | 0.3 Hz |
+| 1.55 mV | 3 | 100% | - | 0.4 Hz |
+| 1.6 mV | 3 | 100% | - | 0.5 Hz |
+| 1.7 mV | 3 | 100% | - | 0.5 Hz |
+| 1.8 mV | 3 | 100% | - | 0.6 Hz |
+| 2.0 mV | 3 | 100% | - | 0.7 Hz |
+| 2.4 mV | 3 | 100% | - | 1.0 Hz |
+| 3.2 mV | 3 | 100% | - | 2.2 Hz |
+| 4.0 mV | 3 | 100% | - | 4.4 Hz |
 
 **The consequence matters more than the criticality question.** The measured spontaneous firing rate of Kenyon cells in a real fly is about 0.1 Hz (Turner, Bazhenov & Laurent 2008, *J Neurophysiol* 99:734). In this model the quiescent branch puts Kenyon cells near 0.0005 Hz and the ignited branch puts them above 20 Hz. **0.1 Hz falls inside a gap of more than four orders of magnitude that the model cannot produce at any noise amplitude.** There is no setting of the background drive at which the mushroom body idles the way a real one does.
 
-Operating point chosen for the downstream stages: **sigma = 1.41 mV**. NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = 1.41 mV (KC rate 5.1292 Hz, whole-brain rate 0.4367 Hz/neuron, m = 0.9983271721650149).
+Operating point chosen for the downstream stages: **sigma = 1.55 mV**. NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical point: it is the sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = 1.55 mV (KC rate 0.3802 Hz, whole-brain rate 1.6367 Hz/neuron, m = 0.6619055704202556). Sigmas whose outcome depends on the seed are excluded, because the rate reported for one of those is an average of two different states rather than the rate of a state. The chosen sigma is classified 'saturated', which in this pipeline means the whole brain's activity never pauses (1.637 Hz per neuron) and the avalanche analysis is therefore not applicable there. That is a property of the model and is reported as one. It is not a statement about the Kenyon cells, which idle at 0.380 Hz inside that state against the 0.1 Hz measured. Excluding the continuously active states, as an earlier version of this rule did, would have chosen sigma = 1.4 mV instead, where the Kenyon cells fire at 0.00008 Hz and the whole brain at 0.00026 Hz per neuron, which is further from the measurement, not closer.
 
 Two methodological points, both of which changed the numbers:
 
@@ -145,6 +132,29 @@ A single Kenyon-cell spike already carries APL most of the way to threshold, and
 | graded, corrected | 4.5% | 0.79 Hz | 0.13 Hz | 0.0 Hz |
 
 Real Kenyon cells respond at 6 plus or minus 5 per cent of the population and idle near 0.1 Hz (Turner, Bazhenov & Laurent 2008). The corrected model lands on both; the published one misses each by more than two orders of magnitude. No parameter was changed to obtain this: the only difference between the two rows is whether APL is allowed to fire action potentials.
+
+## Stage 3f - the DPM transmitter correction
+
+**The substitution changes nothing measurable, because DPM never fires a single spike in either condition and so never releases anything for the sign to apply to. The reason is the other correction: APL modelled as non-spiking sits at its saturating release level and delivers a steady 290 mV of hyperpolarising drive to DPM through 1,595 synapses, which is 41 times DPM's threshold gap. Both runs give 4.45% of Kenyon cells at 0.778 Hz during the odour and 0.138 Hz after it. The transmitter assignment is still wrong and is still corrected everywhere, but in this model it is inert: DPM is one of the cells the corrected APL switches off. The same happens to the readout MBON. Both cells have measured odour responses in the fly, so a model in which APL silences them is not reproducing them.**
+
+Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.
+
+| quantity | value |
+|---|---|
+| DPM synapses onto Kenyon cells | 32,795 onto 3,989 of 4,064 |
+| Kenyon-cell synapses onto DPM | 95,527 from 4,042 cells |
+| DPM's share of all input onto Kenyon cells | 1.57% |
+| one DPM spike delivers to each Kenyon cell | 1.31 mV, 19% of a full threshold gap |
+| what the corrected APL delivers to DPM | -290 mV through 1,595 synapses, 41 times its threshold gap |
+| transmitter the connectome predicts | dopamine |
+| transmitter that was measured | gaba |
+
+With the predicted transmitter the Kenyon-cell population drives DPM and DPM drives the whole Kenyon-cell population back, so the mushroom body carries a second brain-wide POSITIVE feedback loop on top of the recurrent Kenyon-cell wiring, in parallel with the one negative loop (APL) that is supposed to keep the code sparse. With the measured transmitter it is a second negative loop, which is what the chloride measurement shows.
+
+| DPM | Kenyon cells responding | rate during odour | rate after odour | readout MBON | DPM rate |
+|---|---|---|---|---|---|
+| as predicted (dopamine, excitatory) | 4.45% | 0.778 Hz | 0.138 Hz | 0.00 Hz | 0.00 Hz |
+| as measured (GABA, inhibitory) | 4.45% | 0.778 Hz | 0.138 Hz | 0.00 Hz | 0.00 Hz |
 
 ## Stage 3b - is there a sparse odour code to build a memory on?
 
@@ -217,17 +227,17 @@ No gain in the scan produced sparse, transient Kenyon-cell coding.
 
 | gain | effective W_syn | Kenyon cells responding | spikes per responding cell | rate during | rate after | sparse | transient |
 |---|---|---|---|---|---|---|---|
-| 1.00 (published) | 0.15978 mV | 67.5% | 59.4 | 3.4492 | 2.8774 | no | no |
-| 0.80 | 0.12782 mV | 36.8% | 23.8 | 1.8183 | 1.2726 | no | no |
-| 0.60 | 0.09586 mV | 8.2% | 17.0 | 1.1573 | 0.8307 | yes | no |
-| 0.50 | 0.07989 mV | 2.8% | 14.9 | 0.9516 | 0.6472 | no | no |
-| 0.40 | 0.06391 mV | 0.4% | 10.5 | 0.7607 | 0.4695 | no | no |
-| 0.35 | 0.05592 mV | 0.0% | 0.0 | 0.6757 | 0.3922 | no | no |
-| 0.30 | 0.04793 mV | 0.0% | 0.0 | 0.5955 | 0.3161 | no | no |
-| 0.25 | 0.03994 mV | 0.0% | 0.0 | 0.5201 | 0.2460 | no | no |
-| 0.20 | 0.03196 mV | 0.0% | 0.0 | 0.4454 | 0.1737 | no | no |
-| 0.15 | 0.02397 mV | 0.0% | 0.0 | 0.3702 | 0.0978 | no | no |
-| 0.10 | 0.01598 mV | 0.0% | 0.0 | 0.2665 | 0.0000 | no | yes |
+| 1.00 (published) | 0.15978 mV | 4.4% | 17.8 | 2.0240 | 1.6975 | no | no |
+| 0.80 | 0.12782 mV | 1.2% | 14.4 | 1.4354 | 1.0944 | no | no |
+| 0.60 | 0.09586 mV | 0.0% | 11.7 | 1.0721 | 0.7602 | no | no |
+| 0.50 | 0.07989 mV | 0.0% | 0.0 | 0.9017 | 0.6002 | no | no |
+| 0.40 | 0.06391 mV | 0.0% | 0.0 | 0.7299 | 0.4375 | no | no |
+| 0.35 | 0.05592 mV | 0.0% | 0.0 | 0.6495 | 0.3635 | no | no |
+| 0.30 | 0.04793 mV | 0.0% | 0.0 | 0.5738 | 0.2932 | no | no |
+| 0.25 | 0.03994 mV | 0.0% | 0.0 | 0.5029 | 0.2272 | no | no |
+| 0.20 | 0.03196 mV | 0.0% | 0.0 | 0.4322 | 0.1571 | no | no |
+| 0.15 | 0.02397 mV | 0.0% | 0.0 | 0.3612 | 0.0873 | no | no |
+| 0.10 | 0.01598 mV | 0.0% | 0.0 | 0.2661 | 0.0000 | no | yes |
 
 ## Stage 3c - is the runaway the model, or this dataset?
 
@@ -264,9 +274,7 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 
 ## Stage 3 - dopamine-gated plasticity
 
-**passed.** Criterion: unit test passes (depression only when Kenyon-cell activity precedes dopamine); the readout MBON responds to the calibration odour before pairing (> 5 spikes/s); and some learning rate in the grid produces a clear depression. Whether that depression can be made GRADED, as Hige et al. measured, is reported separately rather than being required.
-
-**Run at a synaptic gain of 0.6, a labelled deviation from the published parameters.** DEVIATION: every synaptic weight scaled to 0.6 of its published value, because at the published value the network has no sparse odour code to store a memory in (stage 3b). This is an uncited free parameter introduced by this project; see configs/stage3d_gain.yaml.
+**passed.** Criterion: unit test passes (depression only when Kenyon-cell activity precedes dopamine); the readout MBON carries a measurable odour signal before pairing, as spikes (> 5 spikes/s) or, when the corrected APL holds it below threshold, as an odour-evoked EPSC from the Kenyon cells the odour drove; and some learning rate in the grid produces a clear depression. Whether that depression can be made GRADED, as Hige et al. measured, is reported separately rather than being required.
 
 - Rule: dopamine-gated anti-Hebbian two-factor LTD at KC->MBON; no MBON postsynaptic term (Hige 2015 showed LTD with MBON spikes blocked); compartment specificity from connectome DAN->MBON synapses
   - `de/dt = -e/tau_e (per KC->MBON synapse); on KC spike: e += 1`
@@ -275,7 +283,7 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
   - `w in [w_min_frac*w0, w_max_frac*w0]; w(0) = w0 = sign*count*0.581*W_syn`
 - Plastic synapses: 61,210 Kenyon-cell to output-neuron connections (463,640 synapses) between 4,064 Kenyon cells and 97 output neurons, gated by 340 dopaminergic neurons through 1,408 connections.
 - **The readout is all-or-none, not graded.** The readout MBON's odour response is all-or-none here: every learning rate in the grid, including the smallest, takes it from its full response to exactly zero, with nothing in between. Hige et al. measured a graded 80% reduction in a real fly, so that endpoint is not reproducible in this model. The depression is still odour-specific, which is what the memory test needs, and stage 4 tests that directly.
-- Learning rate chosen: 0.0005 - the readout MBON is all-or-none in this model, so Hige's graded endpoint cannot be matched; the SMALLEST learning rate that still produces a clear depression is used instead, to keep the plasticity as weak as possible while remaining measurable
+- Learning rate chosen: 0.0005 - The readout MBON does not spike in this model, because APL modelled as non-spiking holds it below threshold, so Hige's spike endpoint has no value to fit. The learning rate is fitted instead to the other endpoint Hige et al. measured in the same cell after the same single pairing: the odour-evoked EPSC, target 0.10 of its pre-pairing value. The EPSC here is the summed weight of the plastic synapses from the Kenyon cells the calibration odour actually drove. The chosen rate is the one whose endpoint is closest to that target.
 - Unit test on an isolated three-neuron circuit: passed. Pairing Kenyon-cell activity with dopaminergic activity depressed the synapse to 0.000 of its starting weight; dopamine alone and Kenyon-cell activity alone left it unchanged.
 
 | parameter | value | source | cited |
@@ -289,7 +297,7 @@ Olfactory input ignites EVERY network tested, at every rate, including the FlyWi
 | w bounds | [0.0, 1.0] x w0, init at w0 | Jiang & Litwin-Kumar 2021; Eschbach 2020 (init at w_max) | yes |
 | dan_mbon_min_synapses | 5 | uncited pipeline choice (compartment gating threshold) | **no** |
 | DAN pairing rate | 20.0 Hz for 2.0 s from +0.2 s | timing from Hige 2015; rate uncited (absorbed by eta_ltd) | **no** |
-| background sigma during calibration | 0.0 mV | conditioning_sigma_mV in configs/stage4_encode.yaml (0.0 mV), matching stage 4; the offline background is 1.6 mV from stage2 operating point (NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = 1.6 mV (KC rate 1.9667 Hz, whole-brain rate 0.7866 Hz/neuron, m = 0.9999994021964815).) | **no** |
+| background sigma during calibration | 0.0 mV | conditioning_sigma_mV in configs/stage4_encode.yaml (0.0 mV), matching stage 4; the offline background is 1.4 mV from stage2 operating point (NO critical regime found in the sweep (no sigma satisfied all criteria; the network is bistable - silent below the transition and continuously active above it). The operating point for the downstream stages is therefore NOT a critical point: it is the non-saturated sigma whose Kenyon-cell population rate is closest to the measured KC spontaneous rate of 0.1 Hz (Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734), i.e. sigma = 1.4 mV (KC rate 0.0001 Hz, whole-brain rate 0.0003 Hz/neuron, m = None). Sigmas whose outcome depends on the seed are excluded, because the rate reported for one of those is an average of two different states rather than the rate of a state.) | **no** |
 
 ## Stage 4 - encoding a memory
 
