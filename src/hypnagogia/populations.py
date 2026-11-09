@@ -43,7 +43,7 @@ POPULATIONS = {
 
 # Neurons that do not fire action potentials and release transmitter continuously in proportion to membrane
 # depolarisation. APL: Amin H, Apostolopoulou AA, Suarez-Grimalt R, Vrontou E, Lin AC (2020) "Localized
-# learning-related plasticity in the mushroom body of adult Drosophila" / Amin & Lin, eLife 9:e56954 report that
+# inhibition in the Drosophila mushroom body", eLife 9:e56954, report that
 # APL does not fire action potentials. Modelling it as a spiking neuron turns the mushroom body's graded gain
 # control into a saturated binary relay.
 NON_SPIKING = {
@@ -69,7 +69,7 @@ SUBSET_MB_CX = {
 #
 # DPM (dorsal paired medial, one per hemisphere) is annotated 'dopamine' by the male CNS v1.0 consensus
 # transmitter, which the Shiu sign rule maps to +1, making its 32,795 synapses onto 3,989 of the 4,064 Kenyon
-# cells excitatory. Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868 show that DPM cell bodies stain
+# cells excitatory. Haynes PR, Christmann BL, Griffith LC (2015) eLife 4:e03868 show that DPM cell bodies stain
 # for Gad1, that DPM contains GABA and 5-HT, and that activating DPM drives a large chloride increase in
 # mushroom-body neurons with no detectable calcium or cAMP increase, i.e. its action on Kenyon cells is
 # inhibitory. Lee P-T et al. (2011) PNAS 108:13794 independently report DPM as serotonergic. Neither
@@ -79,7 +79,7 @@ NT_CORRECTIONS = {
     "DPM": {"selector": {"cell_type": "DPM"},
             "annotated_nt": "dopamine", "annotated_sign": +1,
             "measured_nt": "gaba", "corrected_sign": -1,
-            "source": ("Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, "
+            "source": ("Haynes PR, Christmann BL, Griffith LC (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, "
                        "DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body "
                        "neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report "
                        "DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.")},
@@ -282,7 +282,7 @@ SLEEP_OBSERVABLES = {
                              "significantly with it."),
         "source": ("Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, "
                    "Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, "
-                   "DOI 10.1016/j.cub.2019.08.070, PMID 31630950. In vivo, with simultaneous patch clamp."),
+                   "DOI 10.1016/j.cub.2019.08.070, PMID 31630955. In vivo, with simultaneous patch clamp."),
         "version_caveat": ("These numbers were read in the bioRxiv PREPRINT full text, not the version of "
                            "record: the publisher returns HTTP 403 to every fetch route tried. The preprint "
                            "calls these cells R2 and the published paper renames them R5. The 0.5 to 1.5 Hz "

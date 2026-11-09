@@ -39,7 +39,7 @@
    {
     "name": "eta_ltd",
     "value": "0.0005 (calibrated)",
-    "source": "FREE: fit to Hige 2015 single-pairing endpoint (post/pre = 0.20)",
+    "source": "FREE: fit to Hige 2015 single-pairing EPSC endpoint (post/pre = 0.10)",
     "cited": false
    },
    {

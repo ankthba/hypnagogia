@@ -23,6 +23,28 @@ def fmt(x, n=3):
     return str(x)
 
 
+MEASURED_KC_HZ = 0.1   # Kenyon-cell spontaneous rate, Turner, Bazhenov & Laurent 2008 J Neurophysiol 99:734
+
+
+def kc_gap(s2):
+    """The Kenyon-cell rate gap between the two branches of the stage-2 sweep, read from its ignition curve:
+    (highest quiescent-branch mean, lowest ignited-branch mean), or None if either branch is missing."""
+    if not s2:
+        return None
+    rows = [r for r in s2.get("ignition_curve", []) if r.get("n_seeds", 0) >= 3]
+    q = [r["kc_rate_hz_quiescent_mean"] for r in rows if r.get("kc_rate_hz_quiescent_mean") is not None]
+    ig = [r["kc_rate_hz_ignited_mean"] for r in rows if r.get("kc_rate_hz_ignited_mean") is not None]
+    return (max(q), min(ig)) if q and ig else None
+
+
+def kc_gap_is_around_measurement(g):
+    return g is not None and g[0] < MEASURED_KC_HZ < g[1]
+
+
+def kc_gap_factor(g):
+    return f"a factor of {g[1] / g[0]:,.0f}" if g[0] > 0 else "an unbounded factor"
+
+
 def main():
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     conn = load_connectome("malecns", "v1.0", "brain")
@@ -163,6 +185,13 @@ def main():
             def rate(rs, pop):
                 v = [r["pop"][pop]["rate_hz"] for r in rs if pop in r["pop"]]
                 return sum(v) / len(v) if v else float("nan")
+            def span(rs, pop):
+                v = [r["pop"][pop]["rate_hz"] for r in rs if pop in r["pop"]]
+                return (min(v), max(v)) if v else (float("nan"), float("nan"))
+            # Both antennal-lobe scopes, every fit: the range is reported, not one arm's mean.
+            al_rows = byscope.get("al_local", []) + byscope.get("al_all", [])
+            alln_lo, alln_hi = span(al_rows, "ALLN")
+            kc_lo, kc_hi = span(al_rows, "KC")
             w()
         if s6dev:
             comps = {c.get("name"): c for c in (s6dev.get("comparisons") or [])}
@@ -202,9 +231,10 @@ def main():
               "where the constants were measured, at ORN synapses, it does nothing: the antennal lobe still "
               f"runs at {rate(byscope.get('orn_only', []), 'ALLN'):.1f} Hz, because offline there is no odour "
               "and those synapses carry almost no traffic. Extrapolated to the antennal-lobe loop it works as "
-              f"predicted and takes the mushroom body with it: the runaway falls to "
-              f"{rate(byscope.get('al_local', []), 'ALLN'):.1f} Hz and Kenyon-cell activity falls with it, from "
-              f"0.42 Hz to {rate(byscope.get('al_local', []), 'KC'):.3f} Hz. That is a finding about the model "
+              f"predicted and takes the mushroom body with it: across the {len(al_rows)} runs scoped to the "
+              f"antennal lobe, its local neurons fall to between {alln_lo:.1f} and {alln_hi:.1f} Hz and "
+              f"Kenyon-cell activity falls with them, from 0.42 Hz to between {kc_lo:.4f} and {kc_hi:.4f} Hz. "
+              "That is a finding about the model "
               "rather than a failed manipulation: the offline Kenyon-cell activity this project has measured "
               "for ten stages was the antennal-lobe runaway driving it, and with the runaway gone there is "
               "nothing left in the mushroom body to reactivate. No arm of Stage 13 produced an episode.")
@@ -230,10 +260,13 @@ def main():
         w()
         w("Two independent findings block it, and neither came from tuning anything:")
         w()
+        g = kc_gap(s2)
         w("1. *There is no critical regime, because the network is bistable.* Sweeping the background noise never "
           "produces a sustained intermediate activity level. Seeds at the same noise amplitude either stay silent or "
-          "ignite into a saturated state. The Kenyon-cell firing rate measured in a real fly, about 0.1 Hz, falls "
-          "inside a gap of more than four orders of magnitude that the model cannot occupy.")
+          "ignite into a saturated state."
+          + (f" The Kenyon-cell firing rate measured in a real fly, about {MEASURED_KC_HZ} Hz, falls inside a gap "
+             f"between {g[0]:.5f} and {g[1]:.3f} Hz, {kc_gap_factor(g)}, that the model cannot occupy."
+             if kc_gap_is_around_measurement(g) else ""))
         w("2. *There is no sparse odour code to encode a memory in.* Every olfactory stimulus tested, down to a "
           "single receptor neuron driven at 50 Hz, ignites the whole network, and the activity never decays: the "
           "population rate after the odour is as high as during it, indefinitely. More than half of all Kenyon "
@@ -390,12 +423,21 @@ def main():
                     w(f"| {r['sigma_mV']} mV | {r['n_seeds']} | {r['ignition_probability']:.0%} | "
                       f"{'-' if q is None else f'{q:.5f} Hz'} | {'-' if ig is None else f'{ig:.1f} Hz'} |")
             w()
+            g = kc_gap(s2)
+            if g is None:
+                gap_text = "The sweep has no quiescent and ignited branches to compare."
+            else:
+                gap_text = (f"In this model the quiescent branch puts Kenyon cells at or below {g[0]:.5f} Hz and the "
+                            f"ignited branch puts them at or above {g[1]:.3f} Hz. ")
+                if kc_gap_is_around_measurement(g):
+                    gap_text += (f"**{MEASURED_KC_HZ} Hz falls inside that gap, {kc_gap_factor(g)} wide, which the "
+                                 "model cannot produce at any noise amplitude.** There is no setting of the background "
+                                 "drive at which the mushroom body idles the way a real one does.")
+                else:
+                    gap_text += f"The measured {MEASURED_KC_HZ} Hz does not fall between the two branches."
             w("**The consequence matters more than the criticality question.** The measured spontaneous firing rate of "
               "Kenyon cells in a real fly is about 0.1 Hz (Turner, Bazhenov & Laurent 2008, *J Neurophysiol* 99:734). "
-              "In this model the quiescent branch puts Kenyon cells near 0.0005 Hz and the ignited branch puts them "
-              "above 20 Hz. **0.1 Hz falls inside a gap of more than four orders of magnitude that the model cannot "
-              "produce at any noise amplitude.** There is no setting of the background drive at which the mushroom "
-              "body idles the way a real one does.")
+              + gap_text)
             w()
         w(f"Operating point chosen for the downstream stages: **sigma = {s2['operating_sigma_mV']} mV**. "
           f"{s2['operating_sigma_reason']}")

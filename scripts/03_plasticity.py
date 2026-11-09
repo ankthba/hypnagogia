@@ -210,7 +210,7 @@ def main():
                         {"name": "no postsynaptic factor", "value": "MBON spiking not required", "source": "Hige et al. 2015 'Plasticity is Independent of Postsynaptic Spiking'", "cited": True},
                         {"name": "tau_e", "value": f"{pl['tau_e_s']} s", "source": "Jiang & Litwin-Kumar 2021 PLoS Comput Biol code (tau = 5); Handler 2019 window suggests 1-2 s", "cited": True},
                         {"name": "tau_da", "value": f"{pl['tau_da_s']} s", "source": "Jiang & Litwin-Kumar 2021 code", "cited": True},
-                        {"name": "eta_ltd", "value": (f"{chosen['eta']} (calibrated)" if chosen else "not found"), "source": "FREE: fit to Hige 2015 single-pairing endpoint (post/pre = 0.20)", "cited": False},
+                        {"name": "eta_ltd", "value": (f"{chosen['eta']} (calibrated)" if chosen else "not found"), "source": (f"FREE: fit to Hige 2015 single-pairing EPSC endpoint (post/pre = {tgt_e:.2f})" if endpoint == "epsc" else f"FREE: fit to Hige 2015 single-pairing spike endpoint (post/pre = {cal['target_post_over_pre']:.2f})"), "cited": False},
                         {"name": "eta_ltp", "value": str(pl["eta_ltp"]), "source": "Hige 2015: no backward-pairing potentiation in gamma1pedc (Handler 2019 finds it in gamma2/4/5)", "cited": True},
                         {"name": "w bounds", "value": f"[{pl['w_min_frac']}, {pl['w_max_frac']}] x w0, init at w0", "source": "Jiang & Litwin-Kumar 2021; Eschbach 2020 (init at w_max)", "cited": True},
                         {"name": "dan_mbon_min_synapses", "value": str(pl["dan_mbon_min_synapses"]), "source": "uncited pipeline choice (compartment gating threshold)", "cited": False},

@@ -36,11 +36,11 @@ the published model on purpose, because its question is whether the runaway belo
 
 1. **APL does not spike.** It releases transmitter in proportion to membrane depolarisation (Amin et al. 2020,
    *eLife* 9:e56954). Modelling it with a threshold replaces the mushroom body's one graded gain control with a
-   switch. Correcting it, at the published parameters, takes odour coding from 67.7% of Kenyon cells at 40.1 Hz
-   to 4.5% at 0.79 Hz, and the offline rate from 32.3 Hz to 0.134 Hz, against 6 +/- 5% and 0.1 Hz measured.
+   switch. Correcting it, at the published parameters, takes odour coding from 52.6% of Kenyon cells at 23.0 Hz
+   to 4.5% at 0.79 Hz, and the offline rate from 18.1 Hz to 0.134 Hz, against 6 +/- 5% and 0.1 Hz measured.
    Set `graded_release.populations: []` in `configs/base.yaml` to run without it.
 2. **DPM is inhibitory, not dopaminergic.** The connectome predicts dopamine, which the sign rule makes
-   excitatory onto 3,989 of the 4,064 Kenyon cells. Haynes, Christmann & Waddell 2015 (*eLife* 4:e03868) show
+   excitatory onto 3,989 of the 4,064 Kenyon cells. Haynes, Christmann & Griffith 2015 (*eLife* 4:e03868) show
    DPM is Gad1-positive and that activating it drives chloride influx in mushroom-body neurons; Lee et al. 2011
    (*PNAS* 108:13794) report it as serotonergic. Set `nt_corrections.populations: []` to run without it.
 

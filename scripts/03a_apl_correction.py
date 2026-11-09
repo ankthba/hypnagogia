@@ -2,7 +2,7 @@
 
 APL is the mushroom body's feedback inhibitory neuron: it collects input from Kenyon cells and inhibits them
 back, which is what keeps the odour code sparse. In the fly it does NOT fire action potentials, it releases
-transmitter continuously in proportion to its membrane potential (Amin, Aso, Lin et al. 2020, eLife 9:e56954).
+transmitter continuously in proportion to its membrane potential (Amin et al. 2020, eLife 9:e56954).
 The published model treats every neuron as spiking, so APL becomes a threshold device.
 
 That substitution is not neutral. This script measures, in this connectome, how far off it is, and what the

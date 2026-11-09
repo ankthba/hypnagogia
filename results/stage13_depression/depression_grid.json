@@ -785,6 +785,6 @@
   "period_is_derived": "The paper prints the frequency band, not a period and not an episode duration. 0.67 to 2.0 s is 1/f of the printed band and is arithmetic, not a measurement.",
   "up_down_amplitude_mV": "about 26 +/- 7",
   "sleep_dependence": "Frequency is unchanged by sleep deprivation; up and down state POWER increases significantly with it.",
-  "source": "Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, DOI 10.1016/j.cub.2019.08.070, PMID 31630950. In vivo, with simultaneous patch clamp."
+  "source": "Raccuglia D, Huang S, Ender A, Heim MM, Laber D, Suarez-Grimalt R, Liotta A, Sigrist SJ, Geiger JRP, Owald D (2019) Current Biology 29:3611-3621.e3, DOI 10.1016/j.cub.2019.08.070, PMID 31630955. In vivo, with simultaneous patch clamp."
  }
 }

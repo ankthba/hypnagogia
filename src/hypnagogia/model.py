@@ -143,7 +143,7 @@ class Simulation:
         if use_graded:
             # Graded (non-spiking) release. APL, the mushroom body's feedback inhibitory neuron, does not fire
             # action potentials; it releases transmitter continuously in proportion to its membrane potential
-            # (Amin, Aso et al. 2020 eLife 9:e56954). Modelling it as a spiking neuron replaces a continuously
+            # (Amin et al. 2020 eLife 9:e56954). Modelling it as a spiking neuron replaces a continuously
             # graded gain control with a saturated binary relay, because one Kenyon-cell spike already exceeds
             # its threshold and its output is then capped by the refractory period.
             eqs.append("g_graded : volt")

@@ -4,7 +4,7 @@
  "gain": 1.0,
  "gain_note": "published parameters",
  "question": "What does the connectome's predicted transmitter for DPM do to the mushroom body?",
- "correction": "Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.",
+ "correction": "Haynes PR, Christmann BL, Griffith LC (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.",
  "why_it_matters": {
   "threshold_gap_mV": 7.0,
   "n_DPM_neurons": 2,
@@ -18,7 +18,7 @@
   "DPM_spike_as_fraction_of_KC_threshold_gap": 0.1876525131611933,
   "annotated_nt": "dopamine",
   "measured_nt": "gaba",
-  "source": "Haynes PR, Christmann BL, Waddell S (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.",
+  "source": "Haynes PR, Christmann BL, Griffith LC (2015) eLife 4:e03868: DPM cell bodies are Gad1-positive, DPM contains GABA and 5-HT, and DPM activation evokes a large chloride increase in mushroom-body neurons with no detectable calcium or cAMP increase; Lee P-T et al. (2011) PNAS 108:13794 report DPM as serotonergic. The connectome's consensus transmitter for DPM is 'dopamine'.",
   "APL_graded_drive_onto_DPM_mV": -289.59218749999997,
   "note": "With the predicted transmitter the Kenyon-cell population drives DPM and DPM drives the whole Kenyon-cell population back, so the mushroom body carries a second brain-wide POSITIVE feedback loop on top of the recurrent Kenyon-cell wiring, in parallel with the one negative loop (APL) that is supposed to keep the code sparse. With the measured transmitter it is a second negative loop, which is what the chloride measurement shows.",
   "APL_graded_drive_onto_DPM_as_threshold_gaps": -41.3703125,

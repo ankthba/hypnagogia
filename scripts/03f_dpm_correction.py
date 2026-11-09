@@ -6,7 +6,7 @@ them. The male CNS v1.0 consensus transmitter calls it dopaminergic, and the mod
 maps dopamine to +1, so in the published model that whole return path is excitatory: Kenyon cells excite DPM,
 DPM excites every Kenyon cell back.
 
-The measurement says the opposite. Haynes, Christmann & Waddell (2015) eLife 4:e03868 show DPM cell bodies
+The measurement says the opposite. Haynes, Christmann & Griffith (2015) eLife 4:e03868 show DPM cell bodies
 stain for Gad1, that DPM contains GABA and 5-HT, and that activating DPM drives a large chloride increase in
 mushroom-body neurons with no detectable calcium or cAMP increase. Lee et al. (2011) PNAS 108:13794 report DPM
 as serotonergic. Neither transmitter is dopamine and the postsynaptic effect is inhibition.

@@ -79,7 +79,7 @@ export default function Methods() {
           <li>
             <em>DPM is inhibitory, not dopaminergic.</em> The connectome's predicted transmitter for DPM is dopamine,
             which the model's sign rule makes excitatory, so its 32,795 synapses onto 3,989 of the 4,064 Kenyon cells
-            excite them. Haynes, Christmann and Waddell 2015 (eLife 4:e03868) show DPM cell bodies are Gad1-positive,
+            excite them. Haynes, Christmann and Griffith 2015 (eLife 4:e03868) show DPM cell bodies are Gad1-positive,
             that DPM contains GABA and 5-HT, and that activating it drives a large chloride increase in mushroom-body
             neurons with no detectable calcium or cAMP increase; Lee et al. 2011 (PNAS 108:13794) report it as
             serotonergic. The sign rule is untouched: the measured transmitter is put in place of the predicted one and
