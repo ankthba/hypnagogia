@@ -200,7 +200,7 @@ def main():
          "and not by the injection: at the same sigma the temporal pattern is identical with the injection "
          "and without it, and all the injection changes is how loudly the ensemble fires once the network has "
          "ignited. This model has one transition available to it, silent to active, and it is one-way. There "
-         "is no state variable slower than the 5 ms synaptic time constant, so nothing can terminate an up "
+         "is no state variable slower than the 20 ms membrane time constant, so nothing can terminate an up "
          "state. The finding is therefore about the model class and not about the memory: it cannot represent "
          "an episode even when the mechanism for one is handed to it directly, which means no negative replay "
          "result from it can be read as evidence that the fly does not replay."))

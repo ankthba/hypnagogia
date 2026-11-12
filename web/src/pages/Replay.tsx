@@ -699,7 +699,7 @@ function Stage6View({ d }: { d: Stage6 }) {
               the connectome weights give the same timing: one transition, about 34 s of the 60 s recording. The
               injection changes how loudly the ensemble fires by a factor of twenty and does not change when it
               fires. The transition is the network's own bistable ignition, not the injected memory. Nothing in
-              the published model is slower than the 5 ms synaptic time constant, so nothing can end an up state.
+              the published model is slower than the 20 ms membrane time constant, so nothing can end an up state.
             </p>
             <p className="mt-2 smaller">{d.detector_control.IS_NOT_A_RESULT}</p>
           </Callout>

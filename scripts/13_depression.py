@@ -1,7 +1,7 @@
 """Stage 13 - THE DREAM ATTEMPT: measured short-term depression, and whether the brain then has episodes.
 
 Stage 11 established that the published model cannot represent an episode: with nothing slower than the
-5 ms synaptic time constant, an active state has nothing that can end it, and over 18 runs at four noise
+20 ms membrane time constant, an active state has nothing that can end it, and over 18 runs at four noise
 levels and injected recurrence up to 300x the network was silent, permanently on, or ignited exactly once.
 Stage 12 confirmed the diagnosis from the other side: give every neuron an adaptation term and episodes
 appear, at 1 of 12 scanned settings for the brain and 4 of 12 for the trained ensemble. But both of stage

@@ -161,7 +161,7 @@ def main():
               f"continuously, or it switched on once and never switched off, and which of those happened was set "
               f"by the noise rather than by the injection. So the detector could not be calibrated, because the "
               f"model never produced the positive data to calibrate it on. Nothing in the published model is "
-              f"slower than the 5 ms synaptic time constant, so nothing can terminate an up state. Every failure "
+              f"slower than the 20 ms membrane time constant, so nothing can terminate an up state. Every failure "
               f"below is therefore a property of this model class, which cannot represent an episode even when the "
               f"mechanism for one is supplied directly, and is not evidence that the fly does not replay.")
         # What was done about it. Both are labelled deviations and both sentences say so, because a reader
@@ -662,7 +662,21 @@ def main():
               f"gated by {obj['n_dan']} dopaminergic neurons through {obj['n_dan_mbon_gates']:,} connections.")
             cal = obj.get("calibration", {})
             if cal.get("readout_is_graded") is False:
-                w(f"- **The readout is all-or-none, not graded.** {cal.get('graded_note', '')}")
+                if cal.get("readout_spikes_before_pairing", True):
+                    w(f"- **The readout is all-or-none, not graded.** {cal.get('graded_note', '')}")
+                else:
+                    # The stored all-or-none note was written for a readout that spikes. With the corrected APL
+                    # the readout never spikes before pairing, so there is no spike response to grade; report
+                    # the EPSC endpoint the fit actually used.
+                    grid = [g for g in cal.get("grid", []) if g.get("epsc_ratio_odor_mean") is not None]
+                    line = ("- **Whether the spike response is graded cannot be assessed.** The readout does not "
+                            "spike before pairing, so there is no spike response to grade.")
+                    if grid and cal.get("target_epsc_ratio") is not None:
+                        g0 = min(grid, key=lambda g: g["eta"])
+                        line += (f" On the EPSC endpoint the smallest learning rate in the grid ({g0['eta']}) "
+                                 f"already leaves {g0['epsc_ratio_odor_mean']:.3f} of the odour-evoked response, "
+                                 f"against a target of {cal['target_epsc_ratio']}.")
+                    w(line)
             if cal.get("chosen_rule"):
                 w(f"- Learning rate chosen: {cal.get('chosen_eta_ltd')} - {cal['chosen_rule']}")
             w(f"- Unit test on an isolated three-neuron circuit: {'passed' if obj['unit_test']['passed'] else 'FAILED'}. "
@@ -673,7 +687,15 @@ def main():
             w("| parameter | value | source | cited |")
             w("|---|---|---|---|")
             for p in obj["rule"]["parameters"]:
-                w(f"| {p['name']} | {p['value']} | {p['source']} | {'yes' if p['cited'] else '**no**'} |")
+                src = p["source"]
+                # The stage 3 output stores the offline operating point as it stood when stage 3 last ran. The
+                # calibration runs at conditioning_sigma_mV, so only that description can go stale: restate it
+                # from the current stage 2 result instead of repeating the stored text.
+                marker = "; the offline background is "
+                if marker in src and s2 and s2.get("operating_sigma_mV") is not None:
+                    src = (f"{src.split(marker)[0]}{marker}{s2['operating_sigma_mV']} mV, "
+                           f"the stage 2 operating point")
+                w(f"| {p['name']} | {p['value']} | {src} | {'yes' if p['cited'] else '**no**'} |")
             w()
         if name == "Stage 4" and obj.get("effect"):
             e = obj["effect"]
